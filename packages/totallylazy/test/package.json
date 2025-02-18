@@ -1,0 +1,9 @@
+{
+  "name": "@bodar/totallylazy-test",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@bodar/totallylazy": "workspace:totallylazy",
+    "bun-types": "1.2.2"
+  }
+}

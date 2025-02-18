@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DenoSettings">
+    <option name="denoInit" value="{&#10;  &quot;enable&quot;: true,&#10;  &quot;lint&quot;: true,&#10;  &quot;unstable&quot;: true,&#10;  &quot;importMap&quot;: &quot;import_map.json&quot;,&#10;  &quot;config&quot;: &quot;deno.jsonc&quot;&#10;}" />
+    <option name="denoPath" value="$USER_HOME$/.asdf/shims/deno" />
+    <option name="enableFormatting" value="false" />
+    <option name="useDenoValue" value="DISABLE" />
+  </component>
+</project>

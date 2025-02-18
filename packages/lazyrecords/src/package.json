@@ -1,0 +1,8 @@
+{
+  "name": "@bodar/lazyrecords",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@bodar/totallylazy": "workspace:totallylazy"
+  }
+}

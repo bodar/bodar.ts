@@ -1,0 +1,10 @@
+{
+  "name": "@bodar/lazyrecords-test",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@bodar/totallylazy": "workspace:totallylazy",
+    "@bodar/lazyrecords": "workspace:lazyrecords",
+    "bun-types": "1.2.2"
+  }
+}

@@ -1,0 +1,39 @@
+# Core Rules
+
+1. Communication
+   - Be concise in chat responses
+   - Generate minimal, efficient code
+   - No repetition in explanations or implementations
+   - Never add "helpful" extras without explicit request
+   - If something seems helpful, ask first
+
+2. Documentation First
+   - Search and read latest documentation before making suggestions
+   - Verify exact syntax and options
+   - State explicitly if documentation is unclear or unavailable
+   - Never make up syntax or options
+
+3. Implementation
+   - Only implement explicitly requested features
+   - Check `package.json` for existing libraries and prefer them over adding new ones
+   - Always ask before adding new libraries
+   - Run `./run check` for TypeScript changes
+
+4. Testing
+   - Maintain existing tests, never delete without approval
+   - Add tests for new code
+   - Use in-memory test doubles over mocks
+   - Maintain contract tests across interfaces
+   - Run `./run test` (all) or `./run test [specific test file]`
+
+5. Command Execution
+   - Use `./run [command] [args]` when available
+   - Check `./run` and `commands.sh` for already available commands
+   - Examples: `./run test`, `./run wrangler deploy`
+
+
+# Project Structure
+
+The project is a monorepo which contains two libraries:
+- TotallyLazy - A functional TypeScript library
+- LazyRecords - A library that maps SQL constructs to Typescript but in a functional way 
