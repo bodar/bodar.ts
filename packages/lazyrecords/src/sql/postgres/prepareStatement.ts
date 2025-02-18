@@ -1,6 +1,4 @@
 import {Sql} from "../template/Sql.ts";
-import {sql} from "../template/Sql.ts";
-import {text} from "../template/Text.ts";
 import {statement} from "./statement.ts";
 
 async function hashSHA256(value: string): Promise<string> {

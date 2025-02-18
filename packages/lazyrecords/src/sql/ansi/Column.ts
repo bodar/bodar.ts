@@ -1,7 +1,6 @@
 import {Qualified} from "./Qualified.ts";
 import {Aliasable} from "./Aliasable.ts";
-import {type SQL} from "@bodar/lazyrecords/sql/template/Sql.ts";
-import {id} from "@bodar/lazyrecords/sql/template/Identifier.ts";
+import {id, Identifier} from "../template/Identifier.ts";
 import {Aliased} from "./Aliased.ts";
 import {text} from "../template/Text.ts";
 
