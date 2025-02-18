@@ -1,7 +1,7 @@
-# bodar.deno
-[![bodar](https://circleci.com/gh/bodar/bodar.deno.svg?style=shield)](https://app.circleci.com/pipelines/github/bodar/bodar.deno)
-[![codecov](https://codecov.io/gh/bodar/bodar.deno/graph/badge.svg?token=USVRV8KZ4R)](https://codecov.io/gh/bodar/bodar.deno)
-[![deno land](http://img.shields.io/badge/available%20on-deno.land/x-lightgrey.svg?logo=deno&labelColor=black)](https://deno.land/x/bodar)
+# bodar.ts
+[![bodar](https://circleci.com/gh/bodar/bodar.ts.svg?style=shield)](https://app.circleci.com/pipelines/github/bodar/bodar.ts)
+[![codecov](https://codecov.io/gh/bodar/bodar.ts/graph/badge.svg?token=USVRV8KZ4R)](https://codecov.io/gh/bodar/bodar.ts)
+
 
 Top level tasks
 * [x] Basic structure
@@ -10,7 +10,7 @@ Top level tasks
   * [x] lint
   * [x] typecheck
   * [x] CI target
-    * [x] Publish to deno.loand/x
+    * [] Publish to JSR
     * [x] TSDoc/JSDoc
     * [ ] Tests -> Docs
 
@@ -24,6 +24,6 @@ Top level tasks
   * [ ] ...
 * lazyrecord
   * [ ] Postgres
-  * [ ] 
+  * [ ] SQLite
 * yadic
 * utterlyidle / http4d
