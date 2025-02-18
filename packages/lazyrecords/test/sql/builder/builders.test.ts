@@ -1,17 +1,17 @@
 import {describe, it} from "bun:test";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {definition, toSelect} from "@bodar/lazyrecords/sql/builder/builders";
-import {sql} from "@bodar/lazyrecords/sql/template/Sql";
-import {accept, filter, reject} from "@bodar/totallylazy/transducers/FilterTransducer";
-import {where} from "@bodar/totallylazy/predicates/WherePredicate";
-import {property} from "@bodar/totallylazy/functions/Property";
-import {map} from "@bodar/totallylazy/transducers/MapTransducer";
-import {select} from "@bodar/totallylazy/functions/Select";
-import {and} from "@bodar/totallylazy/predicates/AndPredicate";
-import {or} from "@bodar/totallylazy/predicates/OrPredicate";
-import {not} from "@bodar/totallylazy/predicates/NotPredicate";
-import {between} from "@bodar/totallylazy/predicates/BetweenPredicate";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {definition, toSelect} from "@bodar/lazyrecords/sql/builder/builders.ts";
+import {sql} from "@bodar/lazyrecords/sql/template/Sql.ts";
+import {accept, filter, reject} from "@bodar/totallylazy/transducers/FilterTransducer.ts";
+import {where} from "@bodar/totallylazy/predicates/WherePredicate.ts";
+import {property} from "@bodar/totallylazy/functions/Property.ts";
+import {map} from "@bodar/totallylazy/transducers/MapTransducer.ts";
+import {select} from "@bodar/totallylazy/functions/Select.ts";
+import {and} from "@bodar/totallylazy/predicates/AndPredicate.ts";
+import {or} from "@bodar/totallylazy/predicates/OrPredicate.ts";
+import {not} from "@bodar/totallylazy/predicates/NotPredicate.ts";
+import {between} from "@bodar/totallylazy/predicates/BetweenPredicate.ts";
 
 
 interface Country {

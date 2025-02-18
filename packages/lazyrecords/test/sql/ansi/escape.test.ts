@@ -1,7 +1,7 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {escapeIdentifier, escapeLiteral} from "@bodar/lazyrecords/sql/ansi/escape";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {escapeIdentifier, escapeLiteral} from "@bodar/lazyrecords/sql/ansi/escape.ts";
 
 describe('escapeIdentifier', () => {
     it('wraps in double quotes and escapes existing quotes', () => {

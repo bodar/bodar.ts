@@ -1,8 +1,8 @@
 import type {SQL} from "bun";
-import type {Transducer} from "@bodar/totallylazy/transducers/Transducer";
-import {type Definition, toSelect, type Supported} from "../builder/builders";
-import {statement} from "./statement";
-import {sql} from "../template/Sql";
+import type {Transducer} from "@bodar/totallylazy/transducers/Transducer.ts";
+import {type Definition, toSelect, type Supported} from "../builder/builders.ts";
+import {statement} from "./statement.ts";
+import {sql} from "../template/Sql.ts";
 
 /**
  * PostgresRecords is a class that provides methods for interacting with a PostgreSQL database using Bun's SQL client.

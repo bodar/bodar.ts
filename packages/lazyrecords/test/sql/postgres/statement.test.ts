@@ -1,10 +1,10 @@
 import {describe, it} from "bun:test";
-import {statement} from "@bodar/lazyrecords/sql/postgres/statement";
-import {id} from "@bodar/lazyrecords/sql/template/Identifier";
-import {SQL} from "@bodar/lazyrecords/sql/template/Sql";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {ids, values} from "@bodar/lazyrecords/sql/template/Compound";
+import {statement} from "@bodar/lazyrecords/sql/postgres/statement.ts";
+import {id} from "@bodar/lazyrecords/sql/template/Identifier.ts";
+import {SQL} from "@bodar/lazyrecords/sql/template/Sql.ts";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {ids, values} from "@bodar/lazyrecords/sql/template/Compound.ts";
 
 describe('statement', () => {
     it('supports correctly escaping identifiers', () => {

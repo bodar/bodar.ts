@@ -1,24 +1,24 @@
-import {select, SelectExpression, type SelectList} from "../ansi/SelectExpression";
-import {from, FromClause} from "../ansi/FromClause";
-import {table} from "../ansi/Table";
-import {SetQuantifier} from "../ansi/SetQuantifier";
-import type {Mapper} from "@bodar/totallylazy/functions/Mapper";
-import {type Predicand, PredicatePair, WhereClause} from "../ansi/WhereClause";
-import {Transducer} from "@bodar/totallylazy/transducers/Transducer";
-import {type FilterTransducer, isFilterTransducer} from "@bodar/totallylazy/transducers/FilterTransducer";
-import {isMapTransducer, type MapTransducer} from "@bodar/totallylazy/transducers/MapTransducer";
-import {isSelect} from "@bodar/totallylazy/functions/Select";
-import {Column, column, star} from "../ansi/Column";
-import {isWherePredicate} from "@bodar/totallylazy/predicates/WherePredicate";
-import {isProperty, type Property} from "@bodar/totallylazy/functions/Property";
-import {isIsPredicate} from "@bodar/totallylazy/predicates/IsPredicate";
-import {is} from "../ansi/IsExpression";
-import type {Predicate} from "@bodar/totallylazy/predicates/Predicate";
-import {isAndPredicate} from "@bodar/totallylazy/predicates/AndPredicate";
-import {and, between, Compound, not, or} from "../template/Compound";
-import {isOrPredicate} from "@bodar/totallylazy/predicates/OrPredicate";
-import {isNotPredicate} from "@bodar/totallylazy/predicates/NotPredicate";
-import {isBetweenPredicate} from "@bodar/totallylazy/predicates/BetweenPredicate";
+import {select, SelectExpression, type SelectList} from "../ansi/SelectExpression.ts";
+import {from, FromClause} from "../ansi/FromClause.ts";
+import {table} from "../ansi/Table.ts";
+import {SetQuantifier} from "../ansi/SetQuantifier.ts";
+import type {Mapper} from "@bodar/totallylazy/functions/Mapper.ts";
+import {type Predicand, PredicatePair, WhereClause} from "../ansi/WhereClause.ts";
+import {type Transducer} from "@bodar/totallylazy/transducers/Transducer.ts";
+import {type FilterTransducer, isFilterTransducer} from "@bodar/totallylazy/transducers/FilterTransducer.ts";
+import {isMapTransducer, type MapTransducer} from "@bodar/totallylazy/transducers/MapTransducer.ts";
+import {isSelect} from "@bodar/totallylazy/functions/Select.ts";
+import {Column, column, star} from "../ansi/Column.ts";
+import {isWherePredicate} from "@bodar/totallylazy/predicates/WherePredicate.ts";
+import {isProperty, type Property} from "@bodar/totallylazy/functions/Property.ts";
+import {isIsPredicate} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {is} from "../ansi/IsExpression.ts";
+import type {Predicate} from "@bodar/totallylazy/predicates/Predicate.ts";
+import {isAndPredicate} from "@bodar/totallylazy/predicates/AndPredicate.ts";
+import {and, between, Compound, not, or} from "../template/Compound.ts";
+import {isOrPredicate} from "@bodar/totallylazy/predicates/OrPredicate.ts";
+import {isNotPredicate} from "@bodar/totallylazy/predicates/NotPredicate.ts";
+import {isBetweenPredicate} from "@bodar/totallylazy/predicates/BetweenPredicate.ts";
 
 // @ts-ignore
 export interface Definition<A> {

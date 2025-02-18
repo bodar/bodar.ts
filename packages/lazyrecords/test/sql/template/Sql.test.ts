@@ -1,10 +1,10 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {sql, SQL} from "@bodar/lazyrecords/sql/template/Sql";
-import {text} from "@bodar/lazyrecords/sql/template/Text";
-import {value} from "@bodar/lazyrecords/sql/template/Value";
-import {spread} from "@bodar/lazyrecords/sql/template/Compound";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {sql, SQL} from "@bodar/lazyrecords/sql/template/Sql.ts";
+import {text} from "@bodar/lazyrecords/sql/template/Text.ts";
+import {value} from "@bodar/lazyrecords/sql/template/Value.ts";
+import {spread} from "@bodar/lazyrecords/sql/template/Compound.ts";
 
 describe('SQL', () => {
     it('text', () => {

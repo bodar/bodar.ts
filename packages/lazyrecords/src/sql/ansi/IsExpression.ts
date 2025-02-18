@@ -1,4 +1,5 @@
-import {text} from "../template/Text.ts";
+import {type SQL} from "@bodar/lazyrecords/sql/template/Sql.ts";
+import {text} from "@bodar/lazyrecords/sql/template/Text.ts";
 import {Value} from "../template/Value.ts";
 import {PredicateExpression} from "./PredicateExpression.ts";
 import {Expression} from "../template/Expression.ts";

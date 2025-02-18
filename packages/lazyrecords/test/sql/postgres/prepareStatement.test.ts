@@ -1,9 +1,9 @@
 import {describe, it} from "bun:test";
-import {prepareStatement} from "@bodar/lazyrecords/sql/postgres/prepareStatement";
-import {SQL} from "@bodar/lazyrecords/sql/template/Sql";
-import {id} from "@bodar/lazyrecords/sql/template/Identifier";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
+import {prepareStatement} from "@bodar/lazyrecords/sql/postgres/prepareStatement.ts";
+import {SQL} from "@bodar/lazyrecords/sql/template/Sql.ts";
+import {id} from "@bodar/lazyrecords/sql/template/Identifier.ts";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 
 describe('prepareStatement', () => {
     it('can automatically generate a name from the SQL ("An operator name is a sequence of up to NAMEDATALEN-1 (63 by default)")', async () => {

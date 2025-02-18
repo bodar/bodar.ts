@@ -1,8 +1,8 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {Compound} from "@bodar/lazyrecords/sql/template/Compound";
-import {text} from "@bodar/lazyrecords/sql/template/Text";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {Compound} from "@bodar/lazyrecords/sql/template/Compound.ts";
+import {text} from "@bodar/lazyrecords/sql/template/Text.ts";
 
 describe('Compound', () => {
     const a = text('a');
