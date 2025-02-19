@@ -9,6 +9,7 @@
 
 2. Documentation First
    - Search and read latest documentation before making suggestions
+   - If you can't find documentation look for the source code and read that
    - Verify exact syntax and options
    - State explicitly if documentation is unclear or unavailable
    - Never make up syntax or options
@@ -37,3 +38,6 @@
 The project is a monorepo which contains two libraries:
 - TotallyLazy - A functional TypeScript library
 - LazyRecords - A library that maps SQL constructs to Typescript but in a functional way 
+
+
+On the first start of every chat, tell me the number of Core Rules that have been read
