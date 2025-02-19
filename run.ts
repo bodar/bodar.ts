@@ -8,7 +8,7 @@ export async function version() {
   const buildNumber = process.env.CIRCLE_BUILD_NUM || new Date().toISOString().replace(/[-:T]/g, '').split('.')[0];
   const revisions = (await $`git rev-list --count ${branch}`.quiet()).text().trim();
   const version = `0.${revisions}.${buildNumber}`;
-  
+
   console.log(`version: ${version}`);
   return version;
 }
@@ -61,6 +61,11 @@ const args = process.argv.slice(3);
 try {
   await eval(command)(...args);
 } catch (e) {
-  console.error('Command failed:', command, ...args);
-  process.exit(1);
+  if (e instanceof ReferenceError) {
+    const { exitCode } = await $`${command} ${args}`.nothrow();
+    process.exit(exitCode);
+  } else {
+    console.error('Command failed:', command, ...args);
+    process.exit(1);
+  }
 }

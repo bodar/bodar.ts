@@ -13,6 +13,7 @@
    - Verify exact syntax and options
    - State explicitly if documentation is unclear or unavailable
    - Never make up syntax or options
+   - Always cite at least one source for each suggestion
 
 3. Implementation
    - Only implement explicitly requested features
