@@ -56,3 +56,9 @@ function bun() {
   bun "$@"
 }
 export -f bun
+
+# If this script is being executed (not sourced) and has an argument, run it with bun
+if [[ "${BASH_SOURCE[0]}" == "${0}" && -n "${1}" ]]; then
+    bun "$@"
+    exit $?
+fi
