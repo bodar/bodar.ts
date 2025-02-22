@@ -14,25 +14,22 @@ function curl() {
 export -f curl
 
 
-function asdf() {
-  unset -f asdf
-  if [[ ! -f "$HOME/.asdf/asdf.sh" ]]; then
-    echo "* Downloading and installing asdf..."
-    git clone -c advice.detachedHead=false https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.12.0 > /dev/null 2>&1
+function mise() {
+  unset -f mise
+  if [[ ! -f "$HOME/.local/bin/mise" ]]; then
+    echo "* Downloading and installing mise..."
+    curl https://mise.run | sh > /dev/null 2>&1
   fi
-  . "$HOME/.asdf/asdf.sh"
-  asdf "$@"
+  eval "$(mise env)"
+  mise "$@"
 }
-export -f asdf
+export -f mise
 
 
 function node() {
   unset -f node
-  if [[ ! $(asdf plugin list) =~ nodejs ]]; then
-    echo "* Downloading and installing node plugin..."
-    asdf plugin add nodejs > /dev/null 2>&1
-  fi
-  asdf install nodejs > /dev/null 2>&1
+  mise install node
+  eval "$(mise env)"
   node "$@"
 }
 export -f node
@@ -48,14 +45,11 @@ export -f npm
 
 function bun() {
   unset -f bun
-  if [[ ! $(asdf plugin list) =~ bun ]]; then
-    echo "* Downloading and installing bun plugin..."
-    asdf plugin add bun > /dev/null 2>&1
-  fi
-  asdf install bun > /dev/null 2>&1
+  mise install bun
+  eval "$(mise env)"
   bun "$@"
-}
-export -f bun
+ }
+ export -f bun
 
 # If this script is being executed (not sourced) and has an argument, run it with bun
 if [[ "${BASH_SOURCE[0]}" == "${0}" && -n "${1}" ]]; then

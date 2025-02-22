@@ -48,6 +48,10 @@ export async function build() {
   await test();
 }
 
+export async function publish() {
+  await $`bunx jsr publish --dry-run --allow-dirty`;
+}
+
 export async function ci() {
   await clean();
   await check();
