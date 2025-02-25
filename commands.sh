@@ -18,7 +18,7 @@ function mise() {
   unset -f mise
   if [[ ! -f "$HOME/.local/bin/mise" ]]; then
     echo "* Downloading and installing mise..."
-    curl https://mise.run | sh > /dev/null 2>&1
+    curl https://mise.run | sh
   fi
   eval "$(mise env)"
   mise "$@"

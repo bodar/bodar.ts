@@ -7,7 +7,7 @@ import {is} from "@bodar/totallylazy/predicates/IsPredicate";
 import {definition} from "@bodar/lazyrecords/sql/builder/builders";
 import {select} from "@bodar/totallylazy/functions/Select";
 import {map} from "@bodar/totallylazy/transducers/MapTransducer";
-import { SQL } from "bun";
+import {SQL} from "bun";
 
 
 describe("PostgresRecords", () => {

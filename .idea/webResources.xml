@@ -6,6 +6,8 @@
         <entryData>
           <resourceRoots>
             <path value="file://$PROJECT_DIR$/src" />
+            <path value="file://$PROJECT_DIR$/packages/totallylazy/src" />
+            <path value="file://$PROJECT_DIR$/packages/lazyrecords/src" />
           </resourceRoots>
         </entryData>
       </entry>

@@ -28,9 +28,9 @@ export const raw = text;
 /**
  * An empty text expression.
  */
-export const empty = new Text('');
+export const empty: Text = new Text('');
 
 /**
  * A space text expression.
  */
-export const space = new Text(' ');
+export const space: Text = new Text(' ');

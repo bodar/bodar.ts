@@ -33,7 +33,7 @@ export const accept = filter;
 /**
  * Alias for not filter  (inspired by ruby)
  */
-export function reject<A>(predicate: Predicate<A>) {
+export function reject<A>(predicate: Predicate<A>): FilterTransducer<A> {
     return filter(not(predicate));
 }
 

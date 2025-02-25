@@ -6,3 +6,9 @@ export type ReadonlyArrayContains<A, B> = readonly Extract<A | B, B>[];
 
 // export type Init<T extends any[]> = T extends [...infer INIT, any] ? INIT : never;
 // export type Last<T extends any[]> = T extends [...infer IGNORE, infer LAST] ? LAST : never;
+
+export async function toPromiseArray<T>(iterable: AsyncIterable<T>): Promise<T[]> {
+    const result: T[] = [];
+    for await (const value of iterable) result.push(value);
+    return result;
+}

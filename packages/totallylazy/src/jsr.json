@@ -1,6 +1,0 @@
-{
-  "name": "@bodar/totallylazy",
-  "version": "0.0.0",
-  "exports": "./**/*.ts",
-  "license": "Apache-2.0"
-}

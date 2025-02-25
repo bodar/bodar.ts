@@ -39,7 +39,7 @@ export function expression(...expressions: readonly Expression[]): Compound {
 /**
  * Create a Compound list from an array of Expressions.
  */
-export function list(expressions: readonly Expression[], separator = text(', ')): Compound {
+export function list(expressions: readonly Expression[], separator: Text = text(', ')): Compound {
     return new Compound(expressions, separator);
 }
 

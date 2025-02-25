@@ -4,5 +4,8 @@
   "type": "module",
   "dependencies": {
     "@bodar/totallylazy": "workspace:totallylazy"
+  },
+  "peerDependencies": {
+    "bun": "^1.2.2"
   }
 }
