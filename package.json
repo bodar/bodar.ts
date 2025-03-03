@@ -6,9 +6,7 @@
     "packages/**/test"
   ],
   "devDependencies": {
-    "typescript": "^5.7.3"
-  },
-  "peerDependencies": {
-    "bun": "1.2.2"
+    "typescript": "^5.7.3",
+    "@types/bun": "^1.2.3"
   }
 }
