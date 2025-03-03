@@ -74,15 +74,13 @@ export async function publish() {
         }, null, 2));
     }
 
-    await $`bunx jsr publish --allow-dirty`;
+    await $`bunx jsr publish --allow-dirty --token ${process.env.JSR_TOKEN}`;
     await $`rm -rf **/jsr.json`;
 }
 
 export async function ci() {
-    await clean();
-    await check();
-    await version();
     await build();
+    await publish();
 }
 
 const command = process.argv[2] || 'build';
