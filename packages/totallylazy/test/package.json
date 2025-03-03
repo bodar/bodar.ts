@@ -3,10 +3,9 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "@bodar/totallylazy": "workspace:totallylazy",
-    "bun-types": "1.2.3"
+    "@bodar/totallylazy": "workspace:totallylazy"
   },
-  "peerDependencies": {
-    "typescript": "^5.7.3"
+  "devDependencies": {
+    "bun-types": "1.2.3"
   }
 }

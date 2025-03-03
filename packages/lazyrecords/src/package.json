@@ -6,6 +6,6 @@
     "@bodar/totallylazy": "workspace:totallylazy"
   },
   "devDependencies": {
-    "bun-types": "1.2.2"
+    "bun-types": "1.2.3"
   }
 }
