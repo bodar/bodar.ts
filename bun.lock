@@ -3,10 +3,8 @@
   "workspaces": {
     "": {
       "name": "bodar",
-      "dependencies": {
+      "peerDependencies": {
         "bun": "1.2.2",
-      },
-      "devDependencies": {
         "typescript": "^5.7.3",
       },
     },
@@ -15,6 +13,10 @@
       "version": "0.0.0",
       "dependencies": {
         "@bodar/totallylazy": "workspace:totallylazy",
+        "bun-types": "1.2.2",
+      },
+      "peerDependencies": {
+        "bun": "^1.2.2",
       },
     },
     "packages/lazyrecords/test": {
@@ -36,6 +38,9 @@
       "dependencies": {
         "@bodar/totallylazy": "workspace:totallylazy",
         "bun-types": "1.2.2",
+      },
+      "peerDependencies": {
+        "typescript": "^5.7.3",
       },
     },
   },

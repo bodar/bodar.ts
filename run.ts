@@ -56,7 +56,6 @@ async function toPromiseArray<T>(iterable: AsyncIterable<T>): Promise<T[]> {
 }
 
 export async function publish() {
-    await $`rm -rf **/jsr.json`;
     const v = await version();
 
     for await (const f of new Glob("packages/**/src/package.json").scan(".")) {
@@ -76,6 +75,7 @@ export async function publish() {
     }
 
     await $`bunx jsr publish --allow-dirty`;
+    await $`rm -rf **/jsr.json`;
 }
 
 export async function ci() {

@@ -23,7 +23,7 @@ export class Transducer<A, B> {
     }
 }
 
-export function transducer<N extends string, T extends (iterable: Iterable<any>) => Iterable<any>, U extends object>(name: N, target: T, source: U): Transducer<any, any> {
+export function transducer<N extends string, T extends (iterable: Iterable<any>) => Iterable<any>, U extends object>(name: N, target: T, source: U): {[Transducer.type]: N} & T & U {
     return Object.assign(target, {
         [Transducer.type]: name,
         toString: () => {

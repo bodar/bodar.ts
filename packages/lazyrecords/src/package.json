@@ -5,6 +5,9 @@
   "dependencies": {
     "@bodar/totallylazy": "workspace:totallylazy"
   },
+  "devDependencies": {
+    "bun-types": "1.2.2"
+  },
   "peerDependencies": {
     "bun": "^1.2.2"
   }

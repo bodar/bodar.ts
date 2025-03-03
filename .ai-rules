@@ -36,9 +36,7 @@
 
 # Project Structure
 
-The project is a monorepo which contains two libraries:
-- TotallyLazy - A functional TypeScript library
-- LazyRecords - A library that maps SQL constructs to Typescript but in a functional way 
+The project is a monorepo which contains ...
 
 
-On the first start of every chat, tell me the number of Core Rules that have been read
+After every response check if you have violated any rules and tell me then correct if needed
