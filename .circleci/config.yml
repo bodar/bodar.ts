@@ -13,9 +13,3 @@ jobs:
       - run:
           name: build
           command: ./run ci
-      - store_artifacts:
-          path: artifacts
-      - store_test_results:
-          path: artifacts/test-results
-      - codecov/upload:
-          file: artifacts/coverage.lcov
