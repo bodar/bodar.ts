@@ -41,6 +41,20 @@
         "bun-types": "1.2.3",
       },
     },
+    "packages/yadic/src": {
+      "name": "@bodar/yadic",
+      "version": "0.0.0",
+    },
+    "packages/yadic/test": {
+      "name": "@bodar/yadic-test",
+      "version": "0.0.0",
+      "dependencies": {
+        "@bodar/yadic": "workspace:yadic",
+      },
+      "devDependencies": {
+        "bun-types": "1.2.3",
+      },
+    },
   },
   "packages": {
     "@bodar/lazyrecords": ["@bodar/lazyrecords@workspace:packages/lazyrecords/src"],
@@ -50,6 +64,10 @@
     "@bodar/totallylazy": ["@bodar/totallylazy@workspace:packages/totallylazy/src"],
 
     "@bodar/totallylazy-test": ["@bodar/totallylazy-test@workspace:packages/totallylazy/test"],
+
+    "@bodar/yadic": ["@bodar/yadic@workspace:packages/yadic/src"],
+
+    "@bodar/yadic-test": ["@bodar/yadic-test@workspace:packages/yadic/test"],
 
     "@types/bun": ["@types/bun@1.2.4", "", { "dependencies": { "bun-types": "1.2.4" } }, "sha512-QtuV5OMR8/rdKJs213iwXDpfVvnskPXY/S0ZiFbsTjQZycuqPbMW8Gf/XhLfwE5njW8sxI2WjISURXPlHypMFA=="],
 
