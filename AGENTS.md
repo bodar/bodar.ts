@@ -34,9 +34,5 @@
    - Examples: `./run test`, `./run wrangler deploy`
 
 
-# Project Structure
-
-The project is a monorepo which contains ...
-
 
 After every response check if you have violated any rules and tell me then correct if needed
