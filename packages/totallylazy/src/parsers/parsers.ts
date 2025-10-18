@@ -1,7 +1,7 @@
-import {parser} from "./Parser.ts";
 import type {Parser} from "./Parser.ts";
+import {parser} from "./Parser.ts";
 import {map} from "../transducers/MapTransducer.ts";
-import {pair, triple} from "./ListParser.ts";
+import {list, pair, triple} from "./ListParser.ts";
 import {string} from "./StringParser.ts";
 import {DebugParser} from "./DebugParser.ts";
 import {optional} from "./OptionalParser.ts";
@@ -70,4 +70,18 @@ export function whitespace<A>(instance: Parser<string, A>): Parser<string, A> {
 
 export function among(characters: string): Parser<string, string> {
     return matches(_among(characters));
+}
+
+/**
+ * Repeat a parser exactly N times.
+ * Similar to regex {n} quantifier.
+ *
+ * @example
+ * // Parse exactly 4 hex digits: /[0-9a-fA-F]{4}/
+ * parser(among('0123456789abcdefABCDEF'), times(4))
+ */
+export function times<A, B>(count: number): (parser: Parser<A, B>) => Parser<A, B[]> {
+    return (parser: Parser<A, B>) => {
+        return list<Parser<A, B>[]>(...Array(count).fill(parser));
+    };
 }

@@ -39,3 +39,16 @@ export function sequence(source: Iterable<any>, ...transducers: readonly Transdu
     return new Sequence<any>(source, flatten(transducers));
 }
 
+
+export function* iterate<T>(generator: (t: T) => T, value: T): Iterable<T> {
+    while (true) {
+        yield value;
+        value = generator(value);
+    }
+}
+
+export function* repeat<T>(generator: () => T): Iterable<T> {
+    while (true) {
+        yield generator();
+    }
+}
