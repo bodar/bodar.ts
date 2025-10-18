@@ -1,4 +1,4 @@
-#!/usr/bin/env ./commands.sh
+#!/usr/bin/env ./bootstrap.sh
 import { $, file, Glob, write } from "bun";
 import { dirname, join } from "path";
 
