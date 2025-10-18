@@ -73,7 +73,7 @@ export function whitespace<A>(instance: Parser<string, A>): Parser<string, A> {
 export const join = map((a:string[]) => a.join(''));
 
 export function among(characters: string): Parser<string, string> {
-    return parser(matches(charactersAmong(characters)), join);
+    return matches(charactersAmong(characters));
 }
 
 export function manyStr(): (a: Parser<string, string>) => Parser<string, string> {
