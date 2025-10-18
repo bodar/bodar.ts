@@ -6,10 +6,10 @@ import {string} from "./StringParser.ts";
 import {DebugParser} from "./DebugParser.ts";
 import {optional} from "./OptionalParser.ts";
 import {many} from "./ManyParser.ts";
-import {pattern} from "./PatternParser.ts";
 import {not} from "./NotParser.ts";
 import {matches} from "./PredicatesParser.ts";
-import {among as charactersAmong} from "../predicates/AmongPredicate.ts";
+import {among as _among} from "../predicates/AmongPredicate.ts";
+import {whitespace as _whitespace} from "../predicates/characters.ts";
 
 export function then<A, B, C>(second: Parser<A, C>): (first: Parser<A, B>) => Parser<A, [B, C]> {
     return first => pair(first, second);
@@ -64,18 +64,10 @@ export function debug<A, B>(name: string): (parser: Parser<A, B>) => Parser<A, B
     return parser => new DebugParser(parser, name);
 }
 
-const _whitespace: Parser<string, string> = pattern(/\s*/);
-
 export function whitespace<A>(instance: Parser<string, A>): Parser<string, A> {
-    return parser(instance, surroundedBy(_whitespace));
+    return parser(instance, surroundedBy(many(matches(_whitespace))));
 }
-
-export const join = map((a:string[]) => a.join(''));
 
 export function among(characters: string): Parser<string, string> {
-    return matches(charactersAmong(characters));
-}
-
-export function manyStr(): (a: Parser<string, string>) => Parser<string, string> {
-    return (a) => parser(a, many(), join);
+    return matches(_among(characters));
 }

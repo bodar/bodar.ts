@@ -5,7 +5,6 @@ import {
     among,
     between,
     literal,
-    manyStr,
     next,
     separatedBy,
     surroundedBy,
@@ -21,6 +20,7 @@ import {lazy} from "../functions/lazy.ts";
 import {optional} from "../parsers/OptionalParser.ts";
 import {C} from "./C.ts";
 import {Jsdoc, JsdocComment} from "./Jsdoc.ts";
+import {many} from "../parsers/ManyParser.ts";
 
 export class Json {
     static null: Parser<string, null> = literal(null);
@@ -35,7 +35,7 @@ export class Json {
 
     static characters: Parser<string, string> = pattern(/[^"\\]+/);
 
-    static string: Parser<string, string> = parser(this.characters, or(this.escaped), manyStr(), surroundedBy(string('"')));
+    static string: Parser<string, string> = parser(many(or(this.characters, this.escaped)), map((characters: string[]) => characters.join("")), surroundedBy(string('"')));
 
     static number: Parser<string, number> = parser(pattern(/[-+eE.\d]+/), map(Number));
 
