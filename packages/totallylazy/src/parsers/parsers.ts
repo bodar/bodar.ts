@@ -1,7 +1,7 @@
 import {parser} from "./Parser.ts";
 import type {Parser} from "./Parser.ts";
 import {map} from "../transducers/MapTransducer.ts";
-import {pair, triple} from "./TupleParser.ts";
+import {pair, triple} from "./ListParser.ts";
 import {string} from "./StringParser.ts";
 import {DebugParser} from "./DebugParser.ts";
 import {optional} from "./OptionalParser.ts";
@@ -9,7 +9,7 @@ import {many} from "./ManyParser.ts";
 import {pattern} from "./PatternParser.ts";
 import {not} from "./NotParser.ts";
 import {matches} from "./PredicatesParser.ts";
-import {among as charactersAmong} from "../predicates/characters.ts";
+import {among as charactersAmong} from "../predicates/AmongPredicate.ts";
 
 export function then<A, B, C>(second: Parser<A, C>): (first: Parser<A, B>) => Parser<A, [B, C]> {
     return first => pair(first, second);

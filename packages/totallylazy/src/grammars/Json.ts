@@ -16,7 +16,7 @@ import {or} from "../parsers/OrParser.ts";
 import {map} from "../transducers/MapTransducer.ts";
 import {pattern} from "../parsers/PatternParser.ts";
 import type {JsonValue} from "./types.ts";
-import {triple} from "../parsers/TupleParser.ts";
+import {triple} from "../parsers/ListParser.ts";
 import {lazy} from "../functions/lazy.ts";
 import {optional} from "../parsers/OptionalParser.ts";
 import {C} from "./C.ts";

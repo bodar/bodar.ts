@@ -4,7 +4,7 @@ import type {Result} from "./Result.ts";
 import {Failure} from "./Failure.ts";
 import {success} from "./Success.ts";
 
-export class TupleParser<A, T extends any[]> implements Parser<A, T> {
+export class ListParser<A, T extends any[]> implements Parser<A, T> {
     constructor(private readonly parsers: Parser<A, any>[]) {
     }
 
@@ -21,13 +21,18 @@ export class TupleParser<A, T extends any[]> implements Parser<A, T> {
     }
 }
 
-type ParserResult<P> = P extends Parser<any, infer R> ? R : never;
-type TupleResult<P extends Parser<any, any>[]> = { [I in keyof P]: ParserResult<P[I]> };
+type InferInput<P> = P extends Parser<infer A, any> ? A : never;
+type InferResult<P> = P extends Parser<any, infer R> ? R : never;
 
-export function tuple<A, P extends Parser<A, any>[]>(...parsers: P): Parser<A, TupleResult<P>> {
-    return new TupleParser(parsers);
+type TupleResult<P extends Parser<any, any>[]> = { [I in keyof P]: InferResult<P[I]> };
+
+export function list<P extends Parser<any, any>[]>(...parsers: P): Parser<InferInput<P[number]>, InferResult<P[number]>[]> {
+    return new ListParser(parsers);
 }
 
+export function tuple<A, P extends Parser<A, any>[]>(...parsers: P): Parser<A, TupleResult<P>> {
+    return new ListParser(parsers);
+}
 export function pair<A, B, C>(first: Parser<A, B>, second: Parser<A, C>): Parser<A, [B, C]> {
     return tuple(first, second);
 }
