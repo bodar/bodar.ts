@@ -20,7 +20,6 @@ export function property<A, K extends keyof A>(key: K): Property<A, K> {
         key,
         toString: () => `property('${String(key)}')`
     })
-
 }
 
 export function isProperty<A = any, B extends keyof A = any>(value: any): value is Property<A, B> {
