@@ -4,13 +4,21 @@ import {view} from "@bodar/totallylazy/parsers/View";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
 import {string} from "@bodar/totallylazy/parsers/StringParser";
-import {pair, triple, list} from "@bodar/totallylazy/parsers/ListParser.ts";
+import {pair, triple, list, tuple} from "@bodar/totallylazy/parsers/ListParser.ts";
 import {pattern} from "@bodar/totallylazy/parsers/PatternParser";
 import {map} from "@bodar/totallylazy/transducers/MapTransducer";
 import {parser} from "@bodar/totallylazy/parsers/Parser";
 import type {Result} from "@bodar/totallylazy/parsers/Result.ts";
 
 describe("ListParser", () => {
+    it("compose parsers into a list", () => {
+        const integer = parser(pattern(/\d+/), map(Number));
+        const result: Result<string, (number|string)[]> = list(integer, string('AAA'), string('BBB'))
+            .parse(view('123AAABBBCCC'));
+        assertThat(result.value, equals([123, 'AAA', 'BBB']));
+        assertThat(result.remainder.toSource(), is('CCC'));
+    });
+
     it("compose parsers into pairs", () => {
         const result: Result<string, [string, string]> = pair(string('AAA'), string('BBB')).parse(view('AAABBBCCC'));
         assertThat(result.value, equals(['AAA', 'BBB']));
@@ -25,11 +33,11 @@ describe("ListParser", () => {
         assertThat(result.remainder.toSource(), is('CCC'));
     });
 
-    it("compose parsers into a list", () => {
+    it("compose parsers into tuples", () => {
         const integer = parser(pattern(/\d+/), map(Number));
-        const result: Result<string, (number|string)[]> = list(integer, string('AAA'), string('BBB'))
-            .parse(view('123AAABBBCCC'));
-        assertThat(result.value, equals([123, 'AAA', 'BBB']));
+        const result: Result<string, [number, string, string, number]> = tuple(integer, string('AAA'), string('BBB'), integer)
+            .parse(view('123AAABBB456CCC'));
+        assertThat(result.value, equals([123, 'AAA', 'BBB', 456]));
         assertThat(result.remainder.toSource(), is('CCC'));
     });
 });
