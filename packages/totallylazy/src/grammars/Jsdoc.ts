@@ -2,8 +2,7 @@ import {parser} from "../parsers/Parser.ts";
 import type {Parser} from "../parsers/Parser.ts";
 import {string} from "../parsers/StringParser.ts";
 import {regex} from "../parsers/RegexParser.ts";
-import {between, next, then, whitespace as ws} from "../parsers/parsers.ts";
-import {many} from "../parsers/ManyParser.ts";
+import {between, many, next, then, whitespace as ws} from "../parsers/parsers.ts";
 import {map} from "../transducers/MapTransducer.ts";
 
 export interface JsdocTags {

@@ -4,7 +4,7 @@ import {string} from "../parsers/StringParser.ts";
 import {
     among,
     between,
-    literal,
+    literal, many,
     next,
     separatedBy,
     surroundedBy,
@@ -20,7 +20,6 @@ import {lazy} from "../functions/lazy.ts";
 import {optional} from "../parsers/OptionalParser.ts";
 import {C} from "./C.ts";
 import {Jsdoc, JsdocComment} from "./Jsdoc.ts";
-import {many} from "../parsers/ManyParser.ts";
 
 export class Json {
     static null: Parser<string, null> = literal(null);

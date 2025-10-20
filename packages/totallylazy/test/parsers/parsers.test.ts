@@ -8,7 +8,7 @@ import {flatMap} from "@bodar/totallylazy/transducers/FlatMapTransducer";
 import {string} from "@bodar/totallylazy/parsers/StringParser";
 import {parser} from "@bodar/totallylazy/parsers/Parser";
 import {regex} from "@bodar/totallylazy/parsers/RegexParser.ts";
-import {between, precededBy, then, times} from "@bodar/totallylazy/parsers/parsers";
+import {atLeast, atMost, between, many, many1, precededBy, then, times} from "@bodar/totallylazy/parsers/parsers";
 import {matches} from "@bodar/totallylazy/parsers/PredicatesParser.ts";
 import {digit} from "@bodar/totallylazy/predicates/characters.ts";
 import {Failure} from "@bodar/totallylazy/parsers/Failure.ts";
@@ -43,6 +43,67 @@ describe("parsers", () => {
         assertThat(r.remainder.toSource(), is(''));
     });
 });
+
+describe("many", () => {
+    it("can parse many", () => {
+        const result = many(string('A')).parse(view('AAABBBCCC'));
+        assertThat(result.value, equals(['A', 'A', 'A']));
+        assertThat(result.remainder.toSource(), is('BBBCCC'));
+    });
+
+    it("still works if it consumes all values", () => {
+        const result = many(string('A')).parse(view('AAA'));
+        assertThat(result.value, equals(['A', 'A', 'A']));
+        assertThat(result.remainder.toSource(), is(''));
+    });
+});
+
+describe("many1", () => {
+    it("parses one or more repetitions", () => {
+        const digits = parser(matches(digit), many1());
+        const result = digits.parse(view('123abc'));
+        assertThat(result.value, equals(['1', '2', '3']));
+        assertThat(result.remainder.toSource(), is('abc'));
+    });
+
+    it("fails if zero repetitions", () => {
+        const digits = parser(matches(digit), many1());
+        const result = digits.parse(view('abc'));
+        assertThat(result instanceof Failure, is(true));
+    });
+});
+
+describe("atLeast", () => {
+    it("parses at least N repetitions", () => {
+        const atLeastThree = parser(matches(digit), atLeast(3));
+        const result = atLeastThree.parse(view('12345abc'));
+        assertThat(result.value, equals(['1', '2', '3', '4', '5']));
+        assertThat(result.remainder.toSource(), is('abc'));
+    });
+
+    it("fails if fewer than N repetitions", () => {
+        const atLeastThree = parser(matches(digit), atLeast(3));
+        const result = atLeastThree.parse(view('12abc'));
+        assertThat(result instanceof Failure, is(true));
+    });
+});
+
+describe("atMost", () => {
+    it("parses at most N repetitions", () => {
+        const atMostThree = parser(matches(digit), atMost(3));
+        const result = atMostThree.parse(view('12345'));
+        assertThat(result.value, equals(['1', '2', '3']));
+        assertThat(result.remainder.toSource(), is('45'));
+    });
+
+    it("succeeds with zero repetitions", () => {
+        const atMostThree = parser(matches(digit), atMost(3));
+        const result = atMostThree.parse(view('abc'));
+        assertThat(result.value, equals([]));
+        assertThat(result.remainder.toSource(), is('abc'));
+    });
+});
+
 
 describe("times", () => {
     it("parses exactly N repetitions", () => {
