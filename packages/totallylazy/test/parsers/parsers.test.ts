@@ -7,7 +7,7 @@ import {map} from "@bodar/totallylazy/transducers/MapTransducer";
 import {flatMap} from "@bodar/totallylazy/transducers/FlatMapTransducer";
 import {string} from "@bodar/totallylazy/parsers/StringParser";
 import {parser} from "@bodar/totallylazy/parsers/Parser";
-import {pattern} from "@bodar/totallylazy/parsers/PatternParser";
+import {regex} from "@bodar/totallylazy/parsers/RegexParser.ts";
 import {between, precededBy, then, times} from "@bodar/totallylazy/parsers/parsers";
 import {matches} from "@bodar/totallylazy/parsers/PredicatesParser.ts";
 import {digit} from "@bodar/totallylazy/predicates/characters.ts";
@@ -15,7 +15,7 @@ import {Failure} from "@bodar/totallylazy/parsers/Failure.ts";
 
 describe("parsers", () => {
     it("can map", () => {
-        const r = parser(pattern(/\d+/), map(Number)).parse(view('123 USD'));
+        const r = parser(regex(/\d+/), map(Number)).parse(view('123 USD'));
         assertThat(r.value, is(123));
         assertThat(r.remainder.toSource(), is(' USD'));
     });
@@ -23,14 +23,14 @@ describe("parsers", () => {
     it("can flatMap", () => {
         const input = view('123 USD');
         const anotherParser = string('1');
-        const r = parser(pattern(/\d+/), flatMap(n => anotherParser.parse(view(n)))).parse(input);
+        const r = parser(regex(/\d+/), flatMap(n => anotherParser.parse(view(n)))).parse(input);
         assertThat(r.value, is('1'));
         assertThat(r.remainder.toSource(), is(' USD'));
     });
 
     it("can compose with 'then'", () => {
         const input = view('123 USD');
-        const r = parser(pattern(/\d+/), map(Number), then(
+        const r = parser(regex(/\d+/), map(Number), then(
             parser(string('USD'), precededBy(string(' '))))).parse(input);
         assertThat(r.value, equals([123, 'USD']));
         assertThat(r.remainder.toSource(), is(''));
@@ -38,7 +38,7 @@ describe("parsers", () => {
 
     it("can compose with 'between'", () => {
         const input = view('(123)');
-        const r = parser(pattern(/\d+/), map(Number), between(string('('), string(')'))).parse(input);
+        const r = parser(regex(/\d+/), map(Number), between(string('('), string(')'))).parse(input);
         assertThat(r.value, is(123));
         assertThat(r.remainder.toSource(), is(''));
     });

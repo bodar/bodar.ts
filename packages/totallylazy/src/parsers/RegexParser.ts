@@ -4,7 +4,7 @@ import {fail} from "./Failure.ts";
 import {success} from "./Success.ts";
 import type {View} from "./View.ts";
 
-export class PatternParser implements Parser<string, string> {
+export class RegexParser implements Parser<string, string> {
     constructor(private readonly matcher: RegExp) {
     }
 
@@ -17,7 +17,7 @@ export class PatternParser implements Parser<string, string> {
     }
 }
 
-export function pattern(matcher: RegExp, fromStart: boolean = true): Parser<string, string> {
-    if (fromStart && !matcher.source.startsWith('^')) return new PatternParser(new RegExp(`^${matcher.source}`, matcher.flags))
-    return new PatternParser(matcher);
+export function regex(matcher: RegExp, fromStart: boolean = true): Parser<string, string> {
+    if (fromStart && !matcher.source.startsWith('^')) return new RegexParser(new RegExp(`^${matcher.source}`, matcher.flags))
+    return new RegexParser(matcher);
 }

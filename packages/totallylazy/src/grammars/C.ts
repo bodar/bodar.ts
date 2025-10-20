@@ -2,7 +2,7 @@ import {parser} from "../parsers/Parser.ts";
 import type {Parser} from "../parsers/Parser.ts";
 import {string} from "../parsers/StringParser.ts";
 import {or} from "../parsers/OrParser.ts";
-import {pattern} from "../parsers/PatternParser.ts";
+import {regex} from "../parsers/RegexParser.ts";
 import {between} from "../parsers/parsers.ts";
 import {eof} from "../parsers/EofParser.ts";
 import {any} from "../parsers/AnyParser.ts";
@@ -15,7 +15,7 @@ export class Comment {
 }
 
 export class C {
-    static singleLineComment = parser(pattern(/[^\n]*/), between(string('//'), or(string('\n'), eof())));
+    static singleLineComment = parser(regex(/[^\n]*/), between(string('//'), or(string('\n'), eof())));
 
     static multiLineComment = parser(any<string>(), until(string('*/')), between(string('/*'), string('*/')), map(characters => characters.join('')));
 

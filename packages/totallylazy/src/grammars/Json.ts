@@ -13,7 +13,7 @@ import {
 } from "../parsers/parsers.ts";
 import {or} from "../parsers/OrParser.ts";
 import {map} from "../transducers/MapTransducer.ts";
-import {pattern} from "../parsers/PatternParser.ts";
+import {regex} from "../parsers/RegexParser.ts";
 import type {JsonValue} from "./types.ts";
 import {triple} from "../parsers/ListParser.ts";
 import {lazy} from "../functions/lazy.ts";
@@ -30,14 +30,14 @@ export class Json {
     static escaped: Parser<string, string> = parser(string('\\'), next(or(
         among("\"\\/"),
         parser(among("bfnrt"), map(unescape)),
-        parser(pattern(/u[0-9a-fA-F]{4}/), map(u => String.fromCharCode(parseInt(u.slice(1), 16))))
+        parser(regex(/u[0-9a-fA-F]{4}/), map(u => String.fromCharCode(parseInt(u.slice(1), 16))))
     )));
 
-    static characters: Parser<string, string> = pattern(/[^"\\]+/);
+    static characters: Parser<string, string> = regex(/[^"\\]+/);
 
     static string: Parser<string, string> = parser(many(or(this.characters, this.escaped)), map((characters: string[]) => characters.join("")), surroundedBy(string('"')));
 
-    static number: Parser<string, number> = parser(pattern(/[-+eE.\d]+/), map(Number));
+    static number: Parser<string, number> = parser(regex(/[-+eE.\d]+/), map(Number));
 
     static whitespace<A>(instance: Parser<string, A>) {
         return parser(whitespace(instance), surroundedBy(optional(C.comment)));
