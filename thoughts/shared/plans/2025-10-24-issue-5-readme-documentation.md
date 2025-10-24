@@ -506,13 +506,13 @@ Apache-2.0
 - [x] Roadmap matches source: PostgreSQL checked, SQLite and BigQuery unchecked
 
 #### Manual Verification:
-- [ ] README provides clear value proposition
-- [ ] Installation instructions work for all platforms
-- [ ] Code examples are accurate and runnable
-- [ ] Feature coverage is comprehensive
-- [ ] Dependencies on totallylazy are clearly documented
-- [ ] Bun requirement is prominently displayed
-- [ ] Roadmap only includes databases from root README (SQLite) and user-mentioned (BigQuery)
+- [x] README provides clear value proposition
+- [x] Installation instructions work for all platforms
+- [x] Code examples are accurate and runnable
+- [x] Feature coverage is comprehensive
+- [x] Dependencies on totallylazy are clearly documented
+- [x] Bun requirement is prominently displayed
+- [x] Roadmap only includes databases from root README (SQLite) and user-mentioned (BigQuery)
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the documentation is satisfactory before marking the issue as complete.
 
