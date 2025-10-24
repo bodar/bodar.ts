@@ -80,8 +80,8 @@ The following todos will be moved to individual package READMEs:
 - [x] Type checking passes: `./run check`
 
 #### End to End Verification:
-- [ ] Links navigate correctly to package directories in GitHub (use Fetch or Curl to find and follow links)
-- [ ] Package descriptions are accurate and helpful
+- [x] Links navigate correctly to package directories in GitHub (use Fetch or Curl to find and follow links)
+- [x] Package descriptions are accurate and helpful
 
 ---
 
@@ -124,13 +124,13 @@ Core features are complete:
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] totallylazy README contains roadmap section: `grep -A 5 "## Roadmap" packages/totallylazy/README.md`
-- [ ] yadic README contains roadmap section: `grep -A 5 "## Roadmap" packages/yadic/README.md`
-- [ ] Type checking passes: `./run check`
+- [x] totallylazy README contains roadmap section: `grep -A 5 "## Roadmap" packages/totallylazy/README.md`
+- [x] yadic README contains roadmap section: `grep -A 5 "## Roadmap" packages/yadic/README.md`
+- [x] Type checking passes: `./run check`
 
 #### Manual Verification:
-- [ ] Roadmap items are accurate and reflect actual plans
-- [ ] Section placement is appropriate and consistent
+- [x] Roadmap items are accurate and reflect actual plans
+- [x] Section placement is appropriate and consistent
 
 ---
 
@@ -496,14 +496,14 @@ Apache-2.0
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] File exists: `ls -la packages/lazyrecords/README.md`
-- [ ] Markdown is valid: `./run check`
-- [ ] All code examples are syntactically correct
-- [ ] Package.json exports align with import examples
-- [ ] Platform Support section exists: `grep -A 3 "## Platform Support" packages/lazyrecords/README.md`
-- [ ] Roadmap section exists: `grep -A 3 "## Roadmap" packages/lazyrecords/README.md`
-- [ ] Bun requirement is emphasized: `grep "requires Bun" packages/lazyrecords/README.md`
-- [ ] Roadmap matches source: PostgreSQL checked, SQLite and BigQuery unchecked
+- [x] File exists: `ls -la packages/lazyrecords/README.md`
+- [x] Markdown is valid: `./run check`
+- [x] All code examples are syntactically correct
+- [x] Package.json exports align with import examples
+- [x] Platform Support section exists: `grep -A 3 "## Platform Support" packages/lazyrecords/README.md`
+- [x] Roadmap section exists: `grep -A 3 "## Roadmap" packages/lazyrecords/README.md`
+- [x] Bun requirement is emphasized: `grep "requires Bun" packages/lazyrecords/README.md`
+- [x] Roadmap matches source: PostgreSQL checked, SQLite and BigQuery unchecked
 
 #### Manual Verification:
 - [ ] README provides clear value proposition
