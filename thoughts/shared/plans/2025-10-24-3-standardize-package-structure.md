@@ -75,13 +75,17 @@ git mv packages/yadic/src/package.json packages/yadic/package.json
 **File**: `packages/yadic/package.json`
 **Changes**: Add exports and files fields
 
+**Note**: Initially tried wildcard exports `"./*": "./src/*.ts"`, but TypeScript's module resolution doesn't fully support wildcard patterns for workspace packages during type-checking (works at runtime with Bun, but `tsc --noEmit` fails). Using explicit exports instead.
+
 ```json
 {
   "name": "@bodar/yadic",
   "version": "0.0.0",
   "type": "module",
   "exports": {
-    "./*": "./src/*.ts"
+    "./chain.ts": "./src/chain.ts",
+    "./LazyMap.ts": "./src/LazyMap.ts",
+    "./types.ts": "./src/types.ts"
   },
   "files": [
     "src/**/*.ts",
@@ -92,16 +96,17 @@ git mv packages/yadic/src/package.json packages/yadic/package.json
 
 #### 3. Update root workspace configuration
 **File**: `package.json:4-7`
-**Changes**: Update workspace globs to point to package roots
+**Changes**: Update workspace globs to support both migrated and un-migrated packages
 
 ```json
 "workspaces": [
   "packages/*",
+  "packages/**/src",
   "packages/**/test"
 ]
 ```
 
-**Note**: Keep `packages/**/test` for now since test directories still have their own package.json files.
+**Note**: Must keep both `packages/*` (for migrated packages like yadic) and `packages/**/src` (for un-migrated packages like totallylazy, lazyrecords) during gradual migration. The `packages/**/src` pattern will be removed in Phase 4 after all packages are migrated. Also keeping `packages/**/test` since test directories still have their own package.json files.
 
 #### 4. Update publish script
 **File**: `run:58-80`
