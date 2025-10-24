@@ -139,8 +139,8 @@ This will generate `jsr.json` with:
 ### Success Criteria
 
 #### Automated Verification:
-- [ ] Build passes: `./run check`
-- [ ] Tests pass: `./run test`
+- [x] Build passes: `./run check`
+- [x] Tests pass: `./run test`
 - [ ] Publish succeeds in CI (CircleCI build completes)
 
 #### Manual Verification:

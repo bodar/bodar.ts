@@ -62,7 +62,7 @@ export async function publish() {
         const packageJson = await file(f).json();
         const parent = dirname(f!);
         const jsrFile = file(join(parent, 'jsr.json'));
-        const typescript = await toPromiseArray<string>(new Glob("./**/types.ts").scan(parent));
+        const typescript = await toPromiseArray<string>(new Glob("./**/*.ts").scan(parent));
         if (typescript.length > 0) await write(jsrFile, JSON.stringify({
             name: packageJson.name,
             version: v,
