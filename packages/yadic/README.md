@@ -1,4 +1,5 @@
 # @bodar/yadic
+[![JSR Score](https://jsr.io/badges/@bodar/yadic/score)](https://jsr.io/@bodar/yadic)
 
 A super small and lightning fast dependency injection container with lazy initialization. Uses lazy properties that once called are automatically converted into regular read-only properties for ultimate speed and reliability in constructing graphs of objects.
 

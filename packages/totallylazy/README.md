@@ -1,4 +1,5 @@
 # @bodar/totallylazy
+[![JSR Score](https://jsr.io/badges/@bodar/totallylazy/score)](https://jsr.io/@bodar/totallylazy)
 
 A comprehensive functional programming library for TypeScript providing composable predicates, transducers, parsers, comparators, and collection utilities. Features lazy evaluation, type safety, and self-describing APIs for ultimate developer experience.
 

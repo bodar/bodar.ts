@@ -1,4 +1,5 @@
 # @bodar/lazyrecords
+[![JSR Score](https://jsr.io/badges/@bodar/lazyrecords/score)](https://jsr.io/@bodar/lazyrecords)
 
 A type-safe SQL query builder that bridges functional programming with relational databases. Convert @bodar/totallylazy predicates and transducers into parameterized SQL queries with full type inference. Features SQL template literals, composable query builders, and PostgreSQL integration via Bun.
 
