@@ -185,6 +185,14 @@ console.log(config.timeout); // 10000 (from overrides)
 console.log(config.retries); // 3 (from defaults)
 ```
 
+## Roadmap
+
+Core features are complete:
+- [x] LazyMap
+  - [x] constructor
+  - [x] instance
+  - [x] decorate
+
 ## API Reference
 
 See the [JSR documentation](https://jsr.io/@bodar/yadic) for complete API details.

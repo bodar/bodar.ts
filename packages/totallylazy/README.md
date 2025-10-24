@@ -376,6 +376,22 @@ const seq = sequence([1, 2, 3],
 // seq is Sequence<string>
 ```
 
+## Roadmap
+
+Core features implemented:
+- [x] Sequence
+- [x] Transducers
+- [x] Predicates
+- [x] Parser Combinators
+- [x] Comparators
+- [x] JSON Grammar
+- [x] Functions (lazy, equal, property, select)
+- [x] Asserts
+
+Future enhancements:
+- [ ] Immutable List + Map
+- [ ] Date Parsing
+
 ## API Reference
 
 See the [JSR documentation](https://jsr.io/@bodar/totallylazy) for complete API details.
