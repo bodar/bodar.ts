@@ -2,17 +2,62 @@
 [![bodar](https://circleci.com/gh/bodar/bodar.ts.svg?style=shield)](https://app.circleci.com/pipelines/github/bodar/bodar.ts)
 [![codecov](https://codecov.io/gh/bodar/bodar.ts/graph/badge.svg?token=USVRV8KZ4R)](https://codecov.io/gh/bodar/bodar.ts)
 
-The project is a monorepo which contains a few packages:
+A monorepo containing TypeScript libraries for functional programming, database access, and dependency injection.
+
+## Packages
+
+### [@bodar/totallylazy](./packages/totallylazy)
+A comprehensive functional programming library providing composable predicates, transducers, parsers, comparators, and collection utilities. Features lazy evaluation, parser combinators, and a complete JSON grammar with JSDoc custom type support.
+
+### [@bodar/lazyrecords](./packages/lazyrecords)
+A type-safe SQL query builder that bridges functional programming with SQL. Convert functional predicates and transducers into parameterized SQL queries. Currently supports PostgreSQL with ANSI SQL foundations.
+
+### [@bodar/yadic](./packages/yadic)
+A lightweight dependency injection container with lazy initialization. Uses property getters that convert to immutable read-only properties on first access for optimal performance.
+
+## Monorepo Structure
+
+```
+bodar.ts/
+├── packages/           # All publishable packages
+│   ├── totallylazy/   # Functional programming library
+│   ├── lazyrecords/   # SQL query builder
+│   └── yadic/         # Dependency injection
+├── run                # Main build/test script
+├── bootstrap.sh       # Auto-installs dependencies via mise
+└── package.json       # Workspace configuration
+```
+
+## Quick Start
+
+The `./run` command handles all build, test, and development tasks. On first use, it automatically installs all required dependencies using `mise`:
+
+```bash
+# Run tests
+./run test
+
+# Type check
+./run check
+
+# Run specific test file
+./run test packages/totallylazy/test/predicates/EqualsPredicate.test.ts
+
+# Development mode (watch)
+./run dev
+
+# Clean and rebuild
+./run build
+
+# Test with coverage
+./run coverage
+```
+
+The bootstrap process installs the correct versions of all tools (Bun, Node, etc.) automatically—no manual setup required.
 
 ## Design Decisions
 
 ### No Barrel Files
 This project does NOT use barrel files (index.ts files that re-export everything). Each module should be imported directly from its source file. Barrel files have several issues including circular dependencies, larger bundle sizes, and slower TypeScript compilation.
-
-## Packages
-- totallylazy - a library for functional programming in TypeScript
-- lazyrecords - a library for accessing databases in a functional way (currently SQL only)
-- yadic - a library for building objects and their dependencies lazily in TypeScript
 
 Top level tasks
 * [x] Basic structure
@@ -25,20 +70,4 @@ Top level tasks
     * [x] TSDoc/JSDoc
     * [ ] Tests -> Docs
 
-* totallylazy
-  * [ ] Sequence
-  * [ ] Transducers
-  * [ ] Predicates
-  * [ ] Parser Combinators
-  * [ ] Immutable List + Map
-  * [ ] Date Parsing ?
-  * [ ] ...
-* lazyrecord
-  * [ ] Postgres
-  * [ ] SQLite
-* yadic
-  * [x] LazyMap
-    * [x] constructor
-    * [x] instance
-    * [x] decorate
 * utterlyidle / http4d
