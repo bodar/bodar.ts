@@ -141,6 +141,7 @@ This will generate `jsr.json` with:
 #### Automated Verification:
 - [x] Build passes: `./run check`
 - [x] Tests pass: `./run test`
+- [x] Pushed to origin (commit 292303d)
 - [ ] Publish succeeds in CI (CircleCI build completes)
 
 #### Manual Verification:
