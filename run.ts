@@ -58,7 +58,8 @@ async function toPromiseArray<T>(iterable: AsyncIterable<T>): Promise<T[]> {
 export async function publish() {
     const v = await version();
 
-    for await (const f of new Glob("packages/**/src/package.json").scan(".")) {
+    // Only publish yadic package
+    for await (const f of new Glob("packages/yadic/src/package.json").scan(".")) {
         const packageJson = await file(f).json();
         const parent = dirname(f!);
         const jsrFile = file(join(parent, 'jsr.json'));
