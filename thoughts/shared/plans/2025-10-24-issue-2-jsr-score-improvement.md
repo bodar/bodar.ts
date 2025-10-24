@@ -75,13 +75,18 @@ Improve the JSR score for the @bodar/yadic package from 47% (8/17 points) to 100
 
 ## Implementation Approach
 
-Work iteratively through each phase, making one commit at a time. After each commit:
+Work iteratively through each phase, **committing one file at a time** as documentation is added. After each commit:
 1. Wait for CircleCI build to complete
 2. Check JSR score with curl command
-3. Verify score increased by expected points
-4. Only proceed to next phase after confirmation
+3. Verify score increased (if applicable)
+4. Only proceed to next file after confirmation
 
 Use test files as source of truth for documentation examples since they demonstrate actual usage patterns.
+
+**Commit Strategy**:
+- Phase 1: One commit for publish script
+- Phase 2: One commit for README
+- Phase 3-5: One commit per source file (module doc + all symbol docs for that file)
 
 ---
 
@@ -373,14 +378,14 @@ Apache-2.0
 
 ---
 
-## Phase 3: Add Module Documentation
+## Phase 3: Add Documentation to chain.ts
 
 ### Overview
-Add module-level JSDoc comments to all three entrypoint files. This satisfies "Has module docs in all entrypoints" (+1 point).
+Add module-level JSDoc and all symbol documentation to chain.ts in a single commit. This file has 3 exported symbols that need documentation.
 
 ### Changes Required
 
-#### 1. chain.ts Module Doc
+#### 1. Module Documentation
 **File**: `packages/yadic/src/chain.ts`
 **Changes**: Add JSDoc at the beginning of the file
 
@@ -410,104 +415,9 @@ Add before line 1:
 
 ```
 
-#### 2. LazyMap.ts Module Doc
-**File**: `packages/yadic/src/LazyMap.ts`
-**Changes**: Add JSDoc at the beginning of the file
+#### 2. Symbol Documentation
 
-Add before line 1:
-```typescript
-/**
- * Lazy dependency injection container with type-safe dependency tracking.
- *
- * LazyMap provides a builder pattern for defining dependencies that are only
- * initialized on first access. Once accessed, dependencies are automatically
- * cached as immutable properties for optimal performance.
- *
- * Supports constructor injection, decoration pattern, parent-child containers,
- * and full TypeScript type inference for all registered dependencies.
- *
- * @module
- *
- * @example
- * ```ts
- * import { LazyMap, instance, constructor } from "@bodar/yadic/LazyMap";
- *
- * class Database {
- *   constructor(deps: Dependency<'url', string>) {
- *     this.connect(deps.url);
- *   }
- * }
- *
- * const container = LazyMap.create()
- *   .set('url', instance('postgres://localhost'))
- *   .set('db', constructor(Database));
- *
- * const db = container.db; // Initialized on first access
- * ```
- */
-
-```
-
-#### 3. types.ts Module Doc
-**File**: `packages/yadic/src/types.ts`
-**Changes**: Add JSDoc at the beginning of the file
-
-Add before line 1:
-```typescript
-/**
- * TypeScript type definitions for the yadic dependency injection system.
- *
- * Provides type-safe interfaces and utilities for defining dependencies,
- * constructors, and dependency-aware classes.
- *
- * @module
- *
- * @example
- * ```ts
- * import type { Dependency, AutoConstructor } from "@bodar/yadic/types";
- *
- * // Define a dependency
- * type DbDep = Dependency<'connectionString', string>;
- *
- * // Use in a constructor
- * class Database {
- *   constructor(deps: DbDep) {
- *     this.connect(deps.connectionString);
- *   }
- * }
- * ```
- */
-
-```
-
-### Success Criteria
-
-#### Automated Verification:
-- [ ] TypeScript compilation succeeds: `./run check`
-- [ ] Tests pass: `./run test`
-- [ ] Module docs are valid JSDoc format
-- [ ] Publish succeeds in CI
-
-#### Manual Verification:
-- [ ] JSR score increases from 65% to 71% (+1 point for module docs)
-- [ ] Verify with: `curl -H 'accept: text/html' https://jsr.io/@bodar/yadic/score | grep -o '[0-9]*%'`
-- [ ] Module documentation appears on JSR package page for each file
-- [ ] Examples in module docs are accurate
-
-**Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation that the score increased to 71% before proceeding to Phase 4.
-
----
-
-## Phase 4: Add Symbol Documentation
-
-### Overview
-Add JSDoc comments to all 11 exported symbols to achieve 100% documentation coverage. This satisfies "Has docs for most symbols" (+5 points). JSR requires 80% coverage for full points, but we'll document 100% for completeness.
-
-### Changes Required
-
-#### 1. chain.ts Symbol Docs
-**File**: `packages/yadic/src/chain.ts`
-**Changes**: Add JSDoc to 3 exported symbols
+Add JSDoc to all 3 exported symbols in chain.ts:
 
 **Symbol 1: Overwrite type** (before line 1):
 ```typescript
@@ -575,7 +485,70 @@ export type Chain<T extends unknown[]> = ...
 export function chain<T extends unknown[]>(...objects: T): Chain<T> {
 ```
 
-#### 2. LazyMap.ts Symbol Docs
+### Success Criteria
+
+#### Automated Verification:
+- [ ] TypeScript compilation succeeds: `./run check`
+- [ ] Tests pass: `./run test`
+- [ ] All JSDoc comments are valid
+- [ ] Publish succeeds in CI
+
+#### Manual Verification:
+- [ ] JSR score may increase (partial credit for module docs and symbols)
+- [ ] Verify with: `curl -H 'accept: text/html' https://jsr.io/@bodar/yadic/score | grep -o '[0-9]*%'`
+- [ ] chain.ts shows module documentation on JSR package page
+- [ ] All 3 symbols in chain.ts show documentation on JSR
+
+**Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation that the JSR build completed successfully before proceeding to Phase 4.
+
+---
+
+## Phase 4: Add Documentation to LazyMap.ts
+
+### Overview
+Add module-level JSDoc and all symbol documentation to LazyMap.ts in a single commit. This file has 5 exported symbols (including class methods) that need documentation.
+
+### Changes Required
+
+#### 1. Module Documentation
+**File**: `packages/yadic/src/LazyMap.ts`
+**Changes**: Add JSDoc at the beginning of the file
+
+Add before line 1:
+```typescript
+/**
+ * Lazy dependency injection container with type-safe dependency tracking.
+ *
+ * LazyMap provides a builder pattern for defining dependencies that are only
+ * initialized on first access. Once accessed, dependencies are automatically
+ * cached as immutable properties for optimal performance.
+ *
+ * Supports constructor injection, decoration pattern, parent-child containers,
+ * and full TypeScript type inference for all registered dependencies.
+ *
+ * @module
+ *
+ * @example
+ * ```ts
+ * import { LazyMap, instance, constructor } from "@bodar/yadic/LazyMap";
+ *
+ * class Database {
+ *   constructor(deps: Dependency<'url', string>) {
+ *     this.connect(deps.url);
+ *   }
+ * }
+ *
+ * const container = LazyMap.create()
+ *   .set('url', instance('postgres://localhost'))
+ *   .set('db', constructor(Database));
+ *
+ * const db = container.db; // Initialized on first access
+ * ```
+ */
+
+```
+
+#### 2. Symbol Documentation
 **File**: `packages/yadic/src/LazyMap.ts`
 **Changes**: Add JSDoc to 5 exported symbols
 
@@ -782,7 +755,64 @@ export function instance<T>(value: T) {
 export function constructor<D, T>(
 ```
 
-#### 3. types.ts Symbol Docs
+### Success Criteria
+
+#### Automated Verification:
+- [ ] TypeScript compilation succeeds: `./run check`
+- [ ] Tests pass: `./run test`
+- [ ] All JSDoc comments are valid
+- [ ] Publish succeeds in CI
+
+#### Manual Verification:
+- [ ] JSR score may increase further
+- [ ] Verify with: `curl -H 'accept: text/html' https://jsr.io/@bodar/yadic/score | grep -o '[0-9]*%'`
+- [ ] LazyMap.ts shows module documentation on JSR package page
+- [ ] All 5 symbols in LazyMap.ts show documentation on JSR
+
+**Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation that the JSR build completed successfully before proceeding to Phase 5.
+
+---
+
+## Phase 5: Add Documentation to types.ts
+
+### Overview
+Add module-level JSDoc and all symbol documentation to types.ts in a single commit. This file has 3 exported type definitions that need documentation. This is the final documentation phase.
+
+### Changes Required
+
+#### 1. Module Documentation
+**File**: `packages/yadic/src/types.ts`
+**Changes**: Add JSDoc at the beginning of the file
+
+Add before line 1:
+```typescript
+/**
+ * TypeScript type definitions for the yadic dependency injection system.
+ *
+ * Provides type-safe interfaces and utilities for defining dependencies,
+ * constructors, and dependency-aware classes.
+ *
+ * @module
+ *
+ * @example
+ * ```ts
+ * import type { Dependency, AutoConstructor } from "@bodar/yadic/types";
+ *
+ * // Define a dependency
+ * type DbDep = Dependency<'connectionString', string>;
+ *
+ * // Use in a constructor
+ * class Database {
+ *   constructor(deps: DbDep) {
+ *     this.connect(deps.connectionString);
+ *   }
+ * }
+ * ```
+ */
+
+```
+
+#### 2. Symbol Documentation
 **File**: `packages/yadic/src/types.ts`
 **Changes**: Add JSDoc to 3 exported symbols
 
@@ -871,10 +901,12 @@ export interface Constructor<T> {
 - [ ] Publish succeeds in CI
 
 #### Manual Verification:
-- [ ] JSR score increases from 71% to 100% (+5 points for symbol documentation)
+- [ ] JSR score reaches 100% (17/17 points)
 - [ ] Verify with: `curl -H 'accept: text/html' https://jsr.io/@bodar/yadic/score | grep -o '[0-9]*%'`
 - [ ] All 11 symbols show documentation on JSR package page
 - [ ] JSR reports 100% documentation coverage (11/11 symbols)
+- [ ] types.ts shows module documentation on JSR package page
+- [ ] All 3 symbols in types.ts show documentation on JSR
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation that the score reached 100% (17/17 points) before marking the task complete.
 
@@ -909,11 +941,14 @@ curl -H 'accept: text/html' https://jsr.io/@bodar/yadic/score
 
 ### Expected Score Progression
 - Start: 47% (8/17 points)
-- After Phase 1: 47% (no documentation added yet)
+- After Phase 1: 47% (no documentation added yet, just export fix)
 - After Phase 2: 65% (+3 points: README + examples)
-- After Phase 3: 71% (+1 point: module docs)
-- After Phase 4: 100% (+5 points: symbol docs)
-- Final: 100% (17/17 points)
+- After Phase 3: ~71-76% (partial credit: chain.ts module + 3 symbols documented)
+- After Phase 4: ~82-88% (partial credit: LazyMap.ts module + 5 more symbols)
+- After Phase 5: 100% (+remaining points: types.ts module + final 3 symbols)
+- Final: 100% (17/17 points - all 11 symbols documented)
+
+Note: JSR may award points incrementally or wait until all files have module docs. The exact progression may vary, but the final score will be 100%.
 
 ## Performance Considerations
 
