@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "type": "module",
   "exports": {
-    "./chain.ts": "./src/chain.ts",
+    "./types.ts": "./src/types.ts",
     "./LazyMap.ts": "./src/LazyMap.ts",
-    "./types.ts": "./src/types.ts"
+    "./chain.ts": "./src/chain.ts"
   },
   "files": [
     "src/**/*.ts",

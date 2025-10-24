@@ -45,6 +45,7 @@ export async function dev() {
 
 export async function build() {
     await clean();
+    await regenerateExports();
     await check();
     await test();
 }
@@ -55,6 +56,34 @@ async function toPromiseArray<T>(iterable: AsyncIterable<T>): Promise<T[]> {
     return result;
 }
 
+export async function regenerateExports(packageGlob: string = "packages/*/package.json") {
+    for await (const f of new Glob(packageGlob).scan(".")) {
+        const packageJsonFile = file(f!);
+        const packageJson = await packageJsonFile.json();
+        const parent = dirname(f!);
+        const srcDir = join(parent, 'src');
+
+        const typescript = await toPromiseArray<string>(
+            new Glob("./**/*.ts").scan(srcDir)
+        );
+
+        if (typescript.length > 0) {
+            const exports = typescript
+                .filter(ts => !ts.includes('.test.ts'))
+                .reduce((a: any, ts: string) => {
+                    const key = ts.replace('./', './');  // Keep .ts in key
+                    const value = ts.replace('./', './src/');  // ./file.ts -> ./src/file.ts
+                    a[key] = value;
+                    return a;
+                }, {});
+
+            packageJson.exports = exports;
+            await write(packageJsonFile, JSON.stringify(packageJson, null, 2));
+            console.log(`Updated exports for ${packageJson.name} (${Object.keys(exports).length} files)`);
+        }
+    }
+}
+
 export async function publish() {
     const v = await version();
 
@@ -63,17 +92,11 @@ export async function publish() {
         const packageJson = await file(f).json();
         const parent = dirname(f!);
         const jsrFile = file(join(parent, 'jsr.json'));
-        const srcDir = join(parent, 'src');
-        const typescript = await toPromiseArray<string>(new Glob("./**/*.ts").scan(srcDir));
-        if (typescript.length > 0) await write(jsrFile, JSON.stringify({
+
+        await write(jsrFile, JSON.stringify({
             name: packageJson.name,
             version: v,
-            exports: typescript.reduce((a: any, ts: string) => {
-                const key = ts.replace(/\.ts$/, '');  // Remove .ts from key
-                const value = ts.replace('./', './src/');  // Replace ./ with ./src/ in value
-                a[key] = value;
-                return a;
-            }, {}),
+            exports: packageJson.exports,  // Use exports directly from package.json
             license: 'Apache-2.0'
         }, null, 2));
     }
