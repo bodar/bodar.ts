@@ -197,7 +197,7 @@ export async function publish() {
 - [x] All tests across monorepo pass: `./run test`
 
 #### Automated Verification (CI/CD):
-- [ ] Commit and push changes
+- [x] Commit and push changes (commit 9ca354e)
 - [ ] Check CircleCI build status (automatically triggered by push)
 - [ ] Wait for publish to complete (~30 seconds after CircleCI success)
 - [ ] Verify JSR publication at https://jsr.io/@bodar/yadic/
