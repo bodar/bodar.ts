@@ -2,7 +2,7 @@
   "name": "bodar",
   "private": true,
   "workspaces": [
-    "packages/**/src",
+    "packages/*",
     "packages/**/test"
   ],
   "devDependencies": {

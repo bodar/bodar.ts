@@ -108,7 +108,9 @@ git mv packages/yadic/src/package.json packages/yadic/package.json
 **Changes**:
 1. Change glob pattern to find package.json at package root
 2. Adjust TypeScript file scanning to look in `src/` subdirectory
-3. Strip `src/` prefix from export keys while keeping it in values
+3. Generate explicit exports for jsr.json (JSR doesn't support wildcard exports like `"./*"`)
+
+**Note**: While package.json uses wildcard exports `"./*": "./src/*.ts"` for local workspace resolution, JSR requires explicit exports. The publish script generates these by scanning TypeScript files and creating individual export mappings.
 
 **Current implementation:**
 ```typescript
@@ -153,11 +155,9 @@ export async function publish() {
             name: packageJson.name,
             version: v,
             exports: typescript.reduce((a: any, ts: string) => {
-                // Strip leading ./ and .ts extension for the key
-                const key = ts.replace(/^\.\//, '').replace(/\.ts$/, '');
-                // Prepend src/ to the value
-                const value = `./src/${ts.replace(/^\.\//, '')}`;
-                a[`./${key}`] = value;
+                const key = ts.replace(/\.ts$/, '');  // Remove .ts from key
+                const value = ts.replace('./', './src/');  // Replace ./ with ./src/ in value
+                a[key] = value;
                 return a;
             }, {}),
             license: 'Apache-2.0'
@@ -173,7 +173,7 @@ export async function publish() {
 - Line 62: `packages/yadic/package.json` instead of `packages/yadic/src/package.json`
 - Line 65: Define `srcDir` as `join(parent, 'src')`
 - Line 66: Scan from `srcDir` instead of `parent`
-- Line 70-73: Strip leading `./` and `.ts` for keys, prepend `src/` to values
+- Line 72-73: Remove `.ts` from keys, replace `./` with `./src/` in values
 
 **Expected jsr.json output:**
 ```json
@@ -192,18 +192,16 @@ export async function publish() {
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] TypeScript compilation passes: `./run check`
-- [ ] All yadic tests pass: `./run test packages/yadic/test`
-- [ ] All tests across monorepo pass: `./run test`
+- [x] TypeScript compilation passes: `./run check`
+- [x] All yadic tests pass: `./run test packages/yadic/test`
+- [x] All tests across monorepo pass: `./run test`
 
-#### Manual Verification:
+#### Automated Verification (CI/CD):
 - [ ] Commit and push changes
-- [ ] Trigger CircleCI build (will run `./run ci` which includes publish)
-- [ ] Wait 30 seconds after publish completes
-- [ ] Check CircleCI status at https://app.circleci.com/pipelines/github/bodar/bodar.ts
-- [ ] Verify JSR publication: `curl -H 'accept: text/html' https://jsr.io/@bodar/yadic/`
-- [ ] Confirm JSR page shows correct exports without `src/` prefix
-- [ ] Verify package can be imported from JSR (exports should show as `./chain`, not `./src/chain`)
+- [ ] Check CircleCI build status (automatically triggered by push)
+- [ ] Wait for publish to complete (~30 seconds after CircleCI success)
+- [ ] Verify JSR publication at https://jsr.io/@bodar/yadic/
+- [ ] Confirm JSR page shows correct exports (should be `./chain`, not `./src/chain`)
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation that CircleCI and JSR publication succeeded before proceeding to the next phase.
 
