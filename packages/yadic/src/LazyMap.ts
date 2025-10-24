@@ -39,15 +39,15 @@ export function isConstructor(func: Function): boolean {
     return !!func.prototype && func.prototype.constructor === func;
 }
 
-export function alias<T extends object, K extends keyof T>(key: K) {
+export function alias<T extends object, K extends keyof T>(key: K): (deps: T) => T[K] {
     return (deps: T) => Reflect.get(deps, key);
 }
 
-export function instance<T>(value: T) {
+export function instance<T>(value: T): () => T {
     return () => value;
 }
 
-export function constructor<D, T>(valueConstructor: Constructor<T> | AutoConstructor<D, T>) {
+export function constructor<D, T>(valueConstructor: Constructor<T> | AutoConstructor<D, T>): (() => T) | ((deps: D) => T) {
     if (!isConstructor(valueConstructor)) throw new Error(`${valueConstructor.name} is not a constructor`);
     if (valueConstructor.length === 0) { // @ts-ignore
         return () => new valueConstructor();
