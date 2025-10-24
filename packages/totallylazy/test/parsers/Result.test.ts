@@ -1,12 +1,12 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {view} from "@bodar/totallylazy/parsers/View";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {success} from "@bodar/totallylazy/parsers/Success";
-import {map} from "@bodar/totallylazy/transducers/MapTransducer";
-import {result} from "@bodar/totallylazy/parsers/Result";
-import {flatMap} from "@bodar/totallylazy/transducers/FlatMapTransducer";
-import {string} from "@bodar/totallylazy/parsers/StringParser";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {view} from "@bodar/totallylazy/parsers/View.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {success} from "@bodar/totallylazy/parsers/Success.ts";
+import {map} from "@bodar/totallylazy/transducers/MapTransducer.ts";
+import {result} from "@bodar/totallylazy/parsers/Result.ts";
+import {flatMap} from "@bodar/totallylazy/transducers/FlatMapTransducer.ts";
+import {string} from "@bodar/totallylazy/parsers/StringParser.ts";
 
 describe("Result", () => {
     it("can map", () => {

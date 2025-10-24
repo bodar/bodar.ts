@@ -1,8 +1,8 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {segment, toString} from "@bodar/totallylazy/collections/Segment";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {segment, toString} from "@bodar/totallylazy/collections/Segment.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 
 describe("Segment", () => {
     it("can create from parts", () => {

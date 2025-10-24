@@ -1,7 +1,7 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {view} from "@bodar/totallylazy/parsers/View";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {view} from "@bodar/totallylazy/parsers/View.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import {regex} from "@bodar/totallylazy/parsers/RegexParser.ts";
 
 describe("RegexParser", () => {

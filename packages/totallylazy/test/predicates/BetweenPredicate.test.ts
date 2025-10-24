@@ -1,7 +1,7 @@
 import {describe, it} from "bun:test";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {between} from "@bodar/totallylazy/predicates/BetweenPredicate";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {between} from "@bodar/totallylazy/predicates/BetweenPredicate.ts";
 
 describe("BetweenPredicate", () => {
     const predicate = between(2, 4);

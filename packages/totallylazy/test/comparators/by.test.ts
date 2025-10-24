@@ -1,10 +1,10 @@
 import {describe, it} from "bun:test";
-import {assertFalse, assertThat, assertTrue} from "@bodar/totallylazy/asserts/assertThat";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {by, isByComparator} from "@bodar/totallylazy/comparators/by";
-import {descending} from "@bodar/totallylazy/comparators/descending";
-import {property} from "@bodar/totallylazy/functions/Property";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
+import {assertFalse, assertThat, assertTrue} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {by, isByComparator} from "@bodar/totallylazy/comparators/by.ts";
+import {descending} from "@bodar/totallylazy/comparators/descending.ts";
+import {property} from "@bodar/totallylazy/functions/Property.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 
 interface Car {
     make: string;

@@ -1,8 +1,8 @@
 import {describe, it} from "bun:test";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {ArrayView, view} from "@bodar/totallylazy/parsers/View";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {ArrayView, view} from "@bodar/totallylazy/parsers/View.ts";
 
 
 describe("ArrayView", () => {

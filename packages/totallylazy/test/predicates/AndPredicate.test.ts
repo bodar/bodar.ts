@@ -1,11 +1,11 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {alwaysTrue, alwaysFalse} from "@bodar/totallylazy/functions/constant"
-import {not} from "@bodar/totallylazy/predicates/NotPredicate";
-import {or} from "@bodar/totallylazy/predicates/OrPredicate";
-import {and, isAndPredicate} from "@bodar/totallylazy/predicates/AndPredicate";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {alwaysTrue, alwaysFalse} from "@bodar/totallylazy/functions/constant.ts"
+import {not} from "@bodar/totallylazy/predicates/NotPredicate.ts";
+import {or} from "@bodar/totallylazy/predicates/OrPredicate.ts";
+import {and, isAndPredicate} from "@bodar/totallylazy/predicates/AndPredicate.ts";
 
 const even = (x: number) => x % 2 === 0;
 

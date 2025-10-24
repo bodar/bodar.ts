@@ -1,10 +1,10 @@
 import {describe, it} from "bun:test";
-import {view} from "@bodar/totallylazy/parsers/View";
-import {assertThat, assertTrue} from "@bodar/totallylazy/asserts/assertThat";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {Json} from "@bodar/totallylazy/grammars/Json";
-import {Failure} from "@bodar/totallylazy/parsers/Failure";
+import {view} from "@bodar/totallylazy/parsers/View.ts";
+import {assertThat, assertTrue} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {Json} from "@bodar/totallylazy/grammars/Json.ts";
+import {Failure} from "@bodar/totallylazy/parsers/Failure.ts";
 
 describe("Json", () => {
     it("can parse null", () => {

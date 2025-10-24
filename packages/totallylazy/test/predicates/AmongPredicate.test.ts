@@ -1,7 +1,7 @@
 import {describe, it} from "bun:test";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {among} from "@bodar/totallylazy/predicates/AmongPredicate";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {among} from "@bodar/totallylazy/predicates/AmongPredicate.ts";
 
 describe("AmongPredicate", () => {
     const vowels = among('aeiou');

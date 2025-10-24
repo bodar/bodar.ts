@@ -1,9 +1,9 @@
 import {describe, it} from "bun:test";
-import { assertThat } from "@bodar/totallylazy/asserts/assertThat";
-import {fromArray, fromString} from "@bodar/totallylazy/collections/ArraySegment";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {empty} from "@bodar/totallylazy/collections/Segment";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
+import { assertThat } from "@bodar/totallylazy/asserts/assertThat.ts";
+import {fromArray, fromString} from "@bodar/totallylazy/collections/ArraySegment.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {empty} from "@bodar/totallylazy/collections/Segment.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 
 describe("ArraySegment", async () => {
     it("supports is empty", function() {

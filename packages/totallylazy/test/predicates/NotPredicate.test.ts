@@ -1,7 +1,7 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {not} from "@bodar/totallylazy/predicates/NotPredicate";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {not} from "@bodar/totallylazy/predicates/NotPredicate.ts";
 
 describe("NotPredicate", () => {
     it("negates the original predicate", () => {

@@ -1,13 +1,13 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {view} from "@bodar/totallylazy/parsers/View";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {parser} from "@bodar/totallylazy/parsers/Parser";
-import {repeat} from "@bodar/totallylazy/parsers/RepeatParser";
-import {matches} from "@bodar/totallylazy/parsers/PredicatesParser";
-import {digit} from "@bodar/totallylazy/predicates/characters";
-import {Failure} from "@bodar/totallylazy/parsers/Failure";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {view} from "@bodar/totallylazy/parsers/View.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {parser} from "@bodar/totallylazy/parsers/Parser.ts";
+import {repeat} from "@bodar/totallylazy/parsers/RepeatParser.ts";
+import {matches} from "@bodar/totallylazy/parsers/PredicatesParser.ts";
+import {digit} from "@bodar/totallylazy/predicates/characters.ts";
+import {Failure} from "@bodar/totallylazy/parsers/Failure.ts";
 
 describe("RepeatParser", () => {
     describe("repeat", () => {

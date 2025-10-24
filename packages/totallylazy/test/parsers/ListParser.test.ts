@@ -1,13 +1,13 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {view} from "@bodar/totallylazy/parsers/View";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {string} from "@bodar/totallylazy/parsers/StringParser";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {view} from "@bodar/totallylazy/parsers/View.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {string} from "@bodar/totallylazy/parsers/StringParser.ts";
 import {pair, triple, list, tuple} from "@bodar/totallylazy/parsers/ListParser.ts";
 import {regex} from "@bodar/totallylazy/parsers/RegexParser.ts";
-import {map} from "@bodar/totallylazy/transducers/MapTransducer";
-import {parser} from "@bodar/totallylazy/parsers/Parser";
+import {map} from "@bodar/totallylazy/transducers/MapTransducer.ts";
+import {parser} from "@bodar/totallylazy/parsers/Parser.ts";
 import type {Result} from "@bodar/totallylazy/parsers/Result.ts";
 
 describe("ListParser", () => {

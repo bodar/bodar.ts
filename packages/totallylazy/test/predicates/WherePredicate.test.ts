@@ -1,11 +1,11 @@
 import {describe, it} from "bun:test";
-import {isWherePredicate, where} from "@bodar/totallylazy/predicates/WherePredicate";
-import type {Property} from "@bodar/totallylazy/functions/Property";
-import {property} from "@bodar/totallylazy/functions/Property";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {assertThat, assertTrue} from "@bodar/totallylazy/asserts/assertThat";
-import {isNotPredicate, not} from "@bodar/totallylazy/predicates/NotPredicate";
+import {isWherePredicate, where} from "@bodar/totallylazy/predicates/WherePredicate.ts";
+import type {Property} from "@bodar/totallylazy/functions/Property.ts";
+import {property} from "@bodar/totallylazy/functions/Property.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {assertThat, assertTrue} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {isNotPredicate, not} from "@bodar/totallylazy/predicates/NotPredicate.ts";
 
 interface Car {
     make: string;

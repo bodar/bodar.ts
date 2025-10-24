@@ -1,8 +1,8 @@
 import {describe, it} from "bun:test";
-import {isProperty, property} from "@bodar/totallylazy/functions/Property";
-import type {Property} from "@bodar/totallylazy/functions/Property";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
+import {isProperty, property} from "@bodar/totallylazy/functions/Property.ts";
+import type {Property} from "@bodar/totallylazy/functions/Property.ts";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 
 interface Car {
     make: string;

@@ -1,7 +1,7 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {is, isIsPredicate} from "@bodar/totallylazy/predicates/IsPredicate";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {is, isIsPredicate} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 
 describe("IsPredicate", () => {
     it("uses Object.is for equality", () => {

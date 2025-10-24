@@ -1,10 +1,10 @@
 import {describe, it} from "bun:test";
-import {property} from "@bodar/totallylazy/functions/Property";
-import type {Property} from "@bodar/totallylazy/functions/Property";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {select} from "@bodar/totallylazy/functions/Select";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
+import {property} from "@bodar/totallylazy/functions/Property.ts";
+import type {Property} from "@bodar/totallylazy/functions/Property.ts";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {select} from "@bodar/totallylazy/functions/Select.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 
 describe("Select", () => {
     interface Car {

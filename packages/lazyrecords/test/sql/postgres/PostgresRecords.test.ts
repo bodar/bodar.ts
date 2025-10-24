@@ -1,12 +1,12 @@
 import {describe, it} from "bun:test";
-import {PostgresRecords} from "@bodar/lazyrecords/sql/postgres/PostgresRecords";
-import {property} from "@bodar/totallylazy/functions/Property";
-import {filter} from "@bodar/totallylazy/transducers/FilterTransducer";
-import {where} from "@bodar/totallylazy/predicates/WherePredicate";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {definition} from "@bodar/lazyrecords/sql/builder/builders";
-import {select} from "@bodar/totallylazy/functions/Select";
-import {map} from "@bodar/totallylazy/transducers/MapTransducer";
+import {PostgresRecords} from "@bodar/lazyrecords/sql/postgres/PostgresRecords.ts";
+import {property} from "@bodar/totallylazy/functions/Property.ts";
+import {filter} from "@bodar/totallylazy/transducers/FilterTransducer.ts";
+import {where} from "@bodar/totallylazy/predicates/WherePredicate.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {definition} from "@bodar/lazyrecords/sql/builder/builders.ts";
+import {select} from "@bodar/totallylazy/functions/Select.ts";
+import {map} from "@bodar/totallylazy/transducers/MapTransducer.ts";
 import {SQL} from "bun";
 
 

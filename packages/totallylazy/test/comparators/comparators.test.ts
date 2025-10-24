@@ -1,10 +1,10 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {ascending} from "@bodar/totallylazy/comparators/ascending";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {comparators} from "@bodar/totallylazy/comparators/comparators";
-import {by} from "@bodar/totallylazy/comparators/by";
-import {descending} from "@bodar/totallylazy/comparators/descending";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {ascending} from "@bodar/totallylazy/comparators/ascending.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {comparators} from "@bodar/totallylazy/comparators/comparators.ts";
+import {by} from "@bodar/totallylazy/comparators/by.ts";
+import {descending} from "@bodar/totallylazy/comparators/descending.ts";
 
 describe("comparators", () => {
     it("can compose multiple comparators to sort by more than 1 property", () => {

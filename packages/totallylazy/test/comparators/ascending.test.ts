@@ -1,7 +1,7 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {ascending} from "@bodar/totallylazy/comparators/ascending";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {ascending} from "@bodar/totallylazy/comparators/ascending.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 
 describe("ascending", () => {
     it("follows the Java comparator contract", () => {

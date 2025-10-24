@@ -1,9 +1,9 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {filter, isFilterTransducer} from "@bodar/totallylazy/transducers/FilterTransducer";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {Transducer} from "@bodar/totallylazy/transducers/Transducer";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {filter, isFilterTransducer} from "@bodar/totallylazy/transducers/FilterTransducer.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {Transducer} from "@bodar/totallylazy/transducers/Transducer.ts";
 
 const even = (x: number) => x % 2 === 0;
 const transducer = filter(even);

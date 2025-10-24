@@ -1,6 +1,6 @@
 import {describe, expect, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 
 describe("assertThat", () => {
     it('does not throw when predicate matches', () => {

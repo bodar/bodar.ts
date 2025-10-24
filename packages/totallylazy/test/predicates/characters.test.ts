@@ -1,7 +1,7 @@
 import {describe, it} from "bun:test";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {alphaNumeric, digit, hexDigit, letter, whitespace} from "@bodar/totallylazy/predicates/characters";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {alphaNumeric, digit, hexDigit, letter, whitespace} from "@bodar/totallylazy/predicates/characters.ts";
 
 describe("characters", () => {
 

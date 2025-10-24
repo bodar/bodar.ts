@@ -2,9 +2,7 @@
   "name": "bodar",
   "private": true,
   "workspaces": [
-    "packages/*",
-    "packages/**/src",
-    "packages/**/test"
+    "packages/*"
   ],
   "devDependencies": {
     "typescript": "^5.7.3",

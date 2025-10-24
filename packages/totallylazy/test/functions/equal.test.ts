@@ -1,7 +1,7 @@
 import {describe, it} from "bun:test";
-import {assertFalse, assertTrue} from "@bodar/totallylazy/asserts/assertThat";
-import {equal} from "@bodar/totallylazy/functions/equal";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
+import {assertFalse, assertTrue} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {equal} from "@bodar/totallylazy/functions/equal.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 
 describe("equal", () => {
     it("handles primitives", () => {

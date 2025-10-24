@@ -1,8 +1,8 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {map, isMapTransducer} from "@bodar/totallylazy/transducers/MapTransducer";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {map, isMapTransducer} from "@bodar/totallylazy/transducers/MapTransducer.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 
 describe("MapTransducer", () => {
     const transducer = map(String);

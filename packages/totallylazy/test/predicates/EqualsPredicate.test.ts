@@ -1,8 +1,8 @@
 import {describe, it} from "bun:test";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {assertThat, assertTrue, assertFalse} from "@bodar/totallylazy/asserts/assertThat";
-import {equal} from "@bodar/totallylazy/functions/equal";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {assertThat, assertTrue, assertFalse} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {equal} from "@bodar/totallylazy/functions/equal.ts";
 
 describe("EqualsPredicate", () => {
     it("is inspectable", () => {

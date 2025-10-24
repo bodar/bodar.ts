@@ -1,10 +1,10 @@
 import {describe, it} from "bun:test";
-import {assertThat} from "@bodar/totallylazy/asserts/assertThat";
-import {filter} from "@bodar/totallylazy/transducers/FilterTransducer";
-import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate";
-import {compose} from "@bodar/totallylazy/transducers/CompositeTransducer";
-import {map} from "@bodar/totallylazy/transducers/MapTransducer";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {filter} from "@bodar/totallylazy/transducers/FilterTransducer.ts";
+import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {compose} from "@bodar/totallylazy/transducers/CompositeTransducer.ts";
+import {map} from "@bodar/totallylazy/transducers/MapTransducer.ts";
 
 describe("CompositeTransducer", () => {
     const even = (x: number) => x % 2 === 0;
