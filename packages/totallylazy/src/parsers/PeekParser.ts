@@ -24,7 +24,7 @@ export class PeekParser<A, B> implements Parser<A, B> {
  * @example
  * ```ts
  * const peekDigit = peek(matches(digit));
- * const result = peekDigit.parse(fromString("123"));
+ * const result = peekDigit.parse(view("123"));
  * // Success with value "1", but remainder is still "123"
  * ```
  */

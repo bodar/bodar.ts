@@ -26,8 +26,8 @@ export class OrParser<A, B> implements Parser<A, B> {
  * @example
  * ```ts
  * const numberOrWord = or(digits, letters);
- * numberOrWord.parse(fromString("123")); // Success with "123"
- * numberOrWord.parse(fromString("abc")); // Success with "abc"
+ * numberOrWord.parse(view("123")); // Success with "123"
+ * numberOrWord.parse(view("abc")); // Success with "abc"
  * ```
  */
 export function or<A, B>(second: Parser<A, B>): (parser: Parser<A, B>) => Parser<A, B>;

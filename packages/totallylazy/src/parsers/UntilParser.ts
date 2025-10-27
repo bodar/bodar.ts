@@ -33,7 +33,7 @@ export class UntilParser<A, B> implements Parser<A, B[]> {
  * ```ts
  * const untilEof = until(eof());
  * const allDigits = untilEof(matches(digit));
- * allDigits.parse(fromString("123")); // Success with ["1", "2", "3"]
+ * allDigits.parse(view("123")); // Success with ["1", "2", "3"]
  * ```
  */
 export function until<A, B>(stop: Parser<A, any>): (step: Parser<A, B>) => Parser<A, B[]> {

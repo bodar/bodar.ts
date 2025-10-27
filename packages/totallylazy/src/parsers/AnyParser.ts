@@ -20,7 +20,7 @@ export class AnyParser<A> implements Parser<A,A>{
  * @example
  * ```ts
  * const parser = any<string>();
- * parser.parse(fromString("abc")); // Success with value "a"
+ * parser.parse(view("abc")); // Success with value "a"
  * ```
  */
 export function any<A>(): Parser<A, A> {

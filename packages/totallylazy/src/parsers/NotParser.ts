@@ -24,8 +24,8 @@ export class NotParser<A> implements Parser<A, undefined> {
  * @example
  * ```ts
  * const notDigit = not(matches(digit));
- * notDigit.parse(fromString("a")); // Success
- * notDigit.parse(fromString("1")); // Failure
+ * notDigit.parse(view("a")); // Success
+ * notDigit.parse(view("1")); // Failure
  * ```
  */
 export function not<A>(): (parser: Parser<A, any>) => Parser<A, undefined>;

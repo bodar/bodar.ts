@@ -42,8 +42,8 @@ export class RepeatParser<A, B> implements Parser<A, B[]> {
  * @example
  * ```ts
  * const threeDigits = repeat(3, 3, matches(digit));
- * threeDigits.parse(fromString("123")); // Success with ["1", "2", "3"]
- * threeDigits.parse(fromString("12")); // Failure (too few)
+ * threeDigits.parse(view("123")); // Success with ["1", "2", "3"]
+ * threeDigits.parse(view("12")); // Failure (too few)
  * ```
  */
 export function repeat<A, B>(): (parser: Parser<A, B>) => Parser<A, B[]>;

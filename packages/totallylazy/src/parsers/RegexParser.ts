@@ -27,7 +27,7 @@ export class RegexParser implements Parser<string, string> {
  * @example
  * ```ts
  * const digits = regex(/\d+/);
- * digits.parse(fromString("123abc")); // Success with "123"
+ * digits.parse(view("123abc")); // Success with "123"
  * ```
  */
 export function regex(matcher: RegExp, fromStart: boolean = true): Parser<string, string> {

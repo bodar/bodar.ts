@@ -24,8 +24,8 @@ export class StringParser implements Parser<string, string> {
  * @example
  * ```ts
  * const parser = string("hello");
- * parser.parse(fromString("hello world")); // Success with "hello"
- * parser.parse(fromString("goodbye")); // Failure
+ * parser.parse(view("hello world")); // Success with "hello"
+ * parser.parse(view("goodbye")); // Failure
  * ```
  */
 export function string(expected: string): Parser<string, string> {

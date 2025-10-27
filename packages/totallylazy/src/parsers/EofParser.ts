@@ -20,8 +20,8 @@ export class EofParser<A> implements Parser<A, undefined> {
  * @example
  * ```ts
  * const parser = eof<string>();
- * parser.parse(fromString("")); // Success
- * parser.parse(fromString("a")); // Failure
+ * parser.parse(view("")); // Success
+ * parser.parse(view("a")); // Failure
  * ```
  */
 export function eof<A>(): Parser<A, undefined> {

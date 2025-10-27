@@ -33,7 +33,7 @@ type InferResult<P> = P extends Parser<any, infer R> ? R : never;
  * @example
  * ```ts
  * const parser = list(string("a"), string("b"));
- * parser.parse(fromString("ab")); // Success with ["a", "b"]
+ * parser.parse(view("ab")); // Success with ["a", "b"]
  * ```
  */
 export function list<P extends Parser<any, any>[]>(...parsers: P): Parser<InferInput<P[number]>, InferResult<P[number]>[]> {
@@ -46,7 +46,7 @@ export function list<P extends Parser<any, any>[]>(...parsers: P): Parser<InferI
  * @example
  * ```ts
  * const parser = tuple(string("a"), regex(/\d+/));
- * parser.parse(fromString("a123")); // Success with ["a", "123"] as [string, string]
+ * parser.parse(view("a123")); // Success with ["a", "123"] as [string, string]
  * ```
  */
 export function tuple<P extends Parser<any, any>[]>(...parsers: P): Parser<InferInput<P[number]>, { [I in keyof P]: InferResult<P[I]> }> {
@@ -59,7 +59,7 @@ export function tuple<P extends Parser<any, any>[]>(...parsers: P): Parser<Infer
  * @example
  * ```ts
  * const parser = pair(string("a"), string("b"));
- * parser.parse(fromString("ab")); // Success with ["a", "b"]
+ * parser.parse(view("ab")); // Success with ["a", "b"]
  * ```
  */
 export function pair<A, B, C>(first: Parser<A, B>, second: Parser<A, C>): Parser<A, [B, C]> {
@@ -72,7 +72,7 @@ export function pair<A, B, C>(first: Parser<A, B>, second: Parser<A, C>): Parser
  * @example
  * ```ts
  * const parser = triple(string("a"), string("b"), string("c"));
- * parser.parse(fromString("abc")); // Success with ["a", "b", "c"]
+ * parser.parse(view("abc")); // Success with ["a", "b", "c"]
  * ```
  */
 export function triple<A, B, C, D>(first: Parser<A, B>, second: Parser<A, C>, third: Parser<A, D>): Parser<A, [B, C, D]> {

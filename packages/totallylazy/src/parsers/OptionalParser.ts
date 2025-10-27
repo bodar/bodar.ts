@@ -25,8 +25,8 @@ export class OptionalParser<A, B> implements Parser<A, B | undefined> {
  * @example
  * ```ts
  * const optionalSign = optional(matches(/[+-]/));
- * optionalSign.parse(fromString("+123")); // Success with "+"
- * optionalSign.parse(fromString("123")); // Success with undefined
+ * optionalSign.parse(view("+123")); // Success with "+"
+ * optionalSign.parse(view("123")); // Success with undefined
  * ```
  */
 export function optional<A, B>(): (parser: Parser<A, B>) => Parser<A, B | undefined> ;
