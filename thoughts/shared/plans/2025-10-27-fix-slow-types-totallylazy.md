@@ -86,9 +86,9 @@ Update the comment to reflect that we're publishing both packages:
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
-- [ ] Script syntax is correct: `./run check`
-- [ ] All tests pass: `./run test`
-- [ ] Build succeeds: `./run build`
+- [x] Script syntax is correct: `./run check`
+- [x] All tests pass: `./run test`
+- [x] Build succeeds: `./run build`
 
 **Implementation Note**: After all verification passes, commit and push changes to trigger CI/CD to see what slow type errors JSR reports.
 
