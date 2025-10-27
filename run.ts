@@ -87,8 +87,8 @@ export async function regenerateExports(packageGlob: string = "packages/*/packag
 export async function publish() {
     const v = await version();
 
-    // Only publish yadic package
-    for await (const f of new Glob("packages/yadic/package.json").scan(".")) {
+    // Publish yadic and totallylazy packages (lazyrecords pending totallylazy publication)
+    for await (const f of new Glob("packages/{yadic,totallylazy}/package.json").scan(".")) {
         const packageJson = await file(f).json();
         const parent = dirname(f!);
         const jsrFile = file(join(parent, 'jsr.json'));
@@ -101,7 +101,7 @@ export async function publish() {
         }, null, 2));
     }
 
-    await $`bunx jsr publish --allow-dirty --token ${process.env.JSR_TOKEN}`;
+    await $`bunx jsr publish --allow-dirty --verbose --token ${process.env.JSR_TOKEN}`;
     await $`rm -rf **/jsr.json`;
 }
 
