@@ -317,6 +317,13 @@ Document remaining files to push percentage from 54% to 80% for maximum points.
 - [x] `packages/totallylazy/src/collections/Sequence.ts` - Added JSDoc to iterate() and repeat() functions
 - [x] `packages/totallylazy/src/collections/Single.ts` - Added JSDoc to single() function
 - [x] Fixed all parser examples to use view() instead of fromString()
+- [x] Documented transducer type guards: isMapTransducer, isFilterTransducer, isFlatMapTransducer
+- [x] Documented Transducer.transducer() factory function
+- [x] Documented ArraySegment.fromArray() and fromString()
+- [x] Documented Sequence.sequence() overloads with example
+- [x] Documented lazy.ts exports (lazy function, interfaces, helper classes)
+- [x] Documented Jsdoc.ts exports (JsdocTags interface, JsdocComment class)
+- [x] Documented C.ts Comment class
 
 ### Files Already Documented:
 - ✅ CompositeTransducer.ts - Already has full documentation

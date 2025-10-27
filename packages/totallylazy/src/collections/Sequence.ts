@@ -24,6 +24,21 @@ export class Sequence<T> implements Iterable<T> {
 
 /**
  * Creates a Sequence from the given iterable and transducers
+ *
+ * @example
+ * ```typescript
+ * import { sequence } from "@bodar/totallylazy/collections/Sequence.ts";
+ * import { filter } from "@bodar/totallylazy/transducers/FilterTransducer.ts";
+ * import { map } from "@bodar/totallylazy/transducers/MapTransducer.ts";
+ *
+ * const numbers = [1, 2, 3, 4, 5];
+ * const result = sequence(
+ *   numbers,
+ *   filter((x: number) => x % 2 === 0),
+ *   map(String)
+ * );
+ * Array.from(result); // ['2', '4']
+ * ```
  */
 export function sequence<A>(a: Iterable<A>): Sequence<A>;
 export function sequence<A, B>(a: Iterable<A>, b: Transducer<A, B>): Sequence<B>;

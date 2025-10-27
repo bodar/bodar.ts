@@ -11,10 +11,25 @@ import {regex} from "../parsers/RegexParser.ts";
 import {between, many, next, then, whitespace as ws} from "../parsers/parsers.ts";
 import {map} from "../transducers/MapTransducer.ts";
 
+/**
+ * JSDoc tag annotations extracted from comments
+ */
 export interface JsdocTags {
     type: string;
 }
 
+/**
+ * Represents a parsed JSDoc comment with its tags
+ *
+ * @example
+ * ```typescript
+ * import { Jsdoc } from "@bodar/totallylazy/grammars/Jsdoc.ts";
+ * import { view } from "@bodar/totallylazy/parsers/View.ts";
+ *
+ * const result = Jsdoc.jsdoc.parse(view('/＊＊ @type {Map} ＊/'));
+ * result.value; // JsdocComment with tags: { type: 'Map' }
+ * ```
+ */
 export class JsdocComment {
     constructor(public tags: Partial<JsdocTags>) {
     }

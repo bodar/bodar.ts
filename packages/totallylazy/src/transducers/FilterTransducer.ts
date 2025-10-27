@@ -37,8 +37,16 @@ export function reject<A>(predicate: Predicate<A>): FilterTransducer<A> {
     return filter(not(predicate));
 }
 
-
-
+/**
+ * Type guard to check if a value is a FilterTransducer
+ *
+ * @example
+ * ```typescript
+ * const evenFilter = filter((x: number) => x % 2 === 0);
+ * isFilterTransducer(evenFilter); // true
+ * isFilterTransducer(() => false); // false
+ * ```
+ */
 export function isFilterTransducer(value: any): value is FilterTransducer<any> {
     return value instanceof Transducer && value[Transducer.type] === 'filter' && Object.hasOwn(value, 'predicate');
 }

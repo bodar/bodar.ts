@@ -24,6 +24,16 @@ export function flatMap<A, B>(mapper: Mapper<A, Iterable<B>>): FlatMapTransducer
     }, {mapper});
 }
 
+/**
+ * Type guard to check if a value is a FlatMapTransducer
+ *
+ * @example
+ * ```typescript
+ * const flatten = flatMap((x: string[]) => x);
+ * isFlatMapTransducer(flatten); // true
+ * isFlatMapTransducer(() => []); // false
+ * ```
+ */
 export function isFlatMapTransducer(value: any): value is FlatMapTransducer<any, any> {
     return value instanceof Transducer && value[Transducer.type] === 'flatMap' && Object.hasOwn(value, 'mapper');
 }

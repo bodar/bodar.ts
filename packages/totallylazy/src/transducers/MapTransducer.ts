@@ -24,6 +24,16 @@ export function map<A, B>(mapper: Mapper<A, B>): MapTransducer<A, B> {
     }, {mapper});
 }
 
+/**
+ * Type guard to check if a value is a MapTransducer
+ *
+ * @example
+ * ```typescript
+ * const mapper = map(String);
+ * isMapTransducer(mapper); // true
+ * isMapTransducer(() => 'false'); // false
+ * ```
+ */
 export function isMapTransducer(value: any): value is MapTransducer<any, any> {
     return value instanceof Transducer && value[Transducer.type] === 'map' && Object.hasOwn(value, 'mapper');
 }

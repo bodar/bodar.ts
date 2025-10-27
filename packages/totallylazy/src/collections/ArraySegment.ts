@@ -43,10 +43,41 @@ export class ArraySegment<T> implements Segment<T> {
     }
 }
 
+/**
+ * Creates a Segment from an array-like object
+ *
+ * @param array - The array-like object to create a segment from
+ * @returns A Segment providing lazy head/tail access over the array
+ *
+ * @example
+ * ```typescript
+ * const seg = fromArray([1, 2, 3]);
+ * seg.head; // 1
+ * seg.tail.head; // 2
+ *
+ * const bytes = new Uint8Array([72, 69, 76, 76, 79]);
+ * const byteSeg = fromArray(bytes);
+ * byteSeg.head; // 72
+ * ```
+ */
 export function fromArray<T>(array: ArrayLike<T>): Segment<T> {
     return new ArraySegment(array);
 }
 
+/**
+ * Creates a Segment from a string by splitting it into characters
+ *
+ * @param value - The string to create a segment from
+ * @returns A Segment providing lazy head/tail access over the characters
+ *
+ * @example
+ * ```typescript
+ * const seg = fromString("HELLO");
+ * seg.head; // 'H'
+ * seg.tail.head; // 'E'
+ * Array.from(seg); // ['H', 'E', 'L', 'L', 'O']
+ * ```
+ */
 export function fromString(value: string): Segment<string> {
     return fromArray(characters(value));
 }
