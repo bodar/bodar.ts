@@ -1,6 +1,7 @@
 {
   "name": "@bodar/totallylazy",
   "version": "0.0.0",
+  "description": "Functional programming utilities for TypeScript including lazy sequences, parsers, predicates, and transducers",
   "type": "module",
   "exports": {
     "./predicates/IsPredicate.ts": "./src/predicates/IsPredicate.ts",
