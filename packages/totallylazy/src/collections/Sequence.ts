@@ -45,43 +45,32 @@ type Head<T extends any[]> = T extends [infer H, ...any] ? H : never;
 
 // Recursive type to validate transducer chaining
 type ValidateTransducers<
-  T extends Transducer<any, any>[],
-  Cache extends Transducer<any, any>[] = []
+    T extends Transducer<any, any>[],
+    Cache extends Transducer<any, any>[] = []
 > = T extends []
-  ? Cache
-  : T extends [infer Last]
-  ? Last extends Transducer<any, any>
-    ? [...Cache, Last]
-    : never
-  : T extends [infer First, ...infer Rest]
-  ? First extends Transducer<infer _A, infer B>
-    ? Rest extends Transducer<any, any>[]
-      ? Head<Rest> extends Transducer<infer C, any>
-        ? B extends C  // Output of First must match input of Next
-          ? ValidateTransducers<Rest, [...Cache, First]>
-          : never  // Type mismatch - compilation error
-        : never
-      : never
-    : never
-  : never;
+    ? Cache
+    : T extends [infer Last]
+        ? Last extends Transducer<any, any>
+            ? [...Cache, Last]
+            : never
+        : T extends [infer First, ...infer Rest]
+            ? First extends Transducer<infer _A, infer B>
+                ? Rest extends Transducer<any, any>[]
+                    ? Head<Rest> extends Transducer<infer C, any>
+                        ? B extends C  // Output of First must match input of Next
+                            ? ValidateTransducers<Rest, [...Cache, First]>
+                            : never  // Type mismatch - compilation error
+                        : never
+                    : never
+                : never
+            : never;
 
 // Extract the output type of the last transducer
 type LastOutput<T extends Transducer<any, any>[]> =
-  T extends [...any, Transducer<any, infer Z>] ? Z : never;
+    T extends [...any, Transducer<any, infer Z>] ? Z : never;
 
-// // Overload for no transducers
-// export function sequence<A>(a: Iterable<A>): Sequence<A>;
-// // Explicit overload for 1 transducer (for better contextual typing with inline lambdas)
-// export function sequence<A, B>(a: Iterable<A>, b: Transducer<A, B>): Sequence<B>;
-// // Explicit overload for 2 transducers (for better contextual typing with inline lambdas)
-// export function sequence<A, B, C>(a: Iterable<A>, b: Transducer<A, B>, c: Transducer<B, C>): Sequence<C>;
-// Recursive type validation for 3+ transducers
-export function sequence<S, T extends readonly Transducer<any, any>[]>(
-  source: Iterable<S>,
-  ...transducers: T & (ValidateTransducers<[...T]> extends [...T] ? unknown : never)
-): Sequence<LastOutput<[...T]>>;
-// Implementation signature
-export function sequence(source: Iterable<any>, ...transducers: readonly Transducer<any, any>[]): Sequence<any> {
+export function sequence<S, T extends Transducer<any, any>[]>(
+    source: Iterable<S>, ...transducers: T & (ValidateTransducers<T> extends T ? unknown : never)): Sequence<LastOutput<T>> {
     if (source instanceof Sequence) {
         return new Sequence<any>(source.source, flatten([...source.transducers, ...transducers]));
     }
