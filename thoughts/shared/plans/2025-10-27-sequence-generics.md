@@ -105,10 +105,10 @@ export function sequence(source: Iterable<any>, ...transducers: readonly Transdu
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
-- [ ] Type checking passes: `./run check`
-- [ ] All tests pass: `./run test packages/totallylazy/test/collections/Sequence.test.ts`
-- [ ] Build succeeds: `./run build`
-- [ ] Verify type inference still works correctly by checking test file compiles
+- [x] Type checking passes: `./run check`
+- [x] All tests pass: `./run test packages/totallylazy/test/collections/Sequence.test.ts`
+- [x] Build succeeds: `./run build`
+- [x] Verify type inference still works correctly by checking test file compiles
 
 **Implementation Note**: After all pre-commit verification passes, pause and request human approval to commit and push changes.
 
