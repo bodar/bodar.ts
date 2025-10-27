@@ -165,12 +165,14 @@ Read each file and add appropriate @module JSDoc documentation based on:
 - [x] Review module docs are accurate based on tests
 
 #### Build Verification:
-- [ ] CircleCI build completes successfully
+- [x] CircleCI build completes successfully
 
 #### Post-deployment Verification (Production):
-- [ ] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/totallylazy/score | jq .allEntrypointsDocs`
-- [ ] Expected result: `true`
-- [ ] Score should increase to ~76% (+1 point)
+- [x] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/totallylazy/score | jq .allEntrypointsDocs`
+- [ ] Expected result: `true` - Still shows false, may need more documentation
+- [ ] Score should increase to ~76% (+1 point) - Score remains at 12/17, but percentageDocumentedSymbols increased from 0.293 to 0.303
+
+**Note**: Module documentation was added to all identified missing entrypoints. The allEntrypointsDocs criterion may require additional work or JSR may need more time to update. Moving forward with symbol documentation which will also help.
 
 ---
 
@@ -216,9 +218,9 @@ Document the most commonly used exported symbols to reach 80% documentation thre
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
-- [ ] Type checking passes: `./run check`
-- [ ] Tests pass: `./run test`
-- [ ] Each symbol has JSDoc with description and @example
+- [x] Type checking passes: `./run check`
+- [x] Tests pass: `./run test`
+- [x] Each symbol has JSDoc with description and @example
 
 #### Build Verification:
 - [ ] CircleCI build completes successfully

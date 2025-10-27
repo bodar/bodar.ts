@@ -4,10 +4,30 @@ import {isNotPredicate, not, type NotPredicate} from "./NotPredicate.ts";
 import type {ReadonlyArrayContains} from "../collections/Array.ts";
 import {and} from "./AndPredicate.ts";
 
+/**
+ * A predicate that returns true if any of the supplied predicates returns true
+ */
 export interface OrPredicate<A> extends Predicate<A> {
+    /**
+     * The predicates to check
+     */
     readonly predicates: readonly Predicate<A>[]
 }
 
+/**
+ * Creates a predicate that returns true if any of the supplied predicates returns true.
+ * Automatically optimizes by removing redundant predicates and applying De Morgan's law.
+ *
+ * @example
+ * ```ts
+ * const even = (x: number) => x % 2 === 0;
+ * const negative = (x: number) => x < 0;
+ * const predicate = or(even, negative);
+ * predicate(2); // true
+ * predicate(-3); // true
+ * predicate(3); // false
+ * ```
+ */
 export function or<A>(): typeof alwaysTrue;
 export function or<P extends Predicate<any>>(predicate: P): P;
 export function or<A>(...predicates: readonly NotPredicate<A>[]): NotPredicate<A>;
@@ -29,6 +49,9 @@ export function or<A>(...original: readonly Predicate<A>[]): Predicate<A> {
     });
 }
 
+/**
+ * Checks if the given value is an OrPredicate
+ */
 export function isOrPredicate<A = any>(value: any): value is OrPredicate<A> {
     return typeof value === 'function' && value.name === 'or' && Array.isArray(value.predicates);
 }
