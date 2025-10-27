@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * Array type utilities and helper functions for working with arrays and async iterables.
+ */
+
 export type ArrayContains<A, B> = Extract<A | B, B>[];
 export type ReadonlyArrayContains<A, B> = readonly Extract<A | B, B>[];
 

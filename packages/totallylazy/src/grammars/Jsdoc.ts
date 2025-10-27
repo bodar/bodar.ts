@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * JSDoc comment grammar parser for extracting type annotations and tags.
+ */
+
 import {parser} from "../parsers/Parser.ts";
 import type {Parser} from "../parsers/Parser.ts";
 import {string} from "../parsers/StringParser.ts";

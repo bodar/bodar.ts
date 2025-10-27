@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * Assertion functions for testing values against predicates.
+ */
+
 import type {Predicate} from "../predicates/Predicate.ts";
 import {is} from "../predicates/IsPredicate.ts";
 import { toString } from "../functions/toString.ts";

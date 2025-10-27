@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * Immutable linked-list-style segments with head/tail access for efficient lazy iteration.
+ */
+
 import {NoSuchElement} from "../errors/NoSuchElement.ts";
 
 export interface Segment<T> extends Iterable<T> {

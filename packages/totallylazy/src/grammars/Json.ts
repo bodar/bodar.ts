@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * JSON grammar parser with support for comments and custom type constructors via JSDoc annotations.
+ */
+
 import type {Parser} from "../parsers/Parser.ts";
 import {parser} from "../parsers/Parser.ts";
 import {string} from "../parsers/StringParser.ts";

@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * Array-backed segment implementation providing efficient head/tail access over array-like structures.
+ */
+
 import {NoSuchElement} from "../errors/NoSuchElement.ts";
 import {empty, type Segment, toString} from "./Segment.ts";
 import {characters} from "../functions/characters.ts";

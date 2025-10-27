@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * Extract a single value from an iterable with optional transducer transformations.
+ */
+
 import {Transducer} from "../transducers/Transducer.ts";
 import {sequence} from "./Sequence.ts";
 

@@ -90,13 +90,13 @@ Add package description to improve searchability and score +1 point.
 **Implementation Note**: After pre-commit verification passes, commit and push changes.
 
 #### Build Verification:
-- [ ] CircleCI build completes: Check via `mcp__circleci-mcp-server__get_latest_pipeline_status`
-- [ ] Build passes: Review logs if failures occur
+- [x] CircleCI build completes: Check via `mcp__circleci-mcp-server__get_latest_pipeline_status`
+- [x] Build passes: Review logs if failures occur
 
 #### Post-deployment Verification (Production):
-- [ ] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/totallylazy/score | jq .hasDescription`
-- [ ] Expected result: `true`
-- [ ] Score should increase to ~64% (+1 point)
+- [x] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/totallylazy/score | jq .hasDescription`
+- [x] Expected result: `true`
+- [x] Score should increase to ~64% (+1 point)
 
 ---
 
@@ -107,23 +107,18 @@ Mark package as compatible with multiple runtimes to score +1 point.
 
 ### Changes Required:
 
-Need to investigate how runtime compatibility is set for JSR packages. Check yadic package settings or JSR documentation.
-
-**Research needed**: Determine if this is set via:
-- Package.json field
-- JSR web interface
-- jsr.json configuration
+Runtime compatibility was marked via JSR web interface.
 
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
-- [ ] Determine correct configuration method
-- [ ] Apply configuration if file-based
+- [x] Determine correct configuration method - JSR web interface
+- [x] Apply configuration if file-based - N/A, done via web interface
 
 #### Post-deployment Verification (Production):
-- [ ] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/totallylazy/score | jq .multipleRuntimesCompatible`
-- [ ] Expected result: `true`
-- [ ] Score should increase to ~70% (+1 point)
+- [x] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/totallylazy/score | jq .multipleRuntimesCompatible`
+- [x] Expected result: `true`
+- [x] Score should increase to ~70% (+1 point)
 
 ---
 
@@ -165,9 +160,9 @@ Read each file and add appropriate @module JSDoc documentation based on:
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
-- [ ] Type checking passes: `./run check`
-- [ ] Tests pass: `./run test`
-- [ ] Review module docs are accurate based on tests
+- [x] Type checking passes: `./run check`
+- [x] Tests pass: `./run test`
+- [x] Review module docs are accurate based on tests
 
 #### Build Verification:
 - [ ] CircleCI build completes successfully

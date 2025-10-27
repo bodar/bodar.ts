@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * C-style comment grammar parser supporting single-line and multi-line comments.
+ */
+
 import {parser} from "../parsers/Parser.ts";
 import type {Parser} from "../parsers/Parser.ts";
 import {string} from "../parsers/StringParser.ts";
