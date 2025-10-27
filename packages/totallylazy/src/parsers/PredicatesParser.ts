@@ -21,6 +21,23 @@ export class PredicateParser<A> implements Parser<A, A> {
     }
 }
 
+/**
+ * Creates a parser that matches a single element if it satisfies the given predicate
+ *
+ * @param predicate - The predicate to test each element against
+ * @returns A parser that succeeds if the predicate returns true for the first element
+ *
+ * @example
+ * ```typescript
+ * import { matches } from "@bodar/totallylazy/parsers/PredicatesParser.ts";
+ * import { digit } from "@bodar/totallylazy/predicates/characters.ts";
+ * import { view } from "@bodar/totallylazy/parsers/View.ts";
+ *
+ * const digitParser = matches(digit);
+ * digitParser.parse(view('5abc')); // Success with value '5'
+ * digitParser.parse(view('abc')); // Failure
+ * ```
+ */
 export function matches<A>(predicate: Predicate<A>): Parser<A, A> {
     return new PredicateParser(predicate);
 }
