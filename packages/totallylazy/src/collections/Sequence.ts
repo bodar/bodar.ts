@@ -39,7 +39,14 @@ export function sequence(source: Iterable<any>, ...transducers: readonly Transdu
     return new Sequence<any>(source, flatten(transducers));
 }
 
-
+/**
+ * Creates an infinite sequence by repeatedly applying a generator function to a value
+ *
+ * @example
+ * ```ts
+ * iterate(x => x + 1, 0); // Generates 0, 1, 2, 3, ...
+ * ```
+ */
 export function* iterate<T>(generator: (t: T) => T, value: T): Iterable<T> {
     while (true) {
         yield value;
@@ -47,6 +54,14 @@ export function* iterate<T>(generator: (t: T) => T, value: T): Iterable<T> {
     }
 }
 
+/**
+ * Creates an infinite sequence by repeatedly calling a generator function
+ *
+ * @example
+ * ```ts
+ * repeat(() => Math.random()); // Generates infinite random numbers
+ * ```
+ */
 export function* repeat<T>(generator: () => T): Iterable<T> {
     while (true) {
         yield generator();

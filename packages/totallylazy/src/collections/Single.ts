@@ -7,6 +7,17 @@
 import {Transducer} from "../transducers/Transducer.ts";
 import {sequence} from "./Sequence.ts";
 
+/**
+ * Extracts the first value from an iterable, optionally applying transducers.
+ * Throws an error if the iterable is empty.
+ *
+ * @example
+ * ```ts
+ * single([1, 2, 3]); // 1
+ * single([1, 2, 3], map(x => x * 2)); // 2
+ * single([]); // Error: Expected a single value
+ * ```
+ */
 export function single<A>(iterable: Iterable<A>): A
 export function single<A, B>(a: Iterable<A>, b: Transducer<A, B>): B;
 export function single<A, B, C>(a: Iterable<A>, b: Transducer<A, B>, c: Transducer<B, C>): C;
