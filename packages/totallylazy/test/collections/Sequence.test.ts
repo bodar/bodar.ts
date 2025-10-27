@@ -27,7 +27,7 @@ describe("Sequence", () => {
     });
 
     it("collapse nested sequences", () => {
-        const r = sequence(t, filter<number>(v => v > 1), map(Number));
+        const r = sequence(t, filter<string>(v => v.length > 1), map(Number));
         assertThat(r.source, is(original));
         assertThat(r.transducers.length, is(4));
     });
