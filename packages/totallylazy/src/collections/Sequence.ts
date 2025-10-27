@@ -72,9 +72,9 @@ type LastOutput<T extends Transducer<any, any>[]> =
 export function sequence<S, T extends Transducer<any, any>[]>(
     source: Iterable<S>, ...transducers: T & (ValidateTransducers<T> extends T ? unknown : never)): Sequence<LastOutput<T>> {
     if (source instanceof Sequence) {
-        return new Sequence<any>(source.source, flatten([...source.transducers, ...transducers]));
+        return new Sequence(source.source, flatten([...source.transducers, ...transducers]));
     }
-    return new Sequence<any>(source, flatten(transducers));
+    return new Sequence(source, flatten(transducers));
 }
 
 /**
