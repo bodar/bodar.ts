@@ -15,9 +15,9 @@ export class Comment {
 }
 
 export class C {
-    static singleLineComment = parser(regex(/[^\n]*/), between(string('//'), or(string('\n'), eof())));
+    static singleLineComment: Parser<string, string> = parser(regex(/[^\n]*/), between(string('//'), or(string('\n'), eof())));
 
-    static multiLineComment = parser(any<string>(), until(string('*/')), between(string('/*'), string('*/')), map(characters => characters.join('')));
+    static multiLineComment: Parser<string, string> = parser(any<string>(), until(string('*/')), between(string('/*'), string('*/')), map(characters => characters.join('')));
 
     static comment: Parser<string, Comment> = parser(or(this.singleLineComment, this.multiLineComment), map(c => new Comment(c.trim())));
 }

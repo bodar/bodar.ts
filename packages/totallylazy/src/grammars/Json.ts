@@ -38,7 +38,7 @@ export class Json {
 
     static number: Parser<string, number> = parser(regex(/[-+eE.\d]+/), map(Number));
 
-    static whitespace<A>(instance: Parser<string, A>) {
+    static whitespace<A>(instance: Parser<string, A>): Parser<string, A> {
         return parser(whitespace(instance), surroundedBy(optional(C.comment)));
     }
 

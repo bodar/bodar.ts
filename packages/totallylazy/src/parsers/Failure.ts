@@ -13,7 +13,7 @@ export class Failure<A, B> implements Result<A, B> {
         throw new Error(this.toString());
     }
 
-    toString() {
+    toString(): string {
         return "Expected " + toString(this.expected) + " but was " + toString(this.actual);
     }
 

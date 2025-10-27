@@ -35,7 +35,7 @@ export class EmptySegment implements Segment<any> {
     }
 }
 
-export const empty = new EmptySegment();
+export const empty: EmptySegment = new EmptySegment();
 
 export class ASegment<T> implements Segment<T> {
     empty = false;
