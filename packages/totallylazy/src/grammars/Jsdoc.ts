@@ -15,7 +15,6 @@ import {map} from "../transducers/MapTransducer.ts";
  * JSDoc tag annotations extracted from comments
  */
 export interface JsdocTags {
-    /** The type annotation from the @type tag */
     type: string;
 }
 
@@ -38,15 +37,11 @@ export class JsdocComment {
 
 /** JSDoc comment grammar parser for extracting type annotations */
 export class Jsdoc {
-    /** Parser for type expressions in curly braces */
     static typeExpression: Parser<string, string> = parser(regex(/[a-zA-Z]+/), between(string('{'), string('}')));
 
-    /** Parser for @type tag with its type expression */
     static type: Parser<string, ['type', string]> = parser(ws(parser(string('@'), next(string('type')))), then(ws(Jsdoc.typeExpression)));
 
-    /** Parser for JSDoc tags, returning an object with tag names as keys */
     static tags: Parser<string, Partial<JsdocTags>> = parser(Jsdoc.type, many(), map(Object.fromEntries));
 
-    /** Parser for complete JSDoc comments */
     static jsdoc: Parser<string, JsdocComment> = parser(Jsdoc.tags, between(string('/**'), string('*/')), map(c => new JsdocComment(c)));
 }

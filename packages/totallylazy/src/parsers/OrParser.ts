@@ -22,13 +22,6 @@ export class OrParser<A, B> implements Parser<A, B> {
 /**
  * Creates a parser that tries multiple parsers in sequence, succeeding with the first that succeeds.
  * Also known as choice or alternative parser.
- *
- * @example
- * ```ts
- * const numberOrWord = or(digits, letters);
- * numberOrWord.parse(view("123")); // Success with "123"
- * numberOrWord.parse(view("abc")); // Success with "abc"
- * ```
  */
 export function or<A, B>(second: Parser<A, B>): (parser: Parser<A, B>) => Parser<A, B>;
 export function or<A, B>(...parsers: Parser<A, B>[]): Parser<A, B> ;

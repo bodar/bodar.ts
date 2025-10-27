@@ -16,12 +16,6 @@ export class AnyParser<A> implements Parser<A,A>{
 
 /**
  * Creates a parser that matches any single element from the input
- *
- * @example
- * ```ts
- * const parser = any<string>();
- * parser.parse(view("abc")); // Success with value "a"
- * ```
  */
 export function any<A>(): Parser<A, A> {
     return new AnyParser();

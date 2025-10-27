@@ -21,13 +21,6 @@ export class OptionalParser<A, B> implements Parser<A, B | undefined> {
 /**
  * Creates a parser that tries to parse but always succeeds, returning undefined if parsing fails.
  * Equivalent to the `?` operator in regular expressions.
- *
- * @example
- * ```ts
- * const optionalSign = optional(matches(/[+-]/));
- * optionalSign.parse(view("+123")); // Success with "+"
- * optionalSign.parse(view("123")); // Success with undefined
- * ```
  */
 export function optional<A, B>(): (parser: Parser<A, B>) => Parser<A, B | undefined> ;
 export function optional<A, B>(parser: Parser<A, B>): Parser<A, B | undefined> ;
