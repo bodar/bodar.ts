@@ -4,6 +4,9 @@ import type {Result} from "./Result.ts";
 import {Success, success} from "./Success.ts";
 import {fail} from "./Failure.ts";
 
+/**
+ * Parser that succeeds only when the wrapped parser fails (negative lookahead)
+ */
 export class NotParser<A> implements Parser<A, undefined> {
     constructor(private readonly parser: Parser<A, any>) {
     }
@@ -14,6 +17,17 @@ export class NotParser<A> implements Parser<A, undefined> {
     }
 }
 
+/**
+ * Creates a parser that succeeds when the given parser fails (negative lookahead).
+ * Does not consume input on success.
+ *
+ * @example
+ * ```ts
+ * const notDigit = not(matches(digit));
+ * notDigit.parse(fromString("a")); // Success
+ * notDigit.parse(fromString("1")); // Failure
+ * ```
+ */
 export function not<A>(): (parser: Parser<A, any>) => Parser<A, undefined>;
 export function not<A>(parser: Parser<A, any>): Parser<A, undefined>;
 export function not<A>(parser?: Parser<A, any>): any {
