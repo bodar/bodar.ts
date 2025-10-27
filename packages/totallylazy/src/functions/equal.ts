@@ -1,5 +1,15 @@
 /**
- * Checks if two values are deeply equal by value
+ * Performs deep equality comparison of two values. Supports primitives, objects, arrays, Maps, Sets, Dates, RegExp, and functions.
+ * Uses same-value-zero equality (NaN === NaN, +0 === -0).
+ *
+ * @example
+ * ```ts
+ * equal(1, 1); // true
+ * equal({a: 1}, {a: 1}); // true
+ * equal([1, 2], [1, 2]); // true
+ * equal(new Set([1]), new Set([1])); // true
+ * equal(NaN, NaN); // true
+ * ```
  */
 export function equal(a: unknown, b: unknown): boolean {
     if (a === b) return true;
