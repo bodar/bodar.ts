@@ -31,7 +31,7 @@
 
 5. Command Execution
    - Use `./run [command] [args]` when available
-   - Check `./run` and `commands.sh` for already available commands
+   - Check `./run` and `bootstrap.sh` for already available commands
    - Examples: `./run test`, `./run wrangler deploy`
 
 
