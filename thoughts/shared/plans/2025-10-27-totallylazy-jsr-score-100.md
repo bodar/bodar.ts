@@ -3,8 +3,8 @@
 ## Progress Summary
 
 **Start:** 10/17 points (58%), 29% symbols documented
-**Current:** 14/17 points (82%), 54% symbols documented
-**Target:** 16-17/17 points (94-100%), 80%+ symbols documented
+**Current:** 15/17 points (88%), 67% symbols documented
+**Target:** 16-17/17 points (94-100%), 100% symbols documented
 
 ### Achievements:
 - ✅ Added package description (+1 point)
@@ -14,9 +14,11 @@
 - ✅ Documented all parser classes and utilities (+1 point)
 - ✅ Fixed parser examples to use correct API (view vs fromString)
 - ✅ Documented collection utilities
+- ✅ Documented grammar classes (Json, Jsdoc, C)
+- ✅ Fixed JSR publish to exclude test files
 
 ### Remaining Work:
-- 🔄 Add ~26% more symbol documentation to reach 80% threshold (+2 points expected)
+- 🔄 Document remaining 33% of exported symbols to reach 100% (+1 point at 80%, potential +1 more at 100%)
 - ⚠️ Investigate "allEntrypointsDocs" criterion (added docs but JSR hasn't recognized it)
 
 ## Overview
@@ -51,10 +53,10 @@ Improve the JSR score for @bodar/totallylazy from 58% to 100% by adding missing 
 
 **Target: 94-100% JSR Score** (16-17/17 points)
 - All 64 entrypoints have proper module documentation
-- At least 80% of exported symbols documented
-- Package has a description
-- At least 2 runtimes marked as compatible
-- Provenance optional (requires GitHub Actions migration)
+- 100% of exported symbols documented (ensures maximum points)
+- Package has a description ✅
+- At least 2 runtimes marked as compatible ✅
+- Provenance optional (requires GitHub Actions migration - skipping)
 
 ### Verification:
 - JSR Score endpoint: `curl -s https://api.jsr.io/scopes/bodar/packages/totallylazy/score`
@@ -309,13 +311,15 @@ Document parser classes and utilities. This is the largest group of undocumented
 ## Phase 6: Add Symbol Documentation - Collections & Remaining
 
 ### Overview
-Document remaining files to push percentage from 54% to 80% for maximum points.
+Document all remaining exported symbols to reach 100% symbol documentation. This ensures we get the maximum points possible and provide comprehensive API documentation for users.
 
-**Current Status: 15/17 points (88%), 65.66% symbols documented**
+**Current Status: 15/17 points (88%), 67.00% symbols documented**
 
 **Progress in Phase 6:**
 - Batch 1 (commit 8694375): 54% → 58% (+4%)
 - Batch 2 (commit 7af2822): 58% → 66% (+8%, gained +1 point to 15/17)
+- Batch 3 (commit e0521ad): 66% → 67% (+1%)
+- JSR publish fix (commit 68cf67e): Fixed test files being published to JSR
 
 ### Completed in Phase 6:
 
@@ -343,32 +347,34 @@ Document remaining files to push percentage from 54% to 80% for maximum points.
   - assertTrue and assertFalse (type assertions)
 - [x] Documented PredicatesParser.matches() function
 
+**Batch 3** (commit e0521ad) - 66% → 67%:
+- [x] Documented Json class and 10 static members (null, boolean, escaped, characters, string, number, whitespace, value, custom)
+- [x] Documented Jsdoc class and 4 static members (typeExpression, type, tags, jsdoc)
+- [x] Documented C class and 3 static members (singleLineComment, multiLineComment, comment)
+- [x] Documented DebugParser class
+- [x] Documented Segment.toString() function
+
 ### Files Already Documented:
 - ✅ CompositeTransducer.ts - Already has full documentation
 - ✅ All parser files - Fully documented in Phase 5
 - ✅ Core predicates, functions, comparators - Fully documented in Phase 4
 - ✅ Module documentation for all identified entrypoints - Phase 3
 
-### Remaining Work to Reach 80%:
-Need approximately **14% more symbol coverage** (from 66% to 80%) to gain final +1 point (16/17 total).
+### New Goal: 100% Symbol Documentation
 
-**Remaining undocumented exports identified** (~20 symbols):
-- **Grammar classes - Json.ts** (10 static members):
-  - static null, boolean, escaped, characters, string, number
-  - static whitespace(), value(), custom()
-  - Json class itself
-- **Grammar classes - Jsdoc.ts** (5 static members):
-  - static typeExpression, type, tags, jsdoc
-  - Jsdoc class itself
-- **Grammar classes - C.ts** (4 static members):
-  - static singleLineComment, multiLineComment, comment
-  - C class itself
-- **Parser classes**:
-  - DebugParser class (1 item)
-- **Collection utilities**:
-  - Segment.toString() (1 item)
+**Rationale for 100% target:**
+- Ensures we exceed the 80% threshold for maximum JSR points
+- Provides complete API documentation for all users
+- Eliminates guesswork about which symbols still need docs
+- Sets high quality standard for the package
 
-**Strategy for Batch 3**: Document all grammar class static members and remaining parser/collection utilities to reach 80% threshold.
+**Remaining work:** Document the remaining **33% of exported symbols** (from 67% to 100%)
+
+**Strategy for Batch 4:**
+- Use JSR API or systematic grep to identify ALL undocumented exported symbols
+- Document them systematically by module
+- Use concise single-line JSDoc comments (consistent with Batch 3 approach)
+- Commit in logical batches to track progress
 
 ### Success Criteria:
 
@@ -380,11 +386,13 @@ Need approximately **14% more symbol coverage** (from 66% to 80%) to gain final 
 - [x] CircleCI build completes successfully (multiple commits)
 
 #### Post-deployment Verification (Production):
-- [x] JSR score at 15/17 (88%), symbol documentation at 65.66%
-- [ ] Need to reach 80% symbol documentation for final +1 point (16/17 total)
-- [ ] Final target: 94% score (16/17 points)
-  - In Progress: +1 point for 80% symbol documentation (currently at 66%, need 14% more)
-  - Remaining: 1 point for "allEntrypointsDocs" (still false after adding module docs - may require JSR reindexing or additional investigation)
+- [x] JSR score at 15/17 (88%), symbol documentation at 67.00%
+- [ ] Reach 80% symbol documentation (+1 point to 16/17)
+- [ ] Reach 100% symbol documentation (ensures maximum documentation quality)
+- [ ] Final target: 94-100% score (16-17/17 points)
+  - In Progress: +1 point for 80% symbol documentation (currently at 67%, need 13% more to reach 80%)
+  - Goal: 100% symbol documentation (33% remaining)
+  - Remaining: 1 point for "allEntrypointsDocs" (still false - needs investigation)
   - Skipping: 1 point for provenance (requires GitHub Actions migration)
 
 ---
