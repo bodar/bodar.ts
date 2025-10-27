@@ -8,6 +8,9 @@ import {NoSuchElement} from "../errors/NoSuchElement.ts";
 import {empty, type Segment, toString} from "./Segment.ts";
 import {characters} from "../functions/characters.ts";
 
+/**
+ * Array-backed segment implementation providing efficient head/tail access over array-like structures
+ */
 export class ArraySegment<T> implements Segment<T> {
     constructor(public array: ArrayLike<T>, public index: number = 0) {
     }

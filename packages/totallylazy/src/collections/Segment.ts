@@ -6,6 +6,9 @@
 
 import {NoSuchElement} from "../errors/NoSuchElement.ts";
 
+/**
+ * Immutable linked-list-style segment providing head/tail access for efficient lazy iteration
+ */
 export interface Segment<T> extends Iterable<T> {
     /** True if the segment contains no elements */
     empty: boolean;
