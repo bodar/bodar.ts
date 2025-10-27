@@ -1,14 +1,4 @@
-/**
- * Converts a value to its string representation, handling special cases like undefined and null
- *
- * @example
- * ```ts
- * toString(undefined); // 'undefined'
- * toString(null); // 'null'
- * toString(42); // '42'
- * toString({x: 1}); // '{"x":1}'
- * ```
- */
+/** Converts a value to its string representation, handling special cases like undefined and null */
 export function toString(value: unknown): string {
     if (value === undefined) return 'undefined';
     if (value === null) return 'null';

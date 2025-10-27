@@ -3,8 +3,8 @@
 ## Progress Summary
 
 **Start:** 10/17 points (58%), 29% symbols documented
-**Current:** 15/17 points (88%), 67% symbols documented
-**Target:** 16-17/17 points (94-100%), 100% symbols documented
+**Current:** 14/17 points (82%), 54% symbols documented
+**Target:** 16-17/17 points (94-100%), 80%+ symbols documented
 
 ### Achievements:
 - ✅ Added package description (+1 point)
@@ -14,11 +14,9 @@
 - ✅ Documented all parser classes and utilities (+1 point)
 - ✅ Fixed parser examples to use correct API (view vs fromString)
 - ✅ Documented collection utilities
-- ✅ Documented grammar classes (Json, Jsdoc, C)
-- ✅ Fixed JSR publish to exclude test files
 
 ### Remaining Work:
-- 🔄 Document remaining 33% of exported symbols to reach 100% (+1 point at 80%, potential +1 more at 100%)
+- 🔄 Add ~26% more symbol documentation to reach 80% threshold (+2 points expected)
 - ⚠️ Investigate "allEntrypointsDocs" criterion (added docs but JSR hasn't recognized it)
 
 ## Overview
@@ -53,10 +51,10 @@ Improve the JSR score for @bodar/totallylazy from 58% to 100% by adding missing 
 
 **Target: 94-100% JSR Score** (16-17/17 points)
 - All 64 entrypoints have proper module documentation
-- 100% of exported symbols documented (ensures maximum points)
-- Package has a description ✅
-- At least 2 runtimes marked as compatible ✅
-- Provenance optional (requires GitHub Actions migration - skipping)
+- At least 80% of exported symbols documented
+- Package has a description
+- At least 2 runtimes marked as compatible
+- Provenance optional (requires GitHub Actions migration)
 
 ### Verification:
 - JSR Score endpoint: `curl -s https://api.jsr.io/scopes/bodar/packages/totallylazy/score`
@@ -311,48 +309,21 @@ Document parser classes and utilities. This is the largest group of undocumented
 ## Phase 6: Add Symbol Documentation - Collections & Remaining
 
 ### Overview
-Document all remaining exported symbols to reach 100% symbol documentation. This ensures we get the maximum points possible and provide comprehensive API documentation for users.
+Document remaining files to push percentage from 54% to 80% for maximum points.
 
-**Current Status: 15/17 points (88%), 67.00% symbols documented**
-
-**Progress in Phase 6:**
-- Batch 1 (commit 8694375): 54% → 58% (+4%)
-- Batch 2 (commit 7af2822): 58% → 66% (+8%, gained +1 point to 15/17)
-- Batch 3 (commit e0521ad): 66% → 67% (+1%)
-- JSR publish fix (commit 68cf67e): Fixed test files being published to JSR
+**Current Status: 14/17 points (82%), 53.9% symbols documented**
 
 ### Completed in Phase 6:
-
-**Batch 1** (commit 8694375) - 54% → 58.25%:
-- [x] `packages/totallylazy/src/collections/Sequence.ts` - Added JSDoc to iterate() and repeat() functions (from earlier work)
-- [x] `packages/totallylazy/src/collections/Single.ts` - Added JSDoc to single() function (from earlier work)
-- [x] Fixed all parser examples to use view() instead of fromString() (from earlier work)
+- [x] `packages/totallylazy/src/collections/Sequence.ts` - Added JSDoc to iterate() and repeat() functions
+- [x] `packages/totallylazy/src/collections/Single.ts` - Added JSDoc to single() function
+- [x] Fixed all parser examples to use view() instead of fromString()
 - [x] Documented transducer type guards: isMapTransducer, isFilterTransducer, isFlatMapTransducer
 - [x] Documented Transducer.transducer() factory function
 - [x] Documented ArraySegment.fromArray() and fromString()
-- [x] Documented Sequence.sequence() overloads with comprehensive example
-- [x] Documented lazy.ts exports (lazy function with object example, GetterPropertyDescriptor interface, internal helpers)
+- [x] Documented Sequence.sequence() overloads with example
+- [x] Documented lazy.ts exports (lazy function, interfaces, helper classes)
 - [x] Documented Jsdoc.ts exports (JsdocTags interface, JsdocComment class)
 - [x] Documented C.ts Comment class
-
-**Batch 2** (commit 7af2822) - 58% → 66%, +1 point to 15/17:
-- [x] Documented 18 parser combinators in parsers.ts:
-  - then, next, followedBy, notFollowedBy, precededBy
-  - between, surroundedBy, separatedBy
-  - returns, ignore, literal, debug
-  - whitespace, among
-  - many, many1, atLeast, atMost
-- [x] Documented assertion functions in assertThat.ts:
-  - assertThat (predicate-based validation)
-  - assertTrue and assertFalse (type assertions)
-- [x] Documented PredicatesParser.matches() function
-
-**Batch 3** (commit e0521ad) - 66% → 67%:
-- [x] Documented Json class and 10 static members (null, boolean, escaped, characters, string, number, whitespace, value, custom)
-- [x] Documented Jsdoc class and 4 static members (typeExpression, type, tags, jsdoc)
-- [x] Documented C class and 3 static members (singleLineComment, multiLineComment, comment)
-- [x] Documented DebugParser class
-- [x] Documented Segment.toString() function
 
 ### Files Already Documented:
 - ✅ CompositeTransducer.ts - Already has full documentation
@@ -360,45 +331,17 @@ Document all remaining exported symbols to reach 100% symbol documentation. This
 - ✅ Core predicates, functions, comparators - Fully documented in Phase 4
 - ✅ Module documentation for all identified entrypoints - Phase 3
 
-### New Goal: 100% Symbol Documentation
+### Remaining Work to Reach 80%:
+Need approximately **26% more symbol coverage** (from 54% to 80%) to gain +2 points.
 
-**Rationale for 100% target:**
-- Ensures we exceed the 80% threshold for maximum JSR points
-- Provides complete API documentation for all users
-- Eliminates guesswork about which symbols still need docs
-- Sets high quality standard for the package
+Priority files to document (need to identify undocumented exports in existing modules):
+- Transducer implementations (Map, Filter, etc.) - check for missing JSDoc
+- Collection types (Array, Segment, ArraySegment) - check for missing exports/methods
+- Grammar parsers - check for undocumented helper functions
+- Function utilities - check for any missing documentation
+- Any other exported symbols without JSDoc
 
-**Remaining work:** Document the remaining **33% of exported symbols** (from 67% to 100%)
-
-**Batch 4** (commit 0d03af3) - 67% → 71% (+4%):
-- [x] Identified all 15 undocumented exported symbols across 7 files using systematic analysis
-- [x] Documented Array.ts types: ArrayContains, ReadonlyArrayContains, toPromiseArray
-- [x] Documented Segment.ts classes: EmptySegment, ASegment, empty constant, segment function
-- [x] Documented type guards: isProperty (Property.ts), isSelect (Select.ts)
-- [x] Documented grammar types: JsonArray, JsonObject, JsonValue (grammars/types.ts)
-- [x] Verified CompositeTransducer.ts already has full documentation (isCompositeTransducer, flatten)
-- [x] Pre-commit verification passed (type check and tests)
-- [x] Build verification passed
-- [x] Post-deployment verification: 67% → 71.04%, still at 15/17 points (88%)
-- Note: Need to reach 80% for next point (+1 to 16/17)
-
-**Batch 5** (commit 6e0044d) - 71% → 71% (no change):
-- [x] Comprehensive analysis found 38 undocumented symbols (including interface properties)
-- [x] Documented 24 interface properties across 12 files:
-  - Segment, Source, View interfaces (13 properties)
-  - Predicate interfaces: LogicalPredicate, AmongPredicate, BetweenPredicate (6 properties)
-  - JsdocTags interface (1 property)
-  - Transducer interfaces (4 symbol properties)
-- [x] Pre-commit verification passed
-- [x] Build verification passed
-- [x] Post-deployment verification: 71.04% → 71.04% (no change)
-- **Finding**: Interface properties don't count as separate "exported symbols" for JSR score calculation
-
-**Strategy for Batch 4:**
-- Use JSR API or systematic grep to identify ALL undocumented exported symbols
-- Document them systematically by module
-- Use concise single-line JSDoc comments (consistent with Batch 3 approach)
-- Commit in logical batches to track progress
+**Strategy**: Use grep/search to find exported symbols without JSDoc comments, prioritize by frequency of use.
 
 ### Success Criteria:
 
@@ -410,13 +353,11 @@ Document all remaining exported symbols to reach 100% symbol documentation. This
 - [x] CircleCI build completes successfully (multiple commits)
 
 #### Post-deployment Verification (Production):
-- [x] JSR score at 15/17 (88%), symbol documentation at 67.00%
-- [ ] Reach 80% symbol documentation (+1 point to 16/17)
-- [ ] Reach 100% symbol documentation (ensures maximum documentation quality)
-- [ ] Final target: 94-100% score (16-17/17 points)
-  - In Progress: +1 point for 80% symbol documentation (currently at 67%, need 13% more to reach 80%)
-  - Goal: 100% symbol documentation (33% remaining)
-  - Remaining: 1 point for "allEntrypointsDocs" (still false - needs investigation)
+- [x] JSR score at 14/17 (82%), symbol documentation at 53.9%
+- [ ] Need to reach 80% symbol documentation for +2 points (16/17 total)
+- [ ] Final target: 94% score (16/17 points)
+  - Missing: 2 points for 80% symbol documentation
+  - Missing: 1 point for "allEntrypointsDocs" (may require JSR reindexing or additional work)
   - Skipping: 1 point for provenance (requires GitHub Actions migration)
 
 ---

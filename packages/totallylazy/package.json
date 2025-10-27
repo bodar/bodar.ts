@@ -55,6 +55,7 @@
     "./comparators/Comparator.ts": "./src/comparators/Comparator.ts",
     "./comparators/ascending.ts": "./src/comparators/ascending.ts",
     "./asserts/assertThat.ts": "./src/asserts/assertThat.ts",
+    "./collections/functional-types.ts": "./src/collections/functional-types.ts",
     "./collections/Segment.ts": "./src/collections/Segment.ts",
     "./collections/Array.ts": "./src/collections/Array.ts",
     "./collections/Sequence.ts": "./src/collections/Sequence.ts",

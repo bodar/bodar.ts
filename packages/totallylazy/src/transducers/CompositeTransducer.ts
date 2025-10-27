@@ -1,19 +1,13 @@
 import {transducer, Transducer} from "./Transducer.ts";
 
-/**
- * A transducer that applies the given transducers in order
- */
+/** A transducer that applies the given transducers in order */
 export interface CompositeTransducer<A, B> extends Transducer<A, B> {
-     /** The transducers to apply in sequence */
      readonly transducers: readonly Transducer<any, any>[];
 
-     /** Type identifier for compose transducers */
      readonly [Transducer.type]: 'compose';
 }
 
-/**
- * Creates a CompositeTransducer that applies the given transducers in order
- */
+/** Creates a CompositeTransducer that applies the given transducers in order */
 export function compose<A, B, C>(a: Transducer<A, B>, b: Transducer<B, C>): CompositeTransducer<A, C>;
 export function compose<A, B, C, D>(a: Transducer<A, B>, b: Transducer<B, C>, c: Transducer<C, D>): CompositeTransducer<A, D>;
 export function compose<A, B, C, D, E>(a: Transducer<A, B>, b: Transducer<B, C>, c: Transducer<C, D>, d: Transducer<D, E>): CompositeTransducer<A, E>;

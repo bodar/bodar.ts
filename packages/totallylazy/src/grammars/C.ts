@@ -15,21 +15,7 @@ import {any} from "../parsers/AnyParser.ts";
 import {until} from "../parsers/UntilParser.ts";
 import {map} from "../transducers/MapTransducer.ts";
 
-/**
- * Represents a parsed C-style comment
- *
- * @example
- * ```typescript
- * import { C } from "@bodar/totallylazy/grammars/C.ts";
- * import { view } from "@bodar/totallylazy/parsers/View.ts";
- *
- * const singleLine = C.comment.parse(view('// This is a comment\n'));
- * singleLine.value; // Comment with value: 'This is a comment'
- *
- * const multiLine = C.comment.parse(view('/＊ Multi-line comment ＊/'));
- * multiLine.value; // Comment with value: 'Multi-line comment'
- * ```
- */
+/** Represents a parsed C-style comment */
 export class Comment {
     constructor(public value: string) {
     }

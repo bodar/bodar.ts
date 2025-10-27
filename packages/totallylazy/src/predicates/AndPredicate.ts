@@ -4,33 +4,20 @@ import {isNotPredicate, not, type NotPredicate} from "./NotPredicate.ts";
 import {or} from "./OrPredicate.ts";
 import type {ReadonlyArrayContains} from "../collections/Array.ts";
 
-/**
- * A predicate that returns true only if all supplied predicates return true
- */
+/** A predicate that returns true only if all supplied predicates return true */
 export interface AndPredicate<A> extends Predicate<A> {
-    /**
-     * The predicates to check
-     */
     readonly predicates: readonly Predicate<A>[]
 }
 
-/**
- * Creates a predicate that returns true only if all supplied predicates return true.
- * Automatically optimizes by removing redundant predicates and applying De Morgan's law.
- *
- * @example
- * ```ts
- * const even = (x: number) => x % 2 === 0;
- * const positive = (x: number) => x > 0;
- * const predicate = and(even, positive);
- * predicate(2); // true
- * predicate(-2); // false
- * ```
- */
+/** Creates a predicate that returns true only if all supplied predicates return true. */
 export function and<A>(): typeof alwaysTrue;
+/** Creates a predicate that returns true only if all supplied predicates return true. */
 export function and<P extends Predicate<any>>(predicate: P): P;
+/** Creates a predicate that returns true only if all supplied predicates return true. */
 export function and<A>(...predicates: readonly NotPredicate<A>[]): NotPredicate<A>;
+/** Creates a predicate that returns true only if all supplied predicates return true. */
 export function and<A>(...predicates: ReadonlyArrayContains<Predicate<A>, typeof alwaysFalse>): typeof alwaysFalse;
+/** Creates a predicate that returns true only if all supplied predicates return true. */
 export function and<A>(...predicates: readonly Predicate<A>[]): AndPredicate<A>;
 export function and<A>(...original: readonly Predicate<A>[]): Predicate<A> {
     const predicates = original
@@ -48,9 +35,7 @@ export function and<A>(...original: readonly Predicate<A>[]): Predicate<A> {
     });
 }
 
-/**
- * Checks if the given value is an AndPredicate
- */
+/** Checks if the given value is an AndPredicate */
 export function isAndPredicate<A = any>(value: any): value is AndPredicate<A> {
     return typeof value === 'function' && value.name === 'and' && Array.isArray(value.predicates);
 }

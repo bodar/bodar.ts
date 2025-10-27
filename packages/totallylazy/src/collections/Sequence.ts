@@ -22,60 +22,27 @@ export class Sequence<T> implements Iterable<T> {
     }
 }
 
-/**
- * Creates a Sequence from the given iterable and transducers
- *
- * @example
- * ```typescript
- * import { sequence } from "@bodar/totallylazy/collections/Sequence.ts";
- * import { filter } from "@bodar/totallylazy/transducers/FilterTransducer.ts";
- * import { map } from "@bodar/totallylazy/transducers/MapTransducer.ts";
- *
- * const numbers = [1, 2, 3, 4, 5];
- * const result = sequence(
- *   numbers,
- *   filter((x: number) => x % 2 === 0),
- *   map(String)
- * );
- * Array.from(result); // ['2', '4']
- * ```
- */
-// Helper type to extract the first element type
-type Head<T extends any[]> = T extends [infer H, ...any] ? H : never;
-
-// Recursive type to validate transducer chaining
-type ValidateTransducers<
-    T extends Transducer<any, any>[],
-    Cache extends Transducer<any, any>[] = []
-> = T extends []
-    ? Cache
-    : T extends [infer Last]
-        ? Last extends Transducer<any, any>
-            ? [...Cache, Last]
-            : never
-        : T extends [infer First, ...infer Rest]
-            ? First extends Transducer<infer _A, infer B>
-                ? Rest extends Transducer<any, any>[]
-                    ? Head<Rest> extends Transducer<infer C, any>
-                        ? B extends C  // Output of First must match input of Next
-                            ? ValidateTransducers<Rest, [...Cache, First]>
-                            : never  // Type mismatch - compilation error
-                        : never
-                    : never
-                : never
-            : never;
-
-// Extract the output type of the last transducer
-type LastOutput<T extends Transducer<any, any>[]> =
-    T extends [...any, Transducer<any, infer Z>] ? Z : never;
-
-export function sequence<S, T extends Transducer<any, any>[]>(
-    source: Iterable<S>, ...transducers: T & (ValidateTransducers<T> extends T ? unknown : never)): Sequence<LastOutput<T>> {
+/** Creates a Sequence from the given iterable and transducers  */
+export function sequence<A>(a: Iterable<A>): Sequence<A>;
+/** Creates a Sequence from the given iterable and transducers  */
+export function sequence<A, B>(a: Iterable<A>, b: Transducer<A, B>): Sequence<B>;
+/** Creates a Sequence from the given iterable and transducers  */
+export function sequence<A, B, C>(a: Iterable<A>, b: Transducer<A, B>, c: Transducer<B, C>): Sequence<C>;
+/** Creates a Sequence from the given iterable and transducers  */
+export function sequence<A, B, C, D>(a: Iterable<A>, b: Transducer<A, B>, c: Transducer<B, C>, d: Transducer<C, D>): Sequence<D>;
+/** Creates a Sequence from the given iterable and transducers  */
+export function sequence<A, B, C, D, E>(a: Iterable<A>, b: Transducer<A, B>, c: Transducer<B, C>, d: Transducer<C, D>, e: Transducer<D, E>): Sequence<E>;
+/** Creates a Sequence from the given iterable and transducers  */
+export function sequence<A, B, C, D, E, F>(a: Iterable<A>, b: Transducer<A, B>, c: Transducer<B, C>, d: Transducer<C, D>, e: Transducer<D, E>, f: Transducer<E, F>): Sequence<F>;
+/** Creates a Sequence from the given iterable and transducers  */
+export function sequence(source: Iterable<any>, ...transducers: readonly Transducer<any, any>[]): Sequence<any> ;
+export function sequence(source: Iterable<any>, ...transducers: readonly Transducer<any, any>[]): Sequence<any> {
     if (source instanceof Sequence) {
         return new Sequence(source.source, flatten([...source.transducers, ...transducers]));
     }
     return new Sequence(source, flatten(transducers));
 }
+
 
 /**
  * Creates an infinite sequence by repeatedly applying a generator function to a value

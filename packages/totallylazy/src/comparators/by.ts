@@ -11,19 +11,11 @@ export interface ByComparator<A, B> extends Comparator<A> {
     readonly comparator: Comparator<B>;
 }
 
-/**
- * Creates a comparator that sorts by extracting a value using a key, property, or mapper function.
- *
- * @example
- * ```ts
- * const cars = [{make: 'Toyota'}, {make: 'Ford'}];
- * cars.sort(by('make')); // Sort by 'make' property ascending
- * cars.sort(by('make', descending)); // Sort by 'make' property descending
- * cars.sort(by(car => car.make)); // Sort by mapper function
- * ```
- */
+/** Creates a comparator that sorts by extracting a value using a key, property, or mapper function. */
 export function by<A, K extends keyof A>(key: K, comparator?: Comparator<A[K]>): ByComparator<A, A[K]>;
+/** Creates a comparator that sorts by extracting a value using a key, property, or mapper function. */
 export function by<A, B>(mapper: Mapper<A, B>, comparator?: Comparator<B>): ByComparator<A, B>;
+/** Creates a comparator that sorts by extracting a value using a key, property, or mapper function. */
 export function by(mapperOfKey: any, comparator: Comparator<any> = ascending): ByComparator<any, any> {
     const mapper = typeof mapperOfKey === "function" ? mapperOfKey : property<any, any>(mapperOfKey);
     return Object.assign(function by(a: any, b: any) {

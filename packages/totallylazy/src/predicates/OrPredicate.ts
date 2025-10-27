@@ -4,34 +4,20 @@ import {isNotPredicate, not, type NotPredicate} from "./NotPredicate.ts";
 import type {ReadonlyArrayContains} from "../collections/Array.ts";
 import {and} from "./AndPredicate.ts";
 
-/**
- * A predicate that returns true if any of the supplied predicates returns true
- */
+/** A predicate that returns true if any of the supplied predicates returns true */
 export interface OrPredicate<A> extends Predicate<A> {
-    /**
-     * The predicates to check
-     */
     readonly predicates: readonly Predicate<A>[]
 }
 
-/**
- * Creates a predicate that returns true if any of the supplied predicates returns true.
- * Automatically optimizes by removing redundant predicates and applying De Morgan's law.
- *
- * @example
- * ```ts
- * const even = (x: number) => x % 2 === 0;
- * const negative = (x: number) => x < 0;
- * const predicate = or(even, negative);
- * predicate(2); // true
- * predicate(-3); // true
- * predicate(3); // false
- * ```
- */
+/** Creates a predicate that returns true if any of the supplied predicates returns true. */
 export function or<A>(): typeof alwaysTrue;
+/** Creates a predicate that returns true if any of the supplied predicates returns true. */
 export function or<P extends Predicate<any>>(predicate: P): P;
+/** Creates a predicate that returns true if any of the supplied predicates returns true. */
 export function or<A>(...predicates: readonly NotPredicate<A>[]): NotPredicate<A>;
+/** Creates a predicate that returns true if any of the supplied predicates returns true. */
 export function or<A>(...predicates: ReadonlyArrayContains<Predicate<A>, typeof alwaysTrue>): typeof alwaysTrue;
+/** Creates a predicate that returns true if any of the supplied predicates returns true. */
 export function or<A>(...predicates: readonly Predicate<A>[]): OrPredicate<A>;
 export function or<A>(...original: readonly Predicate<A>[]): Predicate<A> {
     const predicates = original
