@@ -1,5 +1,24 @@
 # Increase totallylazy JSR Score to 100%
 
+## Progress Summary
+
+**Start:** 10/17 points (58%), 29% symbols documented
+**Current:** 14/17 points (82%), 54% symbols documented
+**Target:** 16-17/17 points (94-100%), 80%+ symbols documented
+
+### Achievements:
+- ✅ Added package description (+1 point)
+- ✅ Added runtime compatibility (+1 point)
+- ✅ Added module documentation to 11 entrypoints
+- ✅ Documented high-priority symbols: predicates, functions, comparators (+1 point)
+- ✅ Documented all parser classes and utilities (+1 point)
+- ✅ Fixed parser examples to use correct API (view vs fromString)
+- ✅ Documented collection utilities
+
+### Remaining Work:
+- 🔄 Add ~26% more symbol documentation to reach 80% threshold (+2 points expected)
+- ⚠️ Investigate "allEntrypointsDocs" criterion (added docs but JSR hasn't recognized it)
+
 ## Overview
 
 Improve the JSR score for @bodar/totallylazy from 58% to 100% by adding missing documentation and package metadata. Following the successful approach used for @bodar/yadic (issue #2), we'll incrementally add documentation and verify improvements through CircleCI builds.
@@ -277,39 +296,62 @@ Document parser classes and utilities. This is the largest group of undocumented
 - [x] Core parser classes documented (Parser, Result, AnyParser, EofParser, Failure, PredicatesParser)
 
 #### Build Verification:
-- [ ] CircleCI build completes successfully
+- [x] CircleCI build completes successfully
 
 #### Post-deployment Verification (Production):
-- [ ] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/totallylazy/score | jq .percentageDocumentedSymbols`
-- [ ] Should reach or exceed 0.80 threshold
-- [ ] Score should reach 94-100%
+- [x] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/totallylazy/score | jq .percentageDocumentedSymbols`
+- [x] Percentage increased from 0.384 to 0.539 (~54%)
+- [x] Score increased to 14/17 (82%) - gained 1 point from crossing 50% documentation threshold
+- [ ] Still need to reach 0.80 (80%) threshold for maximum points
 
 ---
 
 ## Phase 6: Add Symbol Documentation - Collections & Remaining
 
 ### Overview
-Document remaining files to push percentage over 80% if not yet achieved.
+Document remaining files to push percentage from 54% to 80% for maximum points.
 
-### Files:
-- `packages/totallylazy/src/transducers/CompositeTransducer.ts`
-- Collections files (if not fully documented in Phase 3)
-- Any remaining undocumented symbols
+**Current Status: 14/17 points (82%), 53.9% symbols documented**
+
+### Completed in Phase 6:
+- [x] `packages/totallylazy/src/collections/Sequence.ts` - Added JSDoc to iterate() and repeat() functions
+- [x] `packages/totallylazy/src/collections/Single.ts` - Added JSDoc to single() function
+- [x] Fixed all parser examples to use view() instead of fromString()
+
+### Files Already Documented:
+- ✅ CompositeTransducer.ts - Already has full documentation
+- ✅ All parser files - Fully documented in Phase 5
+- ✅ Core predicates, functions, comparators - Fully documented in Phase 4
+- ✅ Module documentation for all identified entrypoints - Phase 3
+
+### Remaining Work to Reach 80%:
+Need approximately **26% more symbol coverage** (from 54% to 80%) to gain +2 points.
+
+Priority files to document (need to identify undocumented exports in existing modules):
+- Transducer implementations (Map, Filter, etc.) - check for missing JSDoc
+- Collection types (Array, Segment, ArraySegment) - check for missing exports/methods
+- Grammar parsers - check for undocumented helper functions
+- Function utilities - check for any missing documentation
+- Any other exported symbols without JSDoc
+
+**Strategy**: Use grep/search to find exported symbols without JSDoc comments, prioritize by frequency of use.
 
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
-- [ ] Type checking passes: `./run check`
-- [ ] Tests pass: `./run test`
+- [x] Type checking passes: `./run check`
+- [x] Tests pass: `./run test`
 
 #### Build Verification:
-- [ ] CircleCI build completes successfully
+- [x] CircleCI build completes successfully (multiple commits)
 
 #### Post-deployment Verification (Production):
-- [ ] Final JSR score check: `curl -H 'accept: text/html' https://jsr.io/@bodar/totallylazy/score`
-- [ ] Score should be 94-100% (16-17/17 points)
-- [ ] All documentation criteria passing
-- [ ] Symbol documentation ≥ 80%
+- [x] JSR score at 14/17 (82%), symbol documentation at 53.9%
+- [ ] Need to reach 80% symbol documentation for +2 points (16/17 total)
+- [ ] Final target: 94% score (16/17 points)
+  - Missing: 2 points for 80% symbol documentation
+  - Missing: 1 point for "allEntrypointsDocs" (may require JSR reindexing or additional work)
+  - Skipping: 1 point for provenance (requires GitHub Actions migration)
 
 ---
 
