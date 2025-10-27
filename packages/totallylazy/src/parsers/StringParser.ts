@@ -4,6 +4,9 @@ import type {Result} from "./Result.ts";
 import type {Parser} from "./Parser.ts";
 import type {View} from "./View.ts";
 
+/**
+ * Parser that matches an exact string
+ */
 export class StringParser implements Parser<string, string> {
     constructor(private expected: string) {
     }
@@ -15,6 +18,16 @@ export class StringParser implements Parser<string, string> {
     }
 }
 
+/**
+ * Creates a parser that matches an exact string
+ *
+ * @example
+ * ```ts
+ * const parser = string("hello");
+ * parser.parse(fromString("hello world")); // Success with "hello"
+ * parser.parse(fromString("goodbye")); // Failure
+ * ```
+ */
 export function string(expected: string): Parser<string, string> {
     return new StringParser(expected);
 }
