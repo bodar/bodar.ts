@@ -18,6 +18,7 @@ export interface Segment<T> extends Iterable<T> {
     toArray(): ArrayLike<T>;
 }
 
+/** Represents an empty segment with no elements */
 export class EmptySegment implements Segment<any> {
     empty = true;
 
@@ -41,8 +42,10 @@ export class EmptySegment implements Segment<any> {
     }
 }
 
+/** Singleton instance of EmptySegment representing an empty segment */
 export const empty: EmptySegment = new EmptySegment();
 
+/** A non-empty segment containing a head element and a tail segment */
 export class ASegment<T> implements Segment<T> {
     empty = false;
 
@@ -62,6 +65,7 @@ export class ASegment<T> implements Segment<T> {
     }
 }
 
+/** Creates a segment from optional head and tail values, returning empty segment if both undefined */
 export function segment<T>(head: T | undefined = undefined, tail: Segment<T> | undefined = undefined): Segment<T> {
     if (head === undefined && tail === undefined) return empty;
     if (tail === undefined) return new ASegment<T>(head!, empty);

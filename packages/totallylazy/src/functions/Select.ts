@@ -29,6 +29,7 @@ export function select<A>(...properties: readonly (Property<A, keyof A> | keyof 
     });
 }
 
+/** Type guard to check if a value is a Select function */
 export function isSelect<A = any>(value: any): value is Select<A> {
     return typeof value === 'function' && value.name === 'select' && Object.hasOwn(value, 'properties');
 }

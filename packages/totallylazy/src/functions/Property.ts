@@ -22,6 +22,7 @@ export function property<A, K extends keyof A>(key: K): Property<A, K> {
     })
 }
 
+/** Type guard to check if a value is a Property function */
 export function isProperty<A = any, B extends keyof A = any>(value: any): value is Property<A, B> {
     return typeof value === 'function' && value.name === 'property' && Object.hasOwn(value, 'key');
 }
