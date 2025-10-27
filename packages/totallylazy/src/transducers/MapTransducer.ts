@@ -10,6 +10,7 @@ export interface MapTransducer<A, B> extends Transducer<A, B> {
      */
     readonly mapper: Mapper<A, B>;
 
+    /** Type identifier for map transducers */
     readonly [Transducer.type]: 'map';
 }
 

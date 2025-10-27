@@ -2,10 +2,13 @@
  * A source of indexed elements
  */
 export interface Source<T> {
+    /** The number of elements in the source */
     readonly length: number;
 
+    /** Gets the element at the specified index */
     at(index: number): T | undefined;
 
+    /** Creates a new source containing elements from start to end */
     slice(start?: number, end?: number): Source<T>;
 }
 
@@ -13,10 +16,13 @@ export interface Source<T> {
  * A view into a source that can be efficiently sliced without copying
  */
 export interface View<A> extends Source<A> {
+    /** Returns true if the view contains no elements */
     isEmpty(): boolean;
 
+    /** Creates a new view containing elements from start to end */
     slice(start?: number, end?: number): View<A>;
 
+    /** Converts this view to a source */
     toSource(): Source<A>;
 }
 

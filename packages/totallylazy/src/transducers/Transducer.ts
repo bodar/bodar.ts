@@ -12,10 +12,12 @@ export interface Transducer<A, B> {
      */
     toString(): string;
 
+    /** The type identifier for this transducer (e.g., 'map', 'filter', 'compose') */
     readonly [Transducer.type]: string;
 }
 
 export class Transducer<A, B> {
+    /** Symbol used as a key for the transducer type property */
     static readonly type = Symbol('Transducer.type');
 
     static [Symbol.hasInstance](value: any): boolean {

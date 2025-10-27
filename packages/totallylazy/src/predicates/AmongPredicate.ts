@@ -4,6 +4,7 @@ import type {Predicate} from "./Predicate.ts";
  * A predicate that checks if a character is among the given characters
  */
 export interface AmongPredicate extends Predicate<string> {
+    /** The set of characters to check against */
     readonly characters: string;
 }
 

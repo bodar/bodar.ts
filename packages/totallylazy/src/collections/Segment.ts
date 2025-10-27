@@ -7,14 +7,19 @@
 import {NoSuchElement} from "../errors/NoSuchElement.ts";
 
 export interface Segment<T> extends Iterable<T> {
+    /** True if the segment contains no elements */
     empty: boolean;
 
+    /** The first element of the segment */
     head: T;
 
+    /** The remaining segment after the first element */
     tail: Segment<T>;
 
+    /** Converts the segment to its string representation */
     toString(): string;
 
+    /** Converts the segment to an array-like structure */
     toArray(): ArrayLike<T>;
 }
 

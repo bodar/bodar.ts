@@ -10,6 +10,7 @@ export interface FlatMapTransducer<A, B> extends Transducer<A, B> {
      */
     readonly mapper: Mapper<A, Iterable<B>>;
 
+    /** Type identifier for flatMap transducers */
     readonly [Transducer.type]: 'flatMap';
 }
 

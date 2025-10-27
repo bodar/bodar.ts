@@ -370,7 +370,7 @@ Document all remaining exported symbols to reach 100% symbol documentation. This
 
 **Remaining work:** Document the remaining **33% of exported symbols** (from 67% to 100%)
 
-**Batch 4** (commit pending) - 67% → target 100%:
+**Batch 4** (commit 0d03af3) - 67% → 71% (+4%):
 - [x] Identified all 15 undocumented exported symbols across 7 files using systematic analysis
 - [x] Documented Array.ts types: ArrayContains, ReadonlyArrayContains, toPromiseArray
 - [x] Documented Segment.ts classes: EmptySegment, ASegment, empty constant, segment function
@@ -378,6 +378,9 @@ Document all remaining exported symbols to reach 100% symbol documentation. This
 - [x] Documented grammar types: JsonArray, JsonObject, JsonValue (grammars/types.ts)
 - [x] Verified CompositeTransducer.ts already has full documentation (isCompositeTransducer, flatten)
 - [x] Pre-commit verification passed (type check and tests)
+- [x] Build verification passed
+- [x] Post-deployment verification: 67% → 71.04%, still at 15/17 points (88%)
+- Note: Need to reach 80% for next point (+1 to 16/17)
 
 **Strategy for Batch 4:**
 - Use JSR API or systematic grep to identify ALL undocumented exported symbols

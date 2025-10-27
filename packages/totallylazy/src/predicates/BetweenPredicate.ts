@@ -6,7 +6,9 @@ import {ascending} from "../comparators/ascending.ts";
  * A predicate that checks if the value is between the given values
  */
 export interface BetweenPredicate<A> extends Predicate<A> {
+    /** The lower bound of the range (inclusive) */
     readonly start: A;
+    /** The upper bound of the range (inclusive) */
     readonly end: A;
 }
 

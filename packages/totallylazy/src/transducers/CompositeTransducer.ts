@@ -4,8 +4,10 @@ import {transducer, Transducer} from "./Transducer.ts";
  * A transducer that applies the given transducers in order
  */
 export interface CompositeTransducer<A, B> extends Transducer<A, B> {
+     /** The transducers to apply in sequence */
      readonly transducers: readonly Transducer<any, any>[];
 
+     /** Type identifier for compose transducers */
      readonly [Transducer.type]: 'compose';
 }
 

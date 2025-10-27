@@ -15,6 +15,7 @@ import {map} from "../transducers/MapTransducer.ts";
  * JSDoc tag annotations extracted from comments
  */
 export interface JsdocTags {
+    /** The type annotation from the @type tag */
     type: string;
 }
 

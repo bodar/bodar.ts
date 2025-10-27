@@ -7,10 +7,13 @@ import {not} from "./NotPredicate.ts";
  * A predicate with fluent methods for logical operations (and, or, not)
  */
 export interface LogicalPredicate<A> extends Predicate<A> {
+    /** Combines this predicate with another using logical AND */
     and(predicate: Predicate<A>): LogicalPredicate<A>;
 
+    /** Combines this predicate with another using logical OR */
     or(predicate: Predicate<A>): LogicalPredicate<A>;
 
+    /** Negates this predicate */
     not(): LogicalPredicate<A>;
 }
 

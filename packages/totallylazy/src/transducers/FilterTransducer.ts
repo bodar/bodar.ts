@@ -11,6 +11,7 @@ export interface FilterTransducer<A> extends Transducer<A, A> {
      */
     readonly predicate: Predicate<A>;
 
+    /** Type identifier for filter transducers */
     readonly [Transducer.type]: 'filter';
 }
 
