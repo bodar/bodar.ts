@@ -27,6 +27,7 @@
    - Use in-memory test doubles over mocks
    - Maintain contract tests across interfaces
    - Run `./run test` (all) or `./run test [specific test file]`
+   - Post deployment - verify JSR Score is till 100% with (curl -H 'accept: text/html' https://jsr.io/@bodar/[package_name]/score)
 
 5. Command Execution
    - Use `./run [command] [args]` when available
