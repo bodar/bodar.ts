@@ -68,6 +68,7 @@ export function segment<T>(head: T | undefined = undefined, tail: Segment<T> | u
     return new ASegment(head!, tail);
 }
 
+/** Converts a segment to its string representation */
 export function toString(segment: Segment<unknown>): string {
     if (segment.empty) return 'segment()';
     if (segment.tail.empty) return `segment(${segment.head})`;

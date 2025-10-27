@@ -2,9 +2,7 @@ import type {Parser} from "./Parser.ts";
 import type {View} from "./View.ts";
 import type {Result} from "./Result.ts";
 
-/**
- * Parser wrapper that logs parse results for debugging
- */
+/** Parser wrapper that logs parse results for debugging */
 export class DebugParser<A, B> implements Parser<A, B> {
     constructor(private readonly parser: Parser<A, B>,
                 private readonly name: string,

@@ -35,10 +35,14 @@ export class Comment {
     }
 }
 
+/** C-style comment grammar parser */
 export class C {
+    /** Parser for single-line C-style comments */
     static singleLineComment: Parser<string, string> = parser(regex(/[^\n]*/), between(string('//'), or(string('\n'), eof())));
 
+    /** Parser for multi-line C-style comments */
     static multiLineComment: Parser<string, string> = parser(any<string>(), until(string('*/')), between(string('/*'), string('*/')), map(characters => characters.join('')));
 
+    /** Parser for any C-style comment, returning a Comment object */
     static comment: Parser<string, Comment> = parser(or(this.singleLineComment, this.multiLineComment), map(c => new Comment(c.trim())));
 }
