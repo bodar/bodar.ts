@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * Parser combinators for building complex parsers from simple ones. Includes sequencing, alternatives, repetition, and other composition utilities.
+ */
+
 import type {Parser} from "./Parser.ts";
 import {parser} from "./Parser.ts";
 import {map} from "../transducers/MapTransducer.ts";
