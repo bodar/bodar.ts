@@ -93,12 +93,21 @@ export async function publish() {
         const parent = dirname(f!);
         const jsrFile = file(join(parent, 'jsr.json'));
 
-        await write(jsrFile, JSON.stringify({
+        const jsrConfig: any = {
             name: packageJson.name,
             version: v,
             exports: packageJson.exports,  // Use exports directly from package.json
             license: 'Apache-2.0'
-        }, null, 2));
+        };
+
+        // Convert files from package.json to publish.include for JSR
+        if (packageJson.files) {
+            jsrConfig.publish = {
+                include: packageJson.files
+            };
+        }
+
+        await write(jsrFile, JSON.stringify(jsrConfig, null, 2));
     }
 
     await $`bunx jsr publish --allow-dirty --verbose --token ${process.env.JSR_TOKEN}`;

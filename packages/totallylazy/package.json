@@ -70,7 +70,7 @@
     "./grammars/C.ts": "./src/grammars/C.ts"
   },
   "files": [
-    "src/**/*.ts",
-    "!src/**/*.test.ts"
+    "src",
+    "README.md"
   ]
 }
