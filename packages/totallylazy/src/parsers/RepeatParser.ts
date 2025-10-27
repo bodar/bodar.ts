@@ -4,6 +4,9 @@ import {fail, Failure} from "./Failure.ts";
 import {success} from "./Success.ts";
 import type {View} from "./View.ts";
 
+/**
+ * Parser that repeats a parser between min and max times
+ */
 export class RepeatParser<A, B> implements Parser<A, B[]> {
     constructor(
         private parser: Parser<A, B>,
@@ -32,6 +35,17 @@ export class RepeatParser<A, B> implements Parser<A, B[]> {
     }
 }
 
+/**
+ * Creates a parser that repeats a parser between min and max times.
+ * Equivalent to the `{min,max}` operator in regular expressions.
+ *
+ * @example
+ * ```ts
+ * const threeDigits = repeat(3, 3, matches(digit));
+ * threeDigits.parse(fromString("123")); // Success with ["1", "2", "3"]
+ * threeDigits.parse(fromString("12")); // Failure (too few)
+ * ```
+ */
 export function repeat<A, B>(): (parser: Parser<A, B>) => Parser<A, B[]>;
 export function repeat<A, B>(min: number): (parser: Parser<A, B>) => Parser<A, B[]>;
 export function repeat<A, B>(min: number, max: number): (parser: Parser<A, B>) => Parser<A, B[]>;

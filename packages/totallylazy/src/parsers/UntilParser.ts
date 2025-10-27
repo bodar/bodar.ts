@@ -4,6 +4,9 @@ import {Success, success} from "./Success.ts";
 import {Failure} from "./Failure.ts";
 import type {View} from "./View.ts";
 
+/**
+ * Parser that repeatedly applies a step parser until a stop parser succeeds
+ */
 export class UntilParser<A, B> implements Parser<A, B[]> {
     constructor(private step: Parser<A, B>, private stop: Parser<A, any>) {
     }
@@ -22,6 +25,17 @@ export class UntilParser<A, B> implements Parser<A, B[]> {
     }
 }
 
+/**
+ * Creates a parser that repeatedly applies a step parser until a stop condition is met.
+ * Collects all successfully parsed values into an array.
+ *
+ * @example
+ * ```ts
+ * const untilEof = until(eof());
+ * const allDigits = untilEof(matches(digit));
+ * allDigits.parse(fromString("123")); // Success with ["1", "2", "3"]
+ * ```
+ */
 export function until<A, B>(stop: Parser<A, any>): (step: Parser<A, B>) => Parser<A, B[]> {
     return (step: Parser<A, B>) => new UntilParser(step, stop);
 }
