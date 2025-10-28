@@ -5,8 +5,8 @@ import { dirname, join } from "path";
 process.env.FORCE_COLOR = "1";
 
 export async function version() {
-    const branch = process.env.CIRCLE_BRANCH || (await $`git rev-parse --abbrev-ref HEAD`.quiet()).text().trim();
-    const buildNumber = process.env.CIRCLE_BUILD_NUM || new Date().toISOString().replace(/[-:T]/g, '').split('.')[0];
+    const branch = process.env.CIRCLE_BRANCH || process.env.GITHUB_REF_NAME || (await $`git rev-parse --abbrev-ref HEAD`.quiet()).text().trim();
+    const buildNumber = process.env.CIRCLE_BUILD_NUM || process.env.GITHUB_RUN_NUMBER || new Date().toISOString().replace(/[-:T]/g, '').split('.')[0];
     const revisions = (await $`git rev-list --count ${branch}`.quiet()).text().trim();
     const version = `0.${revisions}.${buildNumber}`;
 
@@ -84,7 +84,7 @@ export async function regenerateExports(packageGlob: string = "packages/*/packag
     }
 }
 
-export async function publish() {
+export async function generateJsrJson() {
     const v = await version();
 
     // Publish yadic and totallylazy packages (lazyrecords pending totallylazy publication)
@@ -109,8 +109,15 @@ export async function publish() {
 
         await write(jsrFile, JSON.stringify(jsrConfig, null, 2));
     }
+}
 
-    await $`bunx jsr publish --allow-dirty --verbose --token ${process.env.JSR_TOKEN}`;
+export async function publish() {
+    await generateJsrJson();
+    if (process.env.JSR_TOKEN) {
+        await $`bunx jsr publish --allow-dirty --verbose --token ${process.env.JSR_TOKEN}`;
+    } else {
+        await $`bunx jsr publish --allow-dirty --verbose`;
+    }
     await $`rm -rf **/jsr.json`;
 }
 
