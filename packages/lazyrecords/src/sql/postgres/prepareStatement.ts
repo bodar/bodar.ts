@@ -14,6 +14,7 @@ async function hashSHA256(value: string): Promise<string> {
     return hasher.digest("hex");
 }
 
+/** Converts SQL template into a PostgreSQL prepared statement with auto-generated or custom name. */
 export async function prepareStatement(sql: Sql, name?: string): Promise<{ name: string; text: string; args: unknown[] }> {
     const {text, args} = statement(sql);
     return {

@@ -9,6 +9,7 @@ import {empty, space, text, Text} from "./Text.ts";
 import {id, Identifier} from "./Identifier.ts";
 import {value, Value} from "./Value.ts";
 
+/** Represents a compound SQL expression combining multiple sub-expressions with separators. */
 export class Compound extends Expression implements Iterable<Text | Identifier | Value> {
     constructor(public readonly expressions: readonly Expression[],
                 public separator: Text = space,
@@ -35,25 +36,17 @@ export class Compound extends Expression implements Iterable<Text | Identifier |
     }
 }
 
-/**
- * Create a Compound from an array of Expressions.
- */
+/** Creates a compound expression from multiple expressions with space separator. */
 export function expression(...expressions: readonly Expression[]): Compound {
     return new Compound(expressions);
 }
 
-/**
- * Create a Compound list from an array of Expressions.
- */
+/** Creates a comma-separated list of expressions. */
 export function list(expressions: readonly Expression[], separator: Text = text(', ')): Compound {
     return new Compound(expressions, separator);
 }
 
-/**
- * Create multiple Identifiers from an array of strings.
- *
- * With optional separator. Defaults to ', '.
- */
+/** Creates a comma-separated list of identifiers from strings. */
 export function ids(identifiers: readonly string[]): Compound {
     return list(identifiers.map(id));
 }

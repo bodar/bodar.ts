@@ -18,6 +18,7 @@ function generatePlaceholders(sql: Sql) {
     });
 }
 
+/** Converts SQL template into a PostgreSQL parameterized statement with $1, $2, etc. placeholders. */
 export function statement(sql: Sql): { text: string; args: unknown[] } {
     return {
         text: generatePlaceholders(sql),

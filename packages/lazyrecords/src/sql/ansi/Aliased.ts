@@ -9,6 +9,7 @@ import {Expression} from "../template/Expression.ts";
 import {text, Text} from "../template/Text.ts";
 import {id} from "../template/Identifier.ts";
 
+/** Represents a SQL expression with an alias (e.g., column AS alias_name). */
 export class Aliased<T extends Expression> extends Compound {
     static as: Text = text("as");
 

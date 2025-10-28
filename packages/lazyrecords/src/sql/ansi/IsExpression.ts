@@ -9,6 +9,7 @@ import {Value} from "../template/Value.ts";
 import {PredicateExpression} from "./PredicateExpression.ts";
 import {Expression} from "../template/Expression.ts";
 
+/** SQL IS/= expression that automatically handles NULL comparisons. */
 export class IsExpression extends PredicateExpression {
     static equals: Text = text("=");
     static is: Text = text("is");
@@ -23,6 +24,7 @@ export class IsExpression extends PredicateExpression {
     }
 }
 
+/** Creates an IS or = expression depending on whether the value is null. */
 export function is(instance: unknown): IsExpression {
     return new IsExpression(instance);
 }
