@@ -5,8 +5,8 @@ import { dirname, join } from "path";
 process.env.FORCE_COLOR = "1";
 
 export async function version() {
-    const branch = process.env.CIRCLE_BRANCH || process.env.GITHUB_REF_NAME || (await $`git rev-parse --abbrev-ref HEAD`.quiet()).text().trim();
-    const buildNumber = process.env.CIRCLE_BUILD_NUM || process.env.GITHUB_RUN_NUMBER || new Date().toISOString().replace(/[-:T]/g, '').split('.')[0];
+    const branch = process.env.GITHUB_REF_NAME || (await $`git rev-parse --abbrev-ref HEAD`.quiet()).text().trim();
+    const buildNumber = process.env.GITHUB_RUN_NUMBER || new Date().toISOString().replace(/[-:T]/g, '').split('.')[0];
     const revisions = (await $`git rev-list --count ${branch}`.quiet()).text().trim();
     const version = `0.${revisions}.${buildNumber}`;
 

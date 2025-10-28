@@ -1,5 +1,5 @@
 # bodar.ts
-[![bodar](https://circleci.com/gh/bodar/bodar.ts.svg?style=shield)](https://app.circleci.com/pipelines/github/bodar/bodar.ts)
+[![Build](https://github.com/bodar/bodar.ts/actions/workflows/build.yml/badge.svg)](https://github.com/bodar/bodar.ts/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/bodar/bodar.ts/graph/badge.svg?token=USVRV8KZ4R)](https://codecov.io/gh/bodar/bodar.ts)
 
 A monorepo containing TypeScript libraries for functional programming, database access, and dependency injection.
