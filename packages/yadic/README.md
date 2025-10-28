@@ -174,6 +174,7 @@ console.log(child.endpoint); // 'https://api.example.com/users'
 ### Object Chaining
 
 Merge multiple objects with precedence (earlier objects override later ones):
+(The preserves lazyness unlike spreading which would cause all lazy properties to be realised)
 
 ```typescript
 import { chain } from "@bodar/yadic/chain";
