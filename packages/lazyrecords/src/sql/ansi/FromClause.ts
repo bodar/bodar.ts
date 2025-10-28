@@ -1,5 +1,5 @@
 import {Compound} from "@bodar/lazyrecords/sql/template/Compound.ts";
-import {text, Text} from "@bodar/lazyrecords/sql/template/Text.ts";
+import {text, Text} from "../template/Text.ts";
 import {type TableReference} from "./Table.ts";
 
 export class FromClause extends Compound {

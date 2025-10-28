@@ -1,4 +1,4 @@
-import {text, Text} from "@bodar/lazyrecords/sql/template/Text.ts";
+import {text, Text} from "../template/Text.ts";
 import {SetQuantifier} from "./SetQuantifier.ts";
 import {Compound, list} from "@bodar/lazyrecords/sql/template/Compound.ts";
 import {FromClause} from "./FromClause.ts";
