@@ -1,3 +1,34 @@
+/**
+ * @module
+ *
+ * Functional SQL query builder that converts totallylazy transducers and predicates into type-safe SQL SELECT expressions.
+ *
+ * This module provides a composable approach to building SQL queries using familiar functional programming patterns.
+ * Define your table once with `definition()`, then compose queries using `toSelect()` with transducers like `filter()` and `map()`.
+ *
+ * @example
+ * ```ts
+ * import { definition, toSelect } from "@bodar/lazyrecords/sql/builder/builders.ts";
+ * import { filter } from "@bodar/totallylazy/transducers/FilterTransducer.ts";
+ * import { where } from "@bodar/totallylazy/predicates/WherePredicate.ts";
+ * import { property } from "@bodar/totallylazy/functions/Property.ts";
+ * import { is } from "@bodar/totallylazy/predicates/IsPredicate.ts";
+ * import { sql } from "@bodar/lazyrecords/sql/template/Sql.ts";
+ *
+ * interface Country {
+ *   country_code: string;
+ *   country_name: string;
+ * }
+ *
+ * const country = definition<Country>("country");
+ * const countryCode = property<Country, 'country_code'>("country_code");
+ *
+ * // Generate: select all * from "country" where "country_code" = 'GB'
+ * const query = toSelect(country, filter(where(countryCode, is("GB"))));
+ * console.log(sql(query).toString());
+ * ```
+ */
+
 import {select, SelectExpression, type SelectList} from "../ansi/SelectExpression.ts";
 import {from, FromClause} from "../ansi/FromClause.ts";
 import {table} from "../ansi/Table.ts";
