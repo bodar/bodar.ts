@@ -10,8 +10,10 @@ import {Column} from "./Column.ts";
 
 import {PredicateExpression} from "./PredicateExpression.ts";
 
+/** Type alias for SQL predicands used in WHERE conditions. */
 export type Predicand = Column;
 
+/** Represents a SQL WHERE clause for filtering query results. */
 export class WhereClause extends Compound {
     static where: Text = text("where");
 
@@ -28,10 +30,12 @@ export class WhereClause extends Compound {
     }
 }
 
+/** Creates a WHERE clause from a predicand and predicate expression. */
 export function where(predicand: Predicand, predicate: PredicateExpression): WhereClause {
     return new WhereClause(new PredicatePair(predicand, predicate));
 }
 
+/** Represents a pair of predicand and predicate for WHERE conditions. */
 export class PredicatePair extends Compound {
     constructor(public readonly predicand: Predicand, public readonly predicate: PredicateExpression) {
         super([predicand, predicate]);

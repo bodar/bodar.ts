@@ -59,25 +59,30 @@ export function ids(identifiers: readonly string[]): Compound {
 }
 
 
+/** Creates a comma-separated list of SQL values. */
 export function values(values: unknown[]): Compound {
     return list(values.map(value));
 }
 
+/** Alias for values() function. */
 export const spread = values;
 
-
+/** Creates an AND compound expression with parentheses. */
 export function and(...expressions: readonly Expression[]): Compound {
     return new Compound(expressions, text(' and '), text('('), text(')'));
 }
 
+/** Creates an OR compound expression with parentheses. */
 export function or(...expressions: readonly Expression[]): Compound {
     return new Compound(expressions, text(' or '), text('('), text(')'));
 }
 
+/** Creates a NOT compound expression wrapping the given expression. */
 export function not(original: Expression): Compound {
     return expression(text('not'), text('('), original, text(')'));
 }
 
+/** Creates a BETWEEN compound expression for range conditions. */
 export function between(start: unknown, end: unknown): Compound {
     return expression(text('between'), value(start), text('and'), value(end));
 }

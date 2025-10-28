@@ -27,18 +27,21 @@ import {isOrPredicate} from "@bodar/totallylazy/predicates/OrPredicate.ts";
 import {isNotPredicate} from "@bodar/totallylazy/predicates/NotPredicate.ts";
 import {isBetweenPredicate} from "@bodar/totallylazy/predicates/BetweenPredicate.ts";
 
+/** Represents a table definition with a name for SQL query generation. */
 // @ts-ignore
 export interface Definition<A> {
     name: string;
 }
 
+/** Creates a table definition for use in SQL query building. */
 export function definition<A>(name: string): Definition<A> {
     return {name};
 }
 
-
+/** Union type of supported transducers for SQL query building. */
 export type Supported<A> = FilterTransducer<A> | MapTransducer<A, Partial<A>>;
 
+/** Converts a table definition and transducers into a type-safe SQL SELECT expression. */
 export function toSelect<A>(definition: Definition<A>): SelectExpression;
 export function toSelect<A, B>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>): SelectExpression;
 export function toSelect<A, B, C>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>, c: Transducer<B, C> & Supported<B>): SelectExpression;
@@ -60,6 +63,7 @@ export function toSelect<A>(definition: Definition<A>, ...transducers: readonly 
     }, select(SetQuantifier.All, star, toFromClause(definition)));
 }
 
+/** Converts a mapper function to a SQL SELECT list of columns. */
 export function toSelectList<A>(mapper: Mapper<A, keyof A>): SelectList {
     if (isSelect(mapper)) {
         return mapper.properties.map(toColumn);
@@ -67,14 +71,17 @@ export function toSelectList<A>(mapper: Mapper<A, keyof A>): SelectList {
     throw new Error(`Unsupported mapper: ${mapper}`);
 }
 
+/** Converts a property to a SQL column reference. */
 export function toColumn<A>(property: Property<A, keyof A>): Column {
     return column(String(property.key));
 }
 
+/** Converts a table definition to a SQL FROM clause. */
 export function toFromClause<A>(definition: Definition<A>): FromClause {
     return from(table(definition.name));
 }
 
+/** Converts a mapper to a SQL predicand for use in WHERE clauses. */
 export function toPredicand<A>(mapper: Mapper<A, keyof A>): Predicand {
     if (isProperty(mapper)) {
         return toColumn(mapper);
@@ -87,6 +94,7 @@ function mergeWhereClause(oldClause: WhereClause | undefined, newCompound: Compo
     return new WhereClause(and(oldClause.expression, newCompound));
 }
 
+/** Converts a totallylazy predicate to a SQL compound expression. */
 export function toCompound<A>(predicate: Predicate<A>): Compound {
     if (isWherePredicate(predicate)) {
         return new PredicatePair(toPredicand(predicate.mapper), toCompound(predicate.predicate));

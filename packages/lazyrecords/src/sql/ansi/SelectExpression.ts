@@ -25,8 +25,10 @@ import type {ColumnReference} from "./Column.ts";
     Option<FetchClause> fetchClause();
  */
 
+/** Union type representing one or more column references in a SELECT list. */
 export type SelectList = (ColumnReference)[] | (ColumnReference);
 
+/** Represents a complete SQL SELECT statement with quantifier, columns, FROM, and optional WHERE. */
 export class SelectExpression extends Compound {
     static select: Text = text("select");
 
@@ -43,6 +45,7 @@ export class SelectExpression extends Compound {
     }
 }
 
+/** Creates a SQL SELECT expression from quantifier, columns, table, and optional WHERE clause. */
 export function select(setQuantifier: SetQuantifier,
                        selectList: SelectList,
                        fromClause: FromClause,

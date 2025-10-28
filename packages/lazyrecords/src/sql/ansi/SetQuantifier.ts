@@ -6,6 +6,7 @@
 
 import {Text} from "../template/Text.ts";
 
+/** SQL set quantifier for controlling duplicate rows (ALL or DISTINCT). */
 export class SetQuantifier extends Text {
     static All: SetQuantifier = new SetQuantifier('all');
     static Distinct: SetQuantifier = new SetQuantifier('distinct');
@@ -15,5 +16,8 @@ export class SetQuantifier extends Text {
     }
 }
 
+/** The ALL set quantifier (returns all rows including duplicates). */
 export const all = SetQuantifier.All;
+
+/** The DISTINCT set quantifier (returns only unique rows). */
 export const distinct = SetQuantifier.Distinct;
