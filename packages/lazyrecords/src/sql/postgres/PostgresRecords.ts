@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * PostgreSQL database records interface using Bun's SQL client with type-safe query building.
+ */
+
 import type {Transducer} from "@bodar/totallylazy/transducers/Transducer.ts";
 import {type Definition, toSelect, type Supported} from "../builder/builders.ts";
 import {statement} from "./statement.ts";
