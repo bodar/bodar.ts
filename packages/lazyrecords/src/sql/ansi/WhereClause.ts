@@ -1,5 +1,5 @@
 import {and, Compound, or} from "../template/Compound.ts";
-import {text} from "../template/Text.ts";
+import {text, Text} from "../template/Text.ts";
 import {Column} from "./Column.ts";
 
 import {PredicateExpression} from "./PredicateExpression.ts";
@@ -7,7 +7,7 @@ import {PredicateExpression} from "./PredicateExpression.ts";
 export type Predicand = Column;
 
 export class WhereClause extends Compound {
-    static where = text("where");
+    static where: Text = text("where");
 
     constructor(public readonly expression: Compound) {
         super([WhereClause.where, expression]);

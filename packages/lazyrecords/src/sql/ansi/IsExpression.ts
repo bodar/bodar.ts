@@ -1,11 +1,11 @@
-import {text} from "@bodar/lazyrecords/sql/template/Text.ts";
+import {text, Text} from "@bodar/lazyrecords/sql/template/Text.ts";
 import {Value} from "../template/Value.ts";
 import {PredicateExpression} from "./PredicateExpression.ts";
 import {Expression} from "../template/Expression.ts";
 
 export class IsExpression extends PredicateExpression {
-    static equals = text("=");
-    static is = text("is");
+    static equals: Text = text("=");
+    static is: Text = text("is");
 
     private static convert(value: unknown): Expression[] {
         if (value === undefined || value === null) return [IsExpression.is, new Value(null)];

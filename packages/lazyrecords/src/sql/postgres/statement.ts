@@ -12,7 +12,7 @@ function generatePlaceholders(sql: Sql) {
     });
 }
 
-export function statement(sql: Sql) {
+export function statement(sql: Sql): { text: string; args: unknown[] } {
     return {
         text: generatePlaceholders(sql),
         args: sql.values()

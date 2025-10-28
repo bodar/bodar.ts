@@ -1,4 +1,4 @@
-import {text} from "@bodar/lazyrecords/sql/template/Text.ts";
+import {text, Text} from "@bodar/lazyrecords/sql/template/Text.ts";
 import {SetQuantifier} from "./SetQuantifier.ts";
 import {Compound, list} from "@bodar/lazyrecords/sql/template/Compound.ts";
 import {FromClause} from "./FromClause.ts";
@@ -22,7 +22,7 @@ import type {ColumnReference} from "./Column.ts";
 export type SelectList = (ColumnReference)[] | (ColumnReference);
 
 export class SelectExpression extends Compound {
-    static select = text("select");
+    static select: Text = text("select");
 
     constructor(public readonly setQuantifier: SetQuantifier,
                 public readonly selectList: SelectList,

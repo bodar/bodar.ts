@@ -57,9 +57,9 @@ export function statement(sql: Sql): { text: string; args: unknown[] } {
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
-- [ ] Type checking passes: `./run check`
-- [ ] Tests pass: `./run test`
-- [ ] Build succeeds: `./run build`
+- [x] Type checking passes: `./run check`
+- [x] Tests pass: `./run test`
+- [x] Build succeeds: `./run build`
 
 ## Phase 2: Fix Static Property Types
 
@@ -165,9 +165,9 @@ static where: Text = text("where");
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
-- [ ] Type checking passes: `./run check`
-- [ ] Tests pass: `./run test`
-- [ ] Build succeeds: `./run build`
+- [x] Type checking passes: `./run check`
+- [x] Tests pass: `./run test`
+- [x] Build succeeds: `./run build`
 
 **Implementation Note**: After all pre-commit verification passes, pause and request human approval to commit and push changes.
 

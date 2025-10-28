@@ -1,9 +1,9 @@
 import {Compound} from "@bodar/lazyrecords/sql/template/Compound.ts";
-import {text} from "@bodar/lazyrecords/sql/template/Text.ts";
+import {text, Text} from "@bodar/lazyrecords/sql/template/Text.ts";
 import {type TableReference} from "./Table.ts";
 
 export class FromClause extends Compound {
-    static from = text("from");
+    static from: Text = text("from");
 
     constructor(public readonly table: TableReference) {
         super([FromClause.from, table]);

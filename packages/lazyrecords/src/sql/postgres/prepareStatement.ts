@@ -7,7 +7,7 @@ async function hashSHA256(value: string): Promise<string> {
     return hasher.digest("hex");
 }
 
-export async function prepareStatement(sql: Sql, name?: string) {
+export async function prepareStatement(sql: Sql, name?: string): Promise<{ name: string; text: string; args: unknown[] }> {
     const {text, args} = statement(sql);
     return {
         name: (name ?? await hashSHA256(text)).slice(0, 63),
