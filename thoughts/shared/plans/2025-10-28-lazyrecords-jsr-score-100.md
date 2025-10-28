@@ -112,7 +112,6 @@ Add README.md to the files array in package.json so it gets published to JSR. Th
 ```json
 "files": [
   "src/**/*.ts",
-  "!src/**/*.test.ts",
   "README.md",
   "package.json"
 ]
@@ -121,9 +120,9 @@ Add README.md to the files array in package.json so it gets published to JSR. Th
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
-- [ ] Type checking passes: `./run check`
-- [ ] Tests pass: `./run test`
-- [ ] Build succeeds: `./run build`
+- [x] Type checking passes: `./run check`
+- [x] Tests pass: `./run test`
+- [x] Build succeeds: `./run build`
 
 **Implementation Note**: After pre-commit verification passes, commit and push changes.
 
