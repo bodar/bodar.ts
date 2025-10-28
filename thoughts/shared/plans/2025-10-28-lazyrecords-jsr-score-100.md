@@ -212,10 +212,12 @@ Mark as compatible with:
 
 ---
 
-## Phase 4: Add Module Documentation to All Entrypoints
+## Phase 4: Add Module Documentation to All Entrypoints ✅
 
 ### Overview
-Add @module JSDoc to all 24 entrypoints that lack module-level documentation. This addresses the "Has module docs in all entrypoints" criterion (+1 point).
+Add @module JSDoc to all entrypoints that lack module-level documentation. This addresses the "Has module docs in all entrypoints" criterion (+1 point).
+
+**COMPLETED**: Added @module JSDoc to all 23 entrypoints (removed mod.ts). Awaiting JSR re-index to reflect score change.
 
 ### Files Needing Module Documentation:
 
@@ -261,17 +263,19 @@ Read each file and add appropriate @module JSDoc documentation based on:
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
-- [ ] Type checking passes: `./run check`
-- [ ] Tests pass: `./run test`
-- [ ] Review module docs are accurate based on tests
+- [x] Type checking passes: `./run check`
+- [x] Tests pass: `./run test`
+- [x] Review module docs are accurate based on tests
 
 #### Build Verification:
-- [ ] CircleCI build completes successfully
+- [x] CircleCI build completes successfully
 
 #### Post-deployment Verification (Production):
 - [ ] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/lazyrecords/score | jq .allEntrypointsDocs`
-- [ ] Expected result: `true`
-- [ ] Score should increase to ~82% (+1 point, from 13/17 to 14/17)
+- [ ] Expected result: `true` (currently still `false` - awaiting JSR re-index)
+- [ ] Score should increase to ~76% (+1 point, from 12/17 to 13/17)
+
+**Note**: JSR may take time to re-index. Module docs have been added to all 23 entrypoints.
 
 ---
 
