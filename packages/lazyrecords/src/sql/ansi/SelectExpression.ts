@@ -1,9 +1,9 @@
 import {text, Text} from "../template/Text.ts";
 import {SetQuantifier} from "./SetQuantifier.ts";
-import {Compound, list} from "@bodar/lazyrecords/sql/template/Compound.ts";
+import {Compound, list} from "../template/Compound.ts";
 import {FromClause} from "./FromClause.ts";
 import {WhereClause} from "./WhereClause.ts";
-import {Expression} from "@bodar/lazyrecords/sql/template/Expression.ts";
+import {Expression} from "../template/Expression.ts";
 import type {ColumnReference} from "./Column.ts";
 
 

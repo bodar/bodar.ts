@@ -1,4 +1,4 @@
-import {Compound} from "@bodar/lazyrecords/sql/template/Compound.ts";
+import {Compound} from "../template/Compound.ts";
 import {text, Text} from "../template/Text.ts";
 import {type TableReference} from "./Table.ts";
 
