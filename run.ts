@@ -87,11 +87,23 @@ export async function regenerateExports(packageGlob: string = "packages/*/packag
 export async function generateJsrJson() {
     const v = await version();
 
-    // Publish yadic and totallylazy packages (lazyrecords pending totallylazy publication)
-    for await (const f of new Glob("packages/{yadic,totallylazy}/package.json").scan(".")) {
-        const packageJson = await file(f).json();
+    // Publish all packages
+    for await (const f of new Glob("packages/{yadic,totallylazy,lazyrecords}/package.json").scan(".")) {
+        const packageJsonFile = file(f);
+        const packageJson = await packageJsonFile.json();
         const parent = dirname(f!);
         const jsrFile = file(join(parent, 'jsr.json'));
+
+        // Resolve workspace dependencies to actual version numbers
+        if (packageJson.dependencies) {
+            for (const [depName, depVersion] of Object.entries(packageJson.dependencies)) {
+                if (typeof depVersion === 'string' && depVersion.startsWith('workspace:')) {
+                    packageJson.dependencies[depName] = v;
+                }
+            }
+            // Write the resolved package.json back to disk
+            await write(packageJsonFile, JSON.stringify(packageJson, null, 2));
+        }
 
         const jsrConfig: any = {
             name: packageJson.name,

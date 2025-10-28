@@ -36,6 +36,7 @@
   },
   "files": [
     "src/**/*.ts",
-    "!src/**/*.test.ts"
+    "!src/**/*.test.ts",
+    "package.json"
   ]
 }

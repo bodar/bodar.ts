@@ -67,6 +67,7 @@
   },
   "files": [
     "src",
-    "README.md"
+    "README.md",
+    "package.json"
   ]
 }
