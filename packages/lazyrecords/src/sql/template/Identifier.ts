@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * SQL identifier expressions for table and column names that will be properly escaped.
+ */
+
 import {Expression} from "./Expression.ts";
 
 /**

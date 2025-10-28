@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * Base class for all SQL expressions in the template system.
+ */
+
 const NominalType = Symbol('NominalType');
 
 /**

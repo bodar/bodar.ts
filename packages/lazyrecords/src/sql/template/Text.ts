@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * Raw SQL text expressions without parameters or placeholders.
+ */
+
 import {Expression} from "./Expression.ts";
 
 /**

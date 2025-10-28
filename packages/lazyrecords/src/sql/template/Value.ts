@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * SQL value placeholders for parameterized queries and safe value interpolation.
+ */
+
 import {Expression} from "./Expression.ts";
 
 export class Value extends Expression {

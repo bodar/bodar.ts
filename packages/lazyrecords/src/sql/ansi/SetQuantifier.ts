@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * ANSI SQL set quantifiers (ALL and DISTINCT) for controlling duplicate rows in query results.
+ */
+
 import {Text} from "../template/Text.ts";
 
 export class SetQuantifier extends Text {

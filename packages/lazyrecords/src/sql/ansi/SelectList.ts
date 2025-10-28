@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * ANSI SQL SELECT list representing columns to be returned in query results.
+ */
+
 import {Compound} from "../template/Compound.ts";
 import {text} from "../template/Text.ts";
 import {Table} from "./Table.ts";

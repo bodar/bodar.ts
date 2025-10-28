@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * ANSI SQL table references for use in FROM clauses.
+ */
+
 import {Qualified} from "./Qualified.ts";
 import {Aliasable} from "./Aliasable.ts";
 import {id, Identifier} from "../template/Identifier.ts";

@@ -2,20 +2,7 @@
  * @module
  *
  * Converts SQL template expressions into PostgreSQL prepared statements with auto-generated names.
- *
- * Prepared statements improve performance by allowing PostgreSQL to parse and plan queries once,
- * then reuse the plan for subsequent executions. This module automatically generates unique
- * statement names using SHA-256 hashing of the SQL text (truncated to PostgreSQL's 63-character limit).
- *
- * @example
- * ```ts
- * import { prepareStatement } from "@bodar/lazyrecords/sql/postgres/prepareStatement.ts";
- * import { sql } from "@bodar/lazyrecords/sql/template/Sql.ts";
- *
- * const query = sql`select * from users where id = ${123}`;
- * const prepared = await prepareStatement(query);
- * // { name: "a1b2c3...", text: "select * from users where id = $1", args: [123] }
- * ```
+ * Statement names are generated using SHA-256 hashing of the SQL text, truncated to PostgreSQL's 63-character limit.
  */
 
 import {Sql} from "../template/Sql.ts";

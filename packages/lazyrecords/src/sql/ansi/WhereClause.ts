@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * ANSI SQL WHERE clause for filtering query results based on conditions.
+ */
+
 import {and, Compound, or} from "../template/Compound.ts";
 import {text, Text} from "../template/Text.ts";
 import {Column} from "./Column.ts";

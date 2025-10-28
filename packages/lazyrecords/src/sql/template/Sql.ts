@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * SQL template literal tag function for building parameterized SQL queries with type safety.
+ */
+
 import {text, Text} from "./Text.ts";
 import {value, Value} from "./Value.ts";
 import {Identifier} from "./Identifier.ts";

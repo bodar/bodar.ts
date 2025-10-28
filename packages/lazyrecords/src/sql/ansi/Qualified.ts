@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * ANSI SQL qualified names (schema.table or table.column) for explicit object references.
+ */
+
 import {Compound} from "../template/Compound.ts";
 import {empty, text, Text} from "../template/Text.ts";
 import {id} from "../template/Identifier.ts";

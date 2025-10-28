@@ -170,22 +170,24 @@ Add package description to improve searchability and score +1 point.
 **Implementation Note**: After pre-commit verification passes, commit and push changes.
 
 #### Build Verification:
-- [ ] CircleCI build completes: Check via `mcp__circleci-mcp-server__get_latest_pipeline_status`
-- [ ] Build passes: Review logs if failures occur
+- [x] CircleCI build completes: Check via `mcp__circleci-mcp-server__get_latest_pipeline_status`
+- [x] Build passes: Review logs if failures occur
 
 #### Post-deployment Verification (Production):
-- [ ] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/lazyrecords/score | jq .hasDescription`
-- [ ] Expected result: `true`
-- [ ] Score should increase to ~71% (+1 point, from 11/17 to 12/17)
+- [x] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/lazyrecords/score | jq .hasDescription`
+- [x] Expected result: `true` ✓
+- [x] Score increased to 70% (+1 point, from 11/17 to 12/17)
 
 ---
 
-## Phase 3: Add Runtime Compatibility
+## Phase 3: Add Runtime Compatibility ⏸️ (DEFERRED)
 
 ### Overview
 Mark package as compatible with multiple runtimes to score +1 point.
 
-### Changes Required:
+**DEFERRED**: Cannot mark additional runtimes as compatible yet because the SQL client (PostgresRecords) is currently Bun-specific. This phase should be completed after abstracting the database client to support multiple runtimes.
+
+### Changes Required (when ready):
 
 Runtime compatibility must be marked via JSR web interface at:
 https://jsr.io/@bodar/lazyrecords/settings
@@ -198,6 +200,7 @@ Mark as compatible with:
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
+- [ ] Abstract SQL client to support multiple runtimes
 - [ ] Log into JSR web interface
 - [ ] Navigate to package settings
 - [ ] Mark additional runtimes as compatible

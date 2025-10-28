@@ -27,7 +27,6 @@
     "./sql/ansi/FromClause.ts": "./src/sql/ansi/FromClause.ts",
     "./sql/ansi/SelectExpression.ts": "./src/sql/ansi/SelectExpression.ts",
     "./sql/ansi/Qualified.ts": "./src/sql/ansi/Qualified.ts",
-    "./sql/template/mod.ts": "./src/sql/template/mod.ts",
     "./sql/template/Compound.ts": "./src/sql/template/Compound.ts",
     "./sql/template/Value.ts": "./src/sql/template/Value.ts",
     "./sql/template/Text.ts": "./src/sql/template/Text.ts",

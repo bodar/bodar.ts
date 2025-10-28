@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * SQL compound expressions for combining multiple expressions with separators (AND, OR, BETWEEN, etc.).
+ */
+
 import {Expression} from "./Expression.ts";
 import {empty, space, text, Text} from "./Text.ts";
 import {id, Identifier} from "./Identifier.ts";
