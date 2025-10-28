@@ -1,3 +1,4 @@
+/** @module Comparator that compares by extracted property */
 import type {Comparator} from "./Comparator.ts";
 import type {Mapper} from "../functions/Mapper.ts";
 import {ascending} from "./ascending.ts";

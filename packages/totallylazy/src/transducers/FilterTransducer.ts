@@ -1,3 +1,4 @@
+/** @module Transducer that filters elements using a predicate */
 import {not} from "../predicates/NotPredicate.ts";
 import type {Predicate} from "../predicates/Predicate.ts";
 import {transducer, Transducer} from "./Transducer.ts";

@@ -1,3 +1,4 @@
+/** @module Parser that matches using regular expressions */
 import type {Parser} from "./Parser.ts";
 import type {Result} from "./Result.ts";
 import {fail} from "./Failure.ts";

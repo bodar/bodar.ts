@@ -1,3 +1,4 @@
+/** @module Lazy evaluation utilities for deferring computation */
 import {replace} from "../functions/replace.ts";
 
 interface GetterPropertyDescriptor<T, V> {

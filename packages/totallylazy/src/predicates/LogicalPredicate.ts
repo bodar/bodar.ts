@@ -1,3 +1,4 @@
+/** @module Base type for logical predicates that combine multiple predicates */
 import type {Predicate} from "./Predicate.ts";
 import {and} from "./AndPredicate.ts";
 import {or} from "./OrPredicate.ts";

@@ -1,3 +1,4 @@
+/** @module Parser that repeats another parser a specified number of times */
 import type {Parser} from "./Parser.ts";
 import type {Result} from "./Result.ts";
 import {fail, Failure} from "./Failure.ts";

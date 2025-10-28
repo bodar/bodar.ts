@@ -1,3 +1,4 @@
+/** @module Predicate that checks if a value is among a set of values */
 import type {Predicate} from "./Predicate.ts";
 
 /** A predicate that checks if a character is among the given characters */

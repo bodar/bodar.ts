@@ -1,3 +1,4 @@
+/** @module String conversion utility */
 /** Converts a value to its string representation, handling special cases like undefined and null */
 export function toString(value: unknown): string {
     if (value === undefined) return 'undefined';

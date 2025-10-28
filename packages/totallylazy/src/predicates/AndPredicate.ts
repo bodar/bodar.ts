@@ -1,3 +1,4 @@
+/** @module Predicate that combines predicates with logical AND */
 import type {Predicate} from "./Predicate.ts";
 import {alwaysFalse, alwaysTrue} from "../functions/constant.ts";
 import {isNotPredicate, not, type NotPredicate} from "./NotPredicate.ts";

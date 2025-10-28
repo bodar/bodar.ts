@@ -1,3 +1,4 @@
+/** @module Deep equality comparison utilities */
 /**
  * Performs deep equality comparison of two values. Supports primitives, objects, arrays, Maps, Sets, Dates, RegExp, and functions.
  * Uses same-value-zero equality (NaN === NaN, +0 === -0).

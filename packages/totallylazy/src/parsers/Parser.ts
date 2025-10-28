@@ -1,3 +1,4 @@
+/** @module Core parser type and combinators */
 import {result} from "./Result.ts";
 import type {Result} from "./Result.ts";
 import type {View} from "./View.ts";

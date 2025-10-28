@@ -1,3 +1,4 @@
+/** @module Character predicates for testing character types */
 import type {Predicate} from "./Predicate.ts";
 import {or} from "./OrPredicate.ts";
 import {between} from "./BetweenPredicate.ts";

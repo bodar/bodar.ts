@@ -1,3 +1,4 @@
+/** @module Core comparator type */
 /**
  * A function that compares two values and returns a number indicating their relative order.
  * Returns negative if a < b, 0 if a == b, positive if a > b.

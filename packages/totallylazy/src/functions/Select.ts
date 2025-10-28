@@ -1,3 +1,4 @@
+/** @module Select utilities for extracting and transforming properties */
 import type {Mapper} from "./Mapper.ts";
 import type {Property} from "./Property.ts";
 import {property} from "./Property.ts";

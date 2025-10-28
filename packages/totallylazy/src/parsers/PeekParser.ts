@@ -1,3 +1,4 @@
+/** @module Parser that looks ahead without consuming input */
 import {success} from "./Success.ts";
 import type {Result} from "./Result.ts";
 import type {View} from "./View.ts";

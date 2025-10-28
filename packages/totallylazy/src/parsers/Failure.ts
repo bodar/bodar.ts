@@ -1,3 +1,4 @@
+/** @module Failed parse result type */
 import type {Result} from "./Result.ts";
 import {toString} from "../functions/toString.ts";
 

@@ -1,3 +1,4 @@
+/** @module Comparator utilities and combinators */
 import type {Comparator} from "./Comparator.ts";
 
 /**

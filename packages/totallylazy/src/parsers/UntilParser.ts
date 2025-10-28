@@ -1,3 +1,4 @@
+/** @module Parser that consumes input until another parser matches */
 import type {Parser} from "./Parser.ts";
 import type {Result} from "./Result.ts";
 import {Success, success} from "./Success.ts";

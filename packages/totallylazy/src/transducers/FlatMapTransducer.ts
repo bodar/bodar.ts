@@ -1,3 +1,4 @@
+/** @module Transducer that maps and flattens nested iterables */
 import type {Mapper} from "../functions/Mapper.ts";
 import {transducer, Transducer} from "./Transducer.ts";
 

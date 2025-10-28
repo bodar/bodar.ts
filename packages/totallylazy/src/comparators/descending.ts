@@ -1,3 +1,4 @@
+/** @module Descending order comparator */
 /**
  * A comparator that sorts values in descending order (largest to smallest).
  *

@@ -1,3 +1,4 @@
+/** @module Predicate that negates another predicate */
 import type {Predicate} from "./Predicate.ts";
 
 /** A predicate that negates the given predicate */

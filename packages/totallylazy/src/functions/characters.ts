@@ -1,3 +1,4 @@
+/** @module Unicode-aware character utilities */
 /**
  * Returns an array of characters from the given string. Supports unicode.
  */

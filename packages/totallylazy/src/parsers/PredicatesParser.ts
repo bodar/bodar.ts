@@ -1,3 +1,4 @@
+/** @module Parser that matches characters using predicates */
 import type {Predicate} from "../predicates/Predicate.ts";
 import type {Parser} from "./Parser.ts";
 import type {Result} from "./Result.ts";

@@ -1,3 +1,4 @@
+/** @module Lazy sequence type with functional operations */
 import {Transducer} from "../transducers/Transducer.ts";
 import {flatten} from "../transducers/CompositeTransducer.ts";
 

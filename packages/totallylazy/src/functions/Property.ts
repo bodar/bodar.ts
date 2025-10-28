@@ -1,3 +1,4 @@
+/** @module Property access utilities for extracting values from objects */
 import type {Mapper} from "./Mapper.ts";
 
 /**

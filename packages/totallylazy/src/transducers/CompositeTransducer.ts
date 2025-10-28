@@ -1,3 +1,4 @@
+/** @module Transducer that composes multiple transducers */
 import {transducer, Transducer} from "./Transducer.ts";
 
 /** A transducer that applies the given transducers in order */

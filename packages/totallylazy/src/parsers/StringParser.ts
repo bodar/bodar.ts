@@ -1,3 +1,4 @@
+/** @module Parser that matches a specific string */
 import {success} from "./Success.ts";
 import {fail} from "./Failure.ts";
 import type {Result} from "./Result.ts";

@@ -1,3 +1,4 @@
+/** @module Parse result type and operations */
 import type {View} from "./View.ts";
 import {Transducer} from "../transducers/Transducer.ts";
 import {single} from "../collections/Single.ts";

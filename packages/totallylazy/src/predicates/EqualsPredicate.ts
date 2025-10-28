@@ -1,3 +1,4 @@
+/** @module Predicate that checks equality using deep comparison */
 import type {Predicate} from "./Predicate.ts";
 import {toString} from "../functions/toString.ts";
 import {equal} from "../functions/equal.ts";

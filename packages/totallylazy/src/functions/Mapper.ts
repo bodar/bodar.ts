@@ -1,3 +1,4 @@
+/** @module Core mapping function type */
 /**
  * A function that takes an A and returns a B
  */

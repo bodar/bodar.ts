@@ -1,3 +1,4 @@
+/** @module Predicate that tests a property of an object */
 import type {Predicate} from "./Predicate.ts";
 import type {Mapper} from "../functions/Mapper.ts";
 import {logical, type LogicalPredicate} from "./LogicalPredicate.ts";

@@ -1,3 +1,4 @@
+/** @module Parser that makes another parser optional */
 import {Failure} from "./Failure.ts";
 import type {Parser} from "./Parser.ts";
 import type {Result} from "./Result.ts";

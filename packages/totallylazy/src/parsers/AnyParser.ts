@@ -1,3 +1,4 @@
+/** @module Parser that matches any single character */
 import {type Parser} from "./Parser.ts";
 import {success} from "./Success.ts";
 import {fail} from "./Failure.ts";

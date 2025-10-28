@@ -1,3 +1,4 @@
+/** @module Predicate that checks if a value is between two bounds */
 import type {Predicate} from "./Predicate.ts";
 import type {Comparator} from "../comparators/Comparator.ts";
 import {ascending} from "../comparators/ascending.ts";

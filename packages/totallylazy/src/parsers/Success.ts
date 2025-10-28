@@ -1,3 +1,4 @@
+/** @module Successful parse result type */
 import type {Result} from "./Result.ts";
 import type {View} from "./View.ts";
 

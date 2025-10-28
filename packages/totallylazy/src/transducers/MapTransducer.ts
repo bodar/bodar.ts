@@ -1,3 +1,4 @@
+/** @module Transducer that maps elements using a function */
 import type {Mapper} from "../functions/Mapper.ts";
 import {Transducer, transducer} from "./Transducer.ts";
 

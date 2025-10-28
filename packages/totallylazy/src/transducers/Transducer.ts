@@ -1,3 +1,4 @@
+/** @module Core transducer type and utilities */
 /** A transducer that can be applied synchronously */
 export interface Transducer<A, B> {
     (iterable: Iterable<A>): Iterable<B>;

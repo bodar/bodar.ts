@@ -1,3 +1,4 @@
+/** @module Parser that matches end of input */
 import type {Parser} from "./Parser.ts";
 import type {View} from "./View.ts";
 import type {Result} from "./Result.ts";

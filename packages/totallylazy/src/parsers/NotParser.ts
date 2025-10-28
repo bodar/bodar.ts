@@ -1,3 +1,4 @@
+/** @module Parser that succeeds when another parser fails */
 import type {Parser} from "./Parser.ts";
 import type {View} from "./View.ts";
 import type {Result} from "./Result.ts";

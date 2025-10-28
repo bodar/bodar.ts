@@ -1,3 +1,4 @@
+/** @module View type for parsing with position tracking */
 /** A source of indexed elements */
 export interface Source<T> {
     readonly length: number;

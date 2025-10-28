@@ -1,3 +1,4 @@
+/** @module Parser that tries multiple parsers in sequence */
 import type {Parser} from "./Parser.ts";
 import type {Result} from "./Result.ts";
 import {fail, Failure} from "./Failure.ts";

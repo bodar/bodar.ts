@@ -1,3 +1,4 @@
+/** @module Constant function utilities */
 /** A function that always returns the same constant value, regardless of input */
 export interface Constant<T> {
     (..._ignored: any[]): T;

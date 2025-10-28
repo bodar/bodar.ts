@@ -1,3 +1,4 @@
+/** @module Predicate that checks if a value is of a specific type */
 import type {Predicate} from "./Predicate.ts";
 import {toString} from "../functions/toString.ts";
 
