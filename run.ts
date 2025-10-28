@@ -125,12 +125,17 @@ export async function generateJsrJson() {
 
 export async function publish() {
     await generateJsrJson();
-    if (process.env.JSR_TOKEN) {
-        await $`bunx jsr publish --allow-dirty --verbose --token ${process.env.JSR_TOKEN}`;
-    } else {
-        await $`bunx jsr publish --allow-dirty --verbose`;
+    try {
+        if (process.env.JSR_TOKEN) {
+            await $`bunx jsr publish --allow-dirty --verbose --token ${process.env.JSR_TOKEN}`;
+        } else {
+            await $`bunx jsr publish --allow-dirty --verbose`;
+        }
+    } finally {
+        // Always restore workspace dependencies and clean up, even if publish fails
+        await $`git checkout packages/*/package.json`;
+        await $`rm -rf **/jsr.json`;
     }
-    await $`rm -rf **/jsr.json`;
 }
 
 export async function ci() {
