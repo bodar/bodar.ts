@@ -1,8 +1,15 @@
-import type {SQL} from "bun";
 import type {Transducer} from "@bodar/totallylazy/transducers/Transducer.ts";
 import {type Definition, toSelect, type Supported} from "../builder/builders.ts";
 import {statement} from "./statement.ts";
 import {sql} from "../template/Sql.ts";
+
+/**
+ * A SQL client interface that can execute queries with parameters.
+ * Compatible with Bun's SQL client.
+ */
+export interface SQLClient {
+    (query: string, params: unknown[]): Promise<any> | AsyncIterable<any>;
+}
 
 /**
  * PostgresRecords is a class that provides methods for interacting with a PostgreSQL database using Bun's SQL client.
@@ -10,10 +17,10 @@ import {sql} from "../template/Sql.ts";
 export class PostgresRecords {
     /**
      * Creates a new instance of PostgresRecords.
-     * 
-     * @param client - The Bun SQL client instance.
+     *
+     * @param client - The SQL client instance (e.g., Bun's SQL client).
      */
-    constructor(private client: SQL) {
+    constructor(private client: SQLClient) {
     }
 
     /**
