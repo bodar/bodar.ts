@@ -127,16 +127,16 @@ Add README.md to the files array in package.json so it gets published to JSR. Th
 **Implementation Note**: After pre-commit verification passes, commit and push changes.
 
 #### Build Verification:
-- [ ] CircleCI build completes: Check via `mcp__circleci-mcp-server__get_latest_pipeline_status`
-- [ ] Build passes: Review logs if failures occur
+- [x] CircleCI build completes: Check via `mcp__circleci-mcp-server__get_latest_pipeline_status`
+- [x] Build passes: Review logs if failures occur
 
 #### Post-deployment Verification (Production):
-- [ ] README appears on JSR: `curl -H 'accept: text/html' https://jsr.io/@bodar/lazyrecords` (check for README content)
-- [ ] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/lazyrecords/score | jq .hasReadme`
-- [ ] Expected result: `true`
-- [ ] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/lazyrecords/score | jq .hasReadmeExamples`
-- [ ] Expected result: `true`
-- [ ] Score should increase to ~65% (+3 points, from 8/17 to 11/17)
+- [x] README appears on JSR: `curl -H 'accept: text/html' https://jsr.io/@bodar/lazyrecords` (check for README content)
+- [x] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/lazyrecords/score | jq .hasReadme`
+- [x] Expected result: `true` ✓
+- [x] JSR score updated: `curl -s https://api.jsr.io/scopes/bodar/packages/lazyrecords/score | jq .hasReadmeExamples`
+- [x] Expected result: `true` ✓
+- [x] Score increased to 64% (+3 points, from 8/17 to 11/17)
 
 ---
 
@@ -164,8 +164,8 @@ Add package description to improve searchability and score +1 point.
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
-- [ ] Type checking passes: `./run check`
-- [ ] Tests pass: `./run test`
+- [x] Type checking passes: `./run check`
+- [x] Tests pass: `./run test`
 
 **Implementation Note**: After pre-commit verification passes, commit and push changes.
 

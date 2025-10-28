@@ -1,6 +1,7 @@
 {
   "name": "@bodar/lazyrecords",
   "version": "0.0.0",
+  "description": "Type-safe SQL query builder for TypeScript with support for PostgreSQL, template literals, and ANSI SQL standard",
   "type": "module",
   "dependencies": {
     "@bodar/totallylazy": "workspace:totallylazy"
