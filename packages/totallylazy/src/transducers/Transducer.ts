@@ -22,7 +22,7 @@ export function transducer<N extends string, T extends (iterable: Iterable<any>)
         [Transducer.type]: name,
         toString: () => {
             const values = Object.values(source);
-            const valuesStr = values.map(v => typeof v === 'function' ? v.toString().replace(/^\((.*?)\)/, '$1') : v).join(', ');
+            const valuesStr = values.map(v => typeof v === 'function' ? v.toString() : v).join(', ');
             return `${name}(${valuesStr})`;
         }
     }, source);

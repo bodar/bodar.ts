@@ -34,7 +34,7 @@ describe("TakeWhileTransducer", () => {
     });
 
     it("is self describing", () => {
-        assertThat(transducer.toString(), is('takeWhile(n => n < 5)'));
+        assertThat(transducer.toString(), is('takeWhile((n) => n < 5)'));
     });
 });
 

@@ -41,7 +41,7 @@ describe("ReduceTransducer", () => {
     });
 
     it("is self describing", () => {
-        assertThat(transducer.toString(), is('reduce(acc, val => acc + val, 0)'));
+        assertThat(transducer.toString(), is('reduce((acc, val) => acc + val, 0)'));
     });
 });
 

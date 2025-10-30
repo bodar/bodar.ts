@@ -22,7 +22,7 @@ describe("FilterTransducer", () => {
     });
 
     it("is self describing", () => {
-        assertThat(transducer.toString(), is('filter(x => x % 2 === 0)'));
+        assertThat(transducer.toString(), is('filter((x) => x % 2 === 0)'));
     });
 });
 

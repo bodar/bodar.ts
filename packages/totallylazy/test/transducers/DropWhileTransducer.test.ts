@@ -34,7 +34,7 @@ describe("DropWhileTransducer", () => {
     });
 
     it("is self describing", () => {
-        assertThat(transducer.toString(), is('dropWhile(n => n < 5)'));
+        assertThat(transducer.toString(), is('dropWhile((n) => n < 5)'));
     });
 });
 

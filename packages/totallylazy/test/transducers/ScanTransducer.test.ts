@@ -36,7 +36,7 @@ describe("ScanTransducer", () => {
     });
 
     it("is self describing", () => {
-        assertThat(transducer.toString(), is('scan(acc, val => acc + val, 0)'));
+        assertThat(transducer.toString(), is('scan((acc, val) => acc + val, 0)'));
     });
 });
 

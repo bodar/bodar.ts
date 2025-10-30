@@ -356,10 +356,12 @@ Implement zipping and windowing operations.
 
 ---
 
-## Phase 6: Sorting and Search (sort, find, single)
+## Phase 6: Sorting and Search (sort, find)
 
 ### Overview
 Implement sorting using comparators and search operations.
+
+**Note**: `single` was already implemented as a terminal operation in `collections/Single.ts`, not as a transducer. It extracts the first value from an iterable and throws if empty.
 
 ### Changes Required:
 
@@ -371,17 +373,13 @@ Implement sorting using comparators and search operations.
 **File**: `packages/totallylazy/src/transducers/FindTransducer.ts` (new file)
 **Changes**: Find first matching element
 
-#### 3. SingleTransducer
-**File**: `packages/totallylazy/src/transducers/SingleTransducer.ts` (new file)
-**Changes**: Extract single value with error handling
-
-#### 4. Tests
-**Files**: `packages/totallylazy/test/transducers/SortTransducer.test.ts`, etc.
+#### 3. Tests
+**Files**: `packages/totallylazy/test/transducers/SortTransducer.test.ts`, `packages/totallylazy/test/transducers/FindTransducer.test.ts`
 
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
-- [ ] Build passes (auto-generates exports, type checks, and runs tests): `./run build`
+- [x] Build passes (auto-generates exports, type checks, and runs tests): `./run build`
 
 **Implementation Note**: After all pre-commit verification passes, pause and request human approval to commit and push changes.
 
