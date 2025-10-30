@@ -37,3 +37,18 @@ export function isCompositeTransducer(value: any): value is CompositeTransducer<
 export function flatten(transducers: readonly Transducer<any, any>[]): readonly Transducer<any, any>[] {
     return transducers.flatMap(t => isCompositeTransducer(t) ? flatten(t.transducers) : t);
 }
+
+/**
+ * Decomposes a transducer into its constituent parts
+ * For composite transducers, yields all nested transducers
+ * For non-composite transducers, yields the transducer itself
+ */
+export function* decompose(transducer: Transducer<any, any>): Iterable<Transducer<any, any>> {
+    if (isCompositeTransducer(transducer)) {
+        for (const t of transducer.transducers) {
+            yield* decompose(t);
+        }
+    } else {
+        yield transducer;
+    }
+}

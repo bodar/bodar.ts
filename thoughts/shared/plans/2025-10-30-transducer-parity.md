@@ -413,7 +413,7 @@ Implement utility transducers for pass-through and introspection.
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
-- [ ] Build passes (auto-generates exports, type checks, and runs tests): `./run build`
+- [x] Build passes (auto-generates exports, type checks, and runs tests): `./run build`
 
 **Implementation Note**: After all pre-commit verification passes, pause and request human approval to commit and push changes.
 

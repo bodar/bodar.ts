@@ -51,6 +51,7 @@
     "./transducers/DedupeTransducer.ts": "./src/transducers/DedupeTransducer.ts",
     "./transducers/FlatMapTransducer.ts": "./src/transducers/FlatMapTransducer.ts",
     "./transducers/ZipTransducer.ts": "./src/transducers/ZipTransducer.ts",
+    "./transducers/IdentityTransducer.ts": "./src/transducers/IdentityTransducer.ts",
     "./transducers/MapTransducer.ts": "./src/transducers/MapTransducer.ts",
     "./transducers/FindTransducer.ts": "./src/transducers/FindTransducer.ts",
     "./transducers/LastTransducer.ts": "./src/transducers/LastTransducer.ts",

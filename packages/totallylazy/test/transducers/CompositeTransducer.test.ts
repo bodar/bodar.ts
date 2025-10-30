@@ -3,7 +3,7 @@ import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {filter} from "@bodar/totallylazy/transducers/FilterTransducer.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
-import {compose} from "@bodar/totallylazy/transducers/CompositeTransducer.ts";
+import {compose, decompose} from "@bodar/totallylazy/transducers/CompositeTransducer.ts";
 import {map} from "@bodar/totallylazy/transducers/MapTransducer.ts";
 
 describe("CompositeTransducer", () => {
@@ -34,4 +34,28 @@ describe("CompositeTransducer", () => {
         assertThat(r.transducers.length, is(4));
     });
 
+});
+
+describe("decompose", () => {
+    const even = (x: number) => x % 2 === 0;
+    const f = filter(even);
+    const m = map(String);
+
+    it("yields single transducer for non-composite", () => {
+        assertThat(Array.from(decompose(f)), equals([f]));
+    });
+
+    it("yields all transducers from composite", () => {
+        const t = compose(f, m);
+        assertThat(Array.from(decompose(t)), equals([f, m]));
+    });
+
+    it("recursively decomposes nested composites", () => {
+        const inner = compose(f, m);
+        const outer = compose(inner, map(Number));
+        const result = Array.from(decompose(outer));
+        assertThat(result.length, is(3));
+        assertThat(result[0], is(f));
+        assertThat(result[1], is(m));
+    });
 });
