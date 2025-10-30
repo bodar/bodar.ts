@@ -34,6 +34,8 @@
     "./parsers/Parser.ts": "./src/parsers/Parser.ts",
     "./parsers/PredicatesParser.ts": "./src/parsers/PredicatesParser.ts",
     "./parsers/OptionalParser.ts": "./src/parsers/OptionalParser.ts",
+    "./transducers/ScanTransducer.ts": "./src/transducers/ScanTransducer.ts",
+    "./transducers/ReduceTransducer.ts": "./src/transducers/ReduceTransducer.ts",
     "./transducers/Transducer.ts": "./src/transducers/Transducer.ts",
     "./transducers/TakeWhileTransducer.ts": "./src/transducers/TakeWhileTransducer.ts",
     "./transducers/FirstTransducer.ts": "./src/transducers/FirstTransducer.ts",
