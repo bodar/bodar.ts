@@ -210,11 +210,11 @@ export function isLastTransducer(value: any): value is LastTransducer<any> {
 **Implementation Note**: After all pre-commit verification passes, pause and request human approval to commit and push changes.
 
 #### Build Verification:
-- [ ] CI/CD build completes successfully: `gh run watch`
-- [ ] All build steps pass: Review build logs if any failures occur
+- [x] CI/CD build completes successfully: `gh run watch`
+- [x] All build steps pass: Review build logs if any failures occur
 
 #### Post-deployment Verification (Production):
-- [ ] JSR Score remains 100%: `curl -H 'accept: text/html' https://jsr.io/@bodar/totallylazy/score`
+- [x] JSR Score remains 100%: `curl -H 'accept: text/html' https://jsr.io/@bodar/totallylazy/score`
 
 ---
 
