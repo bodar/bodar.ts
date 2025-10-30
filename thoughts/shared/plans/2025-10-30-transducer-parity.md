@@ -27,9 +27,14 @@ The new @bodar/totallylazy has 5 transducers (map, filter, flatMap, compose) whi
 - JSR score maintained at 100%
 
 ### Success Verification:
-- All tests pass: `./run test`
-- TypeScript compilation successful: `./run check`
+- All pre-commit steps: `./run build` (automatically regenerates exports, runs type checking, and runs all tests)
 - JSR Score remains 100%: `curl -H 'accept: text/html' https://jsr.io/@bodar/totallylazy/score`
+
+**Note**: The `./run build` command performs all necessary pre-commit verification steps including:
+1. Auto-generating package exports from source files
+2. Type checking with TypeScript
+3. Running all tests
+This is the single command to use for verification instead of running check and test separately.
 
 ## What We're NOT Doing
 
@@ -200,8 +205,7 @@ export function isLastTransducer(value: any): value is LastTransducer<any> {
 ### Success Criteria:
 
 #### Pre-commit Verification (Local):
-- [ ] Type checking passes: `./run check`
-- [ ] Tests pass: `./run test`
+- [x] Build passes (auto-generates exports, type checks, and runs tests): `./run build`
 
 **Implementation Note**: After all pre-commit verification passes, pause and request human approval to commit and push changes.
 
@@ -231,7 +235,18 @@ Implement conditional taking and dropping operations using predicates.
 **Files**: `packages/totallylazy/test/transducers/TakeWhileTransducer.test.ts`, etc.
 
 ### Success Criteria:
-Same as Phase 1
+
+#### Pre-commit Verification (Local):
+- [ ] Build passes (auto-generates exports, type checks, and runs tests): `./run build`
+
+**Implementation Note**: After all pre-commit verification passes, pause and request human approval to commit and push changes.
+
+#### Build Verification:
+- [ ] CI/CD build completes successfully: `gh run watch`
+- [ ] All build steps pass: Review build logs if any failures occur
+
+#### Post-deployment Verification (Production):
+- [ ] JSR Score remains 100%: `curl -H 'accept: text/html' https://jsr.io/@bodar/totallylazy/score`
 
 ---
 
@@ -254,7 +269,18 @@ Implement deduplication transducers. Note: unique will use Set instead of AVLTre
 **Files**: `packages/totallylazy/test/transducers/DedupeTransducer.test.ts`, etc.
 
 ### Success Criteria:
-Same as Phase 1
+
+#### Pre-commit Verification (Local):
+- [ ] Build passes (auto-generates exports, type checks, and runs tests): `./run build`
+
+**Implementation Note**: After all pre-commit verification passes, pause and request human approval to commit and push changes.
+
+#### Build Verification:
+- [ ] CI/CD build completes successfully: `gh run watch`
+- [ ] All build steps pass: Review build logs if any failures occur
+
+#### Post-deployment Verification (Production):
+- [ ] JSR Score remains 100%: `curl -H 'accept: text/html' https://jsr.io/@bodar/totallylazy/score`
 
 ---
 
@@ -277,7 +303,18 @@ Implement scanning and reduction operations using the Reducer type.
 **Files**: `packages/totallylazy/test/transducers/ScanTransducer.test.ts`, etc.
 
 ### Success Criteria:
-Same as Phase 1
+
+#### Pre-commit Verification (Local):
+- [ ] Build passes (auto-generates exports, type checks, and runs tests): `./run build`
+
+**Implementation Note**: After all pre-commit verification passes, pause and request human approval to commit and push changes.
+
+#### Build Verification:
+- [ ] CI/CD build completes successfully: `gh run watch`
+- [ ] All build steps pass: Review build logs if any failures occur
+
+#### Post-deployment Verification (Production):
+- [ ] JSR Score remains 100%: `curl -H 'accept: text/html' https://jsr.io/@bodar/totallylazy/score`
 
 ---
 
@@ -304,7 +341,18 @@ Implement zipping and windowing operations.
 **Files**: `packages/totallylazy/test/transducers/ZipTransducer.test.ts`, etc.
 
 ### Success Criteria:
-Same as Phase 1
+
+#### Pre-commit Verification (Local):
+- [ ] Build passes (auto-generates exports, type checks, and runs tests): `./run build`
+
+**Implementation Note**: After all pre-commit verification passes, pause and request human approval to commit and push changes.
+
+#### Build Verification:
+- [ ] CI/CD build completes successfully: `gh run watch`
+- [ ] All build steps pass: Review build logs if any failures occur
+
+#### Post-deployment Verification (Production):
+- [ ] JSR Score remains 100%: `curl -H 'accept: text/html' https://jsr.io/@bodar/totallylazy/score`
 
 ---
 
@@ -331,7 +379,18 @@ Implement sorting using comparators and search operations.
 **Files**: `packages/totallylazy/test/transducers/SortTransducer.test.ts`, etc.
 
 ### Success Criteria:
-Same as Phase 1
+
+#### Pre-commit Verification (Local):
+- [ ] Build passes (auto-generates exports, type checks, and runs tests): `./run build`
+
+**Implementation Note**: After all pre-commit verification passes, pause and request human approval to commit and push changes.
+
+#### Build Verification:
+- [ ] CI/CD build completes successfully: `gh run watch`
+- [ ] All build steps pass: Review build logs if any failures occur
+
+#### Post-deployment Verification (Production):
+- [ ] JSR Score remains 100%: `curl -H 'accept: text/html' https://jsr.io/@bodar/totallylazy/score`
 
 ---
 
@@ -354,7 +413,18 @@ Implement utility transducers for pass-through and introspection.
 **Files**: `packages/totallylazy/test/transducers/IdentityTransducer.test.ts`, etc.
 
 ### Success Criteria:
-Same as Phase 1
+
+#### Pre-commit Verification (Local):
+- [ ] Build passes (auto-generates exports, type checks, and runs tests): `./run build`
+
+**Implementation Note**: After all pre-commit verification passes, pause and request human approval to commit and push changes.
+
+#### Build Verification:
+- [ ] CI/CD build completes successfully: `gh run watch`
+- [ ] All build steps pass: Review build logs if any failures occur
+
+#### Post-deployment Verification (Production):
+- [ ] JSR Score remains 100%: `curl -H 'accept: text/html' https://jsr.io/@bodar/totallylazy/score`
 
 ---
 
@@ -394,5 +464,5 @@ Same as Phase 1
 
 - Original issue: Research document at `thoughts/shared/research/2025-10-30-totallylazy-feature-delta.md`
 - Current implementation: `packages/totallylazy/src/transducers/`
-- Old implementation reference: `packages/totallylazy.js/src/transducers/`
+- Old implementation reference: `../../../totallylazy.js/src/transducers/` (totallylazy.js is in project root)
 - Pattern examples: MapTransducer.ts, FilterTransducer.ts
