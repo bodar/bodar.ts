@@ -28,9 +28,12 @@ class CurryHandler<T extends Function> implements ProxyHandler<T> {
         return create(fn, properties, this.parametersSignature);
     }
 
-    get(fn: T, p: string | symbol, receiver: any): any {
-        if (p in fn) return Reflect.get(fn, p, receiver);
-        return Reflect.get(this.parameters, p, receiver);
+    get(fn: T, p: string | symbol, _receiver: any): any {
+        if (p in fn) {
+            const property = Reflect.get(fn, p);
+            return typeof property === 'function' && p === 'toString' ? property.bind(fn) : property;
+        }
+        return Reflect.get(this.parameters, p);
     }
 }
 
