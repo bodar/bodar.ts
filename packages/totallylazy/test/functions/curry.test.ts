@@ -1,5 +1,5 @@
-import {curry, parametersOf} from "../../src/functions/curry.ts";
-import {describe, it} from "bun:test";
+import {curry, defaultParameters, parametersOf} from "../../src/functions/curry.ts";
+import {describe, expect, it} from "bun:test";
 import {assertThat} from "../../src/asserts/assertThat.ts";
 import {is} from "../../src/predicates/IsPredicate.ts";
 import {equals} from "../../src/predicates/EqualsPredicate.ts";
@@ -13,7 +13,7 @@ describe("curry", () => {
         assertThat(typeof curry(add), is('function'));
     });
 
-    it("a curried function name is still correct", () => {
+    it("a curried function still has the correct name", () => {
         assertThat(curry(add).name, is('add'));
     });
 
@@ -36,10 +36,53 @@ describe("curry", () => {
         assertThat(applied.name, is('add'));
     });
 
+    it("can keep applying more and more arguments", () => {
+        const applied = curry((a: number, b: number, c: number, d: number) => a + b + c + d)(1)(2)(3);
+        assertThat(typeof applied, is('function'));
+        assertThat(applied(4), is(10));
+        assertThat(applied.a, is(1));
+        assertThat(applied.b, is(2));
+        assertThat(applied.c, is(3));
+    });
+
+    it("if function has default parameter then it can be called with or with that parameter", () => {
+        const curried = curry(function multiply(a: number, b = 2) {
+            return a * b;
+        });
+        assertThat(curried(3), is(6));
+        assertThat(curried(3, 3), is(9));
+    });
+
 });
 
 describe("parametersOf", () => {
     it("can extract the parameters of a named function", () => {
+        assertThat(parametersOf(function add(a: any, b: any) {
+            return a + b;
+        }), equals(['a', 'b']));
+    });
+
+    it("can extract the parameters of an anonymous function", () => {
+        assertThat(parametersOf(function (a: any, b: any) {
+            return a + b;
+        }), equals(['a', 'b']));
+    });
+
+    it("can extract the parameters of an arrow function", () => {
         assertThat(parametersOf((a: any, b: any) => a + b), equals(['a', 'b']));
+    });
+
+    it("can extract the parameters of a function with defaults", () => {
+        assertThat(parametersOf(function multiply(a: number, b = 1) {
+            return a * b;
+        }), equals(['a', 'b']));
+    });
+});
+
+describe("defaultParameters", () => {
+    it("can detect default parameters of a function", () => {
+        assertThat(defaultParameters(function multiply(a: number, b = 1) {
+            return a * b;
+        }), equals({b: undefined}));
     });
 });
