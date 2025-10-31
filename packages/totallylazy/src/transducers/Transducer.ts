@@ -20,10 +20,6 @@ export class Transducer<A, B> {
 export function transducer<N extends string, T extends (iterable: Iterable<any>) => Iterable<any>, U extends object>(name: N, target: T, source: U): {[Transducer.type]: N} & T & U {
     return Object.assign(target, {
         [Transducer.type]: name,
-        toString: () => {
-            const values = Object.values(source);
-            const valuesStr = values.map(v => typeof v === 'function' ? v.toString() : v).join(', ');
-            return `${name}(${valuesStr})`;
-        }
+        toString: () => `${name}(${(Object.values(source).join(', '))})`
     }, source);
 }
