@@ -1,5 +1,5 @@
-import {curry, defaultParameters, parametersOf} from "../../src/functions/curry.ts";
-import {describe, expect, it} from "bun:test";
+import {curry, parameter, parametersOf} from "../../src/functions/curry.ts";
+import {describe, it} from "bun:test";
 import {assertThat} from "../../src/asserts/assertThat.ts";
 import {is} from "../../src/predicates/IsPredicate.ts";
 import {equals} from "../../src/predicates/EqualsPredicate.ts";
@@ -59,30 +59,22 @@ describe("parametersOf", () => {
     it("can extract the parameters of a named function", () => {
         assertThat(parametersOf(function add(a: any, b: any) {
             return a + b;
-        }), equals(['a', 'b']));
+        }), equals([parameter('a'), parameter('b')]));
     });
 
     it("can extract the parameters of an anonymous function", () => {
         assertThat(parametersOf(function (a: any, b: any) {
             return a + b;
-        }), equals(['a', 'b']));
+        }), equals([parameter('a'), parameter('b')]));
     });
 
     it("can extract the parameters of an arrow function", () => {
-        assertThat(parametersOf((a: any, b: any) => a + b), equals(['a', 'b']));
+        assertThat(parametersOf((a: any, b: any) => a + b), equals([parameter('a'), parameter('b')]));
     });
 
     it("can extract the parameters of a function with defaults", () => {
         assertThat(parametersOf(function multiply(a: number, b = 1) {
             return a * b;
-        }), equals(['a', 'b']));
-    });
-});
-
-describe("defaultParameters", () => {
-    it("can detect default parameters of a function", () => {
-        assertThat(defaultParameters(function multiply(a: number, b = 1) {
-            return a * b;
-        }), equals({b: undefined}));
+        }), equals([parameter('a'), parameter('b', '1')]));
     });
 });
