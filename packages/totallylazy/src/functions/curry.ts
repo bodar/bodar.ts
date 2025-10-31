@@ -1,5 +1,6 @@
 /**
  * Curries a function, enabling partial application while exposing applied arguments as properties.
+ * Can optionally be used to bind the supplied parameters onto the function
  */
 export function curry(fn: any, parameters: object = {}): any {
     return create(fn, parameters, parametersOf(fn));
@@ -33,6 +34,7 @@ class CurryHandler<T extends Function> implements ProxyHandler<T> {
 
 const parameterPattern = /\(([^)]*)\)/;
 
+/** Parse all the Parameters of a function */
 export function parametersOf(fn: any): Parameter[] {
     const args: string = fn.toString().match(parameterPattern)[1];
     return args.split(',')
@@ -49,6 +51,7 @@ class Parameter {
     }
 }
 
-export function parameter(name: string, defaultValue?: string) {
+/** Constructor function to create a Parameter class */
+export function parameter(name: string, defaultValue?: string): Parameter {
     return new Parameter(name, defaultValue);
 }
