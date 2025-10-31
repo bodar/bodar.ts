@@ -2,24 +2,27 @@
  * Curries a function, enabling partial application while exposing applied arguments as properties.
  */
 export function curry(fn: any, parameters: object = {}): any {
-    return new Proxy(fn, new CurryHandler(parameters));
+    return create(fn, parameters, parametersOf(fn));
+}
+
+function create(fn: any, parameters: object, parametersSignature: Parameter[]) {
+    return new Proxy(fn, new CurryHandler(parameters, parametersSignature));
 }
 
 class CurryHandler<T extends Function> implements ProxyHandler<T> {
-    constructor(private readonly parameters: object) {
+    constructor(private readonly parameters: object, private readonly parametersSignature: Parameter[]) {
     }
 
     apply(fn: T, self: any, args: any[]): any {
-        const parameters = parametersOf(fn);
-        const properties = parameters.reduce((properties, {name, hasDefault}) => {
+        const properties = this.parametersSignature.reduce((properties, {name, hasDefault}) => {
             if (Object.hasOwn(this.parameters, name)) Reflect.set(properties, name, Reflect.get(this.parameters, name));
             else if (args.length > 0) Reflect.set(properties, name, args.shift());
             else if (hasDefault) Reflect.set(properties, name, undefined);
             return properties;
         }, {});
 
-        if (parameters.length === Object.keys(properties).length) return Reflect.apply(fn, self, Object.values(properties));
-        return curry(fn, properties);
+        if (this.parametersSignature.length === Object.keys(properties).length) return Reflect.apply(fn, self, Object.values(properties));
+        return create(fn, properties, this.parametersSignature);
     }
 
     get(fn: T, p: string | symbol, receiver: any): any {
@@ -28,8 +31,10 @@ class CurryHandler<T extends Function> implements ProxyHandler<T> {
     }
 }
 
+const parameterPattern = /\(([^)]*)\)/;
+
 export function parametersOf(fn: any): Parameter[] {
-    const args: string = fn.toString().match(/\(([^)]*)\)/)[1];
+    const args: string = fn.toString().match(parameterPattern)[1];
     return args.split(',')
         .map(arg => arg.split('=').map(v => v.trim()))
         .map(p => Reflect.construct(Parameter, p));
