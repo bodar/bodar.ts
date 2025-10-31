@@ -48,8 +48,8 @@ class Parameter {
     constructor(public readonly name: string, public readonly defaultValue?: string) {
     }
 
-    get hasDefault() {
-        return this.defaultValue;
+    get hasDefault(): boolean {
+        return !!this.defaultValue;
     }
 }
 
