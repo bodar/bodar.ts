@@ -1,3 +1,5 @@
+/** @module Functions to support currying functions */
+
 /**
  * Curries a function, enabling partial application while exposing applied arguments as properties.
  * Can optionally be used to bind the supplied parameters onto the function
