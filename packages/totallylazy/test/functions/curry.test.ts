@@ -53,6 +53,17 @@ describe("curry", () => {
         assertThat(curried(3, 3), is(9));
     });
 
+    it("if functions arguments conflict with standard function properties it will not override them", () => {
+        const applied = curry(function weird(name: string, toString: Function) { return name + toString(); })('Dan');
+        assertThat(applied.name, is('weird'));
+        assertThat(applied.toString(), is('function weird(name, toString) { return name + toString(); }'));
+    });
+
+    it("if functions arguments conflict with standard function properties it will not override them", () => {
+        const s = (function weird(name: string, toString: Function) { return name + toString(); }).toString().replaceAll(/\s+/g, ' ');
+        assertThat(s, is('function weird(name, toString) { return name + toString(); }'));
+    });
+
 });
 
 describe("parametersOf", () => {

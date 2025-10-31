@@ -29,8 +29,8 @@ class CurryHandler<T extends Function> implements ProxyHandler<T> {
     }
 
     get(fn: T, p: string | symbol, receiver: any): any {
-        if (Object.hasOwn(this.parameters, p)) return Reflect.get(this.parameters, p, receiver);
-        return Reflect.get(fn, p, receiver);
+        if (p in fn) return Reflect.get(fn, p, receiver);
+        return Reflect.get(this.parameters, p, receiver);
     }
 }
 
