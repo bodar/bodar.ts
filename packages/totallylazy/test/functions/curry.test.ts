@@ -85,7 +85,7 @@ describe("curry", () => {
         assertThat(curried.length, is(4));
         assertThat(curried(1).length, is(3));
         assertThat(curried(1)(2).length, is(2));
-        assertThat(curried(1)(2)(3).length, is(1));
+        assertThat(curried(1, 2)(3).length, is(1));
         assertThat(curried(_, 2, _).length, is(3));
     });
 
