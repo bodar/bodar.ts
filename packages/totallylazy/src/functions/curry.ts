@@ -1,5 +1,6 @@
 /** @module Functions to support currying functions */
 
+/** Placeholder symbol to allow calling curried functions in any order */
 export const _ = Symbol('curry.placeholderSymbol');
 
 /**
