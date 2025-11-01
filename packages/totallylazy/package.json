@@ -64,6 +64,7 @@
     "./functions/replace.ts": "./src/functions/replace.ts",
     "./functions/Property.ts": "./src/functions/Property.ts",
     "./functions/Mapper.ts": "./src/functions/Mapper.ts",
+    "./functions/parameters.ts": "./src/functions/parameters.ts",
     "./functions/constant.ts": "./src/functions/constant.ts",
     "./functions/Select.ts": "./src/functions/Select.ts",
     "./functions/equal.ts": "./src/functions/equal.ts",

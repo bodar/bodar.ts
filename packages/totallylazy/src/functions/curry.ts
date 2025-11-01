@@ -9,45 +9,45 @@ export const _ = Symbol('curry.placeholderSymbol');
  * Curries a function, enabling partial application while exposing applied arguments as properties.
  * Can optionally be used to bind the supplied parameters onto the function
  */
-export function curry(fn: any, parameters: object = {}): any {
-    return create(fn, parameters, parametersOf(fn));
+export function curry(fn: any, appliedParameters: object = {}): any {
+    return create(fn, appliedParameters, parametersOf(fn));
 }
 
-function create(fn: any, parameters: object, parametersSignature: Parameter[]) {
-    return new Proxy(fn, new CurryHandler(parameters, parametersSignature));
+function create(fn: any, appliedParameters: object, parametersSignature: Parameter[]) {
+    return new Proxy(fn, new CurryHandler(appliedParameters, parametersSignature));
 }
 
 class CurryHandler<T extends Function> implements ProxyHandler<T> {
-    constructor(private readonly parameters: object, private readonly parametersSignature: Parameter[]) {
+    constructor(private readonly appliedParameters: object, private readonly parametersSignature: Parameter[]) {
     }
 
     apply(fn: T, self: any, args: any[]): any {
-        const properties = this.getProperties(args);
-        if (this.parametersSignature.length === Object.keys(properties).length) return Reflect.apply(fn, self, Object.values(properties));
-        return create(fn, properties, this.parametersSignature);
+        const allParameters = this.allParameters(args);
+        if (this.parametersSignature.length === Object.keys(allParameters).length) return Reflect.apply(fn, self, Object.values(allParameters));
+        return create(fn, allParameters, this.parametersSignature);
     }
 
-    private getProperties(args: any[]) {
-        return this.parametersSignature.reduce((properties, {name, hasDefault}) => {
-            if (Object.hasOwn(this.parameters, name)) Reflect.set(properties, name, Reflect.get(this.parameters, name));
+    private allParameters(args: any[] = []) {
+        return this.parametersSignature.reduce((properties, parameter) => {
+            if (Object.hasOwn(this.appliedParameters, parameter.name)) Reflect.set(properties, parameter.name, Reflect.get(this.appliedParameters, parameter.name));
             else if (args.length > 0) {
                 const arg = args.shift();
-                if (arg !== _) Reflect.set(properties, name, arg);
-            } else if (hasDefault) Reflect.set(properties, name, undefined);
+                if (arg !== _) Reflect.set(properties, parameter.name, arg);
+            } else if (parameter.hasDefault) Reflect.set(properties, parameter.name, undefined);
             return properties;
         }, {});
     }
 
     get(fn: T, p: string | symbol, _receiver: any): any {
         if (p === 'toString') {
-            if (fn.name) return () => `${fn.name}(${Object.values(this.getProperties([])).join(', ')})`;
+            if (fn.name) return () => `${fn.name}(${Object.values(this.allParameters()).join(', ')})`;
             else return () => fn.toString();
         }
         if (p in fn) return Reflect.get(fn, p);
-        return Reflect.get(this.parameters, p);
+        return Reflect.get(this.appliedParameters, p);
     }
 
     has(fn: T, p: string | symbol): boolean {
-        return p in fn || Object.hasOwn(this.parameters, p);
+        return p in fn || Object.hasOwn(this.appliedParameters, p);
     }
 }
