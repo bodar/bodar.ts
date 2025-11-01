@@ -29,8 +29,14 @@ class CurryHandler<T extends Function> implements ProxyHandler<T> {
 
     private allParameters(args: any[] = []) {
         return this.parametersSignature.reduce((properties, parameter) => {
-            if (Object.hasOwn(this.appliedParameters, parameter.name)) Reflect.set(properties, parameter.name, Reflect.get(this.appliedParameters, parameter.name));
-            else if (args.length > 0) {
+            if (Object.hasOwn(this.appliedParameters, parameter.name)) {
+                const value = Reflect.get(this.appliedParameters, parameter.name);
+                if (!(parameter.hasDefault && typeof value === 'undefined')) {
+                    Reflect.set(properties, parameter.name, value);
+                    return properties;
+                }
+            }
+            if (args.length > 0) {
                 const arg = args.shift();
                 if (arg !== _) Reflect.set(properties, parameter.name, arg);
             } else if (parameter.hasDefault) Reflect.set(properties, parameter.name, undefined);
@@ -43,6 +49,7 @@ class CurryHandler<T extends Function> implements ProxyHandler<T> {
             if (fn.name) return () => `${fn.name}(${Object.values(this.allParameters()).join(', ')})`;
             else return () => fn.toString();
         }
+        if(p === 'length') return this.parametersSignature.length - Object.keys(this.allParameters()).length;
         if (p in fn) return Reflect.get(fn, p);
         return Reflect.get(this.appliedParameters, p);
     }

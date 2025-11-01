@@ -47,7 +47,7 @@ describe("curry", () => {
         assertThat(applied.c, is(3));
     });
 
-    it("if function has default parameter then it can be called with or with that parameter", () => {
+    it("if function has default parameter then it can be called with or without that parameter", () => {
         const curried = curry(function multiply(a: number, b = 2) {
             return a * b;
         });
@@ -78,6 +78,28 @@ describe("curry", () => {
         assertThat('first' in partial, is(false));
         assertThat(partial.last, is('Bodart'));
         assertThat(partial('Dan'), is('Hello Dan Bodart'));
+    });
+
+    it("as arguments are applied the length of the function is reduced", () => {
+        const curried = curry((a: number, b: number, c: number, d: number) => a + b + c + d);
+        assertThat(curried.length, is(4));
+        assertThat(curried(1).length, is(3));
+        assertThat(curried(1)(2).length, is(2));
+        assertThat(curried(1)(2)(3).length, is(1));
+        assertThat(curried(_, 2, _).length, is(3));
+    });
+
+    it("curried function length ignores parameters with default values just like the native function", () => {
+        const functionWithDefault = (a: number, b: number, c: number, d: number = 1) => a + b + c + d;
+        assertThat(functionWithDefault.length, is(3));
+        assertThat(curry(functionWithDefault).length, is(3));
+        assertThat(curry(functionWithDefault)(1).length, is(2));
+    });
+
+    it("can override a default even if we have applied at least once before hand", () => {
+        const curried = curry((a: string, b: string, c: string, d: string = 'default') => a + b + c + d);
+        const partial = curried(_, 'B', 'C');
+        assertThat(partial('A', 'D'), is('ABCD'));
     });
 });
 
