@@ -3,8 +3,10 @@
 const parameterPattern = /\(([^)]*)\)/;
 
 /** Parse all the Parameters of a function */
-export function parametersOf(fn: any): Parameter[] {
-    const args: string = fn.toString().match(parameterPattern)[1];
+export function parametersOf(fn: Function): Parameter[] {
+    const match = fn.toString().match(parameterPattern);
+    if (match === null) return [];
+    const args: string = match[1];
     return args.split(',')
         .map(arg => arg.split('=').map(v => v.trim()))
         .map(p => Reflect.construct(Parameter, p));
