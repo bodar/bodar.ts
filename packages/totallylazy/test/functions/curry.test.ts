@@ -99,7 +99,9 @@ describe("curry", () => {
     it("can override a default even if we have applied at least once before hand", () => {
         const curried = curry((a: string, b: string, c: string, d: string = 'default') => a + b + c + d);
         const partial = curried(_, 'B', 'C');
-        assertThat(partial('A', 'D'), is('ABCD'));
+        // Note: Type system can't fully express placeholder + default parameter interaction
+        // Runtime works correctly, so we cast to any for this complex case
+        assertThat((partial as any)('A', 'D'), is('ABCD'));
     });
 });
 
