@@ -19,14 +19,14 @@ export type Placeholder = typeof _;
 /**
  * Curried function type with 1 parameter
  */
-type Curried1<P1, R> =
+export type Curried1<P1, R> =
     & ((...args: [P1 | Placeholder]) => R)
     & { readonly [K: string]: any }; // Allow dynamic property access for parameter names
 
 /**
  * Curried function type with 2 parameters
  */
-type Curried2<P1, P2, R> =
+export type Curried2<P1, P2, R> =
     & ((arg1: P1 | Placeholder, arg2: P2 | Placeholder) => R)
     & ((arg1: P1 | Placeholder) => Curried1<P2, R>)
     & { readonly [K: string]: any };
@@ -34,7 +34,7 @@ type Curried2<P1, P2, R> =
 /**
  * Curried function type with 3 parameters
  */
-type Curried3<P1, P2, P3, R> =
+export type Curried3<P1, P2, P3, R> =
     & ((arg1: P1 | Placeholder, arg2: P2 | Placeholder, arg3: P3 | Placeholder) => R)
     & ((arg1: P1 | Placeholder, arg2: P2 | Placeholder) => Curried1<P3, R>)
     & ((arg1: P1 | Placeholder) => Curried2<P2, P3, R>)
@@ -43,7 +43,7 @@ type Curried3<P1, P2, P3, R> =
 /**
  * Curried function type with 4 parameters
  */
-type Curried4<P1, P2, P3, P4, R> =
+export type Curried4<P1, P2, P3, P4, R> =
     & ((arg1: P1 | Placeholder, arg2: P2 | Placeholder, arg3: P3 | Placeholder, arg4: P4 | Placeholder) => R)
     & ((arg1: P1 | Placeholder, arg2: P2 | Placeholder, arg3: P3 | Placeholder) => Curried1<P4, R>)
     & ((arg1: P1 | Placeholder, arg2: P2 | Placeholder) => Curried2<P3, P4, R>)

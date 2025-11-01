@@ -1,4 +1,4 @@
-import {_, curry} from "../../src/functions/curry.ts";
+import {_, type Curried, type Curried1, type Curried2, curry} from "../../src/functions/curry.ts";
 import {describe, it} from "bun:test";
 import {assertThat} from "../../src/asserts/assertThat.ts";
 import {is} from "../../src/predicates/IsPredicate.ts";
@@ -102,6 +102,13 @@ describe("curry", () => {
         // Note: Type system can't fully express placeholder + default parameter interaction
         // Runtime works correctly, so we cast to any for this complex case
         assertThat((partial as any)('A', 'D'), is('ABCD'));
+    });
+
+    it('check the types are correct', () => {
+        const curried: Curried2<number, number, number> = curry((a: number, b: number) => a + b);
+        const applied: Curried1<number, number> & { a: number } = curried(1);
+        assertThat(applied.a, is(1))
+        assertThat(applied(2), is(3))
     });
 });
 
