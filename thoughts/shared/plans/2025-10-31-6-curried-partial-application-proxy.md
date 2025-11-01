@@ -176,11 +176,11 @@ Add comprehensive TypeScript types for progressive type refinement as arguments 
 - [x] Properties are correctly typed on partial functions
 
 #### Build Verification:
-- [ ] CI/CD build completes: `gh run watch`
-- [ ] All build steps pass
+- [x] CI/CD build completes: `gh run watch`
+- [x] All build steps pass
 
 #### Post-deployment Verification:
-- [ ] JSR Score remains 100%: `curl -H 'accept: text/html' https://jsr.io/@bodar/totallylazy/score`
+- [x] JSR Score remains 100%: `curl -H 'accept: text/html' https://jsr.io/@bodar/totallylazy/score`
 
 ---
 
