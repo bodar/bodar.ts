@@ -1,4 +1,4 @@
-import {curry, parameter, parametersOf} from "../../src/functions/curry.ts";
+import {_, curry, parameter, parametersOf} from "../../src/functions/curry.ts";
 import {describe, it} from "bun:test";
 import {assertThat} from "../../src/asserts/assertThat.ts";
 import {is} from "../../src/predicates/IsPredicate.ts";
@@ -71,6 +71,13 @@ describe("curry", () => {
     it("calling toString on a named function will display the partially applied parameters", () => {
         const applied = curry(add)(1);
         assertThat(applied.toString(), is('add(1)'));
+    });
+
+    it("can use _ placeholder to apply later arguments", () => {
+        const partial = curry((first:string, last:string) => 'Hello ' + first + ' ' + last)(_, 'Bodart');
+        assertThat('first' in partial, is(false));
+        assertThat(partial.last, is('Bodart'));
+        assertThat(partial('Dan'), is('Hello Dan Bodart'));
     });
 });
 

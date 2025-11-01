@@ -1,5 +1,7 @@
 /** @module Functions to support currying functions */
 
+export const _ = Symbol('curry.placeholderSymbol');
+
 /**
  * Curries a function, enabling partial application while exposing applied arguments as properties.
  * Can optionally be used to bind the supplied parameters onto the function
@@ -25,7 +27,10 @@ class CurryHandler<T extends Function> implements ProxyHandler<T> {
     private getProperties(args: any[]) {
         return this.parametersSignature.reduce((properties, {name, hasDefault}) => {
             if (Object.hasOwn(this.parameters, name)) Reflect.set(properties, name, Reflect.get(this.parameters, name));
-            else if (args.length > 0) Reflect.set(properties, name, args.shift());
+            else if (args.length > 0) {
+                const arg = args.shift();
+                if(arg !== _) Reflect.set(properties, name, arg);
+            }
             else if (hasDefault) Reflect.set(properties, name, undefined);
             return properties;
         }, {});
