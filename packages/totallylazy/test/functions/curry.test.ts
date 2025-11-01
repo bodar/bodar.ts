@@ -1,4 +1,4 @@
-import {_, curry, parameter, parametersOf} from "../../src/functions/curry.ts";
+import {_, curry} from "../../src/functions/curry.ts";
 import {describe, it} from "bun:test";
 import {assertThat} from "../../src/asserts/assertThat.ts";
 import {is} from "../../src/predicates/IsPredicate.ts";
@@ -78,30 +78,6 @@ describe("curry", () => {
         assertThat('first' in partial, is(false));
         assertThat(partial.last, is('Bodart'));
         assertThat(partial('Dan'), is('Hello Dan Bodart'));
-    });
-});
-
-describe("parametersOf", () => {
-    it("can extract the parameters of a named function", () => {
-        assertThat(parametersOf(function add(a: any, b: any) {
-            return a + b;
-        }), equals([parameter('a'), parameter('b')]));
-    });
-
-    it("can extract the parameters of an anonymous function", () => {
-        assertThat(parametersOf(function (a: any, b: any) {
-            return a + b;
-        }), equals([parameter('a'), parameter('b')]));
-    });
-
-    it("can extract the parameters of an arrow function", () => {
-        assertThat(parametersOf((a: any, b: any) => a + b), equals([parameter('a'), parameter('b')]));
-    });
-
-    it("can extract the parameters of a function with defaults", () => {
-        assertThat(parametersOf(function multiply(a: number, b = 1) {
-            return a * b;
-        }), equals([parameter('a'), parameter('b', '1')]));
     });
 });
 

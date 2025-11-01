@@ -1,5 +1,7 @@
 /** @module Functions to support currying functions */
 
+import {Parameter, parametersOf} from "./parameters.ts";
+
 /** Placeholder symbol to allow calling curried functions in any order */
 export const _ = Symbol('curry.placeholderSymbol');
 
@@ -30,9 +32,8 @@ class CurryHandler<T extends Function> implements ProxyHandler<T> {
             if (Object.hasOwn(this.parameters, name)) Reflect.set(properties, name, Reflect.get(this.parameters, name));
             else if (args.length > 0) {
                 const arg = args.shift();
-                if(arg !== _) Reflect.set(properties, name, arg);
-            }
-            else if (hasDefault) Reflect.set(properties, name, undefined);
+                if (arg !== _) Reflect.set(properties, name, arg);
+            } else if (hasDefault) Reflect.set(properties, name, undefined);
             return properties;
         }, {});
     }
@@ -49,30 +50,4 @@ class CurryHandler<T extends Function> implements ProxyHandler<T> {
     has(fn: T, p: string | symbol): boolean {
         return p in fn || Object.hasOwn(this.parameters, p);
     }
-
-
-}
-
-const parameterPattern = /\(([^)]*)\)/;
-
-/** Parse all the Parameters of a function */
-export function parametersOf(fn: any): Parameter[] {
-    const args: string = fn.toString().match(parameterPattern)[1];
-    return args.split(',')
-        .map(arg => arg.split('=').map(v => v.trim()))
-        .map(p => Reflect.construct(Parameter, p));
-}
-
-class Parameter {
-    constructor(public readonly name: string, public readonly defaultValue?: string) {
-    }
-
-    get hasDefault(): boolean {
-        return !!this.defaultValue;
-    }
-}
-
-/** Constructor function to create a Parameter class */
-export function parameter(name: string, defaultValue?: string): Parameter {
-    return new Parameter(name, defaultValue);
 }
