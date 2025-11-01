@@ -3,6 +3,8 @@ import {describe, it} from "bun:test";
 import {assertThat} from "../../src/asserts/assertThat.ts";
 import {is} from "../../src/predicates/IsPredicate.ts";
 import {equals} from "../../src/predicates/EqualsPredicate.ts";
+import type {Mapper} from "../../src/functions/Mapper.ts";
+import {isMapTransducer} from "../../src/transducers/MapTransducer.ts";
 
 function add(a: number, b: number) {
     return a + b;
@@ -60,9 +62,15 @@ describe("curry", () => {
         assertThat(applied.name, is('weird'));
     });
 
-    it("calling toString still calls the function toString not the Proxy", () => {
-        const applied = curry((a: number, b: number) => a + b)('Dan');
-        assertThat(applied.toString().replaceAll(/\s+/g, ' '), is('(a, b) => a + b'));
+    it("calling toString on a curried lambda will return the lambda", () => {
+        const applied = curry((a: number, b: number) => a + b)(1);
+        assertThat(applied.toString(), is('(a, b) => a + b'));
+        // Potentially we could make this print "(b) => 1 + b" but is it worth it
+    });
+
+    it("calling toString on a named function will display the partially applied parameters", () => {
+        const applied = curry(add)(1);
+        assertThat(applied.toString(), is('add(1)'));
     });
 });
 
@@ -89,3 +97,31 @@ describe("parametersOf", () => {
         }), equals([parameter('a'), parameter('b', '1')]));
     });
 });
+
+describe("curried map example test", () => {
+    function* map<A, B>(mapper: Mapper<A, B>, iterable: Iterable<A>) {
+        for (const a of iterable) {
+            yield mapper(a);
+        }
+    }
+
+    const transducer = curry(map)(String);
+
+    it("can be created first then applied to an iterable", () => {
+        assertThat(Array.from(transducer([1, 2, 3, 4, 5])), equals(['1', '2', '3', '4', '5']));
+    });
+
+    it("is inspectable",  () => {
+        assertThat(transducer.mapper, is(String));
+    });
+
+    it("is self describing",  () => {
+        assertThat(transducer.toString(), is(`map(${String})`));
+    });
+
+    it("isMapTransducer works",  () => {
+        assertThat(isMapTransducer(transducer), is(true));
+        assertThat(isMapTransducer(() => 'false'), is(false));
+    });
+
+})
