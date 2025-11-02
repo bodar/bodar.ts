@@ -10,17 +10,21 @@ export const _ = Symbol('curry.placeholderSymbol');
 
 type Fn = (...args: any[]) => any;
 
+/** Type representing the placeholder symbol used in curried functions. */
 export type Placeholder = typeof _;
 
+/** Maps a tuple type to allow Placeholder as a value for each element. */
 export type AllowPlaceholder<T extends any[]> = {
     [K in keyof T]: T[K] | Placeholder;
 };
 
+/** Extracts function parameters with first required and rest optional, allowing Placeholder values. */
 export type RequiredFirstParam<F extends Fn> =
     Parameters<F> extends [infer Head, ...infer Tail]
         ? [Head | Placeholder, ...Partial<AllowPlaceholder<Tail>>]
         : [];
 
+/** Calculates remaining parameters after applying arguments, skipping positions with Placeholder. */
 export type RemainingParameters<AppliedParams extends any[], ExpectedParams extends any[]> =
     AppliedParams extends [infer AHead, ...infer ATail]
         ? ExpectedParams extends [infer EHead, ...infer ETail]
@@ -30,6 +34,7 @@ export type RemainingParameters<AppliedParams extends any[], ExpectedParams exte
             : []
         : ExpectedParams;
 
+/** Type representing a curried function that supports partial application and placeholders. */
 export type Curried<F extends Fn, Accumulated extends any[] = []> =
     <AppliedParams extends RequiredFirstParam<F>>(...args: AppliedParams) =>
         RemainingParameters<AppliedParams, Parameters<F>> extends [any, ...any[]]
