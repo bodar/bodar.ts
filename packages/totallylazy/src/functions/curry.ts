@@ -1,6 +1,7 @@
 /** @module Functions to support currying functions */
 
 import {Parameter, parametersOf} from "./parameters.ts";
+import type {Curried} from "./curry.types.ts";
 
 /**
  * Placeholder symbol to allow calling curried functions in any order.
@@ -8,25 +9,7 @@ import {Parameter, parametersOf} from "./parameters.ts";
  */
 export const _ = Symbol('curry.placeholderSymbol');
 
-type Fn = (...args: any[]) => any;
 
-type RequiredFirstParam<F extends Fn> =
-    Parameters<F> extends [infer Head, ...infer Tail]
-    ? [Head, ...Partial<Tail>]
-    : [];
-
-type RemainingParameters<AppliedParams extends any[], ExpectedParams extends any[]> =
-    AppliedParams extends [any, ...infer ATail]
-    ? ExpectedParams extends [any, ...infer ETail]
-        ? RemainingParameters<ATail, ETail>
-        : []
-    : ExpectedParams;
-
-type Curried<F extends Fn> =
-    <AppliedParams extends RequiredFirstParam<F>>(...args: AppliedParams) =>
-        RemainingParameters<AppliedParams, Parameters<F>> extends [any, ...any[]]
-    ? Curried<(...args: RemainingParameters<AppliedParams, Parameters<F>>) => ReturnType<F>>
-    : ReturnType<F>;
 
 /**
  * Curries a function, enabling partial application while exposing applied arguments as properties.

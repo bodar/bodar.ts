@@ -76,7 +76,8 @@ describe("curry", () => {
     it("can use _ placeholder to apply later arguments", () => {
         const partial = curry((first:string, last:string) => 'Hello ' + first + ' ' + last)(_, 'Bodart');
         assertThat('first' in partial, is(false));
-        assertThat(partial.last, is('Bodart'));
+        const actual = partial.last;
+        assertThat(actual, is('Bodart'));
         assertThat(partial('Dan'), is('Hello Dan Bodart'));
     });
 
