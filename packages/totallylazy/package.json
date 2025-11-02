@@ -59,7 +59,6 @@
     "./functions/Reducer.ts": "./src/functions/Reducer.ts",
     "./functions/lazy.ts": "./src/functions/lazy.ts",
     "./functions/characters.ts": "./src/functions/characters.ts",
-    "./functions/curry.types.ts": "./src/functions/curry.types.ts",
     "./functions/curry.ts": "./src/functions/curry.ts",
     "./functions/toString.ts": "./src/functions/toString.ts",
     "./functions/replace.ts": "./src/functions/replace.ts",
