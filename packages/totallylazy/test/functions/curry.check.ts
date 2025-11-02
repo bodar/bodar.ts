@@ -1,9 +1,9 @@
 import {assertType, type Equal} from "asserttt";
-import type {Placeholder, RemainingParameters, RequiredFirstParam} from "../../src/functions/curry.types.ts";
+import type {Placeholder, RemainingParameters, RequiredFirstParam} from "../../src/functions/curry.ts";
 
 
 /*
-
+RequiredFirstParam should allow Placeholders
  */
 assertType<Equal<
     RequiredFirstParam<(arg1: string, arg2: string, arg3: number) => void>,
@@ -11,8 +11,7 @@ assertType<Equal<
 >>(true);
 
 /*
-type Remaining = RemainingParameters<[string, number], [string, number, number, Symbol]>
-// Remaining has type [number, Symbol]
+RemainingParameters should take away applied from expected
  */
 assertType<Equal<
     RemainingParameters<[string, number], [string, number, number, Symbol]>,
@@ -21,8 +20,7 @@ assertType<Equal<
 
 
 /*
-type Remaining = RemainingParameters<[string, number], [string, number, number, Symbol]>
-// Remaining has type [number, Symbol]
+RemainingParameters should ignore placeholders
  */
 assertType<Equal<
     RemainingParameters<[Placeholder, number], [string, number, Symbol]>,
