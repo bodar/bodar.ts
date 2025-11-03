@@ -31,7 +31,8 @@
     "./sql/ansi/SelectList.ts": "./src/sql/ansi/SelectList.ts",
     "./sql/ansi/Table.ts": "./src/sql/ansi/Table.ts",
     "./sql/ansi/Qualified.ts": "./src/sql/ansi/Qualified.ts",
-    "./sql/ansi/SetQuantifier.ts": "./src/sql/ansi/SetQuantifier.ts"
+    "./sql/ansi/SetQuantifier.ts": "./src/sql/ansi/SetQuantifier.ts",
+    "./sql/builder/builders.ts": "./src/sql/builder/builders.ts"
   },
   "files": [
     "src/**/*.ts",
