@@ -25,4 +25,9 @@ describe("parametersOf", () => {
             return a * b;
         }), equals([parameter('a'), parameter('b', '1')]));
     });
+
+    it("can extract rest parameters", () => {
+        assertThat(parametersOf((a: number, b: number, ...rest: number[]) => [a + b, ...rest]),
+            equals([parameter('a'), parameter('b'), parameter('...rest')]));
+    });
 });

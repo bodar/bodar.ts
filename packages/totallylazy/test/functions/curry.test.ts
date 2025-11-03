@@ -73,7 +73,7 @@ describe("curry", () => {
     });
 
     it("can use _ placeholder to apply later arguments", () => {
-        const partial = curry((first:string, last:string) => 'Hello ' + first + ' ' + last)(_, 'Bodart');
+        const partial = curry((first: string, last: string) => 'Hello ' + first + ' ' + last)(_, 'Bodart');
         assertThat('first' in partial, is(false));
         const actual = partial.last;
         assertThat(actual, is('Bodart'));
@@ -96,6 +96,13 @@ describe("curry", () => {
         assertThat(curry(functionWithDefault)(1).length, is(2));
     });
 
+    it("curried function length ignores ...rest parameters just like the native function", () => {
+        const functionWithRest = (a: number, b: number, c: number, ...d: number[]) => a + b + c + d.reduce((a, b) => a + b);
+        assertThat(functionWithRest.length, is(3));
+        assertThat(curry(functionWithRest).length, is(3));
+        assertThat(curry(functionWithRest)(1).length, is(2));
+    });
+
     it("can override a default even if we have applied at least once before hand", () => {
         const curried = curry((a: string, b: string, c: string, d: string = 'default') => a + b + c + d);
         const partial = curried(_, 'B', 'C');
@@ -104,6 +111,26 @@ describe("curry", () => {
 
     it("can detect if a function has been curried", () => {
         assertThat(isCurried(curry((a: string, b: string) => a + b)), is(true));
+    });
+
+    it("supports rest parameters in type signature", () => {
+        const curried = curry((a: number, b: number, ...rest: number[]) => {
+            return [a, b, ...rest].reduce((sum, n) => sum + n, 0);
+        });
+        assertThat(curried(1, 2, 3, 4, 5), is(15));
+        assertThat(curried(1)(2, 3, 4), is(10));
+        assertThat(curried(1, 2), is(3));
+    });
+
+    it("forwards extra arguments even without rest parameter in signature", () => {
+        // @ts-expect-error - intentionally passing extra args for runtime flexibility
+        const curried = curry(function (a: number, b: number) {
+            return Array.from(arguments).reduce((sum: number, n: number) => sum + n, 0);
+        });
+        // @ts-expect-error - intentionally passing extra args
+        assertThat(curried(1, 2, 3, 4), is(10));
+        // @ts-expect-error - intentionally passing extra args
+        assertThat(curried(1)(2, 3, 4), is(10));
     });
 });
 
@@ -114,15 +141,15 @@ describe("curried map example test", () => {
         assertThat(Array.from(transducer([1, 2, 3, 4, 5])), equals(['1', '2', '3', '4', '5']));
     });
 
-    it("is inspectable",  () => {
+    it("is inspectable", () => {
         assertThat(transducer.mapper, is(String));
     });
 
-    it("is self describing",  () => {
+    it("is self describing", () => {
         assertThat(transducer.toString(), is(`map(${String})`));
     });
 
-    it("isMapTransducer works",  () => {
+    it("isMapTransducer works", () => {
         assertThat(isMapTransducer(transducer), is(true));
         assertThat(isMapTransducer(() => 'false'), is(false));
     });

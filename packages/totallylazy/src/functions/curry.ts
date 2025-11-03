@@ -69,12 +69,17 @@ class CurryHandler<T extends Function> implements ProxyHandler<T> {
 
     apply(fn: T, self: any, args: any[]): any {
         const allParameters = this.allParameters(args);
-        if (this.parametersSignature.length === Object.keys(allParameters).length) return Reflect.apply(fn, self, Object.values(allParameters));
+        if (this.signatureLength() <= Object.keys(allParameters).length) {
+            const restArgs = Reflect.get(allParameters, '...');
+            if (restArgs) Reflect.deleteProperty(allParameters, '...');
+            const values = Object.values(allParameters);
+            return Reflect.apply(fn, self, restArgs ? [...values, ...restArgs] : values);
+        }
         return create(fn, allParameters, this.parametersSignature);
     }
 
     private allParameters(args: any[] = []) {
-        return this.parametersSignature.reduce((properties, parameter) => {
+        const properties = this.parametersSignature.reduce((properties, parameter) => {
             if (Object.hasOwn(this.appliedParameters, parameter.name)) {
                 const value = Reflect.get(this.appliedParameters, parameter.name);
                 if (!(parameter.hasDefault && typeof value === 'undefined')) {
@@ -82,12 +87,14 @@ class CurryHandler<T extends Function> implements ProxyHandler<T> {
                     return properties;
                 }
             }
-            if (args.length > 0) {
+            if (args.length > 0 && !parameter.name.startsWith('...')) {
                 const arg = args.shift();
                 if (arg !== _) Reflect.set(properties, parameter.name, arg);
             } else if (parameter.hasDefault) Reflect.set(properties, parameter.name, undefined);
             return properties;
         }, {});
+        if (args.length > 0) Reflect.set(properties, '...', args);
+        return properties;
     }
 
     get(fn: T, p: string | symbol, _receiver: any): any {
@@ -95,9 +102,13 @@ class CurryHandler<T extends Function> implements ProxyHandler<T> {
             if (fn.name) return () => `${fn.name}(${Object.values(this.allParameters()).join(', ')})`;
             else return () => fn.toString();
         }
-        if (p === 'length') return this.parametersSignature.length - Object.keys(this.allParameters()).length;
+        if (p === 'length') return this.signatureLength() - Object.keys(this.allParameters()).length;
         if (p in fn) return Reflect.get(fn, p);
         return Reflect.get(this.appliedParameters, p);
+    }
+
+    private signatureLength() {
+        return this.parametersSignature.filter(p => !p.name.startsWith("...")).length;
     }
 
     has(fn: T, p: string | symbol): boolean {
