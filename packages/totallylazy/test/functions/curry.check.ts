@@ -26,3 +26,4 @@ assertType<Equal<
     RemainingParameters<[Placeholder, number], [string, number, Symbol]>,
     [string, Symbol]
 >>(true);
+

@@ -1,4 +1,6 @@
 /** @module Core transducer type and utilities */
+import {isCurried} from "../functions/curry.ts";
+
 /** A transducer that can be applied synchronously */
 export interface Transducer<A, B> {
     (iterable: Iterable<A>): Iterable<B>;
@@ -12,7 +14,7 @@ export class Transducer<A, B> {
     static readonly type = Symbol('Transducer.type');
 
     static [Symbol.hasInstance](value: any): boolean {
-        return typeof value === 'function' && value.length === 1 && Object.hasOwn(value, Transducer.type);
+        return typeof value === 'function' && value.length === 1 && (Object.hasOwn(value, Transducer.type) || isCurried(value));
     }
 }
 

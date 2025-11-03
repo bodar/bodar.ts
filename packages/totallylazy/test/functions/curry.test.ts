@@ -1,10 +1,9 @@
-import {_, curry} from "../../src/functions/curry.ts";
+import {_, curry, isCurried} from "../../src/functions/curry.ts";
 import {describe, it} from "bun:test";
 import {assertThat} from "../../src/asserts/assertThat.ts";
 import {is} from "../../src/predicates/IsPredicate.ts";
 import {equals} from "../../src/predicates/EqualsPredicate.ts";
-import type {Mapper} from "../../src/functions/Mapper.ts";
-import {isMapTransducer} from "../../src/transducers/MapTransducer.ts";
+import {isMapTransducer, map} from "../../src/transducers/MapTransducer.ts";
 
 function add(a: number, b: number) {
     return a + b;
@@ -100,20 +99,16 @@ describe("curry", () => {
     it("can override a default even if we have applied at least once before hand", () => {
         const curried = curry((a: string, b: string, c: string, d: string = 'default') => a + b + c + d);
         const partial = curried(_, 'B', 'C');
-        // Note: Type system can't fully express placeholder + default parameter interaction
-        // Runtime works correctly, so we cast to any for this complex case
-        assertThat((partial as any)('A', 'D'), is('ABCD'));
+        assertThat((partial)('A', 'D'), is('ABCD'));
+    });
+
+    it("can detect if a function has been curried", () => {
+        assertThat(isCurried(curry((a: string, b: string) => a + b)), is(true));
     });
 });
 
 describe("curried map example test", () => {
-    function* map<A, B>(mapper: Mapper<A, B>, iterable: Iterable<A>) {
-        for (const a of iterable) {
-            yield mapper(a);
-        }
-    }
-
-    const transducer = curry(map)(String);
+    const transducer = map(String);
 
     it("can be created first then applied to an iterable", () => {
         assertThat(Array.from(transducer([1, 2, 3, 4, 5])), equals(['1', '2', '3', '4', '5']));

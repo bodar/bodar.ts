@@ -6,9 +6,17 @@ import {Parameter, parametersOf} from "./parameters.ts";
  * Placeholder symbol to allow calling curried functions in any order.
  * Can be used in place of any argument type.
  */
-export const _ = Symbol('curry.placeholderSymbol');
+export const _ = Symbol('placeholderSymbol');
 
-type Fn = (...args: any[]) => any;
+const curried = Symbol('curried');
+
+/** Used to detect if a function has already been curried */
+export function isCurried(value: any): boolean {
+    return Reflect.has(value, curried);
+}
+
+/** Type for a function */
+export type Fn = (...args: any[]) => any;
 
 /** Type representing the placeholder symbol used in curried functions. */
 export type Placeholder = typeof _;
@@ -38,14 +46,16 @@ export type RemainingParameters<AppliedParams extends any[], ExpectedParams exte
 export type Curried<F extends Fn, Accumulated extends any[] = []> =
     <AppliedParams extends RequiredFirstParam<F>>(...args: AppliedParams) =>
         RemainingParameters<AppliedParams, Parameters<F>> extends [any, ...any[]]
-            ? (Curried<(...args: RemainingParameters<AppliedParams, Parameters<F>>) => ReturnType<F>, [...Accumulated, ...AppliedParams]>) & {readonly [key:string]: [...Accumulated, ...AppliedParams][number]}
+            ? (Curried<(...args: RemainingParameters<AppliedParams, Parameters<F>>) => ReturnType<F>, [...Accumulated, ...AppliedParams]>) & {
+            readonly [key: string]: [...Accumulated, ...AppliedParams][number]
+        }
             : ReturnType<F>;
 
 /**
  * Curries a function, enabling partial application while exposing applied arguments as properties.
  * Can optionally be used to bind the supplied parameters onto the function
  */
-export function curry<F extends (...args: any[]) => any>(fn: F, appliedParameters: object = {}): Curried<F> {
+export function curry<F extends Fn>(fn: F, appliedParameters: object = {}): Curried<F> {
     return create(fn, appliedParameters, parametersOf(fn));
 }
 
@@ -91,6 +101,7 @@ class CurryHandler<T extends Function> implements ProxyHandler<T> {
     }
 
     has(fn: T, p: string | symbol): boolean {
+        if (p === curried) return true;
         return p in fn || Object.hasOwn(this.appliedParameters, p);
     }
 }
