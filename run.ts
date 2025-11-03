@@ -1,6 +1,6 @@
 #!/usr/bin/env ./bootstrap.sh
-import { $, file, Glob, write } from "bun";
-import { dirname, join } from "path";
+import {$, file, Glob, write} from "bun";
+import {dirname, join} from "path";
 
 process.env.FORCE_COLOR = "1";
 
@@ -45,74 +45,54 @@ export async function dev() {
 
 export async function build() {
     await clean();
-    await regenerateExports();
+    await generateExports();
     await check();
     await test();
 }
 
-async function toPromiseArray<T>(iterable: AsyncIterable<T>): Promise<T[]> {
-    const result: T[] = [];
-    for await (const value of iterable) result.push(value);
-    return result;
-}
-
-export async function regenerateExports(packageGlob: string = "packages/*/package.json") {
+export async function generateExports(packageGlob: string = "packages/*/package.json") {
     for await (const f of new Glob(packageGlob).scan(".")) {
         const packageJsonFile = file(f!);
         const packageJson = await packageJsonFile.json();
         const parent = dirname(f!);
         const srcDir = join(parent, 'src');
 
-        const typescript = await toPromiseArray<string>(
-            new Glob("./**/*.ts").scan(srcDir)
-        );
-
-        if (typescript.length > 0) {
-            const exports = typescript
-                .filter(ts => !ts.includes('.test.ts'))
-                .reduce((a: any, ts: string) => {
-                    const key = ts.replace('./', './');  // Keep .ts in key
-                    const value = ts.replace('./', './src/');  // ./file.ts -> ./src/file.ts
-                    a[key] = value;
-                    return a;
-                }, {});
-
-            packageJson.exports = exports;
-            await write(packageJsonFile, JSON.stringify(packageJson, null, 2));
-            console.log(`Updated exports for ${packageJson.name} (${Object.keys(exports).length} files)`);
+        const exports: Record<string, string> = {};
+        for await (const ts of new Glob("./**/*.ts").scan(srcDir)) {
+            const content = await file(join(srcDir, ts)).text();
+            if(content.includes('@module')) exports[ts] = ts.replace('./', './src/');
         }
+        packageJson.exports = exports;
+        await write(packageJsonFile, JSON.stringify(packageJson, null, 2));
+        console.log(`Updated exports for ${packageJson.name} (${Object.keys(exports).length} files)`);
     }
 }
 
-export async function generateJsrJson() {
+export async function generateJsr() {
     const v = await version();
 
-    // Publish all packages
-    for await (const f of new Glob("packages/{yadic,totallylazy,lazyrecords}/package.json").scan(".")) {
+    for await (const f of new Glob("packages/*/package.json").scan(".")) {
         const packageJsonFile = file(f);
         const packageJson = await packageJsonFile.json();
         const parent = dirname(f!);
         const jsrFile = file(join(parent, 'jsr.json'));
 
-        // Resolve workspace dependencies to actual version numbers
         if (packageJson.dependencies) {
             for (const [depName, depVersion] of Object.entries(packageJson.dependencies)) {
                 if (typeof depVersion === 'string' && depVersion.startsWith('workspace:')) {
                     packageJson.dependencies[depName] = v;
                 }
             }
-            // Write the resolved package.json back to disk
             await write(packageJsonFile, JSON.stringify(packageJson, null, 2));
         }
 
         const jsrConfig: any = {
             name: packageJson.name,
             version: v,
-            exports: packageJson.exports,  // Use exports directly from package.json
+            exports: packageJson.exports,
             license: 'Apache-2.0'
         };
 
-        // Convert files from package.json to publish.include for JSR
         if (packageJson.files) {
             jsrConfig.publish = {
                 include: packageJson.files
@@ -124,7 +104,7 @@ export async function generateJsrJson() {
 }
 
 export async function publish() {
-    await generateJsrJson();
+    await generateJsr();
     try {
         if (process.env.JSR_TOKEN) {
             await $`bunx jsr publish --allow-dirty --verbose --token ${process.env.JSR_TOKEN}`;
@@ -132,7 +112,6 @@ export async function publish() {
             await $`bunx jsr publish --allow-dirty --verbose`;
         }
     } finally {
-        // Always restore workspace dependencies and clean up, even if publish fails
         await $`git checkout packages/*/package.json`;
         await $`rm -rf **/jsr.json`;
     }
