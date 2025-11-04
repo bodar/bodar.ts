@@ -290,6 +290,58 @@ const result = single([1, 2, 3], filter(n => n === 2));
 
 ### Functions
 
+#### Curry
+
+Type-safe function currying with introspection and advanced features:
+
+```typescript
+import { curry, _ } from "@bodar/totallylazy/functions/curry";
+
+// Basic currying
+const add = (a: number, b: number) => a + b;
+const curriedAdd = curry(add);
+
+curriedAdd(1, 2); // 3
+curriedAdd(1)(2); // 3
+
+// Introspection - applied arguments as properties
+const partial = curriedAdd(1);
+partial.a; // 1
+partial.toString(); // "add(1)"
+
+// Placeholder support
+const greet = curry((first: string, last: string) => `Hello ${first} ${last}`);
+greet(_, 'Bodart')('Dan'); // "Hello Dan Bodart"
+
+// Default parameters (works unlike Ramda)
+const multiply = curry((a: number, b: number = 2) => a * b);
+multiply(3); // 6
+multiply(3, 3); // 9
+
+// Rest parameters
+const sum = curry((a: number, b: number, ...rest: number[]) =>
+  [a, b, ...rest].reduce((sum, n) => sum + n, 0)
+);
+sum(1, 2, 3, 4, 5); // 15
+sum(1)(2, 3, 4); // 10
+```
+
+**Comparison to Ramda:**
+
+totallylazy's curry offers several advantages:
+
+| Feature | totallylazy | Ramda |
+|---------|-------------|-------|
+| **Default parameters** | ✅ Full support | ❌ Breaks (documented limitation) |
+| **Rest parameters** | ✅ Full support | ✅ Via extra args |
+| **Introspection** | ✅ Via properties | ❌ Not available |
+| **toString()** | ✅ Shows applied args | ❌ Standard toString |
+| **Type safety** | ✅ Full TypeScript | ⚠️ Basic types |
+| **Placeholder** | ✅ `_` placeholder | ✅ `R.__` placeholder |
+| **Implementation** | Proxy-based | Recursive wrapping |
+
+**Runtime flexibility:** Like native JavaScript, curried functions forward all arguments at runtime while TypeScript enforces type safety at compile-time.
+
 #### Deep Equality
 
 ```typescript
@@ -386,7 +438,7 @@ Core features implemented:
 - [x] Parser Combinators
 - [x] Comparators
 - [x] JSON Grammar
-- [x] Functions (lazy, equal, property, select)
+- [x] Functions (curry, lazy, equal, property, select)
 - [x] Asserts
 
 Future enhancements:
