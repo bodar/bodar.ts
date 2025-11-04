@@ -337,7 +337,7 @@ totallylazy's curry offers several advantages:
 | **Introspection** | ✅ Via properties | ❌ Not available |
 | **toString()** | ✅ Shows applied args | ❌ Standard toString |
 | **Type safety** | ✅ Full TypeScript | ⚠️ Basic types |
-| **Placeholder** | ✅ `_` placeholder | ✅ `R.__` placeholder |
+| **Placeholder** | ✅ `_` placeholder symbol | ✅ `R.__` placeholder object |
 | **Implementation** | Proxy-based | Recursive wrapping |
 
 **Runtime flexibility:** Like native JavaScript, curried functions forward all arguments at runtime while TypeScript enforces type safety at compile-time.
