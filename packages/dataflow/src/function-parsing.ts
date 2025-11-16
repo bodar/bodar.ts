@@ -21,5 +21,8 @@ export function getOutputs(definition: FunDef): string[] {
         }
     };
 
-    return (findObjectExpression()?.properties as Property[]).map((p) => (p.key as Identifier).name);
+    const objectExpression = findObjectExpression();
+    if (!objectExpression) return [];
+
+    return (objectExpression.properties as Property[]).map((p) => (p.key as Identifier).name);
 }
