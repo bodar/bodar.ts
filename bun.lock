@@ -9,6 +9,13 @@
         "typescript": "^5.7.3",
       },
     },
+    "packages/dataflow": {
+      "name": "@bodar/dataflow",
+      "version": "0.0.0",
+      "dependencies": {
+        "acorn": "^8.15.0",
+      },
+    },
     "packages/lazyrecords": {
       "name": "@bodar/lazyrecords",
       "version": "0.0.0",
@@ -29,6 +36,8 @@
     },
   },
   "packages": {
+    "@bodar/dataflow": ["@bodar/dataflow@workspace:packages/dataflow"],
+
     "@bodar/lazyrecords": ["@bodar/lazyrecords@workspace:packages/lazyrecords"],
 
     "@bodar/totallylazy": ["@bodar/totallylazy@workspace:packages/totallylazy"],
@@ -40,6 +49,8 @@
     "@types/node": ["@types/node@22.13.4", "", { "dependencies": { "undici-types": "~6.20.0" } }, "sha512-ywP2X0DYtX3y08eFVx5fNIw7/uIv8hYUKgXoK8oayJlLnKcRfEYCxWMVE1XagUdVtCJlZT1AU4LXEABW+L1Peg=="],
 
     "@types/ws": ["@types/ws@8.5.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-bd/YFLW+URhBzMXurx7lWByOu+xzU9+kb3RboOteXYDfW+tr+JZa99OyNmPINEGB/ahzKrEuc8rcv4gnpJmxTw=="],
+
+    "acorn": ["acorn@8.15.0", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg=="],
 
     "asserttt": ["asserttt@1.0.1", "", {}, "sha512-bqiz6RE6xNait1jl8r8rXSlKEf2ZTKTzc+hVxu3n8cUjZftK2meo42PPq1sW09nlwnPlCJbo6eAI9du4SdOtbQ=="],
 

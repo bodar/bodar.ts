@@ -1,0 +1,9 @@
+{
+  "name": "@bodar/dataflow",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "acorn": "^8.15.0"
+  },
+  "exports": {}
+}

@@ -7,6 +7,7 @@ export function parametersOf(fn: Function): Parameter[] {
     const match = fn.toString().match(parameterPattern);
     if (match === null) return [];
     const args: string = match[1];
+    if (args === "") return [];
     return args.split(',')
         .map(arg => arg.split('=').map(v => v.trim()))
         .map(p => Reflect.construct(Parameter, p));

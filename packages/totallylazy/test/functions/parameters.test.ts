@@ -30,4 +30,9 @@ describe("parametersOf", () => {
         assertThat(parametersOf((a: number, b: number, ...rest: number[]) => [a + b, ...rest]),
             equals([parameter('a'), parameter('b'), parameter('...rest')]));
     });
+
+    it("handles functions with no arguments", () => {
+        assertThat(parametersOf(() => []),
+            equals([]));
+    });
 });
