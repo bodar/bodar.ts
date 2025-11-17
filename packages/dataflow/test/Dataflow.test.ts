@@ -1,6 +1,5 @@
-import {describe, expect, test} from "bun:test";
+import {describe, test} from "bun:test";
 import {Dataflow} from "../src/Dataflow.ts";
-import {Mutable} from "../src/Mutable.ts";
 import {toPromiseArray} from "@bodar/totallylazy/collections/Array.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
@@ -93,15 +92,4 @@ describe("Dataflow", () => {
         assertThat(await toPromiseArray(b), equals([2]));
     });
 })
-
-describe("Mutable", () => {
-    test("is a generator of values", async () => {
-        const numbers = Mutable(1);
-        expect(await numbers.next()).toEqual({value: 1, done: false});
-        numbers.value++;
-        expect(await numbers.next()).toEqual({value: 2, done: false});
-        numbers.value++;
-        expect(await numbers.next()).toEqual({value: 3, done: false});
-    });
-});
 
