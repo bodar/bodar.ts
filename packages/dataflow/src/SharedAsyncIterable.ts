@@ -23,8 +23,8 @@ export class Strategy {
 
 /** Shares an async iterator across multiple consumers with back-pressure synchronization */
 export class SharedAsyncIterable<T> implements AsyncIterable<T> {
-    iterator?: AsyncIterator<T>;
-    consumers = new Set<SharedAsyncIterator<T>>();
+    private iterator?: AsyncIterator<T>;
+    private consumers: Set<SharedAsyncIterator<T>> = new Set();
 
     constructor(private iterable: AsyncIterable<T>, private strategy: StrategyChecker) {
     }
@@ -36,16 +36,16 @@ export class SharedAsyncIterable<T> implements AsyncIterable<T> {
         return iterator;
     }
 
-    reset() {
+    reset(): void {
         this.iterator = undefined;
         this.consumers.clear();
     }
 
-    get ready() {
+    get ready(): boolean {
         return this.strategy(Array.from(this.consumers).map(v => v.ready));
     }
 
-    async sendNext() {
+    async sendNext() : Promise<void> {
         const result = await this.iterator!.next();
         for (const consumer of this.consumers) {
             consumer.sendNext(result);
@@ -79,7 +79,7 @@ class SharedAsyncIterator<T> implements AsyncIterator<T> {
         })
     }
 
-    sendNext(result: IteratorResult<T>) {
+    sendNext(result: IteratorResult<T>): void {
         if (this.resolve) {
             this.resolve!(result);
             this.resolve = undefined;

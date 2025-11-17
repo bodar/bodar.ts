@@ -9,6 +9,7 @@
             <path value="file://$PROJECT_DIR$/packages/totallylazy/src" />
             <path value="file://$PROJECT_DIR$/packages/lazyrecords/src" />
             <path value="file://$PROJECT_DIR$/packages/yadic/src" />
+            <path value="file://$PROJECT_DIR$/packages/dataflow/src" />
           </resourceRoots>
         </entryData>
       </entry>
