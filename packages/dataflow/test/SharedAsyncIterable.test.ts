@@ -139,4 +139,170 @@ describe("SharedAsyncIterator", () => {
             assertThat(await iter2.next(), equals({done: true, value: undefined}));
         });
     });
+
+    describe("Strategy.latest", () => {
+        test("single consumer works normally", async () => {
+            const shared = new SharedAsyncIterable(numbers(1, 2, 3), Strategy.latest);
+            const iter = shared[Symbol.asyncIterator]();
+
+            assertThat(await iter.next(), equals({value: 1, done: false}));
+            assertThat(await iter.next(), equals({value: 2, done: false}));
+            assertThat(await iter.next(), equals({value: 3, done: false}));
+            assertThat(await iter.next(), equals({done: true, value: undefined}));
+        });
+
+        test("fast consumer advances source without waiting for slow consumer", async () => {
+            let sourceCallCount = 0;
+
+            async function* counted() {
+                for (const v of [1, 2, 3]) {
+                    sourceCallCount++;
+                    yield v;
+                }
+            }
+
+            const shared = new SharedAsyncIterable(counted(), Strategy.latest);
+            const iter1 = shared[Symbol.asyncIterator]();
+            const iter2 = shared[Symbol.asyncIterator]();
+
+            // iter1 calls next - should advance immediately without waiting for iter2
+            const result1 = await iter1.next();
+            assertThat(result1, equals({value: 1, done: false}));
+            assertThat(sourceCallCount, equals(1));
+
+            // iter1 advances again - still doesn't wait for iter2
+            const result2 = await iter1.next();
+            assertThat(result2, equals({value: 2, done: false}));
+            assertThat(sourceCallCount, equals(2));
+
+            // Now iter2 calls next - it gets the latest cached value (2)
+            const result3 = await iter2.next();
+            assertThat(result3, equals({value: 2, done: false}));
+            assertThat(sourceCallCount, equals(2)); // Source hasn't advanced yet
+        });
+
+        test("slow consumer gets latest cached value", async () => {
+            const shared = new SharedAsyncIterable(numbers(1, 2, 3, 4), Strategy.latest);
+            const fast = shared[Symbol.asyncIterator]();
+            const slow = shared[Symbol.asyncIterator]();
+
+            // Fast consumer gets first three values (slow gets them cached, latest overwrites previous)
+            assertThat(await fast.next(), equals({value: 1, done: false}));
+            assertThat(await fast.next(), equals({value: 2, done: false}));
+            assertThat(await fast.next(), equals({value: 3, done: false}));
+
+            // Slow consumer finally calls next - gets latest cached value (3)
+            assertThat(await slow.next(), equals({value: 3, done: false}));
+
+            // Both advance together now
+            const [r1, r2] = await Promise.all([fast.next(), slow.next()]);
+            assertThat(r1, equals({value: 4, done: false}));
+            assertThat(r2, equals({value: 4, done: false}));
+        });
+
+        test("multiple consumers calling next simultaneously may trigger multiple advances", async () => {
+            let sourceCallCount = 0;
+
+            async function* counted() {
+                for (const v of [1, 2, 3]) {
+                    sourceCallCount++;
+                    yield v;
+                }
+            }
+
+            const shared = new SharedAsyncIterable(counted(), Strategy.latest);
+            const iter1 = shared[Symbol.asyncIterator]();
+            const iter2 = shared[Symbol.asyncIterator]();
+
+            // Both call next simultaneously - each may trigger sendNext()
+            const [result1, result2] = await Promise.all([iter1.next(), iter2.next()]);
+
+            // Both should get values (possibly different due to race condition)
+            assertThat(result1.done, equals(false));
+            assertThat(result2.done, equals(false));
+        });
+
+        test("multiple consumers at same pace all get same values", async () => {
+            const shared = new SharedAsyncIterable(numbers(1, 2), Strategy.latest);
+            const iter1 = shared[Symbol.asyncIterator]();
+            const iter2 = shared[Symbol.asyncIterator]();
+
+            // Both advance together - first value
+            const [r1, r2] = await Promise.all([iter1.next(), iter2.next()]);
+            assertThat(r1, equals({value: 1, done: false}));
+            assertThat(r2, equals({value: 1, done: false}));
+
+            // Both advance together - second value
+            const [r3, r4] = await Promise.all([iter1.next(), iter2.next()]);
+            assertThat(r3, equals({value: 2, done: false}));
+            assertThat(r4, equals({value: 2, done: false}));
+        });
+
+        test("three consumers with different paces", async () => {
+            const shared = new SharedAsyncIterable(numbers(1, 2, 3, 4, 5), Strategy.latest);
+            const fastest = shared[Symbol.asyncIterator]();
+            const medium = shared[Symbol.asyncIterator]();
+            const slowest = shared[Symbol.asyncIterator]();
+
+            // Fastest gets 1, 2, 3 (others cache 3 as latest)
+            assertThat(await fastest.next(), equals({value: 1, done: false}));
+            assertThat(await fastest.next(), equals({value: 2, done: false}));
+            assertThat(await fastest.next(), equals({value: 3, done: false}));
+
+            // Medium gets cached latest (3)
+            assertThat(await medium.next(), equals({value: 3, done: false}));
+
+            // Fastest advances to 4, slowest caches 4
+            assertThat(await fastest.next(), equals({value: 4, done: false}));
+
+            // Slowest gets cached latest (4)
+            assertThat(await slowest.next(), equals({value: 4, done: false}));
+
+            // Medium and slowest still have cached values
+            // Fastest and slowest advance, but medium gets cached 4
+            const [r1, r2, r3] = await Promise.all([
+                fastest.next(),
+                medium.next(),
+                slowest.next()
+            ]);
+            assertThat(r1, equals({value: 5, done: false}));
+            assertThat(r2, equals({value: 4, done: false})); // Gets cached value from step 5
+            assertThat(r3, equals({value: 5, done: false}));
+        });
+
+        test("done state propagates to all consumers", async () => {
+            const shared = new SharedAsyncIterable(numbers(1), Strategy.latest);
+            const iter1 = shared[Symbol.asyncIterator]();
+            const iter2 = shared[Symbol.asyncIterator]();
+
+            // iter1 consumes the value
+            assertThat(await iter1.next(), equals({value: 1, done: false}));
+
+            // iter1 gets done
+            assertThat(await iter1.next(), equals({done: true, value: undefined}));
+
+            // iter2 should also get done
+            assertThat(await iter2.next(), equals({done: true, value: undefined}));
+        });
+
+        test("late joiner gets fresh iterator after completion", async () => {
+            let iteratorCount = 0;
+            const shared = new SharedAsyncIterable({
+                async* [Symbol.asyncIterator](): AsyncIterator<number> {
+                    iteratorCount++;
+                    yield* [1, 2, 3];
+                }
+            }, Strategy.latest);
+
+            // First consumer
+            const first = await toPromiseArray(shared);
+            assertThat(first, equals([1, 2, 3]));
+            assertThat(iteratorCount, equals(1));
+
+            // Second consumer should get fresh iterator
+            const second = await toPromiseArray(shared);
+            assertThat(second, equals([1, 2, 3]));
+            assertThat(iteratorCount, equals(2));
+        });
+    });
 });
