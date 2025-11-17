@@ -9,12 +9,24 @@
  * @module
  */
 
+export type StrategyChecker = (ready: boolean[]) => boolean;
+
+export class Strategy {
+    static backpressure: StrategyChecker = (ready: boolean[]) => {
+        return ready.every(status => status);
+    }
+
+    static latest: StrategyChecker = (ready: boolean[]) => {
+        return ready.some(status => status);
+    }
+}
+
 /** Shares an async iterator across multiple consumers with back-pressure synchronization */
 export class SharedAsyncIterable<T> implements AsyncIterable<T> {
     iterator?: AsyncIterator<T>;
     consumers = new Set<SharedAsyncIterator<T>>();
 
-    constructor(private iterable: AsyncIterable<T>) {
+    constructor(private iterable: AsyncIterable<T>, private strategy: StrategyChecker) {
     }
 
     [Symbol.asyncIterator](): AsyncIterator<T> {
@@ -29,8 +41,8 @@ export class SharedAsyncIterable<T> implements AsyncIterable<T> {
         this.consumers.clear();
     }
 
-    allReady() {
-        return Array.from(this.consumers).every((value) => value.ready);
+    get ready() {
+        return this.strategy(Array.from(this.consumers).map(v => v.ready));
     }
 
     async sendNext() {
@@ -44,9 +56,9 @@ export class SharedAsyncIterable<T> implements AsyncIterable<T> {
 
 class SharedAsyncIterator<T> implements AsyncIterator<T> {
     private resolve?: (value: (PromiseLike<IteratorResult<T, any>> | IteratorResult<T, any>)) => void;
-    private done = false;
+    private result?: IteratorResult<T>
 
-    constructor(private iterable: SharedAsyncIterable<T>) {
+    constructor(private controller: SharedAsyncIterable<T>) {
     }
 
     get ready(): boolean {
@@ -54,16 +66,25 @@ class SharedAsyncIterator<T> implements AsyncIterator<T> {
     }
 
     async next(): Promise<IteratorResult<T, any>> {
-        if (this.done) return {done: true, value: undefined}
+        if (this.result) {
+            try {
+                return this.result;
+            } finally {
+                this.result = undefined;
+            }
+        }
         return new Promise<IteratorResult<T, any>>((resolve) => {
             this.resolve = resolve;
-            if (this.iterable.allReady()) this.iterable.sendNext();
+            if (this.controller.ready) this.controller.sendNext();
         })
     }
 
     sendNext(result: IteratorResult<T>) {
-        this.resolve!(result);
-        this.resolve = undefined;
-        this.done = !!result.done;
+        if (this.resolve) {
+            this.resolve!(result);
+            this.resolve = undefined;
+        } else {
+            this.result = result;
+        }
     }
 }
