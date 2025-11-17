@@ -1,10 +1,10 @@
-import {equal} from "@bodar/totallylazy/functions/equal.ts";
-import {isAsyncIterable, isAsyncIterator} from "./IsAsyncIterable.ts";
-import {combineLatest} from "./combineLatest.ts";
 /**
  * Reactive nodes that combine dependency streams and yield computed values
  * @module
  */
+import {isAsyncIterable, isAsyncIterator} from "./IsAsyncIterable.ts";
+import {combineLatest} from "./combineLatest.ts";
+import {equal} from "./equal.ts";
 
 /** A reactive node that emits values based on its dependencies */
 export interface Node<T = any> extends AsyncIterable<T> {

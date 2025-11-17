@@ -63,8 +63,13 @@ export async function generateExports(packageGlob: string = "packages/*/package.
             if(content.includes('@module')) exports[ts] = ts.replace('./', './src/');
         }
         packageJson.exports = exports;
+        packageJson.files = [
+            "src",
+            "README.md",
+            "package.json"
+        ]
         await write(packageJsonFile, JSON.stringify(packageJson, null, 2));
-        console.log(`Updated exports for ${packageJson.name} (${Object.keys(exports).length} files)`);
+        console.log(`Updated exports and files for ${packageJson.name} (${Object.keys(exports).length} files)`);
     }
 }
 

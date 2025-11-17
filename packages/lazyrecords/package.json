@@ -35,7 +35,7 @@
     "./sql/template/Identifier.ts": "./src/sql/template/Identifier.ts"
   },
   "files": [
-    "src/**/*.ts",
+    "src",
     "README.md",
     "package.json"
   ]

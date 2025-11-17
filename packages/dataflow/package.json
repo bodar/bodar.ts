@@ -7,6 +7,12 @@
   },
   "exports": {
     "./Node.ts": "./src/Node.ts",
-    "./Dataflow.ts": "./src/Dataflow.ts"
-  }
+    "./Dataflow.ts": "./src/Dataflow.ts",
+    "./equal.ts": "./src/equal.ts"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "package.json"
+  ]
 }
