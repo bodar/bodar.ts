@@ -1,16 +1,21 @@
 import {simpleHash} from "./simpleHash.ts";
-import {getInputs, parseFunction} from "./function-parsing.ts";
+import {getInputs, getOutputs, parseFunction} from "./function-parsing.ts";
 import {node, type Node} from "./Node.ts";
 
 export class Dataflow {
-    define(fun: Function, id = simpleHash(fun.toString())): any {
+    define(fun:Function): { [id: string]: Node };
+    define(key: string, fun: Function): { [id: string]: Node };
+    define(...args:any[]): { [id: string]: Node } {
+        const fun = args.find(v => typeof v === "function")!;
+        const key = args.find(v => typeof v === 'string') || (fun.name === '' ? simpleHash(fun.toString()) : fun.name);
         const definition = parseFunction(fun);
         const inputs = getInputs(definition);
-        // const outputs = getOutputs(definition);
-        return this.set(id, inputs, fun)
+        const outputs = getOutputs(definition);
 
-        // for (const output of outputs) this.set(output, [id], (result: any) => Reflect.get(result, output))
-        // return this;
+        return Object.fromEntries([
+            [key, this.set(key, inputs, fun)],
+            ...outputs.map(output => [output, this.set(output, [key], (result: any) => Reflect.get(result, output))])
+        ])
     }
 
     private nodes = new Map<string, Node>();
@@ -21,22 +26,6 @@ export class Dataflow {
         this.nodes.set(key, newNode);
         return newNode
     }
-
-    // private dependants = new Map<string, Set<string>>();
-    //
-    // clear(key: string) {
-    //     console.log('clear', key);
-    //     LazyProperties.resetProperty(this, key);
-    //     for (const dependant of this.getDependants(key)) this.clear(dependant);
-    // }
-    //
-    // private getDependants(key: string): Set<string> {
-    //     return this.dependants.get(key) || new Set<string>();
-    // }
-    //
-    // private setDependant(key: string, dependant: string) {
-    //     this.dependants.set(key, this.getDependants(key).add(dependant));
-    // }
 }
 
 
