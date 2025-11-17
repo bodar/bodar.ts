@@ -5,5 +5,8 @@
   "dependencies": {
     "acorn": "^8.15.0"
   },
-  "exports": {}
+  "exports": {
+    "./Node.ts": "./src/Node.ts",
+    "./Dataflow.ts": "./src/Dataflow.ts"
+  }
 }

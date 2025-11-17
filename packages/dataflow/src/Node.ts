@@ -27,7 +27,7 @@ export class DependantNode<T> implements Node, AsyncIterable<T> {
     private lastInputs?: any[];
     private lastResult?: any;
 
-    async* execute(currentInputs: any[]) {
+    async* execute(currentInputs: any[]): AsyncGenerator<T> {
         if (equal(this.lastInputs, currentInputs)) {
             yield* this.processResult(this.lastResult);
         } else {
@@ -38,7 +38,7 @@ export class DependantNode<T> implements Node, AsyncIterable<T> {
         }
     }
 
-    async* processResult(result: any) {
+    async* processResult(result: any): AsyncGenerator<T> {
         if (isAsyncIterable(result)) {
             throw new Error('Not implemented');
         } else if (isAsyncIterator(result)) {
@@ -54,6 +54,6 @@ export class DependantNode<T> implements Node, AsyncIterable<T> {
 }
 
 /** Factory function to create a new reactive node */
-export function node(key: string, dependencies: Node[], fun: Function) {
+export function node(key: string, dependencies: Node[], fun: Function): Node {
     return new DependantNode(key, dependencies, fun)
 }
