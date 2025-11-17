@@ -1,4 +1,6 @@
 /** @module Deep equality comparison utilities */
+import {by} from "../comparators/by.ts";
+
 /**
  * Performs deep equality comparison of two values. Supports primitives, objects, arrays, Maps, Sets, Dates, RegExp, and functions.
  * Uses same-value-zero equality (NaN === NaN, +0 === -0).
@@ -39,7 +41,7 @@ export function equal(a: unknown, b: unknown): boolean {
         if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b.valueOf();
         if (a.toString !== Object.prototype.toString) return a.toString() === b.toString();
 
-        return equal(Object.entries(a), Object.entries(b));
+        return equal(Object.entries(a).sort(by(v => v[0])), Object.entries(b).sort(by(v => v[0])));
     }
 
     if (typeof a == 'function' && typeof b == 'function') {

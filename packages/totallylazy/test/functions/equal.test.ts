@@ -53,6 +53,11 @@ describe("equal", () => {
         assertFalse(equal(new Car(), {}));
     });
 
+    it("supports Objects - examples", () => {
+        assertTrue(equal({value: undefined, done: true },{value: undefined, done: true }));
+        assertTrue(equal({done: true, value: undefined },{value: undefined, done: true }));
+    });
+
     it("supports Arrays", () => {
         assertTrue(equal([], []));
         assertFalse(equal([], [1]));
