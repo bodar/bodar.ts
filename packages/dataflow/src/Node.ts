@@ -5,6 +5,7 @@
 import {isAsyncIterable, isAsyncIterator} from "./IsAsyncIterable.ts";
 import {combineLatest} from "./combineLatest.ts";
 import {equal} from "@bodar/totallylazy/functions/equal.ts";
+import {SharedAsyncIterable} from "./SharedAsyncIterable.ts";
 
 /** A reactive node that emits values based on its dependencies */
 export interface Node<T = any> extends AsyncIterable<T> {
@@ -15,10 +16,19 @@ export interface Node<T = any> extends AsyncIterable<T> {
 
 /** Node implementation that uses combineLatest to merge dependency streams and memoizes results */
 export class DependantNode<T> implements Node, AsyncIterable<T> {
+    private shared?: SharedAsyncIterable<T>;
+
     constructor(public key: string, public dependencies: Node[], public fun: Function) {
     }
 
-    async* [Symbol.asyncIterator](): AsyncIterator<T, any, any> {
+    [Symbol.asyncIterator](): AsyncIterator<T> {
+        if (!this.shared) this.shared = new SharedAsyncIterable<T>({
+            [Symbol.asyncIterator]: () => this.create()
+        })
+        return this.shared[Symbol.asyncIterator]();
+    }
+
+    async* create(): AsyncIterator<T> {
         for await (const currentInputs of combineLatest(this.dependencies)) {
             yield* this.execute(currentInputs);
         }

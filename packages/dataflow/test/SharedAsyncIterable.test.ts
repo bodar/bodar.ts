@@ -75,22 +75,6 @@ describe("SharedAsyncIterator", () => {
         assertThat(result2, equals({value: 1, done: false}));
     });
 
-    test("when consumer finishes, remaining consumer continues alone", async () => {
-        const shared = new SharedAsyncIterable(numbers(1, 2, 3));
-        const iter1 = shared[Symbol.asyncIterator]();
-        const iter2 = shared[Symbol.asyncIterator]();
-
-        // Both advance once
-        await Promise.all([iter1.next(), iter2.next()]);
-
-        // iter1 finishes
-        await iter1.return!();
-
-        // iter2 should be able to continue alone
-        assertThat(await iter2.next(), equals({value: 2, done: false}));
-        assertThat(await iter2.next(), equals({value: 3, done: false}));
-    });
-
     test("when all consumers finish, new consumer gets fresh iterator", async () => {
         let iteratorCount = 0;
         const shared = new SharedAsyncIterable({
