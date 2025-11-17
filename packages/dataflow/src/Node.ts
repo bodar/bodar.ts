@@ -1,13 +1,19 @@
 import {equal} from "@bodar/totallylazy/functions/equal.ts";
 import {isAsyncIterable, isAsyncIterator} from "./IsAsyncIterable.ts";
 import {combineLatest} from "./combineLatest.ts";
+/**
+ * Reactive nodes that combine dependency streams and yield computed values
+ * @module
+ */
 
+/** A reactive node that emits values based on its dependencies */
 export interface Node<T = any> extends AsyncIterable<T> {
     key: string;
     dependencies: Node[];
     fun: Function;
 }
 
+/** Node implementation that uses combineLatest to merge dependency streams and memoizes results */
 export class DependantNode<T> implements Node, AsyncIterable<T> {
     constructor(public key: string, public dependencies: Node[], public fun: Function) {
     }
@@ -47,6 +53,7 @@ export class DependantNode<T> implements Node, AsyncIterable<T> {
     }
 }
 
+/** Factory function to create a new reactive node */
 export function node(key: string, dependencies: Node[], fun: Function) {
     return new DependantNode(key, dependencies, fun)
 }
