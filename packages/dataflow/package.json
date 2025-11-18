@@ -6,9 +6,9 @@
     "acorn": "^8.15.0"
   },
   "exports": {
-    "./Node.ts": "./src/Node.ts",
+    "./Dataflow.ts": "./src/Dataflow.ts",
     "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts",
-    "./Dataflow.ts": "./src/Dataflow.ts"
+    "./Node.ts": "./src/Node.ts"
   },
   "files": [
     "src",

@@ -22,11 +22,11 @@ describe("Mutation", () => {
 
         mut.value = 10;
         assertThat(events.length, equals(1));
-        assertThat(events[0].detail.value, equals(10));
+        assertThat(events[0].detail, equals(10));
 
         mut.value = 20;
         assertThat(events.length, equals(2));
-        assertThat(events[1].detail.value, equals(20));
+        assertThat(events[1].detail, equals(20));
     });
 
     test("async iterator yields on change", async () => {
