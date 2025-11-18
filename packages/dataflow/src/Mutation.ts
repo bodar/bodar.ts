@@ -1,4 +1,4 @@
-import {iterator, IteratorStrategy} from "./Iterator.ts";
+import {iterator} from "./Iterator.ts";
 
 export class Mutation<T> extends EventTarget implements AsyncIterable<T> {
     constructor(private _value: T) {
@@ -15,6 +15,6 @@ export class Mutation<T> extends EventTarget implements AsyncIterable<T> {
     }
 
     [Symbol.asyncIterator]() {
-        return iterator(notify => this.addEventListener('change', (ev: any) => notify(ev.detail)), this._value, IteratorStrategy.latest);
+        return iterator(notify => this.addEventListener('change', (ev: any) => notify(ev.detail)), this._value);
     }
 }

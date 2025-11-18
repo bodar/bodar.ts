@@ -1,19 +1,14 @@
-export enum IteratorStrategy {
-    earliest,
-    latest
-}
-
-export async function* iterator<T>(init: (notify: (e: T) => any) => any, latest: T, strategy: IteratorStrategy): AsyncIterator<T> {
+export async function* iterator<T>(init: (notify: (e: T) => any) => any, value: T): AsyncIterator<T> {
     let {promise, resolve} = Promise.withResolvers<T>();
     // Must close over the resolve variable to see it change
-    init((v => resolve(latest = v)))
+    init((v => resolve(value = v)))
 
-    yield latest;
+    yield value;
 
     while (true) {
-        const earliest = await promise;
+        await promise;
         // Must create new promise before yielding otherwise we miss any synchronous notifications
         ({promise, resolve} = Promise.withResolvers<T>());
-        yield strategy === IteratorStrategy.latest ? latest! : earliest;
+        yield value!;
     }
 }
