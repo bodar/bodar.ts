@@ -39,5 +39,18 @@ describe("Mutation", () => {
         mut.value =  2;
         assertThat((await iter.next()).value, equals(2));
     });
+
+    test("intermediate values are lost", async () => {
+        const mut = new Mutation(0);
+        const iter = mut[Symbol.asyncIterator]();
+
+        assertThat((await iter.next()).value, equals(0));
+
+        mut.value = 1;
+        mut.value = 2;
+        mut.value = 3;
+
+        assertThat((await iter.next()).value, equals(3));
+    });
 });
 
