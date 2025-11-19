@@ -14,7 +14,7 @@ export class NodeDefinition {
     ) {
     }
 
-    toString() {
+    toString(): string {
         return `${JSON.stringify(this.key)},${JSON.stringify(this.inputs)},${JSON.stringify(this.outputs)},${this.fun()}`;
     }
 

@@ -5,7 +5,7 @@ import {Graph} from "./Graph.ts";
 
 /** Renderer **/
 export class Renderer {
-    constructor(private graph = new Graph()) {
+    constructor(private graph: Graph = new Graph()) {
     }
 
     async render(key: string, inputs: string[], outputs: string[], fun: Function) {
