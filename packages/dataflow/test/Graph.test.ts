@@ -86,10 +86,11 @@ describe("graph", () => {
 
     test("if a function returns a promise then the node will yield the value of the promise", async () => {
         const graph = new Graph();
-        const {test} = graph.define(function test() {
-            return Promise.resolve(2);
+        graph.define('promise', () => Promise.resolve(2));
+        const {test} = graph.define(function test(promise:number) {
+            return promise * 3;
         });
-        assertThat(await toPromiseArray(test), equals([2]));
+        assertThat(await toPromiseArray(test), equals([6]));
     });
 
     test("can compose generators with constants", async () => {
