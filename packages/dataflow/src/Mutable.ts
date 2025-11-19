@@ -1,6 +1,6 @@
 import {iterator} from "./Iterator.ts";
 
-export class Mutation<T> extends EventTarget implements AsyncIterable<T> {
+export class Mutable<T> extends EventTarget implements AsyncIterable<T> {
     constructor(private _value: T) {
         super();
     }
