@@ -1,5 +1,5 @@
 import {describe, test} from "bun:test";
-import {SharedAsyncIterable, Strategy} from "../src/SharedAsyncIterable.ts";
+import {SharedAsyncIterable, Backpressure} from "../src/SharedAsyncIterable.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {toPromiseArray} from "@bodar/totallylazy/collections/Array.ts";
@@ -9,9 +9,9 @@ async function* numbers(...values: number[]) {
 }
 
 describe("SharedAsyncIterator", () => {
-    describe("Strategy.backpressure", () => {
+    describe("Backpressure.slowest", () => {
         test("single consumer works normally", async () => {
-            const shared = new SharedAsyncIterable(numbers(1, 2, 3), Strategy.backpressure);
+            const shared = new SharedAsyncIterable(numbers(1, 2, 3), Backpressure.slowest);
             const iter = shared[Symbol.asyncIterator]();
 
             assertThat(await iter.next(), equals({value: 1, done: false}));
@@ -30,7 +30,7 @@ describe("SharedAsyncIterator", () => {
                 }
             }
 
-            const shared = new SharedAsyncIterable(counted(), Strategy.backpressure);
+            const shared = new SharedAsyncIterable(counted(), Backpressure.slowest);
             const iter1 = shared[Symbol.asyncIterator]();
             const iter2 = shared[Symbol.asyncIterator]();
 
@@ -57,7 +57,7 @@ describe("SharedAsyncIterator", () => {
         });
 
         test("consumers can advance at different times but source waits", async () => {
-            const shared = new SharedAsyncIterable(numbers(1, 2, 3), Strategy.backpressure);
+            const shared = new SharedAsyncIterable(numbers(1, 2, 3), Backpressure.slowest);
             const iter1 = shared[Symbol.asyncIterator]();
             const iter2 = shared[Symbol.asyncIterator]();
 
@@ -83,7 +83,7 @@ describe("SharedAsyncIterator", () => {
                     iteratorCount++;
                     yield* [1, 2, 3];
                 }
-            }, Strategy.backpressure);
+            }, Backpressure.slowest);
 
             // First consumer
             const first = await toPromiseArray(shared);
@@ -95,7 +95,7 @@ describe("SharedAsyncIterator", () => {
         });
 
         test("three consumers all synchronized", async () => {
-            const shared = new SharedAsyncIterable(numbers(1, 2), Strategy.backpressure);
+            const shared = new SharedAsyncIterable(numbers(1, 2), Backpressure.slowest);
             const iter1 = shared[Symbol.asyncIterator]();
             const iter2 = shared[Symbol.asyncIterator]();
             const iter3 = shared[Symbol.asyncIterator]();
@@ -112,7 +112,7 @@ describe("SharedAsyncIterator", () => {
         });
 
         test("done state propagates to all consumers", async () => {
-            const shared = new SharedAsyncIterable(numbers(1), Strategy.backpressure);
+            const shared = new SharedAsyncIterable(numbers(1), Backpressure.slowest);
             const iter1 = shared[Symbol.asyncIterator]();
             const iter2 = shared[Symbol.asyncIterator]();
 
@@ -127,7 +127,7 @@ describe("SharedAsyncIterator", () => {
         });
 
         test("consumer joining after source completes gets done immediately", async () => {
-            const shared = new SharedAsyncIterable(numbers(1), Strategy.backpressure);
+            const shared = new SharedAsyncIterable(numbers(1), Backpressure.slowest);
             const iter1 = shared[Symbol.asyncIterator]();
 
             // Consume until done
@@ -140,9 +140,9 @@ describe("SharedAsyncIterator", () => {
         });
     });
 
-    describe("Strategy.latest", () => {
+    describe("Backpressure.fastest", () => {
         test("single consumer works normally", async () => {
-            const shared = new SharedAsyncIterable(numbers(1, 2, 3), Strategy.latest);
+            const shared = new SharedAsyncIterable(numbers(1, 2, 3), Backpressure.fastest);
             const iter = shared[Symbol.asyncIterator]();
 
             assertThat(await iter.next(), equals({value: 1, done: false}));
@@ -161,7 +161,7 @@ describe("SharedAsyncIterator", () => {
                 }
             }
 
-            const shared = new SharedAsyncIterable(counted(), Strategy.latest);
+            const shared = new SharedAsyncIterable(counted(), Backpressure.fastest);
             const iter1 = shared[Symbol.asyncIterator]();
             const iter2 = shared[Symbol.asyncIterator]();
 
@@ -182,7 +182,7 @@ describe("SharedAsyncIterator", () => {
         });
 
         test("slow consumer gets latest cached value", async () => {
-            const shared = new SharedAsyncIterable(numbers(1, 2, 3, 4), Strategy.latest);
+            const shared = new SharedAsyncIterable(numbers(1, 2, 3, 4), Backpressure.fastest);
             const fast = shared[Symbol.asyncIterator]();
             const slow = shared[Symbol.asyncIterator]();
 
@@ -210,7 +210,7 @@ describe("SharedAsyncIterator", () => {
                 }
             }
 
-            const shared = new SharedAsyncIterable(counted(), Strategy.latest);
+            const shared = new SharedAsyncIterable(counted(), Backpressure.fastest);
             const iter1 = shared[Symbol.asyncIterator]();
             const iter2 = shared[Symbol.asyncIterator]();
 
@@ -223,7 +223,7 @@ describe("SharedAsyncIterator", () => {
         });
 
         test("multiple consumers at same pace all get same values", async () => {
-            const shared = new SharedAsyncIterable(numbers(1, 2), Strategy.latest);
+            const shared = new SharedAsyncIterable(numbers(1, 2), Backpressure.fastest);
             const iter1 = shared[Symbol.asyncIterator]();
             const iter2 = shared[Symbol.asyncIterator]();
 
@@ -239,7 +239,7 @@ describe("SharedAsyncIterator", () => {
         });
 
         test("three consumers with different paces", async () => {
-            const shared = new SharedAsyncIterable(numbers(1, 2, 3, 4, 5), Strategy.latest);
+            const shared = new SharedAsyncIterable(numbers(1, 2, 3, 4, 5), Backpressure.fastest);
             const fastest = shared[Symbol.asyncIterator]();
             const medium = shared[Symbol.asyncIterator]();
             const slowest = shared[Symbol.asyncIterator]();
@@ -271,7 +271,7 @@ describe("SharedAsyncIterator", () => {
         });
 
         test("done state propagates to all consumers", async () => {
-            const shared = new SharedAsyncIterable(numbers(1), Strategy.latest);
+            const shared = new SharedAsyncIterable(numbers(1), Backpressure.fastest);
             const iter1 = shared[Symbol.asyncIterator]();
             const iter2 = shared[Symbol.asyncIterator]();
 
@@ -292,7 +292,7 @@ describe("SharedAsyncIterator", () => {
                     iteratorCount++;
                     yield* [1, 2, 3];
                 }
-            }, Strategy.latest);
+            }, Backpressure.fastest);
 
             // First consumer
             const first = await toPromiseArray(shared);

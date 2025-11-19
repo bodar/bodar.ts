@@ -9,14 +9,14 @@
  * @module
  */
 
-export type StrategyChecker = (ready: boolean[]) => boolean;
+export type BackpressureStrategy = (ready: boolean[]) => boolean;
 
-export class Strategy {
-    static backpressure: StrategyChecker = (ready: boolean[]) => {
+export class Backpressure {
+    static slowest: BackpressureStrategy = (ready: boolean[]) => {
         return ready.every(status => status);
     }
 
-    static latest: StrategyChecker = (ready: boolean[]) => {
+    static fastest: BackpressureStrategy = (ready: boolean[]) => {
         return ready.some(status => status);
     }
 }
@@ -26,7 +26,7 @@ export class SharedAsyncIterable<T> implements AsyncIterable<T> {
     private iterator?: AsyncIterator<T>;
     private consumers: Set<SharedAsyncIterator<T>> = new Set();
 
-    constructor(private iterable: AsyncIterable<T>, private strategy: StrategyChecker) {
+    constructor(private iterable: AsyncIterable<T>, private backpressure: BackpressureStrategy) {
     }
 
     [Symbol.asyncIterator](): AsyncIterator<T> {
@@ -42,7 +42,7 @@ export class SharedAsyncIterable<T> implements AsyncIterable<T> {
     }
 
     get ready(): boolean {
-        return this.strategy(Array.from(this.consumers).map(v => v.ready));
+        return this.backpressure(Array.from(this.consumers).map(v => v.ready));
     }
 
     async sendNext() : Promise<void> {
