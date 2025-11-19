@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "acorn": "^8.15.0"
+    "acorn": "^8.15.0",
+    "acorn-walk": "^8.3.4"
   },
   "exports": {
     "./Node.ts": "./src/Node.ts",

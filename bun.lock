@@ -14,6 +14,7 @@
       "version": "0.0.0",
       "dependencies": {
         "acorn": "^8.15.0",
+        "acorn-walk": "^8.3.4",
       },
     },
     "packages/lazyrecords": {
@@ -51,6 +52,8 @@
     "@types/ws": ["@types/ws@8.5.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-bd/YFLW+URhBzMXurx7lWByOu+xzU9+kb3RboOteXYDfW+tr+JZa99OyNmPINEGB/ahzKrEuc8rcv4gnpJmxTw=="],
 
     "acorn": ["acorn@8.15.0", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg=="],
+
+    "acorn-walk": ["acorn-walk@8.3.4", "", { "dependencies": { "acorn": "^8.11.0" } }, "sha512-ueEepnujpqee2o5aIYnvHU6C0A42MNdsIDeqy5BydrkuC5R1ZuUFnm27EeFJGoEHJQgn3uleRvmTXaJgfXbt4g=="],
 
     "asserttt": ["asserttt@1.0.1", "", {}, "sha512-bqiz6RE6xNait1jl8r8rXSlKEf2ZTKTzc+hVxu3n8cUjZftK2meo42PPq1sW09nlwnPlCJbo6eAI9du4SdOtbQ=="],
 

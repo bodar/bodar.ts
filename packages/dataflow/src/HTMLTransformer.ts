@@ -1,5 +1,5 @@
 import {simpleHash} from "./simpleHash.ts";
-import {findTopLevelVariableDeclarations, parseScript} from "./function-parsing.ts";
+import {findTopLevelVariableDeclarations, findUnresolvedReferences, parseScript} from "./function-parsing.ts";
 
 export class NodeDefinition {
     constructor(public key: string,
@@ -37,9 +37,10 @@ export class HTMLTransformer {
 
     addScript(javascript: string): string {
         const program = parseScript(javascript);
+        const inputs = findUnresolvedReferences(program);
         const outputs = findTopLevelVariableDeclarations(program);
         const key = simpleHash(javascript);
-        this.definitions.push(new NodeDefinition(key, [], outputs, javascript))
+        this.definitions.push(new NodeDefinition(key, inputs, outputs, javascript))
         return key;
     }
 }

@@ -15,7 +15,7 @@ return {a};
 </script></body>`);
     });
 
-    test.only("can transform multiple reactive scripts", async () => {
+    test("can transform multiple reactive scripts", async () => {
         const transformer = new HTMLTransformer(new HTMLRewriter());
         const result = transformer.transform('<body><script reactive>const a = 1;</script><script reactive>const b = a + 1;</script></body>');
         expect(result).toBe(`<body><!--?placeholder id="vge10p"?--><!--?placeholder id="vk6clg"?--><script type="module">
