@@ -1,43 +1,49 @@
 # @bodar/dataflow
 
-A reactive dataflow library inspired by Observable Framework's reactive cells.
+A reactive dataflow library heavily inspired by Observable Framework but grounded in HTML not markdown.
+Aiming to be an extremely light alternative to React, that natively supports static websites, server rendered,
+edge rendered or client rendered content.
 
 ## Key Differences
 
-- **Library, not framework**: Individual pieces are usable independently
-- **HTML-based**: Designed for HTML reactive code blocks, not markdown
-- **Runtime flexible**: Works at build time, in service workers, at the edge (Cloudflare Workers), or on the server
+- **Extremely Simple**: Add a single attribute to add reactivity to HTML.
+- **Library, not framework**: a tiny library with independently useful components (the graph can be used for data processing outside of HTML)
+- **HTML-based**: Designed to add reactivity to standard HTML rather than Markdown (though Markdown could easily be a plugin)
+- **Runtime flexible**: The reactivity can be added at build time (static website), as middleware on the server or edge or finally as a service worker in the browser. 
 
 ## Status
 
-**Early days** - API will change. Currently focusing on the core dataflow engine.
+Early days - 
+
+- [x] Create Graph and Nodes
+  - [X] Function parsing
+    - [x] Detect dependencies / inputs
+    - [x] Detect outputs
+  - [x] Support event sources (converted in AsyncIterables)
+  - [x] Support AsyncIterable / AsyncIterator
+  - [x] Support promises
+- [ ] HTML Processors
+  - [ ] Script tag parsing
+  - [ ] JSX support (converts to native DOM methods)
+  - [ ] Topological sorter
+  - [ ] Buffered version (linkedom / browser)
+  - [ ] Streaming version (cloudflare / bun)
+- [ ] Fetch / Service Worker middleware
 
 ## Vision
 
-The plan is to build an HTML parser that:
-- Identifies reactive code blocks in HTML
-- Performs topological sorting of dependencies
-- Uses the `Dataflow` class to construct the reactive graph
-- Inserts cell markers similar to Observable Framework
-
-This enables static generation, edge computing, or dynamic server middleware - all using the same reactive primitives.
+One day this could just be built into the browser (as single attribute)
 
 ## Usage
 
 ```typescript
-import { Dataflow } from '@bodar/dataflow';
+import { Graph } from '@bodar/dataflow';
 
-const dataflow = new Dataflow();
-const { nodeA } = dataflow.define(() => 1, 'nodeA');
-const { nodeB } = dataflow.define((nodeA: number) => nodeA * 2);
+const graph = new Graph();
+graph.define('constant', () => 1);
+const { reactive } = graph.define((constant: number) => nodeA * 2);
 
-for await (const value of nodeB) {
+for await (const value of reactive) {
   console.log(value); // 2
 }
 ```
-
-## What's Next
-
-- HTML rewriter for extracting reactive blocks
-- Cell markers and templating
-- Build-time and runtime integration examples

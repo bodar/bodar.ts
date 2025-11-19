@@ -4,14 +4,18 @@
  */
 import {simpleHash} from "./simpleHash.ts";
 import {getInputs, getOutputs, parseFunction} from "./function-parsing.ts";
-import {node, type Node} from "./Node.ts";
+import {node, Node} from "./Node.ts";
+import {Backpressure, type BackpressureStrategy} from "./SharedAsyncIterable.ts";
 
 /** Manages a graph of reactive nodes with automatic dependency tracking */
-export class Dataflow {
+export class Graph {
+    constructor(private backpressure: BackpressureStrategy = Backpressure.fastest) {
+    }
+
     /** Creates nodes from a function, parsing inputs/outputs to build the dependency graph */
-    define(fun:Function): { [id: string]: Node };
-    define(key: string, fun: Function): { [id: string]: Node };
-    define(...args:any[]): { [id: string]: Node } {
+    define(fun:Function): { [id: string]: Node<any> };
+    define(key: string, fun: Function): { [id: string]: Node<any> };
+    define(...args:any[]): { [id: string]: Node<any> } {
         const fun = args.find(v => typeof v === "function")!;
         const key = args.find(v => typeof v === 'string') || (fun.name === '' ? simpleHash(fun.toString()) : fun.name);
         const definition = parseFunction(fun);
@@ -24,12 +28,12 @@ export class Dataflow {
         ])
     }
 
-    private nodes = new Map<string, Node>();
+    private nodes = new Map<string, Node<any>>();
 
     /** Creates and registers a node with explicit key, inputs, and function */
-    set(key: string, inputs: string[], fun: Function): Node {
+    set(key: string, inputs: string[], fun: Function): Node<any> {
         const dependencies = inputs.map(input => this.nodes.get(input)!);
-        const newNode = node(key, dependencies, fun);
+        const newNode = node(key, dependencies, fun, this.backpressure);
         this.nodes.set(key, newNode);
         return newNode
     }

@@ -4,24 +4,25 @@
  * All active consumers must call .next() before the underlying iterator advances.
  * No buffering - consumers are synchronized in lock-step.
  *
- * Inspired by Highland.js fork() pattern.
- *
  * @module
  */
 
 export type BackpressureStrategy = (ready: boolean[]) => boolean;
 
+/** Backpressure is a collection of built-in strategies */
 export class Backpressure {
+    /** Backpressure is applied based on the slowest consumer */
     static slowest: BackpressureStrategy = (ready: boolean[]) => {
         return ready.every(status => status);
     }
 
+    /** Backpressure is applied based on the fastest consumer */
     static fastest: BackpressureStrategy = (ready: boolean[]) => {
         return ready.some(status => status);
     }
 }
 
-/** Shares an async iterator across multiple consumers with back-pressure synchronization */
+/** Shares an async iterator across multiple consumers with backpressure synchronization */
 export class SharedAsyncIterable<T> implements AsyncIterable<T> {
     private iterator?: AsyncIterator<T>;
     private consumers: Set<SharedAsyncIterator<T>> = new Set();

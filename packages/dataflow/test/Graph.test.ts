@@ -1,59 +1,59 @@
 import {describe, test} from "bun:test";
-import {Dataflow} from "../src/Dataflow.ts";
+import {Graph} from "../src/Graph.ts";
 import {toPromiseArray} from "@bodar/totallylazy/collections/Array.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 
-describe("Dataflow", () => {
+describe("graph", () => {
     test("if the function has a name use that as the key", async () => {
-        const dataflow = new Dataflow();
-        const {constant} = dataflow.define(function constant() {
+        const graph = new Graph();
+        const {constant} = graph.define(function constant() {
             return 1;
         });
         assertThat(await toPromiseArray(constant), equals([1]));
     });
 
     test("otherwise calculate the hash of the function source", async () => {
-        const dataflow = new Dataflow();
-        const {rmbt6f} = dataflow.define(function () {
+        const graph = new Graph();
+        const {rmbt6f} = graph.define(function () {
             return 1;
         });
         assertThat(await toPromiseArray(rmbt6f), equals([1]));
     });
 
     test("can provide a key explicitly", async () => {
-        const dataflow = new Dataflow();
-        const {fun} = dataflow.define('fun', function () {
+        const graph = new Graph();
+        const {fun} = graph.define('fun', function () {
             return 1;
         });
         assertThat(await toPromiseArray(fun), equals([1]));
     });
 
     test("can create a node from a function that returns a value, if it has no inputs it only ever have 1 result", async () => {
-        const dataflow = new Dataflow();
-        const {node} = dataflow.define('node', () => 1);
+        const graph = new Graph();
+        const {node} = graph.define('node', () => 1);
         assertThat(await toPromiseArray(node), equals([1]));
     });
 
     test("Can iterate multiple times and it still returns the same state", async () => {
-        const dataflow = new Dataflow();
-        const {node} = dataflow.define('node', () => 1);
+        const graph = new Graph();
+        const {node} = graph.define('node', () => 1);
         assertThat(await toPromiseArray(node), equals([1]));
         assertThat(await toPromiseArray(node), equals([1]));
     });
 
     test("nodes can depend on other nodes", async () => {
-        const dataflow = new Dataflow();
-        dataflow.define("nodeA", () => 1);
-        const {nodeB} = dataflow.define('nodeB', (nodeA: number) => nodeA * 2);
+        const graph = new Graph();
+        graph.define("nodeA", () => 1);
+        const {nodeB} = graph.define('nodeB', (nodeA: number) => nodeA * 2);
         assertThat(await toPromiseArray(nodeB), equals([2]));
     });
 
     test("functions are only called once unless their input change", async () => {
-        const dataflow = new Dataflow();
+        const graph = new Graph();
         let count = 0;
-        const {node} = dataflow.define(function node() {
+        const {node} = graph.define(function node() {
             count++;
             return 1;
         });
@@ -65,28 +65,48 @@ describe("Dataflow", () => {
     });
 
     test("if a function returns an generator then the node will yield the values not the generator", async () => {
-        const dataflow = new Dataflow();
-        const {test} = dataflow.define(function* test() {
+        const graph = new Graph();
+        const {test} = graph.define(function* test() {
             yield* [1, 2, 3];
         });
         assertThat(await toPromiseArray(test), equals([1, 2, 3]));
     });
 
+    test("if a function returns an async iterable it will yield the values", async () => {
+        const graph = new Graph();
+        const {test} = graph.define(function test() {
+            return {
+                async *[Symbol.asyncIterator]() {
+                    yield* [1, 2, 3];
+                }
+            }
+        });
+        assertThat(await toPromiseArray(test), equals([1, 2, 3]));
+    });
+
+    test("if a function returns a promise then the node will yield the value of the promise", async () => {
+        const graph = new Graph();
+        const {test} = graph.define(function test() {
+            return Promise.resolve(2);
+        });
+        assertThat(await toPromiseArray(test), equals([2]));
+    });
+
     test("can compose generators with constants", async () => {
-        const dataflow = new Dataflow();
-        dataflow.define('constant', () => 10);
-        dataflow.define(function* generator() {
+        const graph = new Graph();
+        graph.define('constant', () => 10);
+        graph.define(function* generator() {
             yield* [1, 2, 3];
         });
-        const {combined} = dataflow.define(function combined(constant: number, generator: number) {
+        const {combined} = graph.define(function combined(constant: number, generator: number) {
             return constant * generator
         });
         assertThat(await toPromiseArray(combined), equals([10, 20, 30]));
     });
 
     test("if a function returns multiple things then it will create multiple nodes", async () => {
-        const dataflow = new Dataflow();
-        const {fun, a, b} = dataflow.define('fun', () => ({a: 1, b: 2}));
+        const graph = new Graph();
+        const {fun, a, b} = graph.define('fun', () => ({a: 1, b: 2}));
         assertThat(await toPromiseArray(fun), equals([{a: 1, b: 2}]));
         assertThat(await toPromiseArray(a), equals([1]));
         assertThat(await toPromiseArray(b), equals([2]));

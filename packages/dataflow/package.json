@@ -7,8 +7,8 @@
   },
   "exports": {
     "./Node.ts": "./src/Node.ts",
-    "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts",
-    "./Dataflow.ts": "./src/Dataflow.ts"
+    "./Graph.ts": "./src/Graph.ts",
+    "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts"
   },
   "files": [
     "src",
