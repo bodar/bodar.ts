@@ -18,8 +18,6 @@ ${this.body}
 return {${this.outputs.join(',')}};
 }`;
     }
-
-
 }
 
 export class HTMLTransformer {
@@ -87,7 +85,7 @@ export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementCon
         end.before(`<script type="module">
 import {Graph} from "@bodar/dataflow/Graph.ts";
 const graph = new Graph();
-${this.controller.definitions.map((d: NodeDefinition) => `graph.define(${[...d]});`)}
+${this.controller.definitions.map((d: NodeDefinition) => `graph.define(${[...d]});`).join('\n')}
 </script>`, {html: true})
     }
 }
