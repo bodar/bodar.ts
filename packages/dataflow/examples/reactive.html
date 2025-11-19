@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reactive Test</title>
+</head>
+<body>
+<script type="module" reactive>`The time now is ${now}`</script>
+<script type="module" reactive>
+    const now = function* () {
+        while (true) {
+            yield Date.now();
+        }
+    }
+</script>
+Hello World!
+</body>
+</html>

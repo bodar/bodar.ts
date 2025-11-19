@@ -1,5 +1,10 @@
+/** @module
+ * Module
+ * **/
 import {simpleHash} from "./simpleHash.ts";
 import {findTopLevelVariableDeclarations, findUnresolvedReferences, parseScript} from "./function-parsing.ts";
+import {topologicalSort} from "./TopologicalSort.ts";
+
 
 export class NodeDefinition {
     constructor(public key: string,
@@ -9,17 +14,19 @@ export class NodeDefinition {
     ) {
     }
 
-    *[Symbol.iterator]() {
-        yield JSON.stringify(this.key);
-        yield JSON.stringify(this.inputs);
-        yield JSON.stringify(this.outputs);
-        yield `(${this.inputs.join(',')}) => {
+    toString() {
+        return `${JSON.stringify(this.key)},${JSON.stringify(this.inputs)},${JSON.stringify(this.outputs)},${this.fun()}`;
+    }
+
+    fun(): string {
+        return `(${this.inputs.join(',')}) => {
 ${this.body}
 return {${this.outputs.join(',')}};
 }`;
     }
 }
 
+/** HTMLTransformer **/
 export class HTMLTransformer {
     constructor(private rewriter: HTMLRewriter) {
         this.rewriter.on('script[reactive]', new ScriptTransformer(this))
@@ -83,10 +90,11 @@ export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementCon
     }
 
     endTag(end: HTMLRewriterTypes.EndTag) {
+        const sorted = topologicalSort(this.controller.definitions);
         end.before(`<script type="module">
 import {Graph} from "@bodar/dataflow/Graph.ts";
 const graph = new Graph();
-${this.controller.definitions.map((d: NodeDefinition) => `graph.define(${[...d]});`).join('\n')}
+${sorted.map((d: NodeDefinition) => `graph.define(${d});`).join('\n')}
 </script>`, {html: true})
     }
 }

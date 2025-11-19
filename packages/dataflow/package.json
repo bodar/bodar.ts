@@ -7,8 +7,10 @@
     "acorn-walk": "^8.3.4"
   },
   "exports": {
+    "./HTMLTransformer.ts": "./src/HTMLTransformer.ts",
     "./Node.ts": "./src/Node.ts",
     "./Graph.ts": "./src/Graph.ts",
+    "./Renderer.ts": "./src/Renderer.ts",
     "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts"
   },
   "files": [

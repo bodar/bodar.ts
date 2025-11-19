@@ -32,6 +32,12 @@ export class Graph {
 
     /** Creates and registers a node with explicit key, inputs, and function */
     set(key: string, inputs: string[], fun: Function): Node<any> {
+        // Validate all input dependencies exist
+        const missing = inputs.filter(input => !this.nodes.has(input));
+        if (missing.length > 0) {
+            throw new Error(`Cannot set node "${key}": missing dependencies [${missing.join(', ')}]`);
+        }
+
         const dependencies = inputs.map(input => this.nodes.get(input)!);
         const newNode = node(key, dependencies, fun, this.backpressure);
         this.nodes.set(key, newNode);
