@@ -3,8 +3,8 @@ import {
     type Expression,
     type Function as FunDef,
     type Identifier,
-    type ObjectExpression,
-    parseExpressionAt,
+    type ObjectExpression, parse,
+    parseExpressionAt, type Program,
     type Property
 } from "acorn";
 
@@ -15,6 +15,16 @@ function findFunction(statement: Expression): FunDef | undefined {
         case 'ArrowFunctionExpression':
             return statement;
     }
+}
+
+export function parseScript(javascript: string): Program {
+    return parse(javascript, {ecmaVersion: "latest"});
+}
+
+export function findTopLevelVariableDeclarations(program: Program): string[] {
+    const variables = program.body.filter(v => v.type === 'VariableDeclaration');
+    return variables.flatMap(v=> v.declarations)
+        .map(d => d.id.type === 'Identifier' ? d.id.name : '')
 }
 
 export function parseFunction(fun: Function): FunDef {
