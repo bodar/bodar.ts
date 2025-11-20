@@ -5,13 +5,16 @@
 import {isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator} from "./IsAsyncIterable.ts";
 import {combineLatest} from "./combineLatest.ts";
 import {equal} from "@bodar/totallylazy/functions/equal.ts";
-import {SharedAsyncIterable, Backpressure, type BackpressureStrategy} from "./SharedAsyncIterable.ts";
+import {type BackpressureStrategy, SharedAsyncIterable} from "./SharedAsyncIterable.ts";
+import type {ThrottleStrategy} from "./Throttle.ts";
 
 /** Node implementation that uses combineLatest to merge dependency streams and memoizes results */
 export class Node<T> implements AsyncIterable<T> {
     private shared?: SharedAsyncIterable<T>;
 
-    constructor(public key: string, public dependencies: Node<any>[], public fun: Function, private backpressure: BackpressureStrategy) {
+    constructor(public key: string, public dependencies: Node<any>[], public fun: Function,
+                private backpressure: BackpressureStrategy,
+                private throttle: ThrottleStrategy) {
     }
 
     [Symbol.asyncIterator](): AsyncIterator<T> {
@@ -42,28 +45,38 @@ export class Node<T> implements AsyncIterable<T> {
     }
 
     async* processResult(result: any): AsyncGenerator<T> {
+        const iterable = this.getIterable(result);
+        if(iterable) {
+            for await (const value of iterable) {
+                yield value;
+                await this.throttle();
+            }
+        } else {
+            yield result;
+        }
+    }
+
+    getIterable(result: any): AsyncIterable<T> | undefined {
         if (isAsyncIterable(result)) {
-            yield* result;
+            return result;
         } else if (isAsyncIterator(result)) {
-            yield* {
+            return {
                 [Symbol.asyncIterator]() {
                     return result;
                 }
             };
         } else if (isAsyncGeneratorFunction(result)) {
             const iterator = result() as AsyncGenerator<T>;
-            yield* {
+            return {
                 [Symbol.asyncIterator]() {
                     return iterator;
                 }
             };
-        } else {
-            yield result;
         }
     }
 }
 
 /** Factory function to create a new reactive node */
-export function node<T>(key: string, dependencies: Node<any>[], fun: Function, backpressure: BackpressureStrategy = Backpressure.fastest): Node<T> {
-    return new Node(key, dependencies, fun, backpressure)
+export function node<T>(key: string, dependencies: Node<any>[], fun: Function, backpressure: BackpressureStrategy, throttle: ThrottleStrategy): Node<T> {
+    return new Node(key, dependencies, fun, backpressure, throttle)
 }

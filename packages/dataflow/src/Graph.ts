@@ -7,10 +7,12 @@ import {getInputs, getOutputs, parseFunction} from "./function-parsing.ts";
 import {node, Node} from "./Node.ts";
 import {Backpressure, type BackpressureStrategy} from "./SharedAsyncIterable.ts";
 import {lazy} from "@bodar/totallylazy/functions/lazy.ts";
+import {Throttle, type ThrottleStrategy} from "./Throttle.ts";
 
 /** Manages a graph of reactive nodes with automatic dependency tracking */
 export class Graph {
-    constructor(private backpressure: BackpressureStrategy = Backpressure.fastest) {
+    constructor(private backpressure: BackpressureStrategy = Backpressure.fastest,
+                private throttle: ThrottleStrategy = Throttle.auto()) {
     }
 
     /** Creates nodes from a function, parsing inputs/outputs to build the dependency graph */
@@ -39,7 +41,7 @@ export class Graph {
         }
 
         const dependencies = inputs.map(input => this.nodes.get(input)!);
-        const newNode = node(key, dependencies, fun, this.backpressure);
+        const newNode = node(key, dependencies, fun, this.backpressure, this.throttle);
         this.nodes.set(key, newNode);
         return newNode
     }
