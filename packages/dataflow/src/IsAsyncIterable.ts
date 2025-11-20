@@ -9,3 +9,9 @@ export function isAsyncIterator(instance: any): instance is AsyncIterator<any> {
 export function isPromiseLike(instance: any): instance is PromiseLike<any> {
     return typeof instance == 'object' && typeof instance.then === 'function';
 }
+
+const AsyncGeneratorFunction = (function*(){yield undefined;}).constructor;
+
+export function isAsyncGeneratorFunction(instance: any): instance is AsyncGeneratorFunction {
+    return typeof instance == 'function' && instance instanceof AsyncGeneratorFunction;
+}

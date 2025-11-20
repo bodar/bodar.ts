@@ -2,7 +2,7 @@
  * Reactive nodes that combine dependency streams and yield computed values
  * @module
  */
-import {isAsyncIterable, isAsyncIterator} from "./IsAsyncIterable.ts";
+import {isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator} from "./IsAsyncIterable.ts";
 import {combineLatest} from "./combineLatest.ts";
 import {equal} from "@bodar/totallylazy/functions/equal.ts";
 import {SharedAsyncIterable, Backpressure, type BackpressureStrategy} from "./SharedAsyncIterable.ts";
@@ -48,6 +48,13 @@ export class Node<T> implements AsyncIterable<T> {
             yield* {
                 [Symbol.asyncIterator]() {
                     return result;
+                }
+            };
+        } else if (isAsyncGeneratorFunction(result)) {
+            const iterator = result() as AsyncGenerator<T>;
+            yield* {
+                [Symbol.asyncIterator]() {
+                    return iterator;
                 }
             };
         } else {

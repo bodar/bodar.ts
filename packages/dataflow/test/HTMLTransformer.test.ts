@@ -6,9 +6,9 @@ describe("HTMLTransformer", () => {
         const transformer = new HTMLTransformer(new HTMLRewriter());
         const result = transformer.transform('<body><script reactive>const a = 1;</script></body>');
         expect(result).toBe(`<body><!--?placeholder id="vge10p"?--><script type="module">
-import {Graph} from "@bodar/dataflow/Graph.ts";
-const graph = new Graph();
-graph.define("vge10p",[],["a"],() => {
+import {Renderer} from "@bodar/dataflow/Renderer.ts";
+const renderer = new Renderer();
+renderer.render("vge10p",[],["a"],() => {
 const a = 1;
 return {a};
 });
@@ -19,13 +19,13 @@ return {a};
         const transformer = new HTMLTransformer(new HTMLRewriter());
         const result = transformer.transform('<body><script reactive>const a = 1;</script><script reactive>const b = a + 1;</script></body>');
         expect(result).toBe(`<body><!--?placeholder id="vge10p"?--><!--?placeholder id="vk6clg"?--><script type="module">
-import {Graph} from "@bodar/dataflow/Graph.ts";
-const graph = new Graph();
-graph.define("vge10p",[],["a"],() => {
+import {Renderer} from "@bodar/dataflow/Renderer.ts";
+const renderer = new Renderer();
+renderer.render("vge10p",[],["a"],() => {
 const a = 1;
 return {a};
 });
-graph.define("vk6clg",["a"],["b"],(a) => {
+renderer.render("vk6clg",["a"],["b"],(a) => {
 const b = a + 1;
 return {b};
 });

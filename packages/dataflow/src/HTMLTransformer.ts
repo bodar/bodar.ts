@@ -4,6 +4,7 @@
 import {simpleHash} from "./simpleHash.ts";
 import {findTopLevelVariableDeclarations, findUnresolvedReferences, parseScript} from "./function-parsing.ts";
 import {topologicalSort} from "./TopologicalSort.ts";
+import {placeholder} from "./Placeholder.ts";
 
 
 export class NodeDefinition {
@@ -65,7 +66,7 @@ export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementC
 
     endTag(end: HTMLRewriterTypes.EndTag) {
         const id = this.controller.addScript(this.getJavascript());
-        end.after(`<!--?placeholder id="${id}"?-->`, {html: true})
+        end.after(`<!--${placeholder(id)}-->`, {html: true})
         end.remove();
     }
 
@@ -92,9 +93,9 @@ export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementCon
     endTag(end: HTMLRewriterTypes.EndTag) {
         const sorted = topologicalSort(this.controller.definitions);
         end.before(`<script type="module">
-import {Graph} from "@bodar/dataflow/Graph.ts";
-const graph = new Graph();
-${sorted.map((d: NodeDefinition) => `graph.define(${d});`).join('\n')}
+import {Renderer} from "@bodar/dataflow/Renderer.ts";
+const renderer = new Renderer();
+${sorted.map((d: NodeDefinition) => `renderer.render(${d});`).join('\n')}
 </script>`, {html: true})
     }
 }

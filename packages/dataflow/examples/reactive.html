@@ -5,12 +5,17 @@
     <title>Reactive Test</title>
 </head>
 <body>
-<script type="module" reactive>`The time now is ${now}`</script>
+<script type="module" reactive>const s = `The time now is ${now}`</script>
 <script type="module" reactive>
     const now = function* () {
-        while (true) {
-            yield Date.now();
-        }
+        yield* [0,1,2,3,4,5,6,7,8,9]
+    }
+</script>
+<script type="importmap">
+    {
+      "imports": {
+        "@bodar/": "/"
+      }
     }
 </script>
 Hello World!

@@ -76,7 +76,7 @@ describe("graph", () => {
         const graph = new Graph();
         const {test} = graph.define(function test() {
             return {
-                async *[Symbol.asyncIterator]() {
+                async* [Symbol.asyncIterator]() {
                     yield* [1, 2, 3];
                 }
             }
@@ -87,7 +87,7 @@ describe("graph", () => {
     test("if a function returns a promise then the node will yield the value of the promise", async () => {
         const graph = new Graph();
         graph.define('promise', () => Promise.resolve(2));
-        const {test} = graph.define(function test(promise:number) {
+        const {test} = graph.define(function test(promise: number) {
             return promise * 3;
         });
         assertThat(await toPromiseArray(test), equals([6]));
@@ -111,6 +111,36 @@ describe("graph", () => {
         assertThat(await toPromiseArray(fun), equals([{a: 1, b: 2}]));
         assertThat(await toPromiseArray(a), equals([1]));
         assertThat(await toPromiseArray(b), equals([2]));
+    });
+
+    test("generators still work when there are multiple objects returned", async () => {
+        const graph = new Graph();
+        const {b} = graph.define('fun', () => ({
+            a: 1, b: function* () {
+                yield* [1, 2, 3];
+            }
+        }));
+        assertThat(await toPromiseArray(b), equals([1, 2, 3]));
+    });
+
+    test("can detect the sink nodes of the graph", async () => {
+        const graph = new Graph();
+        graph.define('a', () => 1);
+        graph.define('b', (a: number) => a + 2);
+        graph.define('c', () => 3);
+        const {d} = graph.define('d', (b: number, c: number) => b + c + 4);
+        const {e} = graph.define('e', () => 5);
+        assertThat(graph.sinks(), equals([d, e]));
+    });
+
+    test("can detect the source nodes of the graph", async () => {
+        const graph = new Graph();
+        const {a} = graph.define('a', () => 1);
+        graph.define('b', (a: number) => a + 2);
+        const {c} = graph.define('c', () => 3);
+        graph.define('d', (b: number, c: number) => b + c + 4);
+        const {e} = graph.define('e', () => 5);
+        assertThat(graph.sources(), equals([a, c, e]));
     });
 })
 

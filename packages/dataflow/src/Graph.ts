@@ -14,13 +14,13 @@ export class Graph {
     }
 
     /** Creates nodes from a function, parsing inputs/outputs to build the dependency graph */
-    define(fun:Function): { [id: string]: Node<any> };
+    define(fun: Function): { [id: string]: Node<any> };
     define(key: string, fun: Function): { [id: string]: Node<any> };
     define(key: string, inputs: string[], outputs: string[], fun: Function): { [id: string]: Node<any> };
-    define(...args:any[]): { [id: string]: Node<any> } {
+    define(...args: any[]): { [id: string]: Node<any> } {
         const fun = args.find(v => typeof v === "function")!;
         const key = args.find(v => typeof v === 'string') || (fun.name === '' ? simpleHash(fun.toString()) : fun.name);
-        const definition = lazy(() =>  parseFunction(fun));
+        const definition = lazy(() => parseFunction(fun));
         const [inputs = getInputs(definition), outputs = getOutputs(definition)] = args.filter(Array.isArray) as string[][];
         return Object.fromEntries([
             [key, this.set(key, inputs, fun)],
@@ -42,6 +42,20 @@ export class Graph {
         const newNode = node(key, dependencies, fun, this.backpressure);
         this.nodes.set(key, newNode);
         return newNode
+    }
+
+    sinks(): Node<any>[] {
+        const keys = new Set(this.nodes.keys());
+        for (const node of this.nodes.values()) {
+            for (const dependency of node.dependencies) {
+                keys.delete(dependency.key)
+            }
+        }
+        return Array.from(keys).map(node => this.nodes.get(node)!)
+    }
+
+    sources(): Node<any>[] {
+        return Array.from(this.nodes.values().filter(n => n.dependencies.length === 0));
     }
 }
 
