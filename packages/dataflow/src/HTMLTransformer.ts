@@ -95,7 +95,8 @@ export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementCon
 <script type="module">
 import {Renderer} from "@bodar/dataflow/Renderer.ts";
 const renderer = new Renderer();
-${sorted.map((d: NodeDefinition) => `renderer.render(${d});`).join('\n')}
+${sorted.map((d: NodeDefinition) => `renderer.register(${d});`).join('\n')}
+renderer.render();
 </script>`, {html: true})
     }
 }

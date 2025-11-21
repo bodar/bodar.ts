@@ -9,10 +9,10 @@
 <p>This is our first reactive document. <script type="module" reactive>const time = `The current time is ${new Date(now).toLocaleTimeString("en-GB")}.`</script></p>
 <!--TODO support JSX to native DOM-->
 <script type="module" reactive>
-    const color = (now / 10) % 360;
     const rainbow = document.createElement('div');
-    rainbow.style.color = `hsl(${color} 100% 50%)`;
+    rainbow.style.color = `hsl(${((now / 10) % 360)} 100% 50%)`;
     rainbow.innerText = 'Rainbow text!';
+    console.log(rainbow.style.color);
 </script>
 <script type="module" reactive>
     const now = function* () {

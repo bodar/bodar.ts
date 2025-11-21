@@ -8,13 +8,17 @@ export class Renderer {
     constructor(private graph: Graph = new Graph(), private doc: Document = document) {
     }
 
-    async render(key: string, inputs: string[], outputs: string[], fun: Function) {
-        const nodes = this.graph.define(key, inputs, outputs, fun);
-        Object.entries(nodes).map(async ([id, node]) => {
-            const slot = this.doc.querySelector(`slot[name="${id}"]`)!;
+    async register(key: string, inputs: string[], outputs: string[], fun: Function) {
+        this.graph.define(key, inputs, outputs, fun);
+    }
+
+    render() {
+        this.graph.sinks().map(async (node) => {
+            const slot = this.doc.querySelector(`slot[name="${node.key}"]`)!;
             for await (const update of node) {
                 const newNode = this.createUpdateNode(update);
                 if (!newNode) continue;
+                if(newNode instanceof HTMLDivElement) console.log('div', newNode.style.color);
                 slot.replaceChildren(newNode);
             }
         });

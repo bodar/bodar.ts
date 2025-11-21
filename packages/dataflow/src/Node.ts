@@ -4,7 +4,6 @@
  */
 import {isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isGeneratorFunction} from "./type-guards.ts";
 import {combineLatest} from "./combineLatest.ts";
-import {equal} from "@bodar/totallylazy/functions/equal.ts";
 import {type BackpressureStrategy, SharedAsyncIterable} from "./SharedAsyncIterable.ts";
 import type {ThrottleStrategy} from "./Throttle.ts";
 
@@ -34,7 +33,7 @@ export class Node<T> implements AsyncIterable<T> {
     private lastResult?: any;
 
     async* execute(currentInputs: any[]): AsyncGenerator<T> {
-        if (equal(this.lastInputs, currentInputs)) {
+        if (this.shallowEqual(this.lastInputs, currentInputs)) {
             yield* this.processResult(this.lastResult);
         } else {
             let currentResult = this.fun(...currentInputs);
@@ -42,6 +41,15 @@ export class Node<T> implements AsyncIterable<T> {
             this.lastResult = currentResult;
             yield* this.processResult(currentResult);
         }
+    }
+
+    private shallowEqual(a: any[] | undefined, b: any[]): boolean {
+        if(a === undefined) return false;
+        if (a.length != b.length) return false;
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) return false;
+        }
+        return true;
     }
 
     async* processResult(result: any): AsyncGenerator<T> {
@@ -72,9 +80,9 @@ export class Node<T> implements AsyncIterable<T> {
                 }
             };
         } else if (isGeneratorFunction(result) && result.length === 0) {
+            const iterator = result() as Generator<T>;
             return {
                 async* [Symbol.asyncIterator]() {
-                    const iterator = result() as Generator<T>;
                     yield* {
                         [Symbol.iterator]() {
                             return iterator
