@@ -1,3 +1,6 @@
+import {Promises, type RaceResult} from "./Promises.ts";
+import {isPromiseLike} from "./IsAsyncIterable.ts";
+
 /**
  * Combines multiple async iterables into a single async iterable that emits
  * an array of the latest values whenever any source emits.
@@ -7,6 +10,7 @@
  * 2. After initial emission, emits whenever ANY source emits
  * 3. When a source completes, continues using its last value
  * 4. Completes when ALL sources complete
+ * 5. Batches synchronous updates to prevent glitches (transient inconsistent states)
  *
  * @param iterables Array of async iterables to combine
  * @yields Array of latest values from each source
@@ -21,42 +25,37 @@
  * }
  * ```
  */
-export async function* combineLatest<T extends any[]>(
-    iterables: { [K in keyof T]: AsyncIterable<T[K]> }
-): AsyncIterableIterator<T> {
-    const iterators = (iterables as AsyncIterable<any>[]).map(it => it[Symbol.asyncIterator]());
+export async function* combineLatest(
+    iterables: AsyncIterable<any>[]
+): AsyncIterableIterator<any[]> {
+    const iterators = iterables.map(it => it[Symbol.asyncIterator]());
 
-    // Wait for all iterators to emit at least once
-    let results = await Promise.all(iterators.map(i => i.next()));
-    let currentValues = results.map(r => r.value) as T;
-    yield [...currentValues] as T;
-
-    // Create ONE pending promise per active iterator
-    const pending = new Map<number, Promise<{ index: number, result: IteratorResult<any> }>>();
-
-    for (let i = 0; i < iterators.length; i++) {
-        if (!results[i].done) {
-            pending.set(i, iterators[i].next().then(result => ({ index: i, result })));
-        }
+    if (iterators.length === 0) {
+        yield [];
+        return;
     }
 
-    while (pending.size > 0) {
-        // Race current pending promises
-        const { index, result } = await Promise.race(pending.values());
+    const results = await Promise.all(iterators.map(i => i.next()));
+    let complete = results.map(r => !!r.done)
+    const currentValues = results.map(r => r.value);
+    yield currentValues.slice();
 
-        // Remove this promise from pending
-        pending.delete(index);
-
-        // Update state
-        results[index] = result;
-
-        if (!result.done) {
-            currentValues[index] = result.value;
-
-            // Create NEW promise for this iterator
-            pending.set(index, iterators[index].next().then(r => ({ index, result: r })));
-
-            yield [...currentValues] as T;
+    while (true) {
+        const partial = await Promises.raceAll(iterators.map(i => i.next()));
+        partial.forEach((r, i) => {
+            if (!isPromiseLike(r)) {
+                if (r.done) complete[i] = true;
+                else currentValues[i] = r.value;
+            }
+        })
+        if (complete.every(c => c)) break;
+        else {
+            if (noUpdate(partial)) continue;
+            yield currentValues.slice();
         }
     }
+}
+
+function noUpdate(results: RaceResult<IteratorYieldResult<any> | IteratorReturnResult<any>>[]): boolean {
+    return results.every((result) => isPromiseLike(result) || !!result.done);
 }
