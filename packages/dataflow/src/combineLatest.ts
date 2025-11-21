@@ -27,7 +27,7 @@ import {Promises} from "./Promises.ts";
 export async function* combineLatest(
     iterables: AsyncIterable<any>[]
 ): AsyncIterableIterator<any[]> {
-    const iterators = iterables.map(((it, index) => ({iterator: it[Symbol.asyncIterator](), index})));
+    let iterators = iterables.map(((it, index) => ({iterator: it[Symbol.asyncIterator](), index})));
 
     if (iterators.length === 0) {
         yield [];
@@ -38,8 +38,8 @@ export async function* combineLatest(
     const complete = results.map(r => !!r.done)
     const currentValues = results.map(r => r.value);
     yield currentValues.slice();
-    const pending = new Map<number, Promise<any>>();
 
+    const pending = new Map<number, Promise<any>>();
     while (true) {
         const promises = iterators.map(({iterator, index}) => {
             if (pending.has(index)) return pending.get(index)!;
@@ -52,9 +52,9 @@ export async function* combineLatest(
             pending.delete(index);
             if (result.done) {
                 complete[index] = true;
-                iterators.splice(index, 1);
             } else currentValues[index] = result.value;
         })
+        iterators = iterators.filter(({index}) => !complete[index]);
         if (complete.every(c => c)) break;
         else {
             if (noUpdate(updates)) continue;

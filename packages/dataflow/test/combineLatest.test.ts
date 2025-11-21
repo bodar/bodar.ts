@@ -99,7 +99,7 @@ describe("combineLatest", () => {
         ]));
     });
 
-    test.only("preserves order of emissions within racing", async () => {
+    test("preserves order of emissions within racing", async () => {
         async function* fast() {
             yield 1;
             yield 2;
