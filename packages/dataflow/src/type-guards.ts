@@ -10,7 +10,15 @@ export function isPromiseLike(instance: any): instance is PromiseLike<any> {
     return typeof instance == 'object' && typeof instance.then === 'function';
 }
 
-const AsyncGeneratorFunction = (function*(){yield undefined;}).constructor;
+const GeneratorFunction = (function* () {
+}).constructor;
+
+export function isGeneratorFunction(instance: any): instance is GeneratorFunction {
+    return typeof instance == 'function' && instance instanceof GeneratorFunction;
+}
+
+const AsyncGeneratorFunction = (async function* () {
+}).constructor;
 
 export function isAsyncGeneratorFunction(instance: any): instance is AsyncGeneratorFunction {
     return typeof instance == 'function' && instance instanceof AsyncGeneratorFunction;

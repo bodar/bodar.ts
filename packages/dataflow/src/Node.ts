@@ -2,7 +2,7 @@
  * Reactive nodes that combine dependency streams and yield computed values
  * @module
  */
-import {isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator} from "./IsAsyncIterable.ts";
+import {isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isGeneratorFunction} from "./type-guards.ts";
 import {combineLatest} from "./combineLatest.ts";
 import {equal} from "@bodar/totallylazy/functions/equal.ts";
 import {type BackpressureStrategy, SharedAsyncIterable} from "./SharedAsyncIterable.ts";
@@ -46,7 +46,7 @@ export class Node<T> implements AsyncIterable<T> {
 
     async* processResult(result: any): AsyncGenerator<T> {
         const iterable = this.getIterable(result);
-        if(iterable) {
+        if (iterable) {
             for await (const value of iterable) {
                 yield value;
                 await this.throttle();
@@ -65,11 +65,21 @@ export class Node<T> implements AsyncIterable<T> {
                     return result;
                 }
             };
-        } else if (isAsyncGeneratorFunction(result)) {
-            const iterator = result() as AsyncGenerator<T>;
+        } else if (isAsyncGeneratorFunction(result) && result.length === 0) {
             return {
                 [Symbol.asyncIterator]() {
-                    return iterator;
+                    return result() as AsyncGenerator<T>;
+                }
+            };
+        } else if (isGeneratorFunction(result) && result.length === 0) {
+            return {
+                async* [Symbol.asyncIterator]() {
+                    const iterator = result() as Generator<T>;
+                    yield* {
+                        [Symbol.iterator]() {
+                            return iterator
+                        }
+                    }
                 }
             };
         }
