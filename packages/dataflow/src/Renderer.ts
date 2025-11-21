@@ -18,7 +18,6 @@ export class Renderer {
             for await (const update of node) {
                 const newNode = this.createUpdateNode(update);
                 if (!newNode) continue;
-                if(newNode instanceof HTMLDivElement) console.log('div', newNode.style.color);
                 slot.replaceChildren(newNode);
             }
         });
