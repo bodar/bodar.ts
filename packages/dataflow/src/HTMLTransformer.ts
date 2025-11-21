@@ -4,7 +4,6 @@
 import {simpleHash} from "./simpleHash.ts";
 import {findTopLevelVariableDeclarations, findUnresolvedReferences, parseScript} from "./function-parsing.ts";
 import {topologicalSort} from "./TopologicalSort.ts";
-import {placeholder} from "./Placeholder.ts";
 
 
 export class NodeDefinition {
@@ -43,13 +42,13 @@ export class HTMLTransformer {
 
     definitions: NodeDefinition[] = [];
 
-    addScript(javascript: string): string {
+    addScript(javascript: string): string[] {
         const program = parseScript(javascript);
         const inputs = findUnresolvedReferences(program);
         const outputs = findTopLevelVariableDeclarations(program);
         const key = simpleHash(javascript);
         this.definitions.push(new NodeDefinition(key, inputs, outputs, javascript))
-        return key;
+        return [key, ...outputs];
     }
 }
 
@@ -65,8 +64,8 @@ export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementC
     }
 
     endTag(end: HTMLRewriterTypes.EndTag) {
-        const id = this.controller.addScript(this.getJavascript());
-        end.after(`<!--${placeholder(id)}-->`, {html: true})
+        const names = this.controller.addScript(this.getJavascript());
+        end.after(names.map(name => `<slot name="${name}"></slot>`).join(""), {html: true})
         end.remove();
     }
 
@@ -92,7 +91,8 @@ export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementCon
 
     endTag(end: HTMLRewriterTypes.EndTag) {
         const sorted = topologicalSort(this.controller.definitions);
-        end.before(`<script type="module">
+        end.before(`<script type="importmap"> { "imports": { "@bodar/": "/" } }</script>
+<script type="module">
 import {Renderer} from "@bodar/dataflow/Renderer.ts";
 const renderer = new Renderer();
 ${sorted.map((d: NodeDefinition) => `renderer.render(${d});`).join('\n')}
