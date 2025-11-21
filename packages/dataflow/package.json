@@ -4,18 +4,25 @@
   "type": "module",
   "dependencies": {
     "acorn": "^8.15.0",
-    "acorn-walk": "^8.3.4"
+    "acorn-jsx": "^5.3.2",
+    "acorn-walk": "^8.3.4",
+    "astring": "^1.9.0",
+    "mxn-jsx-ast-transformer": "^0.8.7"
   },
   "exports": {
     "./HTMLTransformer.ts": "./src/HTMLTransformer.ts",
     "./Node.ts": "./src/Node.ts",
     "./Graph.ts": "./src/Graph.ts",
     "./Renderer.ts": "./src/Renderer.ts",
-    "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts"
+    "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts",
+    "./jsx2dom/JSX2DOM.ts": "./src/jsx2dom/JSX2DOM.ts"
   },
   "files": [
     "src",
     "README.md",
     "package.json"
-  ]
+  ],
+  "devDependencies": {
+    "linkedom": "^0.18.12"
+  }
 }

@@ -5,13 +5,17 @@ import {
     type Identifier,
     type Node,
     type ObjectExpression,
-    type Pattern,
-    parse,
     parseExpressionAt,
+    Parser,
+    type Pattern,
     type Program,
     type Property
 } from "acorn";
 import {ancestor} from "acorn-walk";
+import jsx from "acorn-jsx";
+import {generate} from "astring";
+// @ts-ignore
+import transform from "mxn-jsx-ast-transformer";
 
 function findFunction(statement: Expression): FunDef | undefined {
     switch (statement.type) {
@@ -23,12 +27,17 @@ function findFunction(statement: Expression): FunDef | undefined {
 }
 
 export function parseScript(javascript: string): Program {
-    return parse(javascript, {ecmaVersion: "latest"});
+    return Parser.extend(jsx()).parse(javascript, {ecmaVersion: "latest"});
+}
+
+export function processJSX(program: Program): string {
+    const ast = transform(program, {factory: "jsx.createElement"});
+    return generate(ast, {indent: "", lineEnd: "", comments: false});
 }
 
 export function findTopLevelVariableDeclarations(program: Program): string[] {
     const variables = program.body.filter(v => v.type === 'VariableDeclaration');
-    return variables.flatMap(v=> v.declarations)
+    return variables.flatMap(v => v.declarations)
         .map(d => d.id.type === 'Identifier' ? d.id.name : '')
 }
 

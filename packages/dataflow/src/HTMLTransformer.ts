@@ -2,7 +2,12 @@
  * Module
  * **/
 import {simpleHash} from "./simpleHash.ts";
-import {findTopLevelVariableDeclarations, findUnresolvedReferences, parseScript} from "./function-parsing.ts";
+import {
+    findTopLevelVariableDeclarations,
+    findUnresolvedReferences,
+    parseScript,
+    processJSX
+} from "./function-parsing.ts";
 import {topologicalSort} from "./TopologicalSort.ts";
 
 
@@ -19,7 +24,7 @@ export class NodeDefinition {
     }
 
     fun(): string {
-        if(this.outputs.length === 0) return `(${this.inputs.join(',')}) => ${this.body}`
+        if (this.outputs.length === 0) return `(${this.inputs.join(',')}) => ${this.body}`
         return `(${this.inputs.join(',')}) => {
 ${this.body}
 return {${this.outputs.join(',')}};
@@ -48,7 +53,9 @@ export class HTMLTransformer {
         const inputs = findUnresolvedReferences(program);
         const outputs = findTopLevelVariableDeclarations(program);
         const key = simpleHash(javascript);
-        this.definitions.push(new NodeDefinition(key, inputs, outputs, javascript))
+        let newJavascript = processJSX(program);
+        if (!javascript.endsWith(';') && newJavascript.endsWith(';')) newJavascript = newJavascript.slice(0, -1);
+        this.definitions.push(new NodeDefinition(key, inputs, outputs, newJavascript))
         return [key, ...outputs];
     }
 }
@@ -95,6 +102,8 @@ export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementCon
         end.before(`<script type="importmap"> { "imports": { "@bodar/": "/" } }</script>
 <script type="module">
 import {Renderer} from "@bodar/dataflow/Renderer.ts";
+import {JSX2DOM} from "@bodar/dataflow/jsx2dom/JSX2DOM.ts";
+const jsx = new JSX2DOM();
 const renderer = new Renderer();
 ${sorted.map((d: NodeDefinition) => `renderer.register(${d});`).join('\n')}
 renderer.render();
