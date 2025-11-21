@@ -43,6 +43,10 @@ export async function dev() {
     await test('--watch');
 }
 
+export async function demo() {
+    await $`bun run packages/dataflow/server.ts`;
+}
+
 export async function build() {
     await clean();
     await generateExports();
