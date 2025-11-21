@@ -9,10 +9,11 @@ describe("HTMLTransformer", () => {
 <script type="module">
 import {Renderer} from "@bodar/dataflow/Renderer.ts";
 const renderer = new Renderer();
-renderer.render("vge10p",[],["a"],() => {
+renderer.register("vge10p",[],["a"],() => {
 const a = 1;
 return {a};
 });
+renderer.render();
 </script></body>`);
     });
 
@@ -23,14 +24,31 @@ return {a};
 <script type="module">
 import {Renderer} from "@bodar/dataflow/Renderer.ts";
 const renderer = new Renderer();
-renderer.render("vge10p",[],["a"],() => {
+renderer.register("vge10p",[],["a"],() => {
 const a = 1;
 return {a};
 });
-renderer.render("vk6clg",["a"],["b"],(a) => {
+renderer.register("vk6clg",["a"],["b"],(a) => {
 const b = a + 1;
 return {b};
 });
+renderer.render();
+</script></body>`);
+    });
+
+    test("can transform reactive scripts that have no explicit outputs into a lambda", async () => {
+        const transformer = new HTMLTransformer(new HTMLRewriter());
+        const result = transformer.transform('<body><script reactive>const a = 1;</script><script reactive>`Some text ${a}`</script></body>');
+        expect(result).toBe(`<body><slot name="vge10p"></slot><slot name="a"></slot><slot name="4vhz4q"></slot><script type="importmap"> { "imports": { "@bodar/": "/" } }</script>
+<script type="module">
+import {Renderer} from "@bodar/dataflow/Renderer.ts";
+const renderer = new Renderer();
+renderer.register("vge10p",[],["a"],() => {
+const a = 1;
+return {a};
+});
+renderer.register("4vhz4q",["a"],[],(a) => \`Some text \${a}\`);
+renderer.render();
 </script></body>`);
     });
 });

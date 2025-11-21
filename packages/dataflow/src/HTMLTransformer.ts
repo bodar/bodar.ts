@@ -19,6 +19,7 @@ export class NodeDefinition {
     }
 
     fun(): string {
+        if(this.outputs.length === 0) return `(${this.inputs.join(',')}) => ${this.body}`
         return `(${this.inputs.join(',')}) => {
 ${this.body}
 return {${this.outputs.join(',')}};
