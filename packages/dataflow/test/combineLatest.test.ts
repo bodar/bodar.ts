@@ -101,26 +101,24 @@ describe("combineLatest", () => {
 
     test.only("preserves order of emissions within racing", async () => {
         async function* fast() {
-            yield "fast1";
-            yield "fast2";
-            yield "fast3";
+            yield 1;
+            yield 2;
+            yield 3;
         }
 
         async function* slow() {
-            yield 'slow1';
+            yield 'a';
             await new Promise(resolve => setTimeout(resolve, 50));
-            yield 'slow2';
-            yield 'slow3';
+            yield 'b';
         }
 
         const result = await toPromiseArray(combineLatest([fast(), slow()]));
 
         assertThat(result, equals([
-                ['fast1', 'slow1'],
-                ['fast2', 'slow1'],
-                ['fast3', 'slow1'],
-                ['fast3', 'slow2'],
-                ['fast3', 'slow3'],
+                [1, 'a'],
+                [2, 'a'],
+                [3, 'a'],
+                [3, 'b']
             ]));
 
     });

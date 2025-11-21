@@ -38,25 +38,31 @@ export async function* combineLatest(
     const complete = results.map(r => !!r.done)
     const currentValues = results.map(r => r.value);
     yield currentValues.slice();
+    const pending = new Map<number, Promise<any>>();
 
     while (true) {
-        const partial = await Promises.raceAll(iterators
-            .map(({iterator, index}) => iterator.next().then(result => ({result, index}))));
-        partial.forEach(({result, index}) => {
-                if (result.done) {
-                    complete[index] = true;
-                    iterators.splice(index, 1);
-                }
-                else currentValues[index] = result.value;
+        const promises = iterators.map(({iterator, index}) => {
+            if (pending.has(index)) return pending.get(index)!;
+            const promise = iterator.next().then(result => ({result, index}));
+            pending.set(index, promise);
+            return promise;
+        });
+        const updates = await Promises.raceAll(promises);
+        updates.forEach(({result, index}) => {
+            pending.delete(index);
+            if (result.done) {
+                complete[index] = true;
+                iterators.splice(index, 1);
+            } else currentValues[index] = result.value;
         })
         if (complete.every(c => c)) break;
         else {
-            if (noUpdate(partial)) continue;
+            if (noUpdate(updates)) continue;
             yield currentValues.slice();
         }
     }
 }
 
-function noUpdate(results: {result: IteratorResult<any>, index:number}[]): boolean {
+function noUpdate(results: { result: IteratorResult<any>, index: number }[]): boolean {
     return results.every((({result}) => !!result.done));
 }
