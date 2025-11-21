@@ -1,10 +1,15 @@
-export type RaceResult<T> = (T | Promise<T>)
-
 export class Promises {
-    static async raceAll<T extends any>(values: Promise<T>[]): Promise<RaceResult<T>[]> {
-        const result: RaceResult<T>[] = values.slice();
-        const tracked = values.map((p, i): Promise<T> => p.then(v => result[i] = v ));
+    static async raceAll<T extends any>(values: Promise<T>[]): Promise<T[]> {
+        const result: T[] = [];
+        const tracked = values.map(p => p.then(v => result.push(v)));
         await Promise.race(tracked);
         return result;
+    }
+
+    static async fulfilled(promise: Promise<any>): Promise<boolean> {
+        let fulfilled = false;
+        promise.then(_ => fulfilled = true);
+        await Promise.resolve();
+        return fulfilled;
     }
 }

@@ -99,25 +99,29 @@ describe("combineLatest", () => {
         ]));
     });
 
-    test.skip("preserves order of emissions within racing", async () => {
+    test.only("preserves order of emissions within racing", async () => {
         async function* fast() {
-            yield 1;
-            yield 2;
-            yield 3;
+            yield "fast1";
+            yield "fast2";
+            yield "fast3";
         }
 
         async function* slow() {
-            yield 'a';
+            yield 'slow1';
             await new Promise(resolve => setTimeout(resolve, 50));
-            yield 'b';
+            yield 'slow2';
+            yield 'slow3';
         }
 
         const result = await toPromiseArray(combineLatest([fast(), slow()]));
 
-        // Should see all fast emissions with 'a', then one with 'b'
-        assertThat(result[0], equals([1, 'a']));
-        assertThat(result[1], equals([2, 'a']));
-        assertThat(result[2], equals([3, 'a']));
-        assertThat(result[3], equals([3, 'b']));
+        assertThat(result, equals([
+                ['fast1', 'slow1'],
+                ['fast2', 'slow1'],
+                ['fast3', 'slow1'],
+                ['fast3', 'slow2'],
+                ['fast3', 'slow3'],
+            ]));
+
     });
 });

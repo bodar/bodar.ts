@@ -1,5 +1,4 @@
-import {Promises, type RaceResult} from "./Promises.ts";
-import {isPromiseLike} from "./IsAsyncIterable.ts";
+import {Promises} from "./Promises.ts";
 
 /**
  * Combines multiple async iterables into a single async iterable that emits
@@ -28,25 +27,27 @@ import {isPromiseLike} from "./IsAsyncIterable.ts";
 export async function* combineLatest(
     iterables: AsyncIterable<any>[]
 ): AsyncIterableIterator<any[]> {
-    const iterators = iterables.map(it => it[Symbol.asyncIterator]());
+    const iterators = iterables.map(((it, index) => ({iterator: it[Symbol.asyncIterator](), index})));
 
     if (iterators.length === 0) {
         yield [];
         return;
     }
 
-    const results = await Promise.all(iterators.map(i => i.next()));
-    let complete = results.map(r => !!r.done)
+    const results = await Promise.all(iterators.map(({iterator}) => iterator.next()));
+    const complete = results.map(r => !!r.done)
     const currentValues = results.map(r => r.value);
     yield currentValues.slice();
 
     while (true) {
-        const partial = await Promises.raceAll(iterators.map(i => i.next()));
-        partial.forEach((r, i) => {
-            if (!isPromiseLike(r)) {
-                if (r.done) complete[i] = true;
-                else currentValues[i] = r.value;
-            }
+        const partial = await Promises.raceAll(iterators
+            .map(({iterator, index}) => iterator.next().then(result => ({result, index}))));
+        partial.forEach(({result, index}) => {
+                if (result.done) {
+                    complete[index] = true;
+                    iterators.splice(index, 1);
+                }
+                else currentValues[index] = result.value;
         })
         if (complete.every(c => c)) break;
         else {
@@ -56,6 +57,6 @@ export async function* combineLatest(
     }
 }
 
-function noUpdate(results: RaceResult<IteratorYieldResult<any> | IteratorReturnResult<any>>[]): boolean {
-    return results.every((result) => isPromiseLike(result) || !!result.done);
+function noUpdate(results: {result: IteratorResult<any>, index:number}[]): boolean {
+    return results.every((({result}) => !!result.done));
 }
