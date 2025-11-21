@@ -44,7 +44,7 @@ export async function dev() {
 }
 
 export async function demo() {
-    await $`bun run packages/dataflow/server.ts`;
+    await $`bun run --watch packages/dataflow/server.ts`;
 }
 
 export async function build() {
