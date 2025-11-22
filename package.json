@@ -8,5 +8,8 @@
     "@types/bun": "^1.2.3",
     "asserttt": "^1.0.1",
     "typescript": "^5.7.3"
+  },
+  "patchedDependencies": {
+    "mxn-jsx-ast-transformer@0.8.7": "patches/mxn-jsx-ast-transformer@0.8.7.patch"
   }
 }

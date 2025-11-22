@@ -1,0 +1,12 @@
+diff --git a/mxn-jsx-ast-transformer.js b/mxn-jsx-ast-transformer.js
+index 53f429c6c6e86e14bfd6358128dfb5eaa0fe1b7c..558dfad313a1551abeb01219a3de29e36e337a20 100644
+--- a/mxn-jsx-ast-transformer.js
++++ b/mxn-jsx-ast-transformer.js
+@@ -136,6 +136,7 @@ var MXNJSXConv = function(tree, options)
+                     case "CallExpression":
+                     case "ArrowFunctionExpression":
+                     case "Identifier":
++                    case "TemplateLiteral":
+                         this.replace(node.expression);
+                         return;
+ 

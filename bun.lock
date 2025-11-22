@@ -46,6 +46,9 @@
       "version": "0.0.0",
     },
   },
+  "patchedDependencies": {
+    "mxn-jsx-ast-transformer@0.8.7": "patches/mxn-jsx-ast-transformer@0.8.7.patch",
+  },
   "packages": {
     "@bodar/dataflow": ["@bodar/dataflow@workspace:packages/dataflow"],
 
