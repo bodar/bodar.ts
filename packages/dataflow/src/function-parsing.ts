@@ -30,9 +30,12 @@ export function parseScript(javascript: string): Program {
     return Parser.extend(jsx()).parse(javascript, {ecmaVersion: "latest"});
 }
 
-export function processJSX(program: Program): string {
-    const ast = transform(program, {factory: "jsx.createElement"});
-    return generate(ast, {indent: "", lineEnd: "", comments: false});
+export function processJSX(program: Program, factory:string = "jsx.createElement"): Program {
+    return transform(program, {factory});
+}
+
+export function toScript(program: Program): string {
+    return generate(program, {indent: "", lineEnd: "", comments: false});
 }
 
 export function findTopLevelVariableDeclarations(program: Program): string[] {
@@ -79,7 +82,7 @@ const defaultGlobals = new Set([
     "ArrayBuffer", "Blob", "crypto", "URL", "TextEncoder", "TextDecoder",
     "Uint8Array", "Int32Array", "Float64Array", "DataView", "Reflect",
     "Proxy", "WeakMap", "WeakSet", "Infinity", "NaN", "isNaN", "isFinite",
-    "parseInt", "parseFloat", "encodeURI", "decodeURI", "eval"
+    "parseInt", "parseFloat", "encodeURI", "decodeURI", "eval", "jsx", "jsx.createElement"
 ]);
 
 function isScope(node: Node): boolean {

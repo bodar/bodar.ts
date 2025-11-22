@@ -10,10 +10,7 @@
     <script type="module" reactive>`The current time is ${new Date(now).toLocaleTimeString("en-GB")}.`</script>
 </p>
 <script type="module" reactive>
-    // <span style={`color: hsl(${(now / 10) % 360} 100% 50%)`}>Rainbow text!</span>
-    const rainbow = document.createElement('div');
-    rainbow.style.color = `hsl(${((now / 10) % 360)} 100% 50%)`;
-    rainbow.innerText = 'Rainbow text!';
+    <span style={`color: hsl(${(now / 10) % 360} 100% 50%)`}>Rainbow text!</span>
 </script>
 <script type="module" reactive>
     const now = function* () {

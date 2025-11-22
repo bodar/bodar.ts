@@ -6,7 +6,7 @@ import {
     findTopLevelVariableDeclarations,
     findUnresolvedReferences,
     parseScript,
-    processJSX
+    processJSX, toScript
 } from "./function-parsing.ts";
 import {topologicalSort} from "./TopologicalSort.ts";
 import {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
@@ -50,18 +50,18 @@ export class HTMLTransformer {
     definitions: NodeDefinition[] = [];
 
     addScript(javascript: string): string[] {
-        const program = parseScript(javascript);
+        const program = processJSX(parseScript(javascript));
         const inputs = findUnresolvedReferences(program);
         const outputs = findTopLevelVariableDeclarations(program);
         const key = simpleHash(javascript);
-        let newJavascript = processJSX(program);
+        let newJavascript = toScript(program);
         if (!javascript.endsWith(';') && newJavascript.endsWith(';')) newJavascript = newJavascript.slice(0, -1);
         this.definitions.push(new NodeDefinition(key, inputs, outputs, newJavascript))
         return [key, ...outputs];
     }
 }
 
-class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
+export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
     private chunks: string[] = [];
 
     constructor(private controller: HTMLTransformer) {
@@ -90,7 +90,7 @@ class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentH
     }
 }
 
-class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
+export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
     constructor(private controller: HTMLTransformer) {
     }
 

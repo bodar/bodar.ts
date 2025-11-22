@@ -1,5 +1,5 @@
 import {describe, test} from "bun:test";
-import {findUnresolvedReferences, parseScript, processJSX} from "../src/function-parsing.ts";
+import {findUnresolvedReferences, parseScript, processJSX, toScript} from "../src/function-parsing.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 
@@ -26,7 +26,7 @@ describe("findUnresolvedReferences", () => {
 
     test('supports JSX code', () => {
         const program = parseScript("<span style={`color: hsl(${(now / 10) % 360} 100% 50%)`}>Rainbow text!</span>");
-        const result = processJSX(program);
+        const result = toScript(processJSX(program));
         assertThat(result, equals('jsx.createElement("span", {"style": `color: hsl(${now / 10 % 360} 100% 50%)`}, ["Rainbow text!"]);'));
     })
 });
