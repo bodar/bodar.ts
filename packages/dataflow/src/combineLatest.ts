@@ -1,4 +1,4 @@
-import {Promises} from "./Promises.ts";
+import {raceAll} from "./Promise.ts";
 
 /**
  * Combines multiple async iterables into a single async iterable that emits
@@ -47,7 +47,7 @@ export async function* combineLatest(
             pending.set(index, promise);
             return promise;
         });
-        const updates = await Promises.raceAll(promises);
+        const updates = await raceAll(promises);
         updates.forEach(({result, index}) => {
             pending.delete(index);
             if (result.done) {
