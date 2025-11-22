@@ -9,6 +9,7 @@ Bun.serve({
         let path = new URL(req.url).pathname
         if (path.startsWith('/dataflow/')) path = path.replace('/dataflow/', '/src/');
         if (path.startsWith('/totallylazy/')) path = path.replace('/totallylazy/', '/../totallylazy/src/');
+        if (path.startsWith('/jsx2dom/')) path = path.replace('/jsx2dom/', '/../jsx2dom/src/');
         const filePath = `${ROOT}${path}`;
         const file = Bun.file(filePath);
 
