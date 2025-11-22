@@ -2,15 +2,20 @@
  * Super light weight JSX to Native DOM
  */
 /// <reference path="./types.d.ts" />
+
+/** a JSX attribute, currently only a string */
 export type Attributes = { [key: string]: string } | null;
+/** Supported nested JSX content */
 export type Content = string | number | Node | Content[];
 
+/** Explicit Dependencies for JSX2DOM, allows it to work with linkedom and yadic */
 export interface JSX2DOMDependencies {
     document: Document,
     Node: typeof Node,
     HTMLElement: typeof HTMLElement
 }
 
+/** JSX2DOM class, works with native DOM or linkedom */
 export class JSX2DOM {
     constructor(private deps: JSX2DOMDependencies = globalThis) {
     }
