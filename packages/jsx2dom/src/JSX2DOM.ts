@@ -5,14 +5,10 @@
 export type Attributes = { [key: string]: string } | null;
 export type Content = string | number | Node | Content[];
 
-export type Dependency<K extends PropertyKey, V> = {
-    readonly [P in K]: V;
-}
-
-export interface JSX2DOMDependencies extends
-    Dependency<'document', Document>,
-    Dependency<'Node', typeof Node>,
-    Dependency<'HTMLElement', typeof HTMLElement> {
+export interface JSX2DOMDependencies {
+    document: Document,
+    Node: typeof Node,
+    HTMLElement: typeof HTMLElement
 }
 
 export class JSX2DOM {

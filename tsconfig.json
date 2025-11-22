@@ -24,7 +24,7 @@
     "noPropertyAccessFromIndexSignature": false,
 
     "experimentalDecorators": true,
-    // typed-html
+    // jsx2dom
     "jsx": "react",
     "jsxFactory": "jsx.createElement",
     "jsxFragmentFactory": "null"

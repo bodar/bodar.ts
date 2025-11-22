@@ -1,0 +1,16 @@
+{
+  "name": "@bodar/jsx2dom",
+  "version": "0.0.0",
+  "type": "module",
+  "files": [
+    "src",
+    "README.md",
+    "package.json"
+  ],
+  "devDependencies": {
+    "linkedom": "^0.18.12"
+  },
+  "exports": {
+    "./JSX2DOM.ts": "./src/JSX2DOM.ts"
+  }
+}

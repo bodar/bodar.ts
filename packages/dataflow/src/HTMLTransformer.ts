@@ -102,7 +102,7 @@ export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementCon
         end.before(`<script type="importmap"> { "imports": { "@bodar/": "/" } }</script>
 <script type="module">
 import {Renderer} from "@bodar/dataflow/Renderer.ts";
-import {JSX2DOM} from "@bodar/dataflow/jsx2dom/JSX2DOM.ts";
+import {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
 const jsx = new JSX2DOM();
 const renderer = new Renderer();
 ${sorted.map((d: NodeDefinition) => `renderer.register(${d});`).join('\n')}

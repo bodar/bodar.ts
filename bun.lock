@@ -19,6 +19,10 @@
         "astring": "^1.9.0",
         "mxn-jsx-ast-transformer": "^0.8.7",
       },
+    },
+    "packages/jsx2dom": {
+      "name": "@bodar/jsx2dom",
+      "version": "0.0.0",
       "devDependencies": {
         "linkedom": "^0.18.12",
       },
@@ -44,6 +48,8 @@
   },
   "packages": {
     "@bodar/dataflow": ["@bodar/dataflow@workspace:packages/dataflow"],
+
+    "@bodar/jsx2dom": ["@bodar/jsx2dom@workspace:packages/jsx2dom"],
 
     "@bodar/lazyrecords": ["@bodar/lazyrecords@workspace:packages/lazyrecords"],
 

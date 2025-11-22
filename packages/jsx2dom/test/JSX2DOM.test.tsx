@@ -1,6 +1,6 @@
 import {describe, expect, it} from "bun:test";
 import {parseHTML} from "linkedom";
-import {JSX2DOM} from "../../src/jsx2dom/JSX2DOM.ts";
+import {JSX2DOM} from "../src/JSX2DOM.ts";
 
 describe("JSX2DOM", () => {
     it("enables JSX and Linkedom to work together without global pollution", async () => {
