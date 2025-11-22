@@ -10,7 +10,7 @@ import {
 } from "./function-parsing.ts";
 import {topologicalSort} from "./TopologicalSort.ts";
 
-
+/** A definition of a Node but still in raw text format */
 export class NodeDefinition {
     constructor(public key: string,
                 public inputs: string[],
@@ -60,7 +60,7 @@ export class HTMLTransformer {
     }
 }
 
-export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
+class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
     private chunks: string[] = [];
 
     constructor(private controller: HTMLTransformer) {
@@ -89,7 +89,7 @@ export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementC
     }
 }
 
-export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
+class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
     constructor(private controller: HTMLTransformer) {
     }
 
