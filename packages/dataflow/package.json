@@ -11,6 +11,7 @@
     "@bodar/jsx2dom": "workspace:jsx2dom"
   },
   "exports": {
+    "./Iterator.ts": "./src/Iterator.ts",
     "./HTMLTransformer.ts": "./src/HTMLTransformer.ts",
     "./Node.ts": "./src/Node.ts",
     "./Graph.ts": "./src/Graph.ts",

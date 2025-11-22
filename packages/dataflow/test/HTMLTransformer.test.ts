@@ -57,4 +57,32 @@ renderer.register("4vhz4q",["a"],[],(a) => \`Some text \${a}\`);
 renderer.render();
 </script></body>`);
     });
+
+    test("can provide an id/key via HTML id attribute", async () => {
+        const transformer = new HTMLTransformer(new HTMLRewriter());
+        const result = transformer.transform('<body><script reactive id="constant">1</script></body>');
+        expect(result).toBe(`<body><slot name="constant"></slot><script type="importmap"> { "imports": { "@bodar/": "/" } }</script>
+<script type="module">
+import {Renderer} from "@bodar/dataflow/Renderer.ts";
+import {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
+const jsx = new JSX2DOM();
+const renderer = new Renderer();
+renderer.register("constant",[],[],() => 1);
+renderer.render();
+</script></body>`);
+    });
+
+    test("if the javascript is invalid, report the error in the slot", async () => {
+        const transformer = new HTMLTransformer(new HTMLRewriter());
+        const result = transformer.transform('<body><script reactive>=</script></body>');
+        expect(result).toBe(`<body><slot name="00001p"></slot><script type="importmap"> { "imports": { "@bodar/": "/" } }</script>
+<script type="module">
+import {Renderer} from "@bodar/dataflow/Renderer.ts";
+import {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
+const jsx = new JSX2DOM();
+const renderer = new Renderer();
+renderer.register("00001p",[],[],() => "Unexpected token (1:0)");
+renderer.render();
+</script></body>`);
+    });
 });

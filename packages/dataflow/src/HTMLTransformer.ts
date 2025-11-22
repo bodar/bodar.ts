@@ -49,15 +49,20 @@ export class HTMLTransformer {
 
     definitions: NodeDefinition[] = [];
 
-    addScript(javascript: string): string[] {
-        const program = processJSX(parseScript(javascript));
-        const inputs = findUnresolvedReferences(program);
-        const outputs = findTopLevelVariableDeclarations(program);
-        const key = simpleHash(javascript);
-        let newJavascript = toScript(program);
-        if (!javascript.endsWith(';') && newJavascript.endsWith(';')) newJavascript = newJavascript.slice(0, -1);
-        this.definitions.push(new NodeDefinition(key, inputs, outputs, newJavascript))
-        return [key, ...outputs];
+    addScript(javascript: string, id?:string): string[] {
+        const key = id || simpleHash(javascript);
+        try {
+            const program = processJSX(parseScript(javascript));
+            const inputs = findUnresolvedReferences(program);
+            const outputs = findTopLevelVariableDeclarations(program);
+            let newJavascript = toScript(program);
+            if (!javascript.endsWith(';') && newJavascript.endsWith(';')) newJavascript = newJavascript.slice(0, -1);
+            this.definitions.push(new NodeDefinition(key, inputs, outputs, newJavascript))
+            return [key, ...outputs];
+        } catch (error: any) {
+            this.definitions.push(new NodeDefinition(key, [], [], JSON.stringify(error.message)));
+            return [key];
+        }
     }
 }
 
@@ -68,12 +73,13 @@ export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementC
     }
 
     element(start: HTMLRewriterTypes.Element): void | Promise<void> {
+        const id: string | undefined = start.getAttribute('id') || undefined;
         start.remove();
-        start.onEndTag(endTag => this.endTag(endTag));
+        start.onEndTag(endTag => this.endTag(endTag, id));
     }
 
-    endTag(end: HTMLRewriterTypes.EndTag) {
-        const names = this.controller.addScript(this.getJavascript());
+    endTag(end: HTMLRewriterTypes.EndTag, id?: string) {
+        const names = this.controller.addScript(this.getJavascript(), id);
         end.after(names.map(name => `<slot name="${name}"></slot>`).join(""), {html: true})
         end.remove();
     }
