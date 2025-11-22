@@ -25,7 +25,6 @@ Early days - DO NOT USE YET!
 - [x] HTML Processors
   - [x] Script tag parsing
   - [x] JSX support (converts to native DOM methods)
-    - BUG: Waiting on some upstream bugs to be fixed 
   - [x] Topological sorter
   - [ ] Buffered version (linkedom / browser)
   - [x] Streaming version (cloudflare / bun / browser via (htmlrewriter)[https://github.com/remorses/htmlrewriter])
