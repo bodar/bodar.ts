@@ -3,6 +3,7 @@ import {$, file, Glob, write} from "bun";
 import {dirname, join} from "path";
 
 process.env.FORCE_COLOR = "1";
+process.env.CLAUDECODE = "1";
 
 export async function version() {
     const branch = process.env.GITHUB_REF_NAME || (await $`git rev-parse --abbrev-ref HEAD`.quiet()).text().trim();
