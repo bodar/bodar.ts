@@ -12,6 +12,7 @@
   },
   "exports": {
     "./Iterator.ts": "./src/Iterator.ts",
+    "./PushNode.ts": "./src/PushNode.ts",
     "./HTMLTransformer.ts": "./src/HTMLTransformer.ts",
     "./Node.ts": "./src/Node.ts",
     "./Graph.ts": "./src/Graph.ts",
