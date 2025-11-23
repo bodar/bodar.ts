@@ -4,7 +4,7 @@
  */
 import {simpleHash} from "./simpleHash.ts";
 import {getInputs, getOutputs, parseFunction} from "./function-parsing.ts";
-import {Node} from "./Node.ts";
+import {type Node} from "./Node.ts";
 import {Backpressure, type BackpressureStrategy} from "./SharedAsyncIterable.ts";
 import {lazy} from "@bodar/totallylazy/functions/lazy.ts";
 import {Throttle, type ThrottleStrategy} from "./Throttle.ts";

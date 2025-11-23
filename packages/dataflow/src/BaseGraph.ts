@@ -2,7 +2,8 @@
  * Core dataflow graph that manages reactive nodes and their dependencies
  * @module
  */
-import {node, Node} from "./Node.ts";
+import {type Node} from "./Node.ts";
+import {node, PullNode} from "./PullNode.ts";
 import {Backpressure, type BackpressureStrategy} from "./SharedAsyncIterable.ts";
 import {Throttle, type ThrottleStrategy} from "./Throttle.ts";
 
@@ -20,7 +21,7 @@ export class BaseGraph {
         ])
     }
 
-    private nodes = new Map<string, Node<any>>();
+    private nodes = new Map<string, PullNode<any>>();
 
     /** Creates and registers a node with explicit key, inputs, and function */
     set(key: string, inputs: string[], fun: Function): Node<any> {

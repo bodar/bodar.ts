@@ -5,6 +5,7 @@
 import {isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isGeneratorFunction} from "./type-guards.ts";
 import type {ThrottleStrategy} from "./Throttle.ts";
 import {iterator} from "./Iterator.ts";
+import type {Node} from "./Node.ts";
 
 export interface EventData<T> {
     key: string;
@@ -12,7 +13,7 @@ export interface EventData<T> {
 }
 
 /** A push / event based Node*/
-export class PushNode<T> extends EventTarget implements AsyncIterable<EventData<T>> {
+export class PushNode<T> extends EventTarget implements Node<T>, AsyncIterable<T> {
     private lastInputs = new Map<string, any>();
 
     constructor(public key: string, public dependencies: PushNode<any>[], public fun: Function,
@@ -24,8 +25,8 @@ export class PushNode<T> extends EventTarget implements AsyncIterable<EventData<
         }))
     }
 
-    [Symbol.asyncIterator](): AsyncIterator<EventData<T>> {
-        return iterator(notify => this.addEventListener('change', (ev: any) => notify(ev.detail)));
+    [Symbol.asyncIterator](): AsyncIterator<T> {
+        return iterator<T>(notify => this.addEventListener('change', (ev: any) => notify(ev.detail.value)));
     }
 
     private lastResult?: any;
