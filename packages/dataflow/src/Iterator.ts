@@ -2,7 +2,7 @@
  * iterator function
  * */
 
-/** Converts a callback into an AsyncIterator */
+/** Converts a callback into an AsyncIterator that never finishes */
 export async function* iterator<T>(init: (notify: (e: T) => any) => any, value?: T): AsyncIterator<T> {
     let {promise, resolve} = Promise.withResolvers<T>();
     // Must close over the resolve variable to see it change

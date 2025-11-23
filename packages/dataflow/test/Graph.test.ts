@@ -69,7 +69,8 @@ describe("graph", () => {
         const {test} = graph.define(function* test() {
             yield* [1, 2, 3];
         });
-        assertThat(await toPromiseArray(test), equals([1, 2, 3]));
+        const result = await toPromiseArray(test);
+        assertThat(result, equals([1, 2, 3]));
     });
 
     test("if a function returns an async iterable it will yield the values", async () => {

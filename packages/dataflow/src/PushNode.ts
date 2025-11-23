@@ -2,87 +2,90 @@
  * Reactive nodes that combine dependency streams and yield computed values
  * @module
  */
-import {isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isGeneratorFunction} from "./type-guards.ts";
 import type {ThrottleStrategy} from "./Throttle.ts";
-import {iterator} from "./Iterator.ts";
 import type {Node} from "./Node.ts";
+import {toAsyncIterable} from "./toAsyncIterable.ts";
 
-export interface EventData<T> {
+export interface InputUpdate<T> {
     key: string;
-    value: T;
+    value: T | undefined;
+    done: boolean;
 }
 
 /** A push / event based Node*/
 export class PushNode<T> extends EventTarget implements Node<T>, AsyncIterable<T> {
-    private lastInputs = new Map<string, any>();
+    private inputs = new Map<string, InputUpdate<T>>();
+    private value: any;
 
-    constructor(public key: string, public dependencies: PushNode<any>[], public fun: Function,
-                private throttle: ThrottleStrategy) {
+    // @ts-ignore
+    constructor(public key: string, public dependencies: PushNode<any>[], public fun: Function, private throttle: ThrottleStrategy) {
         super();
-        this.lastInputs = new Map(this.dependencies.map(d => {
-            d.addEventListener('change', (ev: any) => this.execute(ev.detail))
-            return [d.key, undefined];
-        }))
+        this.dependencies.forEach(d => d.addEventListener('change', (ev: any) => this.changed(ev.detail)))
     }
 
-    [Symbol.asyncIterator](): AsyncIterator<T> {
-        return iterator<T>(notify => this.addEventListener('change', (ev: any) => notify(ev.detail.value)));
-    }
+    async* [Symbol.asyncIterator](): AsyncIterator<T> {
+        let {promise, resolve} = Promise.withResolvers<any>();
+        // Must close over the resolve variable to see it change
+        this.addEventListener("change", (ev: any) => resolve(ev.detail));
 
-    private lastResult?: any;
+        while (true) {
+            const update = await promise;
 
-    execute(data: EventData<T>) {
-        const oldValue = this.lastInputs.get(data.key);
-        if (oldValue != data.value) {
-            this.lastInputs.set(data.key, data.value);
-            const currentValues = Array.from(this.lastInputs.values());
-            if(currentValues.every(v => v !== undefined)) {
-                this.lastResult = this.fun(...currentValues);
-                this.processResult(this.lastResult)
-            }
+            if (update.done) break;
+            // Must create new promise before yielding otherwise we miss any synchronous notifications
+            ({promise, resolve} = Promise.withResolvers<any>());
+
+            yield update.value;
         }
     }
 
-    async processResult(result: any): Promise<void> {
-        const iterable = this.getIterable(result);
+    addEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean) {
+        super.addEventListener(type, callback, options);
+        this.execute(false);
+    }
+
+    async changed(update: InputUpdate<T>) {
+        const lastUpdate = this.inputs.get(update.key);
+        if (update.done && lastUpdate) {
+            lastUpdate.done = true;
+        } else if (update.value !== lastUpdate?.value) {
+            this.inputs.set(update.key, update);
+            await this.execute(true);
+        }
+    }
+
+    async execute(update: boolean) {
+        if (update || this.value === undefined) {
+            const newValues = Array.from(this.inputs.values().map(u => u.value));
+            this.value = this.fun(...newValues);
+        }
+        await this.processResult()
+    }
+
+    async processResult(): Promise<void> {
+        const iterable = toAsyncIterable<T>(this.value);
         if (iterable) {
             for await (const value of iterable) {
-                // Throttle first so any synchronous events can arrive
-                await this.throttle();
-                this.dispatchEvent(new CustomEvent<EventData<T>>('change', {detail: {key: this.key, value}}));
+                // await this.throttle();
+                // TODO support cancelling on new input
+                this.fireEvent(value, false);
             }
+            this.fireEvent(undefined, this.inputs.values().every(u => u.done));
         } else {
-            this.dispatchEvent(new CustomEvent<EventData<T>>('change', {detail: {key: this.key, value: result}}));
+            this.fireEvent(this.value, false);
+            const done = this.inputs.values().every(u => u.done);
+            if (done) this.fireEvent(undefined, done);
         }
     }
 
-    getIterable(result: any): AsyncIterable<T> | undefined {
-        if (isAsyncIterable(result)) {
-            return result;
-        } else if (isAsyncIterator(result)) {
-            return {
-                [Symbol.asyncIterator]() {
-                    return result;
-                }
-            };
-        } else if (isAsyncGeneratorFunction(result) && result.length === 0) {
-            return {
-                [Symbol.asyncIterator]() {
-                    return result() as AsyncGenerator<T>;
-                }
-            };
-        } else if (isGeneratorFunction(result) && result.length === 0) {
-            const iterator = result() as Generator<T>;
-            return {
-                async* [Symbol.asyncIterator]() {
-                    yield* {
-                        [Symbol.iterator]() {
-                            return iterator
-                        }
-                    }
-                }
-            };
-        }
+    private fireEvent(value: T | undefined, done: boolean) {
+        this.dispatchEvent(new CustomEvent<InputUpdate<T>>('change', {
+            detail: {
+                key: this.key,
+                value,
+                done
+            }
+        }));
     }
 }
 

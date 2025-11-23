@@ -10,6 +10,8 @@ import {type Node} from "./Node.ts";
 
 /** Node implementation that uses combineLatest to merge dependency streams and memoizes results */
 export class PullNode<T> implements Node<T>, AsyncIterable<T> {
+    public value: T | undefined;
+    private inputs?: any[];
     private shared?: SharedAsyncIterable<T>;
 
     constructor(public key: string, public dependencies: PullNode<any>[], public fun: Function,
@@ -30,17 +32,13 @@ export class PullNode<T> implements Node<T>, AsyncIterable<T> {
         }
     }
 
-    private lastInputs?: any[];
-    private lastResult?: any;
-
-    async* execute(currentInputs: any[]): AsyncGenerator<T> {
-        if (this.shallowEqual(this.lastInputs, currentInputs)) {
-            yield* this.processResult(this.lastResult);
+    async* execute(newInputs: any[]): AsyncGenerator<T> {
+        if (this.shallowEqual(this.inputs, newInputs)) {
+            yield* this.processResult(this.value);
         } else {
-            let currentResult = this.fun(...currentInputs);
-            this.lastInputs = currentInputs.slice();
-            this.lastResult = currentResult;
-            yield* this.processResult(currentResult);
+            this.value = this.fun(...newInputs);
+            this.inputs = newInputs.slice();
+            yield* this.processResult(this.value);
         }
     }
 
