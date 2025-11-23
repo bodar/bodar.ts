@@ -4,18 +4,20 @@
 import {simpleHash} from "./simpleHash.ts";
 import {
     findTopLevelVariableDeclarations,
-    findUnresolvedReferences,
-    parseScript,
-    processJSX, toScript
+    findUnresolvedReferences, parseScript,
+    processJSX,
+    toScript
 } from "./function-parsing.ts";
 import {topologicalSort} from "./TopologicalSort.ts";
 import {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
+import {Imports, processImports} from "./imports.ts";
 
 /** A definition of a Node but still in raw text format */
 export class NodeDefinition {
     constructor(public key: string,
                 public inputs: string[],
                 public outputs: string[],
+                public imports: Imports,
                 public body: string
     ) {
     }
@@ -25,8 +27,8 @@ export class NodeDefinition {
     }
 
     fun(): string {
-        if (this.outputs.length === 0) return `(${this.inputs.join(',')}) => ${this.body}`
-        return `(${this.inputs.join(',')}) => {
+        if (this.outputs.length === 0 && this.imports.isEmpty()) return `(${this.inputs.join(',')}) => ${this.body}`
+        return `${!this.imports.isEmpty() ? 'async' : ''}(${this.inputs.join(',')}) => {
 ${this.body}
 return {${this.outputs.join(',')}};
 }`;
@@ -55,12 +57,14 @@ export class HTMLTransformer {
             const program = processJSX(parseScript(javascript));
             const inputs = findUnresolvedReferences(program);
             const outputs = findTopLevelVariableDeclarations(program);
+            const imports = processImports(program);
             let newJavascript = toScript(program);
-            if (!javascript.endsWith(';') && newJavascript.endsWith(';')) newJavascript = newJavascript.slice(0, -1);
-            this.definitions.push(new NodeDefinition(key, inputs, outputs, newJavascript))
+            newJavascript = imports + newJavascript;
+            if (!javascript.match(/;\s*/) && newJavascript.match(/;\s*/)) newJavascript = newJavascript.slice(0, -1);
+            this.definitions.push(new NodeDefinition(key, inputs, outputs, imports, newJavascript))
             return [key, ...outputs];
         } catch (error: any) {
-            this.definitions.push(new NodeDefinition(key, [], [], JSON.stringify(error.message)));
+            this.definitions.push(new NodeDefinition(key, [], [], Imports.empty, JSON.stringify(error.message)));
             return [key];
         }
     }

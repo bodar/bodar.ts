@@ -24,9 +24,8 @@
 </p>
 <script type="module" reactive>
     import {iterator} from "@bodar/dataflow/Iterator.ts";
-
-    const input = <input name="name" type="text" />;
-    const name = iterator(notify => input.addEventListener('input', ev => {notify(ev.data)}), input.value);
+    const input = <input name="name" type="text" value="Dan" />;
+    const name = iterator(notify => input.addEventListener('input', ev => {notify(input.value)}), input.value);
 </script>
 </body>
 </html>

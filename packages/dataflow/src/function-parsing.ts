@@ -30,7 +30,7 @@ export function parseScript(javascript: string): Program {
     return Parser.extend(jsx()).parse(javascript, {ecmaVersion: "latest", sourceType: "module"});
 }
 
-export function processJSX(program: Program, factory:string = "jsx.createElement"): Program {
+export function processJSX(program: Program, factory: string = "jsx.createElement"): Program {
     return transform(program, {factory});
 }
 

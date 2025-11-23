@@ -24,9 +24,14 @@ describe("findUnresolvedReferences", () => {
         assertThat(refs, equals(['now']));
     });
 
+
+});
+
+describe("processJSX", () => {
     test('supports JSX code', () => {
         const program = parseScript("<span style={`color: hsl(${(now / 10) % 360} 100% 50%)`}>Rainbow text!</span>");
         const result = toScript(processJSX(program));
         assertThat(result, equals('jsx.createElement("span", {"style": `color: hsl(${now / 10 % 360} 100% 50%)`}, ["Rainbow text!"]);'));
-    })
+    });
 });
+

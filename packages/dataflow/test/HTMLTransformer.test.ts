@@ -85,4 +85,29 @@ renderer.register("00001p",[],[],() => "Unexpected token (1:0)");
 renderer.render();
 </script></body>`);
     });
+
+    test("can use an import inside a cell", async () => {
+        const transformer = new HTMLTransformer(new HTMLRewriter());
+        const result = transformer.transform(`<body><script type="module" reactive>
+import {iterator} from "@bodar/dataflow/Iterator.ts";
+const input = <input name="name" type="text" />;
+const name = iterator(notify => input.addEventListener('input', ev => {notify(ev.data)}), input.value);
+</script></body>`);
+
+
+        expect(result).toBe(`<body><slot name="tubt3x"></slot><slot name="input"></slot><slot name="name"></slot><script type="importmap"> { "imports": { "@bodar/": "/" } }</script>
+<script type="module">
+import {Renderer} from "@bodar/dataflow/Renderer.ts";
+import {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
+const jsx = new JSX2DOM();
+const renderer = new Renderer();
+renderer.register("tubt3x",[],["input","name"],async() => {
+const [{iterator}] = await Promise.all([import('@bodar/dataflow/Iterator.ts')]);
+const input = jsx.createElement("input", {"name": "name","type": "text"});const name = iterator(notify => input.addEventListener('input', ev => {notify(ev.data);}), input.value);
+return {input,name};
+});
+renderer.render();
+</script></body>`
+        );
+    });
 });
