@@ -1,11 +1,11 @@
 /** @module
  * Renderer module
  * **/
-import {Graph} from "./Graph.ts";
+import {BaseGraph} from "./BaseGraph.ts";
 
 /** Renderer **/
 export class Renderer {
-    constructor(private graph: Graph = new Graph(), private doc: Document = document) {
+    constructor(private graph: BaseGraph = new BaseGraph(), private doc: Document = document) {
     }
 
     async register(key: string, inputs: string[], outputs: string[], fun: Function) {
