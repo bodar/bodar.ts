@@ -27,5 +27,9 @@
     const input = <input name="name" type="text" value="Dan" />;
     const name = iterator(notify => input.addEventListener('input', ev => {notify(input.value)}), input.value);
 </script>
+<script type="module" reactive>
+    import * as Inputs from "https://esm.run/@observablehq/inputs";
+    const slider = Inputs.range([0, 100], {label: "x"});
+</script>
 </body>
 </html>

@@ -1,21 +1,35 @@
-import type {ImportDeclaration, Program} from "acorn";
+import type {
+    ImportDeclaration,
+    ImportDefaultSpecifier,
+    ImportNamespaceSpecifier,
+    ImportSpecifier,
+    Program
+} from "acorn";
 
 export class Imports {
-    constructor(private data: Map<string, string[]>) {
+    constructor(private data: Map<string, string>) {
     }
 
     static from(program: Program): Imports {
-        return new Imports(new Map<string, any>(program.body
+        return new Imports(new Map<string, string>(program.body
             .filter(v => v.type === 'ImportDeclaration')
             .map((im: ImportDeclaration) => [
                 String(im.source.value),
-                im.specifiers.map(sp => sp.local.name)
+                this.handle(im.specifiers)
             ])));
+    }
+
+    static handle(specifiers: Array<ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier>): string {
+        if(specifiers.length === 0) throw new Error("No specifier specifiers found.");
+        const first = specifiers[0];
+        if(first.type === "ImportNamespaceSpecifier") return first.local.name;
+        if(first.type === "ImportDefaultSpecifier") return "{default:" + first.local.name + "}";
+        return `{${specifiers.map(sp => sp.local.name).join(',')}}`;
     }
 
     static empty = new Imports(new Map());
 
-    get(source: string): string[] | undefined {
+    get(source: string): string | undefined {
         return this.data.get(source);
     }
 
@@ -25,7 +39,7 @@ export class Imports {
 
     toString(): string {
         if (this.isEmpty()) return "";
-        const specifierStrings = Array.from(this.data.values().map(names => `{${names.join(',')}}`));
+        const specifierStrings = Array.from(this.data.values());
         const importStrings = Array.from(this.data.keys().map(source => `import('${source}')`));
         return `const [${specifierStrings.join(', ')}] = await Promise.all([${importStrings.join(', ')}]);\n`;
     }
