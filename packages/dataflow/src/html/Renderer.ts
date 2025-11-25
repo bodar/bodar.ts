@@ -1,7 +1,7 @@
 /** @module
  * Renderer module
  * **/
-import {BaseGraph} from "./BaseGraph.ts";
+import {BaseGraph} from "../BaseGraph.ts";
 
 /** Renderer **/
 export class Renderer {

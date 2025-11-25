@@ -3,12 +3,14 @@
  * @module
  */
 import {simpleHash} from "./simpleHash.ts";
-import {getInputs, getOutputs, parseFunction} from "./function-parsing.ts";
 import {type Node} from "./Node.ts";
 import {Backpressure, type BackpressureStrategy} from "./SharedAsyncIterable.ts";
 import {lazy} from "@bodar/totallylazy/functions/lazy.ts";
 import {Throttle, type ThrottleStrategy} from "./Throttle.ts";
 import {BaseGraph} from "./BaseGraph.ts";
+import {parseFunction} from "./javascript/function-parsing.ts";
+import {getOutputs} from "./javascript/outputs.ts";
+import {getInputs} from "./javascript/inputs.ts";
 
 /** Manages a graph of reactive nodes with automatic dependency tracking */
 export class Graph extends BaseGraph {

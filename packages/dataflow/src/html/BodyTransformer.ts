@@ -15,7 +15,7 @@ export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementCon
         const sorted = topologicalSort(this.controller.definitions);
         end.before(`<script type="importmap"> { "imports": { "@bodar/": "/" } }</script>
 <script type="module">
-import {Renderer} from "@bodar/dataflow/Renderer.ts";
+import {Renderer} from "@bodar/dataflow/html/Renderer.ts";
 import {${JSX2DOM.name}} from "@bodar/jsx2dom/JSX2DOM.ts";
 const jsx = new JSX2DOM();
 const renderer = new Renderer();

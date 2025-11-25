@@ -1,11 +1,11 @@
-import {Imports, processImports} from "../imports.ts";
+import {Imports, processImports} from "../javascript/Imports.ts";
 import {simpleHash} from "../simpleHash.ts";
 import {
-    findTopLevelVariableDeclarations,
-    findUnresolvedReferences,
     parseScript,
     processJSX, toScript
-} from "../function-parsing.ts";
+} from "../javascript/script-parsing.ts";
+import {findUnresolvedReferences} from "../javascript/find-unresolved-references.ts";
+import {findTopLevelVariableDeclarations} from "../javascript/find-top-level-variable-declarations.ts";
 
 /** A definition of a Node but still in raw text format */
 export class NodeDefinition {
