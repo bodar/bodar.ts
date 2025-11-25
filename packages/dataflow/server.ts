@@ -1,4 +1,4 @@
-import {HTMLTransformer} from "@bodar/dataflow/HTMLTransformer.ts";
+import {HTMLTransformer} from "@bodar/dataflow/html/HTMLTransformer.ts";
 
 const PORT = 3000;
 const ROOT = import.meta.dir;

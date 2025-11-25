@@ -1,5 +1,5 @@
 import {describe, expect, test} from "bun:test";
-import {HTMLTransformer} from "../src/HTMLTransformer.ts";
+import {HTMLTransformer} from "../../src/html/HTMLTransformer.ts";
 
 describe("HTMLTransformer", () => {
     test("transforms a reactive script to a placeholder", async () => {

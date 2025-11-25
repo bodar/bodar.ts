@@ -1,4 +1,4 @@
-import {NodeDefinition} from "./HTMLTransformer.ts";
+import {NodeDefinition} from "./NodeDefinition.ts";
 
 /**
  * Topologically sort NodeDefinitions using Kahn's algorithm
