@@ -25,7 +25,7 @@ export async function tag() {
 
 export async function clean() {
     await $`rm -rf artifacts`;
-    await $`bun install`.quiet();
+    await $`bun install --ignore-scripts`.quiet();
 }
 
 export async function check() {

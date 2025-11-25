@@ -46,12 +46,14 @@ export class SharedAsyncIterable<T> implements AsyncIterable<T> {
         return this.backpressure(Array.from(this.consumers).map(v => v.ready));
     }
 
-    async sendNext() : Promise<void> {
-        const result = await this.iterator!.next();
-        for (const consumer of this.consumers) {
-            consumer.sendNext(result);
-        }
-        if (result.done) this.reset();
+    sendNext() : void {
+        // Do not make this into a async function, it causes a memory leak with the generator (iterator)
+        this.iterator!.next().then((result) => {
+            for (const consumer of this.consumers) {
+                consumer.sendNext(result);
+            }
+            if (result.done) this.reset();
+        })
     }
 }
 
