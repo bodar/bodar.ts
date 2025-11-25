@@ -1,6 +1,6 @@
 import {describe, expect, test} from "bun:test";
-import {parseScript} from "../src/javascript/script-parsing.ts";
-import {Imports, removeImports} from "../src/javascript/Imports.ts";
+import {parseScript} from "../../src/javascript/script-parsing.ts";
+import {Imports, removeImports} from "../../src/javascript/Imports.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 

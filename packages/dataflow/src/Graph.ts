@@ -8,7 +8,7 @@ import {Backpressure, type BackpressureStrategy} from "./SharedAsyncIterable.ts"
 import {lazy} from "@bodar/totallylazy/functions/lazy.ts";
 import {Throttle, type ThrottleStrategy} from "./Throttle.ts";
 import {BaseGraph} from "./BaseGraph.ts";
-import {parseFunction} from "./javascript/function-parsing.ts";
+import {parseFunction} from "./javascript/parseFunction.ts";
 import {getOutputs} from "./javascript/outputs.ts";
 import {getInputs} from "./javascript/inputs.ts";
 

@@ -1,8 +1,8 @@
 import {describe, test} from "bun:test";
-import {parseScript, processJSX, toScript} from "../src/javascript/script-parsing.ts";
+import {parseScript, processJSX, toScript} from "../../src/javascript/script-parsing.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
-import {findUnresolvedReferences} from "../src/javascript/find-unresolved-references.ts";
+import {findUnresolvedReferences} from "../../src/javascript/findUnresolvedReferences.ts";
 
 describe("findUnresolvedReferences", () => {
     test("can detected undeclared variables", () => {

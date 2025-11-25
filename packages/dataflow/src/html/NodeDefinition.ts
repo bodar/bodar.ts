@@ -4,8 +4,8 @@ import {
     parseScript,
     processJSX, toScript
 } from "../javascript/script-parsing.ts";
-import {findUnresolvedReferences} from "../javascript/find-unresolved-references.ts";
-import {findTopLevelVariableDeclarations} from "../javascript/find-top-level-variable-declarations.ts";
+import {findUnresolvedReferences} from "../javascript/findUnresolvedReferences.ts";
+import {findTopLevelVariableDeclarations} from "../javascript/findTopLevelVariableDeclarations.ts";
 
 /** A definition of a Node but still in raw text format */
 export class NodeDefinition {
