@@ -27,7 +27,7 @@ export class Imports {
         return `{${specifiers.map(sp => sp.local.name).join(',')}}`;
     }
 
-    static empty = new Imports(new Map());
+    static empty: Imports = new Imports(new Map());
 
     get(source: string): string | undefined {
         return this.data.get(source);
