@@ -1,3 +1,7 @@
+/** @module
+ * Functions that can be used inside a reactive element
+ */
+
 import {iterator} from "../Iterator.ts";
 
 export type SupportedInputs = HTMLInputElement | HTMLSelectElement;

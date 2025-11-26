@@ -7,7 +7,7 @@ describe("NodeDefinition", () => {
         display.clear();
     });
 
-    test("detects the usage of the display function", async () => {
+    test("detects explicit display function usage", async () => {
         // language=JavaScript
         const definition = NodeDefinition.parse(`
             import {display} from "@bodar/dataflow/api/display.ts";
@@ -18,6 +18,20 @@ describe("NodeDefinition", () => {
 const [{display}] = await Promise.all([import('@bodar/dataflow/api/display.ts')]);
 const input = display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input,_display_1234:display.pop()};
+}`)
+    });
+
+    test("detects explicit view function usage", async () => {
+        // language=JavaScript
+        const definition = NodeDefinition.parse(`
+            import {view} from "@bodar/dataflow/api/view.ts";
+            const input = view(<input name="name" type="text" value="Dan"/>);
+        `, '1234');
+        // language=JavaScript
+        expect(definition.toString()).toBe(`"1234",[],["input","_display_1234"],async() => {
+const [{view}] = await Promise.all([import('@bodar/dataflow/api/view.ts')]);
+const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
+return {input,_display_1234:view.pop()};
 }`)
     });
 

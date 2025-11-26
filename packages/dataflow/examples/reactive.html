@@ -23,15 +23,13 @@
     <script type="module" reactive>`Hello ${name}.`</script>
 </p>
 <script type="module" reactive>
-    import {iterator} from "@bodar/dataflow/Iterator.ts";
-    import {display} from "@bodar/dataflow/api/display.ts";
-    const input = display(<input name="name" type="text" value="Dan" />);
-    const name = iterator(notify => input.addEventListener('input', ev => {notify(input.value)}), input.value);
+    import {view} from "@bodar/dataflow/api/view.ts";
+    const name = view(<input name="name" type="text" value="Dan" />);
 </script>
 <script type="module" reactive>
-    import * as Inputs from "https://esm.run/@observablehq/inputs";
-    import {display} from "@bodar/dataflow/api/display.ts";
-    const slider = display(Inputs.range([0, 100], {label: "x"}));
+    import {range} from "https://esm.run/@observablehq/inputs";
+    import {view} from "@bodar/dataflow/api/view.ts";
+    const slider = view(range([0, 100], {label: "x"}));
 </script>
 </body>
 </html>

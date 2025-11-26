@@ -44,11 +44,11 @@ export class NodeDefinition {
     }
 
     get outputs(): string[] {
-        return [...this._outputs, ...(this.hasExplicitDisplay() ? [display.format(this.key)] : [])];
+        return [...this._outputs, ...(this.hasExplicitDisplay() || this.hasExplicitView() ? [display.format(this.key)] : [])];
     }
 
     get returnStatement(): string {
-        return `return {${this.outputs.join(',')}${this.hasExplicitDisplay() ? `:display.pop()` : ''}};`;
+        return `return {${this.outputs.join(',')}${this.hasExplicitDisplay() ? `:display.pop()` : this.hasExplicitView() ? `:view.pop()` : ''}};`;
     }
 
     get imports(): Imports {
@@ -91,6 +91,10 @@ export class NodeDefinition {
 
     hasExplicitDisplay(): boolean {
         return !!this._imports.get('@bodar/dataflow/api/display.ts');
+    }
+
+    hasExplicitView(): boolean {
+        return !!this._imports.get('@bodar/dataflow/api/view.ts');
     }
 }
 
