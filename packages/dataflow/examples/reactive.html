@@ -24,12 +24,14 @@
 </p>
 <script type="module" reactive>
     import {iterator} from "@bodar/dataflow/Iterator.ts";
-    const input = <input name="name" type="text" value="Dan" />;
+    import {display} from "@bodar/dataflow/api/display.ts";
+    const input = display(<input name="name" type="text" value="Dan" />);
     const name = iterator(notify => input.addEventListener('input', ev => {notify(input.value)}), input.value);
 </script>
 <script type="module" reactive>
     import * as Inputs from "https://esm.run/@observablehq/inputs";
-    const slider = Inputs.range([0, 100], {label: "x"});
+    import {display} from "@bodar/dataflow/api/display.ts";
+    const slider = display(Inputs.range([0, 100], {label: "x"}));
 </script>
 </body>
 </html>

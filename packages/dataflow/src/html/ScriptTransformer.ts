@@ -1,4 +1,5 @@
 import {HTMLTransformer} from "./HTMLTransformer.ts";
+import {display} from "../api/display.ts";
 
 export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
     private chunks: string[] = [];
@@ -14,7 +15,7 @@ export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementC
 
     endTag(end: HTMLRewriterTypes.EndTag, id?: string) {
         const names = this.controller.addScript(this.getJavascript(), id);
-        end.after(names.map(name => `<slot name="${name}"></slot>`).join(""), {html: true})
+        end.after(names.filter(name => name.startsWith(display.prefix)).map(name => `<slot name="${name}"></slot>`).join(""), {html: true})
         end.remove();
     }
 

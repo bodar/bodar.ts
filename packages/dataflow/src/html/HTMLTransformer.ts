@@ -1,7 +1,7 @@
 /** @module
  * Module
  * **/
-import {NodeDefinition, parseNodeDefinition} from "./NodeDefinition.ts";
+import {NodeDefinition} from "./NodeDefinition.ts";
 import {ScriptTransformer} from "./ScriptTransformer.ts";
 import {BodyTransformer} from "./BodyTransformer.ts";
 
@@ -22,7 +22,7 @@ export class HTMLTransformer {
     definitions: NodeDefinition[] = [];
 
     addScript(javascript: string, id?: string): string[] {
-        const definition = parseNodeDefinition(javascript, id);
+        const definition = NodeDefinition.parse(javascript, id);
         this.definitions.push(definition);
         return [definition.key, ...definition.outputs]
     }

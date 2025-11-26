@@ -18,6 +18,7 @@
     "./PullNode.ts": "./src/PullNode.ts",
     "./BaseGraph.ts": "./src/BaseGraph.ts",
     "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts",
+    "./api/display.ts": "./src/api/display.ts",
     "./html/HTMLTransformer.ts": "./src/html/HTMLTransformer.ts",
     "./html/Renderer.ts": "./src/html/Renderer.ts"
   },
