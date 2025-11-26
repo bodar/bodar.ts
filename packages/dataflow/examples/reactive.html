@@ -27,7 +27,7 @@
     const name = view(<input name="name" type="text" value="Dan" />);
 </script>
 <script type="module" reactive>
-    import {range} from "https://esm.run/@observablehq/inputs";
+    import {range} from "@observablehq/inputs";
     import {view} from "@bodar/dataflow/api/view.ts";
     const slider = view(range([0, 100], {label: "x"}));
 </script>
