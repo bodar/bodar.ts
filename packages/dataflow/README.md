@@ -41,7 +41,8 @@ One day this could just be built into the browser (as single attribute)
 Just add the attribute `reactive` to `<script>` tags, document order does not matter. Any top level constants declared in 
 the block become outputs for other reactive script tags to depend on. Any undeclared variables in the script tags become 
 dependencies / inputs for the script tag. The engine will topologically sort all the reactive script tags and build a 
-reactive graph. If the script tag returns a DOM element, string or number it will be placed in the document.
+reactive graph. If the script tag is a single expression, it will implicitly display the result. 
+Otherwise you need to use the `display` or `view` functions to explicitly say what needs to be displayed 
 
 ```html
 <p>This is our first reactive document.
@@ -56,6 +57,13 @@ reactive graph. If the script tag returns a DOM element, string or number it wil
             yield Date.now();
         }
     }
+</script>
+<p>
+    <script type="module" reactive>`Hello ${name}.`</script>
+</p>
+<script type="module" reactive>
+    import {view} from "@bodar/dataflow/api/view.ts";
+    const name = view(<input name="name" type="text" value="Dan" />);
 </script>
 ```
 

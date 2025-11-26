@@ -10,3 +10,6 @@ export function view(value: HTMLElement): AsyncIterator<any> {
 }
 
 view.pop = (): SupportedValue[]=> display.pop();
+
+// TODO remove once we have proper build for script
+export {display};

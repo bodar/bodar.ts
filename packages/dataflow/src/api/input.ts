@@ -6,9 +6,9 @@ import {iterator} from "../Iterator.ts";
 
 export type SupportedInputs = HTMLInputElement | HTMLSelectElement;
 
-export function input(element: SupportedInputs): AsyncIterator<any> {
+export function input<E extends SupportedInputs, R>(element: E, event: string = eventOf(element), value: (i: E) => R = valueOf): AsyncIterator<R> {
     return iterator((notify) =>
-        element.addEventListener(eventOf(element), () => notify(valueOf(element))), valueOf(element));
+        element.addEventListener(event, () => notify(value(element))), value(element));
 }
 
 function valueOf(element: SupportedInputs): any {
