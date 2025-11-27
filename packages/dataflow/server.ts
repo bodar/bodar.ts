@@ -1,4 +1,5 @@
 import {HTMLTransformer} from "@bodar/dataflow/html/HTMLTransformer.ts";
+import {bundleFile} from "./src/bundling/bundle.ts";
 
 const PORT = 3000;
 const ROOT = import.meta.dir;
@@ -23,15 +24,7 @@ Bun.serve({
                 headers: {'Content-Type': 'text/html'}
             });
         } else if (filePath.endsWith('.ts')) {
-            const result = await Bun.build({
-                entrypoints: [filePath],
-                outdir: `${ROOT}/out`
-            });
-            let bundled: string | undefined;
-            for (const output of result.outputs) {
-                bundled = await output.text();
-                break;
-            }
+            let bundled = await bundleFile(filePath);
             return new Response(bundled, {
                 headers: {'Content-Type': 'application/javascript'}
             });

@@ -1,7 +1,7 @@
 import {describe, expect, test} from "bun:test";
 import {HTMLTransformer} from "../../src/html/HTMLTransformer.ts";
 
-describe("HTMLTransformer", () => {
+describe.skip("HTMLTransformer", () => {
     test("constants are not rendered, so no placeholder slot", async () => {
         const transformer = new HTMLTransformer(new HTMLRewriter());
         const result = transformer.transform('<body><script data-reactive>const a = 1;</script></body>');

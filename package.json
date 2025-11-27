@@ -11,5 +11,8 @@
   },
   "patchedDependencies": {
     "mxn-jsx-ast-transformer@0.8.7": "patches/mxn-jsx-ast-transformer@0.8.7.patch"
+  },
+  "dependencies": {
+    "@observablehq/inputs": "^0.12.0"
   }
 }

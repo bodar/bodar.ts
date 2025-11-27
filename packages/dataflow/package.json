@@ -22,7 +22,8 @@
     "./api/input.ts": "./src/api/input.ts",
     "./api/view.ts": "./src/api/view.ts",
     "./html/HTMLTransformer.ts": "./src/html/HTMLTransformer.ts",
-    "./html/Renderer.ts": "./src/html/Renderer.ts"
+    "./html/Renderer.ts": "./src/html/Renderer.ts",
+    "./bundling/bundle.ts": "./src/bundling/bundle.ts"
   },
   "files": [
     "src",
