@@ -11,9 +11,23 @@
             padding: 2rem;
             line-height: 1.6;
         }
-        h1, h2, h3 { margin-top: 2rem; }
-        p { margin: 1rem 0; }
-        code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+
+        h1, h2, h3 {
+            margin-top: 2rem;
+        }
+
+        p {
+            margin: 1rem 0;
+        }
+
+        pre {
+            margin-top: 0;
+        }
+
+        code {
+            font-family: ui-monospace, monospace;
+        }
+
         .example {
             border: 1px solid #ddd;
             padding: 1rem;
@@ -21,18 +35,21 @@
             border-radius: 4px;
             background: #fafafa;
         }
+
         .note {
             background: #e8f4fd;
             border-left: 4px solid #1976d2;
             padding: 1rem;
             margin: 1rem 0;
         }
+
         .tip {
             background: #e8f5e9;
             border-left: 4px solid #4caf50;
             padding: 1rem;
             margin: 1rem 0;
         }
+
         input, select {
             font-family: inherit;
             font-size: inherit;
@@ -41,10 +58,23 @@
             padding: 0.3em 0.5em;
             background-color: #fff;
         }
+
         input:focus, select:focus {
             outline: none;
             border-color: #1976d2;
             box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+        }
+
+        :root {
+            --sh-class: #2d5e9d;
+            --sh-identifier: #354150;
+            --sh-sign: #8996a3;
+            --sh-property: #0550ae;
+            --sh-entity: #249a97;
+            --sh-jsxliterals: #6266d1;
+            --sh-string: #00a99a;
+            --sh-keyword: #f47067;
+            --sh-comment: #a19595;
         }
     </style>
 </head>
@@ -52,29 +82,30 @@
 
 <h1>Dataflow</h1>
 
-<p>Dataflow is a lightweight reactive JavaScript library inspired by <a href="https://observablehq.com/framework/">Observable Framework</a>. It brings reactive programming to plain HTML pages with minimal overhead - the core library (including JSX support) is under 3KB compressed.</p>
+<p>Dataflow is a lightweight reactive JavaScript library inspired by <a href="https://observablehq.com/framework/">Observable
+    Framework</a>. It brings reactive programming to plain HTML pages with minimal overhead - the core library
+    (including JSX support) is under 3KB compressed.</p>
 
 <p>Just add a single <code>data-reactive</code> attribute to any script tag and it becomes reactive. That's it.</p>
 
-<p>It works like a spreadsheet: just reference a value from another reactive script tag, and the plumbing happens automatically. No <code>setState</code>, no Redux, no reducers, no manual subscriptions. Just declarative dependencies.</p>
+<p>It works like a spreadsheet: just reference a value from another reactive script tag, and the plumbing happens
+    automatically. No <code>setState</code>, no Redux, no reducers, no manual subscriptions. Just declarative
+    dependencies.</p>
 
-<div class="tip">The transformation can happen at build time, at runtime on the server, at the edge, or even client-side using a service worker.</div>
+<div class="tip">The transformation can happen at build time, at runtime on the server, at the edge, or even client-side
+    using a service worker.
+</div>
 
 <h2>Example</h2>
 
 <p>A live clock using a generator that yields the current time:</p>
 
+
 <div class="example">
-    <script type="module" data-reactive>
-        const time = function* () {
-            while (true) {
-                yield Date.now();
-            }
-        }
-    </script>
-    <script type="module" data-reactive>
-        `The current time is ${new Date(time).toLocaleTimeString("en-GB")}.`
-    </script>
+    <script type="module" data-reactive data-echo="html">
+`The current time is ${new Date(now).toLocaleTimeString("en-GB")}.`
+</script>
+
 </div>
 
 <h2>Expressions and Display</h2>
@@ -82,29 +113,30 @@
 <p>A single expression automatically displays its result:</p>
 
 <div class="example">
-    <script type="module" data-reactive>1 + 2</script>
+    <script type="module" data-reactive data-echo>1 + 2</script>
 </div>
 
 <p>Statements like variable declarations don't display anything - they just define values for other blocks to use:</p>
 
 <div class="example">
-    <script type="module" data-reactive>const foo = 1 + 2;</script>
+    <script type="module" data-reactive data-echo>const foo = 1 + 2;</script>
     <p>The variable <code>foo</code> is defined but nothing is displayed.</p>
 </div>
 
 <p>For explicit control, import the <code>display</code> function. You can call it multiple times:</p>
 
 <div class="example">
-    <script type="module" data-reactive>
-        import {display} from "@bodar/dataflow/api/display.ts";
-        for (let i = 0; i < 5; ++i) {
-            display(i);
-        }
+    <script type="module" data-reactive data-echo>
+import {display} from "@bodar/dataflow/api/display.ts";
+for (let i = 0; i < 5; ++i) {
+    display(i);
+}
     </script>
 </div>
 
 <div class="note">
-    <strong>Note:</strong> This differs from Observable Framework which uses semicolons to determine display - we use AST parsing, so semicolons are optional and Prettier won't break anything.
+    <strong>Note:</strong> This differs from Observable Framework which uses semicolons to determine display - we use
+    AST parsing, so semicolons are optional and Prettier won't break anything.
 </div>
 
 <h2>DOM Nodes</h2>
@@ -112,62 +144,65 @@
 <p>If an expression evaluates to a DOM node, the node is inserted into the page. Use this to create dynamic content.</p>
 
 <div class="example">
-    <script type="module" data-reactive>document.createTextNode("[insert chart here]")</script>
+<script type="module" data-reactive data-echo>document.createTextNode("[insert chart here]")</script>
 </div>
 
 <h2>JSX</h2>
 
-<p>JSX is supported for creating DOM elements with a familiar syntax. Under the hood, JSX compiles directly to native DOM methods using the <a href="https://jsr.io/@bodar/jsx2dom">@bodar/jsx2dom</a> library - no virtual DOM, no framework overhead.</p>
+<p>JSX is supported for creating DOM elements with a familiar syntax. Under the hood, JSX compiles directly to native
+    DOM methods using the <a href="https://jsr.io/@bodar/jsx2dom">@bodar/jsx2dom</a> library - no virtual DOM, no
+    framework overhead.</p>
 
 <p>For example, here's a component that displays a greeting:</p>
 
 <div class="example">
-    <script type="module" data-reactive>
-        const greeting = (name) => <i>Hello, {name}!</i>
+    <script type="module" data-reactive data-echo>
+const greeting = (name) => <i>Hello, {name}!</i>
     </script>
-    <script type="module" data-reactive>greeting("world")</script>
+    <script type="module" data-reactive data-echo>greeting("world")</script>
 </div>
 
 <p>JSX attributes work as expected, including dynamic values:</p>
 
 <div class="example">
-    <script type="module" data-reactive>
-        const color = "blue";
+    <script type="module" data-reactive data-echo>
+const color = "blue";
     </script>
-    <script type="module" data-reactive>
-        <span style={`color: ${color}; font-weight: bold`}>Styled with JSX</span>
+    <script type="module" data-reactive data-echo>
+<span style={`color: ${color}; font-weight: bold`}>Styled with JSX</span>
     </script>
 </div>
 
 <h2>Reactivity with Generators</h2>
 
-<p>Code blocks automatically re-run when referenced reactive variables change. The block below references a <code>now</code> variable representing the current time in milliseconds; because <code>now</code> is reactive (defined as a generator), this block runs continuously.</p>
+<p>Code blocks automatically re-run when referenced reactive variables change. The block below references a
+    <code>now</code> variable representing the current time in milliseconds; because <code>now</code> is reactive
+    (defined as a generator), this block runs continuously.</p>
 
 <div class="example">
-    <script type="module" data-reactive>
-        const now = function* () {
-            while (true) {
-                yield Date.now();
-            }
-        }
+    <script type="module" data-reactive data-echo>
+const now = function* () {
+    while (true) {
+        yield Date.now();
+    }
+}
     </script>
-    <script type="module" data-reactive>
-        <span style={`color: hsl(${(now / 10) % 360} 100% 50%)`}>Rainbow text!</span>
-    </script>
+    <script type="module" data-reactive data-echo><span style={`color: hsl(${(now / 10) % 360} 100% 50%)`}>Rainbow text!</span></script>
 </div>
 
 <h2>Reactive Inputs with view()</h2>
 
-<p>The <code>view</code> function combines <code>display</code> and <code>input</code> to create reactive inputs. When the input changes, dependent code re-runs.</p>
+<p>The <code>view</code> function combines <code>display</code> and <code>input</code> to create reactive inputs. When
+    the input changes, dependent code re-runs.</p>
 
 <h3>Using Plain JSX Inputs</h3>
 
 <div class="example">
-    <script type="module" data-reactive>
-        import {view} from "@bodar/dataflow/api/view.ts";
-        const name = view(<input name="name" type="text" value="World" />);
+    <script type="module" data-reactive data-echo>
+import {view} from "@bodar/dataflow/api/view.ts";
+const name = view(<input name="name" type="text" value="World"/>);
     </script>
-    <script type="module" data-reactive>`Hello, ${name}!`</script>
+    <script type="module" data-reactive data-echo>`Hello, ${name}!`</script>
 </div>
 
 <h3>Using Observable Inputs</h3>
@@ -175,26 +210,26 @@
 <p>You can also use the <code>@observablehq/inputs</code> library for more sophisticated input controls.</p>
 
 <div class="example">
-    <script type="module" data-reactive>
-        import {range} from "@observablehq/inputs";
-        import {view} from "@bodar/dataflow/api/view.ts";
-        const slider = view(range([0, 100], {label: "Value", step: 1, value: 50}));
+    <script type="module" data-reactive data-echo>
+import {range} from "@observablehq/inputs";
+import {view} from "@bodar/dataflow/api/view.ts";
+const slider = view(range([0, 100], {label: "Value", step: 1, value: 50}));
     </script>
-    <script type="module" data-reactive>`The slider value is: ${slider}`</script>
+    <script type="module" data-reactive data-echo>`The slider value is: ${slider}`</script>
 </div>
 
 <h3>Multiple Inputs</h3>
 
 <div class="example">
-    <script type="module" data-reactive>
-        import {view} from "@bodar/dataflow/api/view.ts";
-        const a = view(<input type="number" value="10" style="width: 60px" />);
+    <script type="module" data-reactive data-echo>
+import {view} from "@bodar/dataflow/api/view.ts";
+const a = view(<input type="number" value="10" style="width: 60px"/>);
     </script>
-    <script type="module" data-reactive>
-        import {view} from "@bodar/dataflow/api/view.ts";
-        const b = view(<input type="number" value="5" style="width: 60px" />);
+    <script type="module" data-reactive data-echo>
+import {view} from "@bodar/dataflow/api/view.ts";
+const b = view(<input type="number" value="5" style="width: 60px"/>);
     </script>
-    <script type="module" data-reactive>
+    <script type="module" data-reactive data-echo>
         <span>{a} + {b} = {a + b}</span>
     </script>
 </div>
@@ -204,29 +239,27 @@
 <h3>Checkbox</h3>
 
 <div class="example">
-    <script type="module" data-reactive>
-        import {view} from "@bodar/dataflow/api/view.ts";
-        const checked = view(<input type="checkbox" id="feature"/>);
+    <script type="module" data-reactive data-echo>
+import {view} from "@bodar/dataflow/api/view.ts";
+const checked = view(<input type="checkbox" id="feature"/>);
     </script>
     <label for="feature">
-        <script type="module" data-reactive>`Feature is ${checked ? 'enabled' : 'disabled'}`</script>
+        <script type="module" data-reactive data-echo>`Feature is ${checked ? 'enabled' : 'disabled'}`</script>
     </label>
 </div>
 
 <h3>Select</h3>
 
 <div class="example">
-    <script type="module" data-reactive>
-        import {view} from "@bodar/dataflow/api/view.ts";
-        const color1 = view(
-            <select>
-                <option value="red">Red</option>
-                <option value="green">Green</option>
-                <option value="blue">Blue</option>
-            </select>
-        );
+    <script type="module" data-reactive data-echo>
+import {view} from "@bodar/dataflow/api/view.ts";
+const color1 = view(<select>
+    <option value="red">Red</option>
+    <option value="green">Green</option>
+    <option value="blue">Blue</option>
+</select>);
     </script>
-    <script type="module" data-reactive>
+    <script type="module" data-reactive data-echo>
         <span style={`color: ${color1}; font-weight: bold`}>Selected color: {color1}</span>
     </script>
 </div>
@@ -236,24 +269,32 @@
 <p>Reactive values can depend on multiple inputs. The dependent code re-runs whenever any input changes.</p>
 
 <div class="example">
-    <script type="module" data-reactive>
-        import {view} from "@bodar/dataflow/api/view.ts";
-        const width = view(<input type="range" min="50" max="300" value="150" />);
+    <script type="module" data-reactive data-echo>
+import {view} from "@bodar/dataflow/api/view.ts";
+const width = view(<input type="range" min="50" max="300" value="150"/>);
     </script>
-    <script type="module" data-reactive>
-        import {view} from "@bodar/dataflow/api/view.ts";
-        const height = view(<input type="range" min="50" max="200" value="100" />);
+    <script type="module" data-reactive data-echo>
+import {view} from "@bodar/dataflow/api/view.ts";
+const height = view(<input type="range" min="50" max="200" value="100"/>);
     </script>
-    <script type="module" data-reactive>
-        import {view} from "@bodar/dataflow/api/view.ts";
-        const color2 = view(<input type="color" value="#4a90d9" />);
+    <script type="module" data-reactive data-echo>
+import {view} from "@bodar/dataflow/api/view.ts";
+const color2 = view(<input type="color" value="#4a90d9"/>);
     </script>
-    <script type="module" data-reactive>
-        <div style={`width: ${width}px; height: ${height}px; background: ${color2}; display: flex; align-items: center; justify-content: center; color: white; text-shadow: 1px 1px 2px black`}>
-            {width} x {height}
-        </div>
+    <script type="module" data-reactive data-echo>
+<div style={`width: ${width}px; height: ${height}px; background: ${color2};
+    display: flex; align-items: center; justify-content: center; color: white;
+    text-shadow: 1px 1px 2px black`}>
+    {width} x {height}
+</div>
     </script>
 </div>
+
+
+<script type="module">
+import {highlight} from 'https://esm.run/sugar-high';
+document.querySelectorAll('pre > code.language-javascript, pre > code.language-html').forEach(code => code.innerHTML = highlight(code.innerText));
+</script>
 
 </body>
 </html>

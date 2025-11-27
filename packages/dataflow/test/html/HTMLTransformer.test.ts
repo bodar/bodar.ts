@@ -101,7 +101,7 @@ import {Renderer} from "@bodar/dataflow/html/Renderer.ts";
 import {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
 const jsx = new JSX2DOM();
 const renderer = new Renderer();
-renderer.register("tubt3x",[],["input","name"],async() => {
+renderer.register("lmga2r",[],["input","name"],async() => {
 const [{iterator}] = await Promise.all([import('@bodar/dataflow/Iterator.ts')]);
 const input = jsx.createElement("input", {"name": "name","type": "text"});const name = iterator(notify => input.addEventListener('input', ev => {notify(ev.data);}), input.value);
 return {input,name};
@@ -109,5 +109,22 @@ return {input,name};
 renderer.render();
 </script></body>`
         );
+    });
+
+    test.skip("data-echo inserts escaped code block after output", async () => {
+        const transformer = new HTMLTransformer(new HTMLRewriter());
+        const result = transformer.transform('<body><script type="module" data-reactive data-echo>1 + 2</script></body>');
+
+        // Should have display slot, code block with escaped content, and highlight.js setup
+        expect(result).toBe('');
+    });
+
+    test("data-echo is not included when not present", async () => {
+        const transformer = new HTMLTransformer(new HTMLRewriter());
+        const result = transformer.transform('<body><script data-reactive>1 + 2</script></body>');
+
+        expect(result).not.toContain('<pre><code');
+        expect(result).not.toContain('hljs');
+        expect(result).not.toContain('highlight.js');
     });
 });

@@ -20,6 +20,7 @@ export class HTMLTransformer {
     }
 
     definitions: NodeDefinition[] = [];
+    highlight: boolean = false;
 
     addScript(javascript: string, id?: string): string[] {
         const definition = NodeDefinition.parse(javascript, id);
