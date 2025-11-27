@@ -52,15 +52,13 @@
 
 <h1>Dataflow</h1>
 
-<p>Dataflow is a lightweight reactive JavaScript library inspired by <a href="https://observablehq.com/framework/">Observable Framework</a>. It brings reactive programming to plain HTML pages with minimal overhead - the core library is under 3KB compressed.</p>
+<p>Dataflow is a lightweight reactive JavaScript library inspired by <a href="https://observablehq.com/framework/">Observable Framework</a>. It brings reactive programming to plain HTML pages with minimal overhead - the core library (including JSX support) is under 3KB compressed.</p>
 
 <p>Just add a single <code>data-reactive</code> attribute to any script tag and it becomes reactive. That's it.</p>
 
-<p>It works like a spreadsheet: declare that this value depends on that value, and the plumbing happens automatically. No <code>setState</code>, no Redux, no reducers, no manual subscriptions. Just declarative dependencies.</p>
+<p>It works like a spreadsheet: just reference a value from another reactive script tag, and the plumbing happens automatically. No <code>setState</code>, no Redux, no reducers, no manual subscriptions. Just declarative dependencies.</p>
 
-<p>The transformation can happen at build time, at runtime on the server, at the edge, or even client-side using a service worker.</p>
-
-<div class="tip">JavaScript runs on load, and re-runs reactively when variables change.</div>
+<div class="tip">The transformation can happen at build time, at runtime on the server, at the edge, or even client-side using a service worker.</div>
 
 <h2>Reactive Script Blocks</h2>
 
@@ -189,6 +187,7 @@
 
 <div class="note">
     <strong>Note:</strong> This differs from Observable Framework. We use AST parsing to detect whether the code is a single expression versus a statement.
+    Semi colons are optional, Prettier will not break anything.
 </div>
 
 <h2>Reactive Inputs with view()</h2>
