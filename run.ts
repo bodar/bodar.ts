@@ -78,6 +78,10 @@ export async function generateExports(packageGlob: string = "packages/*/package.
     }
 }
 
+export async function generateDocs() {
+    await $`bun run packages/dataflow/docs.ts`;
+}
+
 export async function generateJsr() {
     const v = await version();
 
@@ -129,6 +133,7 @@ export async function publish() {
 
 export async function ci() {
     await build();
+    await generateDocs();
     await publish();
 }
 
