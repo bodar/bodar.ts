@@ -11,10 +11,10 @@ export function display<T extends SupportedValue>(value: T): T {
 
 display.prefix = '_display_';
 display.values = [] as SupportedValue[];
-display.clear = () => {
+display.clear = (): void => {
     display.values.length = 0;
 }
-display.format = (key: string) => display.prefix + key
+display.format = (key: string): string => display.prefix + key
 display.pop = (): SupportedValue[]=> {
     try {
         return display.values.slice();
