@@ -33,11 +33,26 @@
             padding: 1rem;
             margin: 1rem 0;
         }
+        input, select {
+            font-family: inherit;
+            font-size: inherit;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 0.3em 0.5em;
+            background-color: #fff;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+        }
     </style>
 </head>
 <body>
 
 <h1>Dataflow</h1>
+
+<p>Dataflow is a lightweight reactive JavaScript library inspired by <a href="https://observablehq.com/framework/">Observable Framework</a>. It brings reactive programming to plain HTML pages with minimal overhead - the core library is under 3KB compressed.</p>
 
 <p>Use JavaScript to render dynamic, interactive, and reactive content. JavaScript in HTML can be expressed as reactive script blocks using <code>&lt;script type="module" reactive&gt;</code>.</p>
 
@@ -70,13 +85,28 @@
     <script type="module" reactive>document.createTextNode("[insert chart here]")</script>
 </div>
 
-<p>You can use the DOM API to create content as above, but typically you'll use JSX to create content. For example, here's a component that displays a greeting:</p>
+<h2>JSX</h2>
+
+<p>JSX is supported for creating DOM elements with a familiar syntax. Under the hood, JSX compiles directly to native DOM methods using the <a href="https://jsr.io/@bodar/jsx2dom">@bodar/jsx2dom</a> library - no virtual DOM, no framework overhead.</p>
+
+<p>For example, here's a component that displays a greeting:</p>
 
 <div class="example">
     <script type="module" reactive>
         const greeting = (name) => <i>Hello, {name}!</i>
     </script>
     <script type="module" reactive>greeting("world")</script>
+</div>
+
+<p>JSX attributes work as expected, including dynamic values:</p>
+
+<div class="example">
+    <script type="module" reactive>
+        const color = "blue";
+    </script>
+    <script type="module" reactive>
+        <span style={`color: ${color}; font-weight: bold`}>Styled with JSX</span>
+    </script>
 </div>
 
 <h2>Reactivity with Generators</h2>
@@ -207,9 +237,11 @@
 <div class="example">
     <script type="module" reactive>
         import {view} from "@bodar/dataflow/api/view.ts";
-        const checked = view(<input type="checkbox" />);
+        const checked = view(<input type="checkbox" id="feature"/>);
     </script>
-    <script type="module" reactive>`Feature is ${checked ? 'enabled' : 'disabled'}`</script>
+    <label for="feature">
+        <script type="module" reactive>`Feature is ${checked ? 'enabled' : 'disabled'}`</script>
+    </label>
 </div>
 
 <h3>Select</h3>
