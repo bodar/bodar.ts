@@ -54,7 +54,11 @@
 
 <p>Dataflow is a lightweight reactive JavaScript library inspired by <a href="https://observablehq.com/framework/">Observable Framework</a>. It brings reactive programming to plain HTML pages with minimal overhead - the core library is under 3KB compressed.</p>
 
-<p>Use JavaScript to render dynamic, interactive, and reactive content. JavaScript in HTML can be expressed as reactive script blocks using <code>&lt;script type="module" reactive&gt;</code>.</p>
+<p>Just add a single <code>data-reactive</code> attribute to any script tag and it becomes reactive. That's it.</p>
+
+<p>It works like a spreadsheet: declare that this value depends on that value, and the plumbing happens automatically. No <code>setState</code>, no Redux, no reducers, no manual subscriptions. Just declarative dependencies.</p>
+
+<p>The transformation can happen at build time, at runtime on the server, at the edge, or even client-side using a service worker.</p>
 
 <div class="tip">JavaScript runs on load, and re-runs reactively when variables change.</div>
 
@@ -63,7 +67,7 @@
 <p>Reactive script blocks come in two forms: <em>expression</em> blocks and <em>program</em> blocks. An expression block contains a single expression:</p>
 
 <div class="example">
-    <script type="module" reactive>1 + 2</script>
+    <script type="module" data-reactive>1 + 2</script>
 </div>
 
 <p>Expression blocks implicitly display their result.</p>
@@ -71,7 +75,7 @@
 <p>A program block contains statements like variable declarations:</p>
 
 <div class="example">
-    <script type="module" reactive>const foo = 1 + 2;</script>
+    <script type="module" data-reactive>const foo = 1 + 2;</script>
     <p>The variable <code>foo</code> is defined but nothing is displayed.</p>
 </div>
 
@@ -82,7 +86,7 @@
 <p>If an expression evaluates to a DOM node, the node is inserted into the page. Use this to create dynamic content.</p>
 
 <div class="example">
-    <script type="module" reactive>document.createTextNode("[insert chart here]")</script>
+    <script type="module" data-reactive>document.createTextNode("[insert chart here]")</script>
 </div>
 
 <h2>JSX</h2>
@@ -92,19 +96,19 @@
 <p>For example, here's a component that displays a greeting:</p>
 
 <div class="example">
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         const greeting = (name) => <i>Hello, {name}!</i>
     </script>
-    <script type="module" reactive>greeting("world")</script>
+    <script type="module" data-reactive>greeting("world")</script>
 </div>
 
 <p>JSX attributes work as expected, including dynamic values:</p>
 
 <div class="example">
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         const color = "blue";
     </script>
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         <span style={`color: ${color}; font-weight: bold`}>Styled with JSX</span>
     </script>
 </div>
@@ -114,14 +118,14 @@
 <p>Code blocks automatically re-run when referenced reactive variables change. The block below references a <code>now</code> variable representing the current time in milliseconds; because <code>now</code> is reactive (defined as a generator), this block runs continuously.</p>
 
 <div class="example">
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         const now = function* () {
             while (true) {
                 yield Date.now();
             }
         }
     </script>
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         <span style={`color: hsl(${(now / 10) % 360} 100% 50%)`}>Rainbow text!</span>
     </script>
 </div>
@@ -131,7 +135,7 @@
 <p>The <code>display</code> function displays the specified value.</p>
 
 <div class="example">
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         import {display} from "@bodar/dataflow/api/display.ts";
         const x = Math.random();
         display(x);
@@ -141,7 +145,7 @@
 <p>Calling <code>display</code> multiple times will display multiple values. Values are displayed in the order they are received.</p>
 
 <div class="example">
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         import {display} from "@bodar/dataflow/api/display.ts";
         for (let i = 0; i < 5; ++i) {
             display(i);
@@ -152,7 +156,7 @@
 <p>If you pass <code>display</code> a DOM node, it will be inserted directly into the page.</p>
 
 <div class="example">
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         import {display} from "@bodar/dataflow/api/display.ts";
         display(<span>Your lucky number is {Math.floor(Math.random() * 10)}!</span>);
     </script>
@@ -161,7 +165,7 @@
 <p>The <code>display</code> function returns the passed-in value. You can display any value in code; use this as an alternative to <code>console.log</code> to debug your code.</p>
 
 <div class="example">
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         import {display} from "@bodar/dataflow/api/display.ts";
         const y = display(Math.random());
     </script>
@@ -173,13 +177,13 @@
 <p>JavaScript expression blocks are implicitly wrapped with a call to <code>display</code>. For example, this arithmetic expression displays implicitly:</p>
 
 <div class="example">
-    <script type="module" reactive>1 + 2</script>
+    <script type="module" data-reactive>1 + 2</script>
 </div>
 
 <p>Implicit display only applies when the code block contains a single expression. Statements like variable declarations don't implicitly display:</p>
 
 <div class="example">
-    <script type="module" reactive>const foo = 1 + 2;</script>
+    <script type="module" data-reactive>const foo = 1 + 2;</script>
     <p>(Nothing displayed above - variable declarations are statements, not expressions)</p>
 </div>
 
@@ -194,11 +198,11 @@
 <h3>Using Plain JSX Inputs</h3>
 
 <div class="example">
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         import {view} from "@bodar/dataflow/api/view.ts";
         const name = view(<input name="name" type="text" value="World" />);
     </script>
-    <script type="module" reactive>`Hello, ${name}!`</script>
+    <script type="module" data-reactive>`Hello, ${name}!`</script>
 </div>
 
 <h3>Using Observable Inputs</h3>
@@ -206,26 +210,26 @@
 <p>You can also use the <code>@observablehq/inputs</code> library for more sophisticated input controls.</p>
 
 <div class="example">
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         import {range} from "@observablehq/inputs";
         import {view} from "@bodar/dataflow/api/view.ts";
         const slider = view(range([0, 100], {label: "Value", step: 1, value: 50}));
     </script>
-    <script type="module" reactive>`The slider value is: ${slider}`</script>
+    <script type="module" data-reactive>`The slider value is: ${slider}`</script>
 </div>
 
 <h3>Multiple Inputs</h3>
 
 <div class="example">
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         import {view} from "@bodar/dataflow/api/view.ts";
         const a = view(<input type="number" value="10" style="width: 60px" />);
     </script>
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         import {view} from "@bodar/dataflow/api/view.ts";
         const b = view(<input type="number" value="5" style="width: 60px" />);
     </script>
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         <span>{a} + {b} = {a + b}</span>
     </script>
 </div>
@@ -235,19 +239,19 @@
 <h3>Checkbox</h3>
 
 <div class="example">
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         import {view} from "@bodar/dataflow/api/view.ts";
         const checked = view(<input type="checkbox" id="feature"/>);
     </script>
     <label for="feature">
-        <script type="module" reactive>`Feature is ${checked ? 'enabled' : 'disabled'}`</script>
+        <script type="module" data-reactive>`Feature is ${checked ? 'enabled' : 'disabled'}`</script>
     </label>
 </div>
 
 <h3>Select</h3>
 
 <div class="example">
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         import {view} from "@bodar/dataflow/api/view.ts";
         const color1 = view(
             <select>
@@ -257,7 +261,7 @@
             </select>
         );
     </script>
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         <span style={`color: ${color1}; font-weight: bold`}>Selected color: {color1}</span>
     </script>
 </div>
@@ -267,19 +271,19 @@
 <p>Reactive values can depend on multiple inputs. The dependent code re-runs whenever any input changes.</p>
 
 <div class="example">
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         import {view} from "@bodar/dataflow/api/view.ts";
         const width = view(<input type="range" min="50" max="300" value="150" />);
     </script>
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         import {view} from "@bodar/dataflow/api/view.ts";
         const height = view(<input type="range" min="50" max="200" value="100" />);
     </script>
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         import {view} from "@bodar/dataflow/api/view.ts";
         const color2 = view(<input type="color" value="#4a90d9" />);
     </script>
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         <div style={`width: ${width}px; height: ${height}px; background: ${color2}; display: flex; align-items: center; justify-content: center; color: white; text-shadow: 1px 1px 2px black`}>
             {width} x {height}
         </div>
@@ -291,14 +295,14 @@
 <p>A classic example showing reactive updates with a time generator.</p>
 
 <div class="example">
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         const time = function* () {
             while (true) {
                 yield Date.now();
             }
         }
     </script>
-    <script type="module" reactive>
+    <script type="module" data-reactive>
         `The current time is ${new Date(time).toLocaleTimeString("en-GB")}.`
     </script>
 </div>

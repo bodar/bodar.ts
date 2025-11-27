@@ -8,7 +8,7 @@ import {BodyTransformer} from "./BodyTransformer.ts";
 /** HTMLTransformer **/
 export class HTMLTransformer {
     constructor(private rewriter: HTMLRewriter) {
-        this.rewriter.on('script[reactive]', new ScriptTransformer(this))
+        this.rewriter.on('script[data-reactive]', new ScriptTransformer(this))
         this.rewriter.on('body', new BodyTransformer(this))
     }
 

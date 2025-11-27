@@ -46,12 +46,12 @@ Otherwise you need to use the `display` or `view` functions to explicitly say wh
 
 ```html
 <p>This is our first reactive document.
-    <script type="module" reactive>`The current time is ${new Date(now).toLocaleTimeString("en-GB")}.`</script>
+    <script type="module" data-reactive>`The current time is ${new Date(now).toLocaleTimeString("en-GB")}.`</script>
 </p>
-<script type="module" reactive>
+<script type="module" data-reactive>
     <span style={`color: hsl(${(now / 10) % 360} 100% 50%)`}>Rainbow text!</span>
 </script>
-<script type="module" reactive>
+<script type="module" data-reactive>
     const now = function* () {
         while (true) {
             yield Date.now();
@@ -59,9 +59,9 @@ Otherwise you need to use the `display` or `view` functions to explicitly say wh
     }
 </script>
 <p>
-    <script type="module" reactive>`Hello ${name}.`</script>
+    <script type="module" data-reactive>`Hello ${name}.`</script>
 </p>
-<script type="module" reactive>
+<script type="module" data-reactive>
     import {view} from "@bodar/dataflow/api/view.ts";
     const name = view(<input name="name" type="text" value="Dan" />);
 </script>
