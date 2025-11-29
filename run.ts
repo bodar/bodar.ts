@@ -67,7 +67,7 @@ export async function generateExports(packageGlob: string = "packages/*/package.
             const content = await file(join(srcDir, ts)).text();
             if(content.includes('@module')) exports[ts] = ts.replace('./', './src/');
         }
-        packageJson.exports = exports;
+        packageJson.exports = Object.fromEntries(Object.entries(exports).sort((a, b) => a[0].localeCompare(b[0])));
         packageJson.files = [
             "src",
             "README.md",

@@ -11,19 +11,19 @@
     "@bodar/jsx2dom": "workspace:jsx2dom"
   },
   "exports": {
-    "./Iterator.ts": "./src/Iterator.ts",
-    "./PushNode.ts": "./src/PushNode.ts",
-    "./Node.ts": "./src/Node.ts",
-    "./Graph.ts": "./src/Graph.ts",
-    "./PullNode.ts": "./src/PullNode.ts",
-    "./BaseGraph.ts": "./src/BaseGraph.ts",
-    "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts",
     "./api/display.ts": "./src/api/display.ts",
     "./api/input.ts": "./src/api/input.ts",
     "./api/view.ts": "./src/api/view.ts",
+    "./BaseGraph.ts": "./src/BaseGraph.ts",
+    "./bundling/bundle.ts": "./src/bundling/bundle.ts",
+    "./Graph.ts": "./src/Graph.ts",
     "./html/HTMLTransformer.ts": "./src/html/HTMLTransformer.ts",
     "./html/Renderer.ts": "./src/html/Renderer.ts",
-    "./bundling/bundle.ts": "./src/bundling/bundle.ts"
+    "./Iterator.ts": "./src/Iterator.ts",
+    "./Node.ts": "./src/Node.ts",
+    "./PullNode.ts": "./src/PullNode.ts",
+    "./PushNode.ts": "./src/PushNode.ts",
+    "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts"
   },
   "files": [
     "src",
