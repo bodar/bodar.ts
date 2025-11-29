@@ -123,10 +123,26 @@
 
 <div class="example">
     <script type="module" data-reactive data-echo="html">
-import {display} from "@bodar/dataflow/api/display.ts";
 for (let i = 0; i < 5; ++i) {
     display(i);
 }
+    </script>
+</div>
+
+<h2>Imports</h2>
+
+<div class="example">
+    <script type="module" data-reactive data-echo="html">
+        import {display, view} from '@bodar/dataflow/runtime.ts';
+    </script>
+</div>
+
+<p>Any import in a reactive script is available to all other reactive scripts. So the imported display function is now available
+(document order does not matter)</p>
+
+<div class="example">
+    <script type="module" data-reactive data-echo="html">
+        display('Using previously imported display function');
     </script>
 </div>
 
@@ -194,7 +210,6 @@ const now = function* () {
 
 <div class="example">
     <script type="module" data-reactive data-echo>
-import {view} from "@bodar/dataflow/api/view.ts";
 const name = view(<input name="name" type="text" value="World"/>);
     </script>
     <script type="module" data-reactive data-echo>`Hello, ${name}!`</script>
@@ -207,7 +222,6 @@ const name = view(<input name="name" type="text" value="World"/>);
 <div class="example">
     <script type="module" data-reactive data-echo>
 import {range} from "@observablehq/inputs";
-import {view} from "@bodar/dataflow/api/view.ts";
 const slider = view(range([0, 100], {label: "Value", step: 1, value: 50}));
     </script>
     <script type="module" data-reactive data-echo>`The slider value is: ${slider}`</script>
@@ -217,11 +231,9 @@ const slider = view(range([0, 100], {label: "Value", step: 1, value: 50}));
 
 <div class="example">
     <script type="module" data-reactive data-echo>
-import {view} from "@bodar/dataflow/api/view.ts";
 const a = view(<input type="number" value="10" style="width: 60px"/>);
     </script>
     <script type="module" data-reactive data-echo>
-import {view} from "@bodar/dataflow/api/view.ts";
 const b = view(<input type="number" value="5" style="width: 60px"/>);
     </script>
     <script type="module" data-reactive data-echo>
@@ -235,7 +247,6 @@ const b = view(<input type="number" value="5" style="width: 60px"/>);
 
 <div class="example">
     <script type="module" data-reactive data-echo>
-import {view} from "@bodar/dataflow/api/view.ts";
 const checked = view(<input type="checkbox" id="feature"/>);
     </script>
     <label for="feature">
@@ -247,7 +258,6 @@ const checked = view(<input type="checkbox" id="feature"/>);
 
 <div class="example">
     <script type="module" data-reactive data-echo>
-import {view} from "@bodar/dataflow/api/view.ts";
 const color1 = view(<select>
     <option value="red">Red</option>
     <option value="green">Green</option>
@@ -265,15 +275,12 @@ const color1 = view(<select>
 
 <div class="example">
     <script type="module" data-reactive data-echo>
-import {view} from "@bodar/dataflow/api/view.ts";
 const width = view(<input type="range" min="50" max="300" value="150"/>);
     </script>
     <script type="module" data-reactive data-echo>
-import {view} from "@bodar/dataflow/api/view.ts";
 const height = view(<input type="range" min="50" max="200" value="100"/>);
     </script>
     <script type="module" data-reactive data-echo>
-import {view} from "@bodar/dataflow/api/view.ts";
 const color2 = view(<input type="color" value="#4a90d9"/>);
     </script>
     <script type="module" data-reactive data-echo>

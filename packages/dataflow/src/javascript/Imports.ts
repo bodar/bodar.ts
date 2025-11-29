@@ -6,12 +6,17 @@ import type {
     Program
 } from "acorn";
 
+export class Import {
+    constructor(public specifier: string, public locals: string[]) {
+    }
+}
+
 export class Imports {
-    constructor(private data: Map<string, string>) {
+    constructor(private data: Map<string, Import>) {
     }
 
     static from(program: Program): Imports {
-        return new Imports(new Map<string, string>(program.body
+        return new Imports(new Map<string, Import>(program.body
             .filter(v => v.type === 'ImportDeclaration')
             .map((im: ImportDeclaration) => [
                 String(im.source.value),
@@ -19,17 +24,18 @@ export class Imports {
             ])));
     }
 
-    static handle(specifiers: Array<ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier>): string {
+    static handle(specifiers: Array<ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier>): Import {
         if(specifiers.length === 0) throw new Error("No specifier specifiers found.");
         const first = specifiers[0];
-        if(first.type === "ImportNamespaceSpecifier") return first.local.name;
-        if(first.type === "ImportDefaultSpecifier") return "{default:" + first.local.name + "}";
-        return `{${specifiers.map(sp => sp.local.name).join(',')}}`;
+        if(first.type === "ImportNamespaceSpecifier") return new Import(first.local.name, [first.local.name]);
+        if(first.type === "ImportDefaultSpecifier") return new Import("{default:" + first.local.name + "}", [first.local.name]);
+        return new Import(`{${specifiers.map(sp => sp.local.name).join(',')}}`,
+            specifiers.map(sp => sp.local.name));
     }
 
     static empty: Imports = new Imports(new Map());
 
-    get(source: string): string | undefined {
+    get(source: string): Import | undefined {
         return this.data.get(source);
     }
 
@@ -39,9 +45,13 @@ export class Imports {
 
     toString(): string {
         if (this.isEmpty()) return "";
-        const specifierStrings = Array.from(this.data.values());
+        const specifierStrings = Array.from(this.data.values(), i => i.specifier);
         const importStrings = Array.from(this.data.keys().map(source => `import('${source}')`));
         return `const [${specifierStrings.join(', ')}] = await Promise.all([${importStrings.join(', ')}]);\n`;
+    }
+
+    locals(): string[] {
+        return Array.from(this.data.values()).flatMap(i => i.locals)
     }
 }
 

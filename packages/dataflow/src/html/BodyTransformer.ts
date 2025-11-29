@@ -1,5 +1,4 @@
 import {topologicalSort} from "./TopologicalSort.ts";
-import {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
 import {NodeDefinition} from "./NodeDefinition.ts";
 import {HTMLTransformer} from "./HTMLTransformer.ts";
 import {bundleText} from "../bundling/bundle.ts";
@@ -15,8 +14,7 @@ export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementCon
     async endTag(end: HTMLRewriterTypes.EndTag) {
         const sorted = topologicalSort(this.controller.definitions);
         // language=javascript
-        const javascript = await bundleText(`import {Renderer} from "@bodar/dataflow/html/Renderer.ts";
-import {${JSX2DOM.name}} from "@bodar/jsx2dom/JSX2DOM.ts";
+        const javascript = await bundleText(`import {Renderer, JSX2DOM} from "@bodar/dataflow/runtime.ts";
 const jsx = new JSX2DOM();
 const renderer = new Renderer();
 ${sorted.map((d: NodeDefinition) => `renderer.register(${d});`).join('\n')}

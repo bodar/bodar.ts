@@ -2,12 +2,12 @@
  * Functions that can be used inside a reactive element
  */
 
-import {iterator} from "../Iterator.ts";
+import {observe} from "./observe.ts";
 
 export type SupportedInputs = HTMLInputElement | HTMLSelectElement;
 
 export function input<E extends SupportedInputs, R>(element: E, event: string = eventOf(element), value: (i: E) => R = valueOf): AsyncIterator<R> {
-    return iterator((notify) =>
+    return observe((notify) =>
         element.addEventListener(event, () => notify(value(element))), value(element));
 }
 

@@ -89,7 +89,7 @@ renderer.render();
     test("can use an import inside a cell", async () => {
         const transformer = new HTMLTransformer(new HTMLRewriter());
         const result = transformer.transform(`<body><script type="module" data-reactive>
-import {iterator} from "@bodar/dataflow/Iterator.ts";
+import {iterator} from "@bodar/dataflow/observe.ts";
 const input = <input name="name" type="text" />;
 const name = iterator(notify => input.addEventListener('input', ev => {notify(ev.data)}), input.value);
 </script></body>`);
@@ -102,7 +102,7 @@ import {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
 const jsx = new JSX2DOM();
 const renderer = new Renderer();
 renderer.register("lmga2r",[],["input","name"],async() => {
-const [{iterator}] = await Promise.all([import('@bodar/dataflow/Iterator.ts')]);
+const [{iterator}] = await Promise.all([import('@bodar/dataflow/observe.ts')]);
 const input = jsx.createElement("input", {"name": "name","type": "text"});const name = iterator(notify => input.addEventListener('input', ev => {notify(ev.data);}), input.value);
 return {input,name};
 });

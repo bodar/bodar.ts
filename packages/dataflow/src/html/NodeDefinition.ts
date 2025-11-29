@@ -29,7 +29,7 @@ export class NodeDefinition {
             const imports = processImports(program);
             const singleExpression = isSingleExpression(program);
             const newJavascript = toScript(program);
-            return new NodeDefinition(key, inputs, outputs, imports, singleExpression, newJavascript);
+            return new NodeDefinition(key, inputs, [...outputs, ...imports.locals()], imports, singleExpression, newJavascript);
         } catch (error: any) {
             return (new NodeDefinition(key, [], [], Imports.empty, true, JSON.stringify(error.message)));
         }
@@ -90,11 +90,11 @@ export class NodeDefinition {
     }
 
     hasExplicitDisplay(): boolean {
-        return !!this._imports.get('@bodar/dataflow/api/display.ts');
+        return !!this._imports.get('@bodar/dataflow/api/display.ts') || this._inputs.some(v => v === 'display');
     }
 
     hasExplicitView(): boolean {
-        return !!this._imports.get('@bodar/dataflow/api/view.ts');
+        return !!this._imports.get('@bodar/dataflow/api/view.ts') || this._inputs.some(v => v === 'view');
     }
 }
 

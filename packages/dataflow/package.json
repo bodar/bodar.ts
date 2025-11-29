@@ -13,16 +13,17 @@
   "exports": {
     "./api/display.ts": "./src/api/display.ts",
     "./api/input.ts": "./src/api/input.ts",
+    "./api/observe.ts": "./src/api/observe.ts",
     "./api/view.ts": "./src/api/view.ts",
     "./BaseGraph.ts": "./src/BaseGraph.ts",
     "./bundling/bundle.ts": "./src/bundling/bundle.ts",
     "./Graph.ts": "./src/Graph.ts",
     "./html/HTMLTransformer.ts": "./src/html/HTMLTransformer.ts",
     "./html/Renderer.ts": "./src/html/Renderer.ts",
-    "./Iterator.ts": "./src/Iterator.ts",
     "./Node.ts": "./src/Node.ts",
     "./PullNode.ts": "./src/PullNode.ts",
     "./PushNode.ts": "./src/PushNode.ts",
+    "./runtime.ts": "./src/runtime.ts",
     "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts"
   },
   "files": [
