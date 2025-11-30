@@ -67,7 +67,6 @@
         }
 
     </style>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/intellij-light.min.css">
 </head>
 <body>
 
@@ -303,6 +302,10 @@ const color2 = view(<input type="color" value="#4a90d9"/>);
     import hljs from 'highlight.js/lib/core.js';
     import javascript from 'highlight.js/lib/languages/javascript';
     import xml from 'highlight.js/lib/languages/xml';
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = "https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/intellij-light.min.css";
+    document.head.appendChild(link);
     hljs.registerLanguage('javascript', javascript);
     hljs.registerLanguage('xml', xml);
     hljs.highlightAll();
