@@ -72,15 +72,17 @@
 
 <h1>Dataflow <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="logo: GitHub" src="https://img.shields.io/badge/github-repo-blue?logo=github"></a></h1>
 
-<p>Dataflow is a lightweight reactive JavaScript library inspired by <a href="https://observablehq.com/framework/">Observable
+<p>Dataflow is a lightweight reactive JavaScript library heavily inspired by <a href="https://observablehq.com/framework/">Observable
     Framework</a>. It brings reactive programming to plain HTML pages with minimal overhead - the core library
-    (including JSX support) is under 3KB compressed.</p>
+    (including JSX support) is under 3KB compressed!</p>
 
 <p>Just add a single <code>data-reactive</code> attribute to any script tag and it becomes reactive. That's it.</p>
 
 <p>It works like a spreadsheet: just reference a value from another reactive script tag, and the plumbing happens
-    automatically. No <code>setState</code>, no Redux, no reducers, no manual subscriptions. Just declarative
+    automatically. No setState, no Redux, no reducers, no signals, no manual subscriptions. Just declarative
     dependencies.</p>
+
+<p>Document order does not matter, all reactive scripts will be topologically sorted and turned into a DAG before execution.</p>
 
 <div class="tip">The transformation can happen at build time, at runtime on the server, at the edge, or even client-side
     using a service worker.
@@ -106,6 +108,11 @@
     <script type="module" data-reactive data-echo="html">1 + 2</script>
 </div>
 
+<div class="note">
+    <strong>Note:</strong> Unlike Observable, a semicolon on the end of a single expression does not change how it behaves.
+    A single expression is always a singles expression regardless of optional semicolons. Prettier will not break anything.
+</div>
+
 <p>Statements like variable declarations don't display anything - they just define values for other blocks to use:</p>
 
 <div class="example">
@@ -113,10 +120,6 @@
     <p>The variable <code>foo</code> is defined but nothing is displayed.</p>
 </div>
 
-<div class="note">
-    <strong>Note:</strong> This differs from Observable Framework which uses semicolons to determine display - we use
-    AST parsing, so semicolons are optional and Prettier won't break anything.
-</div>
 
 <p>For explicit control, import the <code>display</code> function. You can call it multiple times:</p>
 
@@ -130,14 +133,18 @@ for (let i = 0; i < 5; ++i) {
 
 <h2>Imports</h2>
 
+<p>Any import in a reactive script is available to all other reactive scripts. So the imported display function is now available
+    (document order does not matter)</p>
+
 <div class="example">
     <script type="module" data-reactive data-echo="html">
-        import {display, view} from '@bodar/dataflow/runtime.ts';
+        import {display, view, input} from '@bodar/dataflow/runtime.ts';
     </script>
 </div>
 
-<p>Any import in a reactive script is available to all other reactive scripts. So the imported display function is now available
-(document order does not matter)</p>
+<div class="note">
+    <strong>Note:</strong> Unlike Observable you do need to import <code>display</code>, <code>view</code>, <code>input</code> etc at least once if you want to use them.
+</div>
 
 <div class="example">
     <script type="module" data-reactive data-echo="html">
