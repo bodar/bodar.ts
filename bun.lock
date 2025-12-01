@@ -20,7 +20,6 @@
         "@bodar/jsx2dom": "workspace:jsx2dom",
         "acorn": "^8.15.0",
         "acorn-jsx": "^5.3.2",
-        "acorn-walk": "^8.3.4",
         "astring": "^1.9.0",
         "eslint-scope": "^9.0.0",
       },
@@ -86,8 +85,6 @@
     "acorn": ["acorn@8.15.0", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg=="],
 
     "acorn-jsx": ["acorn-jsx@5.3.2", "", { "peerDependencies": { "acorn": "^6.0.0 || ^7.0.0 || ^8.0.0" } }, "sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ=="],
-
-    "acorn-walk": ["acorn-walk@8.3.4", "", { "dependencies": { "acorn": "^8.11.0" } }, "sha512-ueEepnujpqee2o5aIYnvHU6C0A42MNdsIDeqy5BydrkuC5R1ZuUFnm27EeFJGoEHJQgn3uleRvmTXaJgfXbt4g=="],
 
     "asserttt": ["asserttt@1.0.1", "", {}, "sha512-bqiz6RE6xNait1jl8r8rXSlKEf2ZTKTzc+hVxu3n8cUjZftK2meo42PPq1sW09nlwnPlCJbo6eAI9du4SdOtbQ=="],
 

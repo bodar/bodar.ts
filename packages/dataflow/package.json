@@ -6,7 +6,6 @@
     "@bodar/jsx2dom": "workspace:jsx2dom",
     "acorn": "^8.15.0",
     "acorn-jsx": "^5.3.2",
-    "acorn-walk": "^8.3.4",
     "astring": "^1.9.0",
     "eslint-scope": "^9.0.0"
   },
