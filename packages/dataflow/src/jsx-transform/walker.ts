@@ -65,7 +65,6 @@ class Walker {
             this.enter.call(this.context, node, parent, prop ?? null, index ?? null);
 
             if (this.replacement) {
-                (this.replacement as Node).range = node.range;
                 node = this.replacement;
                 this.replaceNode(parent, prop!, index ?? null, node);
             }
@@ -115,7 +114,6 @@ class Walker {
             this.leave.call(this.context, node, parent, prop ?? null, index ?? null);
 
             if (this.replacement) {
-                (this.replacement as Node).range = node.range;
                 node = this.replacement;
                 this.replaceNode(parent, prop!, index ?? null, node);
             }

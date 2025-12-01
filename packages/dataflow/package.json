@@ -6,8 +6,7 @@
     "@bodar/jsx2dom": "workspace:jsx2dom",
     "acorn": "^8.15.0",
     "acorn-jsx": "^5.3.2",
-    "astring": "^1.9.0",
-    "eslint-scope": "^9.0.0"
+    "astring": "^1.9.0"
   },
   "exports": {
     "./api/display.ts": "./src/api/display.ts",
@@ -30,7 +29,5 @@
     "README.md",
     "package.json"
   ],
-  "devDependencies": {
-    "@types/eslint-scope": "^8.3.2"
-  }
+  "devDependencies": {}
 }
