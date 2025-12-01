@@ -1,8 +1,34 @@
+diff --git a/node_modules/mxn-jsx-ast-transformer/.bun-tag-9ba7708e5eee483 b/.bun-tag-9ba7708e5eee483
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/mxn-jsx-ast-transformer/.bun-tag-b7e9f8ba6ac4d13e b/.bun-tag-b7e9f8ba6ac4d13e
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
 diff --git a/mxn-jsx-ast-transformer.js b/mxn-jsx-ast-transformer.js
-index 53f429c6c6e86e14bfd6358128dfb5eaa0fe1b7c..558dfad313a1551abeb01219a3de29e36e337a20 100644
+index 53f429c6c6e86e14bfd6358128dfb5eaa0fe1b7c..7f4735a9015282ffc91fe9d11ecae0ea297630cc 100644
 --- a/mxn-jsx-ast-transformer.js
 +++ b/mxn-jsx-ast-transformer.js
-@@ -136,6 +136,7 @@ var MXNJSXConv = function(tree, options)
+@@ -4,10 +4,18 @@
+ // ESTree Walker
+ const walk = require("estree-walker").walk;
+ 
++const makeCallee = function (name) {
++    const parts = name.split('.');
++    return parts.slice(1).reduce(
++        (object, name) => ({ type: "MemberExpression", object, property: { type: "Identifier", name }, computed: false }),
++        { type: "Identifier", name: parts[0] }
++    );
++};
++
+ const callFunction = function (name, args) {
+     return {
+         type: "CallExpression",
+-        callee: { type: "Identifier", name: name },
++        callee: makeCallee(name),
+         arguments: args ? args : []
+     };
+ };
+@@ -136,6 +144,7 @@ var MXNJSXConv = function(tree, options)
                      case "CallExpression":
                      case "ArrowFunctionExpression":
                      case "Identifier":
@@ -10,3 +36,11 @@ index 53f429c6c6e86e14bfd6358128dfb5eaa0fe1b7c..558dfad313a1551abeb01219a3de29e3
                          this.replace(node.expression);
                          return;
  
+@@ -188,6 +197,7 @@ var MXNJSXConv = function(tree, options)
+                 }
+ 
+                 let callNode = callFunction(options.factory, args);
++                if (node.range) callNode.range = node.range;
+                 this.replace(callNode);
+             }
+         }

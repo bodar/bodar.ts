@@ -7,14 +7,14 @@ describe("NodeDefinition", () => {
         display.clear();
     });
 
-    test.only("detects explicit display function usage", async () => {
+    test("detects explicit display function usage", async () => {
         // language=JavaScript
         const definition = NodeDefinition.parse(`
             import {display} from "@bodar/dataflow/api/display.ts";
             const input = display(<input name="name" type="text" value="Dan"/>);
         `, '1234');
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",[],["input","display","_display_1234"],async() => {
+        expect(definition.toString()).toBe(`"1234",["jsx"],["input","display","_display_1234"],async(jsx) => {
 const [{display}] = await Promise.all([import('@bodar/dataflow/api/display.ts')]);
 const input = display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input,display,_display_1234:display.pop()};
@@ -28,7 +28,7 @@ return {input,display,_display_1234:display.pop()};
             const input = view(<input name="name" type="text" value="Dan"/>);
         `, '1234');
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",[],["input","view","_display_1234"],async() => {
+        expect(definition.toString()).toBe(`"1234",["jsx"],["input","view","_display_1234"],async(jsx) => {
 const [{view}] = await Promise.all([import('@bodar/dataflow/api/view.ts')]);
 const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input,view,_display_1234:view.pop()};
@@ -41,7 +41,7 @@ return {input,view,_display_1234:view.pop()};
             const input = view(<input name="name" type="text" value="Dan"/>);
         `, '1234');
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["view"],["input","_display_1234"],(view) => {
+        expect(definition.toString()).toBe(`"1234",["view","jsx"],["input","_display_1234"],(view,jsx) => {
 const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input,_display_1234:view.pop()};
 }`)
@@ -51,7 +51,7 @@ return {input,_display_1234:view.pop()};
         // language=JavaScript
         const definition = NodeDefinition.parse(`<input name="name" type="text" value="Dan"/>`, '1234');
         // language=JavaScript
-        expect(definition.toString()).toBe(`"_display_1234",[],[],() => jsx.createElement("input", {"name": "name","type": "text","value": "Dan"})`);
+        expect(definition.toString()).toBe(`"_display_1234",["jsx"],[],(jsx) => jsx.createElement("input", {"name": "name","type": "text","value": "Dan"})`);
     });
 
     test("any import becomes an output", async () => {
@@ -63,5 +63,15 @@ const [{Renderer}] = await Promise.all([import('@bodar/dataflow/html/Renderer.ts
 
 return {Renderer};
 }`)
+    });
+
+    test("still handles jsx as an arrow body", async () => {
+        // language=JavaScript
+        const definition = NodeDefinition.parse(`const greeting = (name) => <i>Hello {name}!</i>`, '1234');
+        // language=JavaScript
+        expect(definition.toString()).toBe(`"1234",["jsx"],["greeting"],(jsx) => {
+const greeting = name => jsx.createElement("i", null, ["Hello", name, "!"]);
+return {greeting};
+}`);
     });
 });

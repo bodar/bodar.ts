@@ -114,7 +114,7 @@ describe("findUnresolvedReferences", () => {
         test("multiple different", () => assertThat(findUnresolvedReferences(parseScript('a + b + a')), equals(['a', 'b'])));
     });
 
-    describe.skip("correctly handles methods on unresolved references", () => {
+    describe("correctly handles methods on unresolved references", () => {
         test("handles methods on references", () => assertThat(findUnresolvedReferences(parseScript('foo.bar()')), equals(['foo'])));
         test("handles methods on references", () => assertThat(findUnresolvedReferences(processJSX(parseScript('<span>Test</span>'))), equals(['jsx'])));
     });

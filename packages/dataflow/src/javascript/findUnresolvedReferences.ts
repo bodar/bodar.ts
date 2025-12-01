@@ -8,7 +8,7 @@ const defaultGlobals = new Set([
     "ArrayBuffer", "Blob", "crypto", "URL", "TextEncoder", "TextDecoder",
     "Uint8Array", "Int32Array", "Float64Array", "DataView", "Reflect",
     "Proxy", "WeakMap", "WeakSet", "Infinity", "NaN", "isNaN", "isFinite",
-    "parseInt", "parseFloat", "encodeURI", "decodeURI", "eval", "jsx", "jsx.createElement"
+    "parseInt", "parseFloat", "encodeURI", "decodeURI", "eval"
 ]);
 
 export function findUnresolvedReferences(program: Program): string[] {
