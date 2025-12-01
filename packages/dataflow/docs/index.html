@@ -298,48 +298,6 @@ const color2 = view(<input type="color" value="#4a90d9"/>);
     </script>
 </div>
 
-<h2>Whitespace Test (Temp)</h2>
-
-<p>Comparing JSX and HTML whitespace rendering:</p>
-
-<div class="example">
-    <p><strong>JSX:</strong></p>
-    <script type="module" data-reactive data-echo>
-const name = "World";
-    </script>
-    <script type="module" data-reactive data-echo><i>Hello {name}!</i></script>
-
-    <p><strong>HTML:</strong></p>
-    <i>Hello World!</i>
-</div>
-
-<div class="example">
-    <p><strong>JSX with newlines:</strong></p>
-    <script type="module" data-reactive data-echo>
-<div>
-    <span>A</span>
-    <span>B</span>
-</div>
-    </script>
-
-    <p><strong>HTML with newlines:</strong></p>
-    <div>
-        <span>A</span>
-        <span>B</span>
-    </div>
-</div>
-
-<div class="example">
-    <p><strong>JSX multiline text:</strong></p>
-    <script type="module" data-reactive data-echo>
-<p>Line one
-Line two</p>
-    </script>
-
-    <p><strong>HTML multiline text:</strong></p>
-    <p>Line one
-Line two</p>
-</div>
 
 <script type="importmap">
     {

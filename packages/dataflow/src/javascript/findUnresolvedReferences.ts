@@ -7,16 +7,14 @@ export function findUnresolvedReferences(program: Program): string[] {
         sourceType: 'module'
     });
 
-    const seen = new Set<string>();
-    const references: string[] = [];
+    const references = new Set<string>();
 
     for (const ref of scopeManager.globalScope.through) {
         const name = ref.identifier.name;
-        if (!seen.has(name)) {
-            seen.add(name);
-            references.push(name);
+        if (!references.has(name)) {
+            references.add(name);
         }
     }
 
-    return references;
+    return Array.from(references);
 }
