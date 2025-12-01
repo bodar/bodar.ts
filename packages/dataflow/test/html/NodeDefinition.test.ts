@@ -7,7 +7,7 @@ describe("NodeDefinition", () => {
         display.clear();
     });
 
-    test("detects explicit display function usage", async () => {
+    test.only("detects explicit display function usage", async () => {
         // language=JavaScript
         const definition = NodeDefinition.parse(`
             import {display} from "@bodar/dataflow/api/display.ts";

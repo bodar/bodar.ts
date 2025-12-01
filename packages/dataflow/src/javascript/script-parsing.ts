@@ -5,7 +5,7 @@ import {generate} from "astring";
 import transform from "mxn-jsx-ast-transformer";
 
 export function parseScript(javascript: string): Program {
-    return Parser.extend(jsx()).parse(javascript, {ecmaVersion: "latest", sourceType: "module"});
+    return Parser.extend(jsx()).parse(javascript, {ecmaVersion: "latest", sourceType: "module", ranges: true});
 }
 
 export function processJSX(program: Program, factory: string = "jsx.createElement"): Program {
