@@ -32,24 +32,20 @@ function isCapitalLetter(char: string): boolean {
     return char !== char.toLowerCase();
 }
 
-function transformName(name: JSXIdentifier | JSXMemberExpression, range?: [number, number]): Expression {
+function transformName(name: JSXIdentifier | JSXMemberExpression): Expression {
     if (name.type === "JSXIdentifier") {
-        return isCapitalLetter(name.name[0])
-            ? identifier(name.name, range)
-            : literal(name.name, range);
+        return isCapitalLetter(name.name[0]) ? identifier(name.name) : literal(name.name);
     }
-
     if (name.type === "JSXMemberExpression") {
-        return transformMemberExpression(name, range);
+        return transformMemberExpression(name);
     }
-
     throw new Error(`Unknown name type: ${(name as any).type}`);
 }
 
-function transformMemberExpression(expr: JSXMemberExpression, range?: [number, number]): Expression {
+function transformMemberExpression(expr: JSXMemberExpression): Expression {
     const object = expr.object.type === "JSXMemberExpression"
-        ? transformMemberExpression(expr.object, range)
-        : identifier(expr.object.name, range);
+        ? transformMemberExpression(expr.object)
+        : identifier(expr.object.name);
 
     return {
         type: "MemberExpression",
@@ -57,77 +53,62 @@ function transformMemberExpression(expr: JSXMemberExpression, range?: [number, n
         property: identifier(expr.property.name),
         computed: false,
         optional: false,
-        start: expr.start,
-        end: expr.end,
-        range
+        start: 0,
+        end: 0
     } as Expression;
 }
 
-function transformAttributes(
-    attributes: Array<JSXAttribute | JSXSpreadAttribute>,
-    range?: [number, number]
-): Expression {
+function transformAttributes(attributes: Array<JSXAttribute | JSXSpreadAttribute>): Expression {
     const properties = attributes.map(attr => {
         if (attr.type === "JSXSpreadAttribute") {
-            return spreadElement(attr.argument, range);
+            return spreadElement(attr.argument);
         }
 
-        const key = literal(attr.name.type === "JSXIdentifier" ? attr.name.name : `${attr.name.namespace.name}:${attr.name.name}`, range);
+        const key = literal(attr.name.type === "JSXIdentifier" ? attr.name.name : `${attr.name.namespace.name}:${attr.name.name}`);
 
         if (!attr.value) {
-            return property(key, literal(true, range), range);
+            return property(key, literal(true));
         }
 
         if (attr.value.type === "Literal") {
-            return property(key, attr.value as unknown as Expression, range);
+            return property(key, attr.value as unknown as Expression);
         }
 
         if (attr.value.type === "JSXExpressionContainer") {
-            return property(key, attr.value.expression as Expression, range);
+            return property(key, attr.value.expression as Expression);
         }
 
         throw new Error(`Unknown attribute value type: ${attr.value.type}`);
     });
 
-    return objectExpression(properties, range);
+    return objectExpression(properties);
 }
 
 function transformElement(node: JSXElement, factory: string): Expression {
-    const range = node.range;
     const {name, attributes} = node.openingElement;
     const children = node.children;
 
-    const args: Expression[] = [
-        transformName(name as JSXIdentifier | JSXMemberExpression, range)
-    ];
+    const args: Expression[] = [transformName(name as JSXIdentifier | JSXMemberExpression)];
 
-    if (attributes.length > 0) {
-        args.push(transformAttributes(attributes as Array<JSXAttribute | JSXSpreadAttribute>, range));
-    } else {
-        args.push(literal(null, range));
-    }
+    args.push(attributes.length > 0
+        ? transformAttributes(attributes as Array<JSXAttribute | JSXSpreadAttribute>)
+        : literal(null));
 
     if (children.length > 0) {
-        args.push(arrayExpression(children as unknown as Expression[], range));
+        args.push(arrayExpression(children as unknown as Expression[]));
     }
 
-    return callExpression(memberExpression(factory, range), args, range);
+    return callExpression(memberExpression(factory), args);
 }
 
 function transformFragment(node: JSXFragment, factory: string): Expression {
-    const range = node.range;
-    const children = node.children;
+    const args: Expression[] = [literal(null), literal(null)];
 
-    const args: Expression[] = [
-        literal(null, range),
-        literal(null, range)
-    ];
-
-    if (children.length > 0) {
-        args.push(arrayExpression(children as unknown as Expression[], range));
+    if (node.children.length > 0) {
+        args.push(arrayExpression(node.children as unknown as Expression[]));
     }
 
-    return callExpression(memberExpression(factory, range), args, range);
+    return callExpression(memberExpression(factory), args);
 }
 
 export function transformJSX(program: Program, options?: TransformOptions): Program {
@@ -138,8 +119,7 @@ export function transformJSX(program: Program, options?: TransformOptions): Prog
             const anyNode = node as AnyNode;
 
             if (anyNode.type === "JSXText") {
-                const value = (anyNode as any).value as string;
-                this.replace(literal(value, anyNode.range));
+                this.replace(literal((anyNode as any).value));
                 return;
             }
 
@@ -149,12 +129,12 @@ export function transformJSX(program: Program, options?: TransformOptions): Prog
             }
 
             if (anyNode.type === "JSXMemberExpression") {
-                this.replace(transformMemberExpression(anyNode as JSXMemberExpression, anyNode.range));
+                this.replace(transformMemberExpression(anyNode as JSXMemberExpression));
                 return;
             }
 
             if (anyNode.type === "JSXIdentifier") {
-                this.replace(identifier((anyNode as any).name, anyNode.range));
+                this.replace(identifier((anyNode as any).name));
                 return;
             }
 

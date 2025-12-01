@@ -10,96 +10,46 @@ import type {
     ArrayExpression
 } from "acorn";
 
-export function identifier(name: string, range?: [number, number]): Identifier {
-    const node: Identifier = {type: "Identifier", name, start: 0, end: 0};
-    if (range) node.range = range;
-    return node;
+export function identifier(name: string): Identifier {
+    return {type: "Identifier", name, start: 0, end: 0};
 }
 
-export function literal(value: string | number | boolean | null, range?: [number, number]): Literal {
-    const node: Literal = {type: "Literal", value, start: 0, end: 0};
-    if (range) node.range = range;
-    return node;
+export function literal(value: string | number | boolean | null): Literal {
+    return {type: "Literal", value, start: 0, end: 0};
 }
 
-export function memberExpression(path: string, range?: [number, number]): Expression {
+export function memberExpression(path: string): Expression {
     const parts = path.split('.');
     return parts.slice(1).reduce<Expression>(
-        (object, name) => {
-            const node: MemberExpression = {
-                type: "MemberExpression",
-                object,
-                property: identifier(name),
-                computed: false,
-                optional: false,
-                start: 0,
-                end: 0
-            };
-            if (range) node.range = range;
-            return node;
-        },
-        identifier(parts[0], range)
+        (object, name): MemberExpression => ({
+            type: "MemberExpression",
+            object,
+            property: identifier(name),
+            computed: false,
+            optional: false,
+            start: 0,
+            end: 0
+        }),
+        identifier(parts[0])
     );
 }
 
-export function callExpression(callee: Expression, args: Expression[], range?: [number, number]): CallExpression {
-    const node: CallExpression = {
-        type: "CallExpression",
-        callee,
-        arguments: args,
-        optional: false,
-        start: 0,
-        end: 0
-    };
-    if (range) node.range = range;
-    return node;
+export function callExpression(callee: Expression, args: Expression[]): CallExpression {
+    return {type: "CallExpression", callee, arguments: args, optional: false, start: 0, end: 0};
 }
 
-export function property(key: Identifier | Literal, value: Expression, range?: [number, number]): Property {
-    const node: Property = {
-        type: "Property",
-        method: false,
-        shorthand: false,
-        computed: false,
-        key,
-        value,
-        kind: "init",
-        start: 0,
-        end: 0
-    };
-    if (range) node.range = range;
-    return node;
+export function property(key: Identifier | Literal, value: Expression): Property {
+    return {type: "Property", method: false, shorthand: false, computed: false, key, value, kind: "init", start: 0, end: 0};
 }
 
-export function spreadElement(argument: Expression, range?: [number, number]): SpreadElement {
-    const node: SpreadElement = {
-        type: "SpreadElement",
-        argument,
-        start: 0,
-        end: 0
-    };
-    if (range) node.range = range;
-    return node;
+export function spreadElement(argument: Expression): SpreadElement {
+    return {type: "SpreadElement", argument, start: 0, end: 0};
 }
 
-export function objectExpression(properties: Array<Property | SpreadElement>, range?: [number, number]): ObjectExpression {
-    const node: ObjectExpression = {
-        type: "ObjectExpression",
-        properties,
-        start: 0,
-        end: 0
-    };
-    if (range) node.range = range;
-    return node;
+export function objectExpression(properties: Array<Property | SpreadElement>): ObjectExpression {
+    return {type: "ObjectExpression", properties, start: 0, end: 0};
 }
 
-export function arrayExpression(elements: Array<Expression | null>, range?: [number, number]): ArrayExpression {
-    const node: ArrayExpression = {
-        type: "ArrayExpression",
-        elements,
-        start: 0,
-        end: 0
-    };
-    if (range) node.range = range;
-    return node;
+export function arrayExpression(elements: Array<Expression | null>): ArrayExpression {
+    return {type: "ArrayExpression", elements, start: 0, end: 0};
 }
