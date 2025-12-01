@@ -70,7 +70,7 @@ return {Renderer};
         const definition = NodeDefinition.parse(`const greeting = (name) => <i>Hello {name}!</i>`, '1234');
         // language=JavaScript
         expect(definition.toString()).toBe(`"1234",["jsx"],["greeting"],(jsx) => {
-const greeting = name => jsx.createElement("i", null, ["Hello", name, "!"]);
+const greeting = name => jsx.createElement("i", null, ["Hello ", name, "!"]);
 return {greeting};
 }`);
     });

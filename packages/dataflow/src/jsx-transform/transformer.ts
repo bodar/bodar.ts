@@ -139,12 +139,7 @@ export function transformJSX(program: Program, options?: TransformOptions): Prog
 
             if (anyNode.type === "JSXText") {
                 const value = (anyNode as any).value as string;
-                if (/^[ \t]*[\r\n][ \t\r\n]*$/.test(value)) {
-                    this.remove();
-                } else {
-                    const trimmed = value.replace(/^\s+/, "").replace(/\s+$/, "");
-                    this.replace(literal(trimmed, anyNode.range));
-                }
+                this.replace(literal(value, anyNode.range));
                 return;
             }
 

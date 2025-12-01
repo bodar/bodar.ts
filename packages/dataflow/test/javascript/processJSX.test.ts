@@ -34,5 +34,11 @@ describe("processJSX", () => {
         const result = toScript(processJSX(program));
         assertThat(result, equals('jsx.createElement("span", {"style": `color: hsl(${now / 10 % 360} 100% 50%)`}, ["Rainbow text!"]);'));
     });
+
+    test('preserves whitespace between text and expressions', () => {
+        const program = parseScript("<i>Hello {name}!</i>");
+        const result = toScript(processJSX(program));
+        assertThat(result, equals('jsx.createElement("i", null, ["Hello ", name, "!"]);'));
+    });
 });
 
