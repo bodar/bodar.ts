@@ -8,8 +8,7 @@
     "acorn-jsx": "^5.3.2",
     "acorn-walk": "^8.3.4",
     "astring": "^1.9.0",
-    "eslint-scope": "^9.0.0",
-    "mxn-jsx-ast-transformer": "^0.8.7"
+    "eslint-scope": "^9.0.0"
   },
   "exports": {
     "./api/display.ts": "./src/api/display.ts",

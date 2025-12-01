@@ -23,7 +23,6 @@
         "acorn-walk": "^8.3.4",
         "astring": "^1.9.0",
         "eslint-scope": "^9.0.0",
-        "mxn-jsx-ast-transformer": "^0.8.7",
       },
       "devDependencies": {
         "@types/eslint-scope": "^8.3.2",
@@ -54,9 +53,6 @@
       "name": "@bodar/yadic",
       "version": "0.0.0",
     },
-  },
-  "patchedDependencies": {
-    "mxn-jsx-ast-transformer@0.8.7": "patches/mxn-jsx-ast-transformer@0.8.7.patch",
   },
   "packages": {
     "@bodar/dataflow": ["@bodar/dataflow@workspace:packages/dataflow"],
@@ -125,8 +121,6 @@
 
     "estraverse": ["estraverse@5.3.0", "", {}, "sha512-MMdARuVEQziNTeJD8DgMqmhwR11BRQ/cBP+pLtYdSTnf3MIO8fFeiINEbX36ZdNlfU/7A9f3gUw49B3oQsvwBA=="],
 
-    "estree-walker": ["estree-walker@2.0.2", "", {}, "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w=="],
-
     "htl": ["htl@0.3.1", "", {}, "sha512-1LBtd+XhSc+++jpOOt0lCcEycXs/zTQSupOISnVAUmvGBpV7DH+C2M6hwV7zWYfpTMMg9ch4NO0lHiOTAMHdVA=="],
 
     "html-escaper": ["html-escaper@3.0.3", "", {}, "sha512-RuMffC89BOWQoY0WKGpIhn5gX3iI54O6nRA0yC124NYVtzjmFWBIiFd8M0x+ZdX0P9R4lADg1mgP8C7PxGOWuQ=="],
@@ -136,8 +130,6 @@
     "isoformat": ["isoformat@0.2.1", "", {}, "sha512-tFLRAygk9NqrRPhJSnNGh7g7oaVWDwR0wKh/GM2LgmPa50Eg4UfyaCO4I8k6EqJHl1/uh2RAD6g06n5ygEnrjQ=="],
 
     "linkedom": ["linkedom@0.18.12", "", { "dependencies": { "css-select": "^5.1.0", "cssom": "^0.5.0", "html-escaper": "^3.0.3", "htmlparser2": "^10.0.0", "uhyphen": "^0.2.0" }, "peerDependencies": { "canvas": ">= 2" }, "optionalPeers": ["canvas"] }, "sha512-jalJsOwIKuQJSeTvsgzPe9iJzyfVaEJiEXl+25EkKevsULHvMJzpNqwvj1jOESWdmgKDiXObyjOYwlUqG7wo1Q=="],
-
-    "mxn-jsx-ast-transformer": ["mxn-jsx-ast-transformer@0.8.7", "", { "dependencies": { "estree-walker": "^2.0.1" } }, "sha512-guvlFMriySE6UturThwC4QMM/2u9ZcSH65KyaYAg+bBMfL2mBndoMMebgLlQ0oKzhA9eeuyzLR3cAXUvcHELqg=="],
 
     "nth-check": ["nth-check@2.1.1", "", { "dependencies": { "boolbase": "^1.0.0" } }, "sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w=="],
 
