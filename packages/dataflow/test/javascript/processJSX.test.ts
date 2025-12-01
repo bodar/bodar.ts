@@ -22,7 +22,7 @@ describe("findUnresolvedReferences", () => {
     rainbow.style.color = \`hsl(\${((now / 10) % 360)} 100% 50%)\`;
     rainbow.innerText = 'Rainbow text!';`);
         const refs = findUnresolvedReferences(program);
-        assertThat(refs, equals(['now']));
+        assertThat(refs, equals(['document', 'now']));
     });
 
 

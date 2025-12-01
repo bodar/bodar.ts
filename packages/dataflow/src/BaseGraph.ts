@@ -10,7 +10,8 @@ import {Throttle, type ThrottleStrategy} from "./Throttle.ts";
 /** A Graph with no function parsing or automatic logic */
 export class BaseGraph {
     constructor(private backpressure: BackpressureStrategy = Backpressure.fastest,
-                private throttle: ThrottleStrategy = Throttle.auto()) {
+                private throttle: ThrottleStrategy = Throttle.auto(),
+                private globals: object = globalThis) {
     }
 
     /** Creates nodes explicit parameters */
@@ -25,10 +26,12 @@ export class BaseGraph {
 
     /** Creates and registers a node with explicit key, inputs, and function */
     set(key: string, inputs: string[], fun: Function): Node<any> {
-        // Validate all input dependencies exist
-        const missing = inputs.filter(input => !this.nodes.has(input));
-        if (missing.length > 0) {
-            throw new Error(`Cannot set node "${key}": missing dependencies [${missing.join(', ')}]`);
+        // Auto-register missing dependencies from globals (lazy lookup)
+        for (const input of inputs) {
+            if (!this.nodes.has(input)) {
+                const globalNode = node(input, [], () => Reflect.get(this.globals, input), this.backpressure, this.throttle);
+                this.nodes.set(input, globalNode);
+            }
         }
 
         const dependencies = inputs.map(input => this.nodes.get(input)!);

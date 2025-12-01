@@ -67,13 +67,13 @@ describe("findUnresolvedReferences", () => {
         test("shadowing", () => assertThat(findUnresolvedReferences(parseScript('const x = 1; function f() { const x = 2; return x; }')), equals([])));
     });
 
-    describe("default globals", () => {
-        test("Array", () => assertThat(findUnresolvedReferences(parseScript('Array.from([])')), equals([])));
-        test("console", () => assertThat(findUnresolvedReferences(parseScript('console.log(1)')), equals([])));
-        test("document", () => assertThat(findUnresolvedReferences(parseScript('document.body')), equals([])));
-        test("window", () => assertThat(findUnresolvedReferences(parseScript('window.location')), equals([])));
-        test("undefined", () => assertThat(findUnresolvedReferences(parseScript('x === undefined')), equals(['x'])));
-        test("Promise", () => assertThat(findUnresolvedReferences(parseScript('new Promise(() => {})')), equals([])));
+    describe("globals are detected as unresolved (resolved at runtime from globalThis)", () => {
+        test("Array", () => assertThat(findUnresolvedReferences(parseScript('Array.from([])')), equals(['Array'])));
+        test("console", () => assertThat(findUnresolvedReferences(parseScript('console.log(1)')), equals(['console'])));
+        test("document", () => assertThat(findUnresolvedReferences(parseScript('document.body')), equals(['document'])));
+        test("window", () => assertThat(findUnresolvedReferences(parseScript('window.location')), equals(['window'])));
+        test("undefined", () => assertThat(findUnresolvedReferences(parseScript('x === undefined')), equals(['x', 'undefined'])));
+        test("Promise", () => assertThat(findUnresolvedReferences(parseScript('new Promise(() => {})')), equals(['Promise'])));
     });
 
     describe("property access", () => {
