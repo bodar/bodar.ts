@@ -62,4 +62,12 @@ describe("JSX2DOM", () => {
         html.document.body.click();
         expect(count).toEqual(1);
     });
+
+    // Linkedom does not implement checked properties in HTMLInputElement
+    it.skip("can set a boolean HTML attributes", async () => {
+        const html = parseHTML('...'); // creates html, head, body
+        const jsx = new JSX2DOM(html)
+        html.document.body.appendChild(<form><input checked={true}/><input checked={false}/></form>);
+        expect(html.document.body.innerHTML).toEqual('<form><input checked/><input/></form>');
+    });
 });

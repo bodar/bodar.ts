@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TodoMatic</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<h3>TodoMatic</h3>
+<div class="example">
+
+    <script type="module" data-reactive>
+        import {display, Mutable} from "@bodar/dataflow/runtime.ts";
+
+        const todos = new Mutable([
+            {id: "todo-0", name: "Eat", completed: true},
+            {id: "todo-1", name: "Sleep", completed: false},
+            {id: "todo-2", name: "Repeat", completed: false},
+        ]);
+        const addTodo = (name) => todos.update(values => {
+            values.push({id: `todo-${values.length}`, name, completed: false});
+            // TODO Fix PushNode invalidation to handle arrays
+            return values.slice();
+        });
+        const deleteTodo = (id) => todos.update(values => values.filter(v => v.id !== id));
+
+        const updateTodo = (todo) => todos.update(values => values.map(v => v.id === todo.id ? todo : v));
+    </script>
+
+    <script type="module" data-reactive>
+        <form>
+            <label>What needs to be done?
+                <input type="text" id="todo-name"/>
+            </label>
+            <input type="reset" value="Add" onclick={() => addTodo(document.getElementById('todo-name').value)}/>
+        </form>
+    </script>
+
+    <script type="module" data-reactive>
+        const filter = new Mutable(v => v);
+        display(<form>
+            <label><input type="radio" name="todo-filter" value="all" checked={true} onchange={() => filter.value = v => v}/>All</label>
+            <label><input type="radio" name="todo-filter" value="active" onchange={() => filter.value = v => !v.completed}/>Active</label>
+            <label><input type="radio" name="todo-filter" value="completed" onchange={() => filter.value = v => v.completed}/>Completed</label>
+        </form>)
+    </script>
+
+    <script type="module" data-reactive>
+        const filtered = todos.filter(filter)
+
+        display(`${filtered.length} tasks remaining`);
+        for (const todo of filtered) {
+            display(todo.editing ?
+                <div>
+                    <label>New name for {todo.name}
+                        <input type="text" id={`${todo.id}.name`}/></label>
+                    <div>
+                        <input type="button" value="Cancel"
+                               onclick={() => updateTodo({...todo, editing: false})}/>
+                        <input type="button" value="Save"
+                               onclick={() => updateTodo({
+                                   ...todo,
+                                   name: document.getElementById(`${todo.id}.name`).value,
+                                   editing: false
+                               })}/>
+                    </div>
+                </div>
+                :
+                <div>
+                    <label>
+                        <input type="checkbox"
+                               checked={todo.completed}
+                               onclick={() => updateTodo({...todo, completed: !todo.completed})}/>{todo.name}</label>
+                    <div>
+                        <input type="button" value="Edit"
+                               onclick={() => updateTodo({...todo, editing: !todo.editing})}/>
+                        <input type="button" value="Delete" onclick={() => deleteTodo(todo.id)}/>
+                    </div>
+                </div>
+            );
+        }
+    </script>
+
+</div>
+
+</body>
+</html>

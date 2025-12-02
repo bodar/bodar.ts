@@ -4,7 +4,7 @@
 /// <reference path="./types.d.ts" />
 
 /** a JSX attribute, currently only a string */
-export type Attributes = { [key: string]: string } | null;
+export type Attributes = { [key: string]: string | boolean } | null;
 /** Supported nested JSX content */
 export type Content = string | number | Node | Content[];
 
@@ -37,7 +37,14 @@ export class JSX2DOM {
                 if (key.startsWith('on') && typeof value === 'function') {
                     node.addEventListener(key.substring(2), value);
                 } else {
-                    if (node instanceof HTMLElement) node.setAttribute(key, value);
+                    if (key in node) {
+                        try {
+                            Reflect.set(node, key, value);
+                        } catch (e) {
+                            if (node instanceof HTMLElement) node.setAttribute(key, String(value))
+                        }
+                    }
+                    else if (node instanceof HTMLElement) node.setAttribute(key, String(value));
                 }
             }
         }

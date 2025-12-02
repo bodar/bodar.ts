@@ -1,0 +1,60 @@
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    line-height: 1.6;
+}
+
+h1, h2, h3 {
+    margin-top: 2rem;
+}
+
+p {
+    margin: 1rem 0;
+}
+
+pre {
+    margin-top: 0;
+}
+
+code {
+    font-family: ui-monospace, monospace;
+}
+
+.example {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+    background: #fafafa;
+}
+
+.note {
+    background: #e8f4fd;
+    border-left: 4px solid #1976d2;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.tip {
+    background: #e8f5e9;
+    border-left: 4px solid #4caf50;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+input, select {
+    font-family: inherit;
+    font-size: inherit;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 0.3em 0.5em;
+    background-color: #fff;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}

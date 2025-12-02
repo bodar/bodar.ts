@@ -2,77 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dataflow Quick Start</title>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-            line-height: 1.6;
-        }
-
-        h1, h2, h3 {
-            margin-top: 2rem;
-        }
-
-        p {
-            margin: 1rem 0;
-        }
-
-        pre {
-            margin-top: 0;
-        }
-
-        code {
-            font-family: ui-monospace, monospace;
-        }
-
-        .example {
-            border: 1px solid #ddd;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 4px;
-            background: #fafafa;
-        }
-
-        .note {
-            background: #e8f4fd;
-            border-left: 4px solid #1976d2;
-            padding: 1rem;
-            margin: 1rem 0;
-        }
-
-        .tip {
-            background: #e8f5e9;
-            border-left: 4px solid #4caf50;
-            padding: 1rem;
-            margin: 1rem 0;
-        }
-
-        input, select {
-            font-family: inherit;
-            font-size: inherit;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            padding: 0.3em 0.5em;
-            background-color: #fff;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #1976d2;
-            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
-        }
-
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Dataflow <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="logo: GitHub" src="https://img.shields.io/badge/github-repo-blue?logo=github"></a></h1>
+<h1>Dataflow <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="logo: GitHub"
+                                                                                            src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
+</h1>
 
-<p>Dataflow is a lightweight reactive JavaScript library heavily inspired by <a href="https://observablehq.com/framework/">Observable
+<p>Dataflow is a lightweight reactive JavaScript library heavily inspired by <a
+        href="https://observablehq.com/framework/">Observable
     Framework</a>. It brings reactive programming to plain HTML pages with minimal overhead - the core library
     (including JSX support) is under 3KB compressed!</p>
 
@@ -82,7 +23,8 @@
     automatically. No setState, no Redux, no reducers, no signals, no manual subscriptions. Just declarative
     dependencies.</p>
 
-<p>Document order does not matter, all reactive scripts will be topologically sorted and turned into a DAG before execution.</p>
+<p>Document order does not matter, all reactive scripts will be topologically sorted and turned into a DAG before
+    execution.</p>
 
 <div class="tip">The transformation can happen at build time, at runtime on the server, at the edge, or even client-side
     using a service worker.
@@ -95,8 +37,8 @@
 
 <div class="example">
     <script type="module" data-reactive data-echo="html">
-`The current time is ${new Date(now).toLocaleTimeString("en-GB")}.`
-</script>
+        `The current time is ${new Date(now).toLocaleTimeString("en-GB")}.`
+    </script>
 
 </div>
 
@@ -109,8 +51,10 @@
 </div>
 
 <div class="note">
-    <strong>Note:</strong> Unlike Observable, a semicolon on the end of a single expression does not change how it behaves.
-    A single expression is always a singles expression regardless of optional semicolons. Prettier will not break anything.
+    <strong>Note:</strong> Unlike Observable, a semicolon on the end of a single expression does not change how it
+    behaves.
+    A single expression is always a singles expression regardless of optional semicolons. Prettier will not break
+    anything.
 </div>
 
 <p>Statements like variable declarations don't display anything - they just define values for other blocks to use:</p>
@@ -125,15 +69,16 @@
 
 <div class="example">
     <script type="module" data-reactive data-echo="html">
-for (let i = 0; i < 5; ++i) {
-    display(i);
-}
+        for (let i = 0; i < 5; ++i) {
+            display(i);
+        }
     </script>
 </div>
 
 <h2>Imports</h2>
 
-<p>Any import in a reactive script is available to all other reactive scripts. So the imported display function is now available
+<p>Any import in a reactive script is available to all other reactive scripts. So the imported display function is now
+    available
     (document order does not matter)</p>
 
 <div class="example">
@@ -143,7 +88,8 @@ for (let i = 0; i < 5; ++i) {
 </div>
 
 <div class="note">
-    <strong>Note:</strong> Unlike Observable you do need to import <code>display</code>, <code>view</code>, <code>input</code> etc at least once if you want to use them.
+    <strong>Note:</strong> Unlike Observable you do need to import <code>display</code>, <code>view</code>,
+    <code>input</code> etc at least once if you want to use them.
 </div>
 
 <div class="example">
@@ -161,7 +107,7 @@ for (let i = 0; i < 5; ++i) {
 <p>If an expression evaluates to a DOM node, the node is inserted into the page. Use this to create dynamic content.</p>
 
 <div class="example">
-<script type="module" data-reactive data-echo>document.createTextNode("[insert chart here]")</script>
+    <script type="module" data-reactive data-echo>document.createTextNode("[insert chart here]")</script>
 </div>
 
 <h2>JSX</h2>
@@ -174,7 +120,7 @@ for (let i = 0; i < 5; ++i) {
 
 <div class="example">
     <script type="module" data-reactive data-echo>
-const greeting = (name) => <i>Hello {name}!</i>
+        const greeting = (name) => <i>Hello {name}!</i>
     </script>
     <script type="module" data-reactive data-echo>greeting("World")</script>
 </div>
@@ -183,10 +129,10 @@ const greeting = (name) => <i>Hello {name}!</i>
 
 <div class="example">
     <script type="module" data-reactive data-echo>
-const color = "blue";
+        const color = "blue";
     </script>
     <script type="module" data-reactive data-echo>
-<span style={`color: ${color}; font-weight: bold`}>Styled with JSX</span>
+        <span style={`color: ${color}; font-weight: bold`}>Styled with JSX</span>
     </script>
 </div>
 
@@ -198,13 +144,14 @@ const color = "blue";
 
 <div class="example">
     <script type="module" data-reactive data-echo>
-const now = function* () {
-    while (true) {
-        yield Date.now();
-    }
-}
+        const now = function* () {
+            while (true) {
+                yield Date.now();
+            }
+        }
     </script>
-    <script type="module" data-reactive data-echo><span style={`color: hsl(${(now / 10) % 360} 100% 50%)`}>Rainbow text!</span></script>
+    <script type="module" data-reactive data-echo><span
+        style={`color: hsl(${(now / 10) % 360} 100% 50%)`}>Rainbow text!</span></script>
 </div>
 
 <h2>Reactive Inputs with view()</h2>
@@ -216,7 +163,7 @@ const now = function* () {
 
 <div class="example">
     <script type="module" data-reactive data-echo>
-const name = view(<input name="name" type="text" value="World"/>);
+        const name = view(<input name="name" type="text" value="World"/>);
     </script>
     <script type="module" data-reactive data-echo>`Hello, ${name}!`</script>
 </div>
@@ -227,8 +174,9 @@ const name = view(<input name="name" type="text" value="World"/>);
 
 <div class="example">
     <script type="module" data-reactive data-echo>
-import {range} from "@observablehq/inputs";
-const slider = view(range([0, 100], {label: "Value", step: 1, value: 50}));
+        import {range} from "@observablehq/inputs";
+
+        const slider = view(range([0, 100], {label: "Value", step: 1, value: 50}));
     </script>
     <script type="module" data-reactive data-echo>`The slider value is: ${slider}`</script>
 </div>
@@ -237,10 +185,10 @@ const slider = view(range([0, 100], {label: "Value", step: 1, value: 50}));
 
 <div class="example">
     <script type="module" data-reactive data-echo>
-const a = view(<input type="number" value="10" style="width: 60px"/>);
+        const a = view(<input type="number" value="10" style="width: 60px"/>);
     </script>
     <script type="module" data-reactive data-echo>
-const b = view(<input type="number" value="5" style="width: 60px"/>);
+        const b = view(<input type="number" value="5" style="width: 60px"/>);
     </script>
     <script type="module" data-reactive data-echo>
         <span>{a} + {b} = {a + b}</span>
@@ -253,7 +201,7 @@ const b = view(<input type="number" value="5" style="width: 60px"/>);
 
 <div class="example">
     <script type="module" data-reactive data-echo>
-const checked = view(<input type="checkbox" id="feature"/>);
+        const checked = view(<input type="checkbox" id="feature"/>);
     </script>
     <label for="feature">
         <script type="module" data-reactive data-echo>`Feature is ${checked ? 'enabled' : 'disabled'}`</script>
@@ -264,11 +212,11 @@ const checked = view(<input type="checkbox" id="feature"/>);
 
 <div class="example">
     <script type="module" data-reactive data-echo>
-const color1 = view(<select>
-    <option value="red">Red</option>
-    <option value="green">Green</option>
-    <option value="blue">Blue</option>
-</select>);
+        const color1 = view(<select>
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="blue">Blue</option>
+        </select>);
     </script>
     <script type="module" data-reactive data-echo>
         <span style={`color: ${color1}; font-weight: bold`}>Selected color: {color1}</span>
@@ -281,22 +229,26 @@ const color1 = view(<select>
 
 <div class="example">
     <script type="module" data-reactive data-echo>
-const width = view(<input type="range" min="50" max="300" value="150"/>);
+        const width = view(<input type="range" min="50" max="300" value="150"/>);
     </script>
     <script type="module" data-reactive data-echo>
-const height = view(<input type="range" min="50" max="200" value="100"/>);
+        const height = view(<input type="range" min="50" max="200" value="100"/>);
     </script>
     <script type="module" data-reactive data-echo>
-const color2 = view(<input type="color" value="#4a90d9"/>);
+        const color2 = view(<input type="color" value="#4a90d9"/>);
     </script>
     <script type="module" data-reactive data-echo>
-<div style={`width: ${width}px; height: ${height}px; background: ${color2};
+        <div style={`width: ${width}px; height: ${height}px; background: ${color2};
     display: flex; align-items: center; justify-content: center; color: white;
     text-shadow: 1px 1px 2px black`}>
-    {width} x {height}
-</div>
+            {width} x {height}
+        </div>
     </script>
 </div>
+
+
+<h2>Examples</h2>
+
 
 
 <script type="importmap">
@@ -310,6 +262,7 @@ const color2 = view(<input type="color" value="#4a90d9"/>);
     import hljs from 'highlight.js/lib/core.js';
     import javascript from 'highlight.js/lib/languages/javascript';
     import xml from 'highlight.js/lib/languages/xml';
+
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = "https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/intellij-light.min.css";
