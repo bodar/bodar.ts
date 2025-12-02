@@ -9,7 +9,7 @@
 <body>
 
 <div class="todo-app">
-    <h1>TodoMatic</h1>
+    <h1>Todos</h1>
 
     <script type="module" data-reactive>
         import {display, Mutable} from "@bodar/dataflow/runtime.ts";
@@ -30,7 +30,7 @@
     <script type="module" data-reactive>
         <form class="todo-form" onsubmit={(e) => { e.preventDefault(); addTodo(document.getElementById('todo-name').value); e.target.reset(); }}>
             <input type="text" id="todo-name" placeholder="What needs to be done?"/>
-            <button type="submit" class="btn btn-add">Add</button>
+            <button type="submit" class="btn-icon add" title="Add">+</button>
         </form>
     </script>
 
@@ -52,8 +52,8 @@
                 <div class="edit-form">
                     <input type="text" id={`${todo.id}.name`} value={todo.name} placeholder="New name"/>
                     <div class="edit-actions">
-                        <button type="button" class="btn btn-cancel" onclick={() => updateTodo({...todo, editing: false})}>Cancel</button>
-                        <button type="button" class="btn btn-save" onclick={() => updateTodo({...todo, name: document.getElementById(`${todo.id}.name`).value, editing: false})}>Save</button>
+                        <button type="button" class="btn-icon cancel" title="Cancel" onclick={() => updateTodo({...todo, editing: false})}>↩</button>
+                        <button type="button" class="btn-icon save" title="Save" onclick={() => updateTodo({...todo, name: document.getElementById(`${todo.id}.name`).value, editing: false})}>✓</button>
                     </div>
                 </div>
                 :
@@ -61,12 +61,8 @@
                     <input type="checkbox" checked={todo.completed} onclick={() => updateTodo({...todo, completed: !todo.completed})}/>
                     <span class="todo-name">{todo.name}</span>
                     <div class="todo-actions">
-                        <button type="button" class="btn-icon" title="Edit" onclick={() => updateTodo({...todo, editing: true})}>
-                            <svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
-                        </button>
-                        <button type="button" class="btn-icon delete" title="Delete" onclick={() => deleteTodo(todo.id)}>
-                            <svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
-                        </button>
+                        <button type="button" class="btn-icon delete" title="Delete" onclick={() => deleteTodo(todo.id)}>✕</button>
+                        <button type="button" class="btn-icon" title="Edit" onclick={() => updateTodo({...todo, editing: true})}>✎</button>
                     </div>
                 </div>
             )}
