@@ -6,10 +6,15 @@ const ROOT = import.meta.dir;
 const docsDir = join(ROOT, "docs");
 const outDir = join(ROOT, "out");
 
-for await (const htmlFile of new Glob("**/*.html").scan(docsDir)) {
-    const content = await file(join(docsDir, htmlFile)).text();
-    const transformer = new HTMLTransformer(new HTMLRewriter());
-    const output = transformer.transform(content);
-    await write(join(outDir, htmlFile), output);
-    console.log(`Generated ${htmlFile}`);
+for await (const path of new Glob("**/*").scan({cwd: docsDir, onlyFiles: true})) {
+    const src = file(join(docsDir, path));
+    if (path.endsWith(".html")) {
+        const transformer = new HTMLTransformer(new HTMLRewriter());
+        const output = transformer.transform(await src.text());
+        await write(join(outDir, path), output);
+        console.log(`Generated ${path}`);
+    } else {
+        await write(join(outDir, path), src);
+        console.log(`Copied ${path}`);
+    }
 }
