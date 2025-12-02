@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <title>TodoMatic</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="todo.css">
 </head>
 <body>
 
-<h3>TodoMatic</h3>
-<div class="example">
+<div class="todo-app">
+    <h1>TodoMatic</h1>
 
     <script type="module" data-reactive>
         import {display, Mutable} from "@bodar/dataflow/runtime.ts";
@@ -21,66 +21,56 @@
         ]);
         const addTodo = (name) => todos.update(values => {
             values.push({id: `todo-${values.length}`, name, completed: false});
-            // TODO Fix PushNode invalidation to handle arrays
             return values.slice();
         });
         const deleteTodo = (id) => todos.update(values => values.filter(v => v.id !== id));
-
         const updateTodo = (todo) => todos.update(values => values.map(v => v.id === todo.id ? todo : v));
     </script>
 
     <script type="module" data-reactive>
-        <form>
-            <label>What needs to be done?
-                <input type="text" id="todo-name"/>
-            </label>
-            <input type="reset" value="Add" onclick={() => addTodo(document.getElementById('todo-name').value)}/>
+        <form class="todo-form" onsubmit={(e) => { e.preventDefault(); addTodo(document.getElementById('todo-name').value); e.target.reset(); }}>
+            <input type="text" id="todo-name" placeholder="What needs to be done?"/>
+            <button type="submit" class="btn btn-add">Add</button>
         </form>
     </script>
 
     <script type="module" data-reactive>
         const filter = new Mutable(v => v);
-        display(<form>
-            <label><input type="radio" name="todo-filter" value="all" checked={true} onchange={() => filter.value = v => v}/>All</label>
-            <label><input type="radio" name="todo-filter" value="active" onchange={() => filter.value = v => !v.completed}/>Active</label>
-            <label><input type="radio" name="todo-filter" value="completed" onchange={() => filter.value = v => v.completed}/>Completed</label>
-        </form>)
+        display(<div class="filters">
+            <label><input type="radio" name="todo-filter" value="all" checked={true} onchange={() => filter.value = v => v}/><span>All</span></label>
+            <label><input type="radio" name="todo-filter" value="active" onchange={() => filter.value = v => !v.completed}/><span>Active</span></label>
+            <label><input type="radio" name="todo-filter" value="completed" onchange={() => filter.value = v => v.completed}/><span>Completed</span></label>
+        </div>)
     </script>
 
     <script type="module" data-reactive>
         const filtered = todos.filter(filter)
 
-        display(`${filtered.length} tasks remaining`);
-        for (const todo of filtered) {
-            display(todo.editing ?
-                <div>
-                    <label>New name for {todo.name}
-                        <input type="text" id={`${todo.id}.name`}/></label>
-                    <div>
-                        <input type="button" value="Cancel"
-                               onclick={() => updateTodo({...todo, editing: false})}/>
-                        <input type="button" value="Save"
-                               onclick={() => updateTodo({
-                                   ...todo,
-                                   name: document.getElementById(`${todo.id}.name`).value,
-                                   editing: false
-                               })}/>
+        display(<p class="task-count">{filtered.length} task{filtered.length !== 1 ? 's' : ''} remaining</p>);
+        display(<div class="todo-list">
+            {filtered.map(todo => todo.editing ?
+                <div class="edit-form">
+                    <input type="text" id={`${todo.id}.name`} value={todo.name} placeholder="New name"/>
+                    <div class="edit-actions">
+                        <button type="button" class="btn btn-cancel" onclick={() => updateTodo({...todo, editing: false})}>Cancel</button>
+                        <button type="button" class="btn btn-save" onclick={() => updateTodo({...todo, name: document.getElementById(`${todo.id}.name`).value, editing: false})}>Save</button>
                     </div>
                 </div>
                 :
-                <div>
-                    <label>
-                        <input type="checkbox"
-                               checked={todo.completed}
-                               onclick={() => updateTodo({...todo, completed: !todo.completed})}/>{todo.name}</label>
-                    <div>
-                        <input type="button" value="Edit"
-                               onclick={() => updateTodo({...todo, editing: !todo.editing})}/>
-                        <input type="button" value="Delete" onclick={() => deleteTodo(todo.id)}/>
+                <div class={`todo-item ${todo.completed ? 'completed' : ''}`}>
+                    <input type="checkbox" checked={todo.completed} onclick={() => updateTodo({...todo, completed: !todo.completed})}/>
+                    <span class="todo-name">{todo.name}</span>
+                    <div class="todo-actions">
+                        <button type="button" class="btn-icon" title="Edit" onclick={() => updateTodo({...todo, editing: true})}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                        </button>
+                        <button type="button" class="btn-icon delete" title="Delete" onclick={() => deleteTodo(todo.id)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                        </button>
                     </div>
                 </div>
-            );
-        }
+            )}
+        </div>);
     </script>
 
 </div>
