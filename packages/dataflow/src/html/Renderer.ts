@@ -19,17 +19,18 @@ export class Renderer {
                 if (slot) {
                     const newNode = this.createUpdateNode(update);
                     if (!newNode) continue;
-                    if (newNode instanceof DocumentFragment) {
-                        if (slot.childNodes.length === newNode.childNodes.length) {
-                            for (let i = 0; i < slot.childNodes.length; i++) {
-                                const slotChild = slot.childNodes[i];
-                                const newChild = newNode.childNodes[i];
-                                if (!slotChild.isEqualNode(newChild)) slotChild.replaceWith(newNode);
-                            }
-                            continue;
-                        }
-                    }
-                    if (slot.childNodes.length !== 1 || !slot.childNodes[0].isEqualNode(newNode)) slot.replaceChildren(newNode);
+                    // if (newNode instanceof DocumentFragment) {
+                    //     if (slot.childNodes.length === newNode.childNodes.length) {
+                    //         for (let i = 0; i < slot.childNodes.length; i++) {
+                    //             const slotChild = slot.childNodes[i];
+                    //             const newChild = newNode.childNodes[i];
+                    //             if (!slotChild.isEqualNode(newChild)) slotChild.replaceWith(newNode);
+                    //         }
+                    //         continue;
+                    //     }
+                    // }
+                    // if (slot.childNodes.length !== 1 || !slot.childNodes[0].isEqualNode(newNode)) slot.replaceChildren(newNode);
+                    slot.replaceChildren(newNode);
                 }
             }
         });
