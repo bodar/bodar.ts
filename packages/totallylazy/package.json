@@ -88,5 +88,8 @@
     "src",
     "README.md",
     "package.json"
-  ]
+  ],
+  "devDependencies": {
+    "linkedom": "^0.18.12"
+  }
 }

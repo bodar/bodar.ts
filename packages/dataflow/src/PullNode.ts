@@ -33,22 +33,13 @@ export class PullNode<T> implements Node<T>, AsyncIterable<T> {
     }
 
     async* execute(newInputs: any[]): AsyncGenerator<T> {
-        if (this.shallowEqual(this.inputs, newInputs)) {
+        if (equal(this.inputs, newInputs)) {
             yield* this.processResult(this.value);
         } else {
             this.value = this.fun(...newInputs);
             this.inputs = newInputs.slice();
             yield* this.processResult(this.value);
         }
-    }
-
-    private shallowEqual(a: any[] | undefined, b: any[]): boolean {
-        if (a === undefined) return false;
-        if (a.length != b.length) return false;
-        for (let i = 0; i < a.length; i++) {
-            if (a[i] !== b[i]) return false;
-        }
-        return true;
     }
 
     async* processResult(result: any): AsyncGenerator<T> {
@@ -96,4 +87,46 @@ export class PullNode<T> implements Node<T>, AsyncIterable<T> {
 /** Factory function to create a new reactive node */
 export function node<T>(key: string, dependencies: PullNode<any>[], fun: Function, backpressure: BackpressureStrategy, throttle: ThrottleStrategy): PullNode<T> {
     return new PullNode(key, dependencies, fun, backpressure, throttle)
+}
+
+
+/** Copied from TL so we don't add a dependency (and trimmed down) */
+function equal(a: unknown, b: unknown): boolean {
+    if (a === b) return true;
+    if (a === null || b === null) return false;
+    if (typeof a !== typeof b) return false;
+
+    if (typeof a == 'number' && typeof b == 'number') return a !== a && b !== b;
+
+    if (typeof a == 'object' && typeof b == 'object') {
+        if (a.constructor !== b.constructor) return false;
+
+        if (Array.isArray(a) && Array.isArray(b)) {
+            if (a.length != b.length) return false;
+            for (let i = 0; i < a.length; i++) {
+                if (!equal(a[i], b[i])) return false;
+            }
+            return true;
+        }
+
+        if (typeof Node === 'function' && (a instanceof Node) && (b instanceof Node)) {
+            return a.isEqualNode(b);
+        }
+
+        if (a.constructor === Object) {
+            return equal(Object.entries(a).sort(by(v => v[0])), Object.entries(b).sort(by(v => v[0])));
+        }
+    }
+
+    return false;
+}
+
+function by<A, B>(mapper: (a: A) => B, comparator: (a: B, b: B) => number = ascending): (a: A, b: A) => number {
+    return (a, b) => comparator(mapper(a), mapper(b));
+}
+
+function ascending<T>(a: T, b: T): number {
+    if (a < b) return -1;
+    if (a > b) return 1;
+    return 0;
 }

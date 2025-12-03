@@ -43,6 +43,9 @@
     "packages/totallylazy": {
       "name": "@bodar/totallylazy",
       "version": "0.0.0",
+      "devDependencies": {
+        "linkedom": "^0.18.12",
+      },
     },
     "packages/yadic": {
       "name": "@bodar/yadic",

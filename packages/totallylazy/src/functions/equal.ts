@@ -1,11 +1,15 @@
 /** @module Deep equality comparison utilities */
 import {by} from "../comparators/by.ts";
 
+interface EqualDependencies {
+    Node?: typeof Node,
+}
+
 /**
  * Performs deep equality comparison of two values. Supports primitives, objects, arrays, Maps, Sets, Dates, RegExp, and functions.
  * Uses same-value-zero equality (NaN === NaN, +0 === -0).
  */
-export function equal(a: unknown, b: unknown): boolean {
+export function equal(a: unknown, b: unknown, globals:EqualDependencies = globalThis): boolean {
     if (a === b) return true;
     if (a === null || b === null) return false;
     if (typeof a !== typeof b) return false;
@@ -35,6 +39,11 @@ export function equal(a: unknown, b: unknown): boolean {
         if ((a instanceof Set) && (b instanceof Set)) {
             if (a.size !== b.size) return false;
             return equal(Array.from(a), Array.from(b));
+        }
+
+        const {Node} = globals;
+        if (typeof Node === 'function' && (a instanceof Node) && (b instanceof Node)) {
+            return a.isEqualNode(b);
         }
 
         // Both of these seem questionable (taken from fast-deep-equal)

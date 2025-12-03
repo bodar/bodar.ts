@@ -19,14 +19,24 @@ export class Renderer {
                 if (slot) {
                     const newNode = this.createUpdateNode(update);
                     if (!newNode) continue;
-                    slot.replaceChildren(newNode);
+                    if (newNode instanceof DocumentFragment) {
+                        if (slot.childNodes.length === newNode.childNodes.length) {
+                            for (let i = 0; i < slot.childNodes.length; i++) {
+                                const slotChild = slot.childNodes[i];
+                                const newChild = newNode.childNodes[i];
+                                if (!slotChild.isEqualNode(newChild)) slotChild.replaceWith(newNode);
+                            }
+                            continue;
+                        }
+                    }
+                    if (slot.childNodes.length !== 1 || !slot.childNodes[0].isEqualNode(newNode)) slot.replaceChildren(newNode);
                 }
             }
         });
     }
 
     private createUpdateNode(update: any): Node | undefined {
-        if(Array.isArray(update)) {
+        if (Array.isArray(update)) {
             const fragment = this.doc.createDocumentFragment();
             fragment.replaceChildren(...update.map(u => this.createUpdateNode(u)).filter(u => u !== undefined));
             return fragment;

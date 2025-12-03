@@ -2,6 +2,7 @@ import {describe, it} from "bun:test";
 import {assertFalse, assertTrue} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equal} from "@bodar/totallylazy/functions/equal.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import {parseHTML} from "linkedom";
 
 describe("equal", () => {
     it("handles primitives", () => {
@@ -99,5 +100,20 @@ describe("equal", () => {
         assertTrue(equal(function (){}, function (){}));
         assertFalse(equal(function (_a:unknown){},function (_a:unknown, _b:unknown){}));
         assertFalse(equal(function a(_a:unknown){}, function b(_a:unknown){}));
+    });
+
+    it("supports Node equality", () => {
+        const html = parseHTML('...');
+        assertTrue(equal(html.document.createTextNode('Foo'), html.document.createTextNode('Foo'), html));
+        assertFalse(equal(html.document.createTextNode('Foo'), html.document.createTextNode('Bar'), html));
+        assertTrue(equal(html.document.createElement('div'), html.document.createElement('div'), html));
+
+        const div1 = html.document.createElement('div');
+        div1.setAttribute('id', 'div1');
+        const div2 = html.document.createElement('div');
+        div2.setAttribute('id', 'div1');
+        assertTrue(equal(div1, div2, html));
+        div2.setAttribute('id', 'different');
+        assertFalse(equal(div1, div2, html));
     });
 });
