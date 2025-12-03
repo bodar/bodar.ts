@@ -10,16 +10,14 @@ export interface RendererDependencies {
     DocumentFragment: typeof DocumentFragment,
 }
 
-const DefaultDependencies: RendererDependencies = {
-    graph: new BaseGraph(),
-    document: globalThis.document,
-    Node: globalThis.Node,
-    DocumentFragment: globalThis.DocumentFragment
-};
-
 /** Renderer **/
 export class Renderer {
-    constructor(private deps: RendererDependencies = DefaultDependencies) {
+    constructor(private deps: RendererDependencies = {
+        graph: new BaseGraph(),
+        document: globalThis.document,
+        Node: globalThis.Node,
+        DocumentFragment: globalThis.DocumentFragment
+    }) {
     }
 
     register(key: string, inputs: string[], outputs: string[], fun: Function): void {
@@ -35,9 +33,12 @@ export class Renderer {
                     const newNode = this.createUpdateNode(update);
                     if (!newNode) continue;
                     if (newNode instanceof DocumentFragment && slot.childNodes.length === newNode.childNodes.length) {
-                        for (let i = 0; i < slot.childNodes.length; i++) {
-                            const slotChild = slot.childNodes[i];
-                            const newChild = newNode.childNodes[i];
+                        // copy the children as when we move them from the fragment the index will change
+                        const slotChildren = Array.from(slot.childNodes);
+                        const newNodeChildren = Array.from(newNode.childNodes);
+                        for (let i = 0; i < slotChildren.length; i++) {
+                            const slotChild = slotChildren[i];
+                            const newChild = newNodeChildren[i];
                             if (!slotChild.isEqualNode(newChild)) slotChild.replaceWith(newChild);
                         }
                     } else if (slot.childNodes.length === 1 && !(newNode instanceof DocumentFragment)) {
