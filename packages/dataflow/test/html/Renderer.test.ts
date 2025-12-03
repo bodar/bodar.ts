@@ -49,8 +49,25 @@ describe("Renderer", () => {
             return elememt;
             },
             '<div id="test"></div>')).childNodes;
-        // If it had replaced it, then this will be true
         const newChild = children[0];
+        // If it had replaced it, then this would be true
         assertFalse(Reflect.get(newChild, '@tag@') === 'new');
+    });
+
+    it("Also does the diff when there are multiple nodes", async () => {
+        let elememt: HTMLElement | undefined;
+        const children = (await render(document => {
+                elememt = document.createElement('div');
+                elememt.setAttribute('id', 'test');
+                // Node.isEqualNode won't see this custom property
+                // so it will think the nodes are the same and not replace it
+                Reflect.set(elememt, '@tag@', 'new');
+                return [elememt, document.createTextNode('different')];
+            },
+            '<div id="test"></div>Will-be-replaced')).childNodes;
+        const [div, text] = Array.from(children);
+        // If it had replaced it, then this would be true
+        assertFalse(Reflect.get(div, '@tag@') === 'new');
+        assertThat(text.textContent, is('different'));
     });
 });
