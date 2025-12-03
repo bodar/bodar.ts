@@ -20,7 +20,6 @@
     "./html/Renderer.ts": "./src/html/Renderer.ts",
     "./Node.ts": "./src/Node.ts",
     "./PullNode.ts": "./src/PullNode.ts",
-    "./PushNode.ts": "./src/PushNode.ts",
     "./runtime.ts": "./src/runtime.ts",
     "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts"
   },

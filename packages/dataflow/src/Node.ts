@@ -3,7 +3,12 @@
  * @module
  */
 
-export interface Node<T> extends AsyncIterable<T> {
+export interface Version<T> {
+    value: T;
+    version: number;
+}
+
+export interface Node<T> extends AsyncIterable<Version<T>> {
     key: string;
     dependencies: Node<T>[];
     fun: Function;

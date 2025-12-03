@@ -15,7 +15,7 @@ export class Renderer {
     render() {
         this.graph.sinks().forEach(async (node) => {
             const slot = this.doc.querySelector(`slot[name="${node.key}"]`);
-            for await (const update of node) {
+            for await (const {value: update} of node) {
                 if (slot) {
                     const newNode = this.createUpdateNode(update);
                     if (!newNode) continue;
