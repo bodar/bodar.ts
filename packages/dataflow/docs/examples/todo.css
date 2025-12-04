@@ -177,6 +177,18 @@ h1 {
     color: #333;
 }
 
+.todo-item .todo-name[contenteditable] {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    outline: none;
+}
+
+.todo-item .todo-name[contenteditable]:focus {
+    border-color: #e6c200;
+    box-shadow: 0 0 0 2px rgba(230, 194, 0, 0.2);
+}
+
 .todo-item.completed .todo-name {
     text-decoration: line-through;
     color: #888;

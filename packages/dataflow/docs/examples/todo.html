@@ -38,7 +38,7 @@
 
     <script type="module" data-reactive>
         <form class="todo-form" onsubmit={(e) => { e.preventDefault(); addTodo(document.getElementById('todo-name').value); e.target.reset(); }}>
-            <input type="text" id="todo-name" placeholder="What needs to be done?"/>
+            <input type="text" id="todo-name" placeholder="What needs to be done?" required/>
             <button type="submit" class="btn-icon add" title="Add">+</button>
         </form>
     </script>
@@ -57,21 +57,12 @@
 
         display(<p class="task-count">{filtered.length} task{filtered.length !== 1 ? 's' : ''} remaining</p>);
         display(<div class="todo-list">
-            {filtered.map(todo => todo.editing ?
-                <div class="edit-form">
-                    <input type="text" id={`${todo.id}.name`} value={todo.name} placeholder="New name"/>
-                    <div class="edit-actions">
-                        <button type="button" class="btn-icon cancel" title="Cancel" onclick={() => updateTodo({...todo, editing: false})}>↩</button>
-                        <button type="button" class="btn-icon save" title="Save" onclick={() => updateTodo({...todo, name: document.getElementById(`${todo.id}.name`).value, editing: false})}>✓</button>
-                    </div>
-                </div>
-                :
+            {filtered.map(todo =>
                 <div class={`todo-item ${todo.completed ? 'completed' : ''}`}>
-                    <input type="checkbox" checked={todo.completed} onclick={() => updateTodo({...todo, completed: !todo.completed})}/>
-                    <span class="todo-name">{todo.name}</span>
+                    <input type="checkbox" checked={todo.completed} onclick={() => updateTodo({...todo, completed: !todo.completed, name: document.getElementById(`${todo.id}.name`).innerText})}/>
+                    <span id={`${todo.id}.name`} class="todo-name" contenteditable="plaintext-only" onblur={(e) => updateTodo({...todo, name: document.getElementById(`${todo.id}.name`).innerText})}>{todo.name}</span>
                     <div class="todo-actions">
                         <button type="button" class="btn-icon delete" title="Delete" onclick={() => deleteTodo(todo.id)}>✕</button>
-                        <button type="button" class="btn-icon" title="Edit" onclick={() => updateTodo({...todo, editing: true})}>✎</button>
                     </div>
                 </div>
             )}
