@@ -30,7 +30,7 @@
         ]);
         const addTodo = (name) => todos.update(values => {
             values.push({id: `todo-${values.length}`, name, completed: false});
-            return values.slice();
+            return values;
         });
         const deleteTodo = (id) => todos.update(values => values.filter(v => v.id !== id));
         const updateTodo = (todo) => todos.update(values => values.map(v => v.id === todo.id ? todo : v));
