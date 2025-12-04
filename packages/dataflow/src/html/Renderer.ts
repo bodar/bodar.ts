@@ -32,16 +32,18 @@ export class Renderer {
                 if (slot) {
                     const newNode = this.createUpdateNode(update);
                     if (!newNode) continue;
-                    if (newNode instanceof DocumentFragment && slot.childNodes.length === newNode.childNodes.length) {
+                    if (newNode instanceof DocumentFragment) {
+                        while (slot.childNodes.length > newNode.childNodes.length) slot.removeChild(slot.lastChild!);
                         // copy the children as when we move them from the fragment the index will change
-                        const slotChildren = Array.from(slot.childNodes);
                         const newNodeChildren = Array.from(newNode.childNodes);
-                        for (let i = 0; i < slotChildren.length; i++) {
-                            const slotChild = slotChildren[i];
+                        const slotChildren = Array.from(slot.childNodes);
+                        for (let i = 0; i < newNodeChildren.length; i++) {
                             const newChild = newNodeChildren[i];
-                            if (!slotChild.isEqualNode(newChild)) slotChild.replaceWith(newChild);
+                            const slotChild = slotChildren[i];
+                            if (slotChild === undefined) slot?.appendChild(newChild);
+                            else if (!newChild.isEqualNode(slotChild)) slotChild.replaceWith(newChild);
                         }
-                    } else if (slot.childNodes.length === 1 && !(newNode instanceof DocumentFragment)) {
+                    } else if (slot.childNodes.length === 1) {
                         if (!slot.childNodes[0].isEqualNode(newNode)) slot.replaceChildren(newNode);
                     } else {
                         slot.replaceChildren(newNode);
