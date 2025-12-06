@@ -19,13 +19,18 @@ export class HTMLTransformer {
         return this.rewriter.transform(input)
     }
 
-    definitions: NodeDefinition[] = [];
-    highlight: boolean = false;
+    private definitions: NodeDefinition[] = [];
 
     addScript(javascript: string, id?: string): string[] {
         const definition = NodeDefinition.parse(javascript, id);
         this.definitions.push(definition);
         return [definition.key, ...definition.outputs]
+    }
+
+    popDefinitions() {
+        const definitions = this.definitions.slice();
+        this.definitions.length = 0;
+        return definitions;
     }
 }
 

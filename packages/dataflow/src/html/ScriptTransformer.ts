@@ -33,7 +33,6 @@ export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementC
     }
 
     private echoScript(end: HTMLRewriterTypes.EndTag, attributes: Map<string, string>, javascript: string): void {
-        this.controller.highlight = true;
         const echo = attributes.get('data-echo') || 'javascript';
         end.after('</code></pre>', {html: true});
         if(echo === 'html') end.after('\n</script>');

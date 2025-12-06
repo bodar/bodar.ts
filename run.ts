@@ -50,12 +50,12 @@ export async function demo() {
 
 export async function build() {
     await clean();
-    await generateExports();
+    await exports();
     await check();
     await test();
 }
 
-export async function generateExports(packageGlob: string = "packages/*/package.json") {
+export async function exports(packageGlob: string = "packages/*/package.json") {
     for await (const f of new Glob(packageGlob).scan(".")) {
         const packageJsonFile = file(f!);
         const packageJson = await packageJsonFile.json();
@@ -78,11 +78,11 @@ export async function generateExports(packageGlob: string = "packages/*/package.
     }
 }
 
-export async function generateDocs() {
+export async function docs() {
     await $`bun run packages/dataflow/docs.ts`;
 }
 
-export async function generateJsr() {
+export async function jsr() {
     const v = await version();
 
     for await (const f of new Glob("packages/*/package.json").scan(".")) {
@@ -118,7 +118,7 @@ export async function generateJsr() {
 }
 
 export async function publish() {
-    await generateJsr();
+    await jsr();
     try {
         if (process.env.JSR_TOKEN) {
             await $`bunx jsr publish --allow-dirty --verbose --token ${process.env.JSR_TOKEN}`;
@@ -133,7 +133,7 @@ export async function publish() {
 
 export async function ci() {
     await build();
-    await generateDocs();
+    await docs();
     await publish();
 }
 

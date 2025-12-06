@@ -12,7 +12,7 @@ export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementCon
     }
 
     async endTag(end: HTMLRewriterTypes.EndTag) {
-        const sorted = topologicalSort(this.controller.definitions);
+        const sorted = topologicalSort(this.controller.popDefinitions());
         // language=javascript
         const javascript = await bundleText(`import {Renderer, JSX2DOM} from "@bodar/dataflow/runtime.ts";
 const renderer = new Renderer();
