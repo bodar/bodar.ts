@@ -6,3 +6,4 @@ tools
 packages/totallylazy.js
 CLAUDE.local.md
 out
+.playwright-mcp
