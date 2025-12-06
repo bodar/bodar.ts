@@ -27,7 +27,7 @@ export class HTMLTransformer {
         return [definition.key, ...definition.outputs]
     }
 
-    popDefinitions() {
+    popDefinitions(): NodeDefinition[] {
         const definitions = this.definitions.slice();
         this.definitions.length = 0;
         return definitions;
