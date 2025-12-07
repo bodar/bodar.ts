@@ -1,10 +1,10 @@
 import {topologicalSort} from "./TopologicalSort.ts";
 import {NodeDefinition} from "./NodeDefinition.ts";
 import {HTMLTransformer} from "./HTMLTransformer.ts";
-import {bundleText} from "../bundling/bundle.ts";
+import type {Bundler} from "../bundling/Bundler.ts";
 
 export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
-    constructor(private controller: HTMLTransformer) {
+    constructor(private controller: HTMLTransformer, private bundler: Bundler) {
     }
 
     element(start: HTMLRewriterTypes.Element): void | Promise<void> {
@@ -14,18 +14,11 @@ export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementCon
     async endTag(end: HTMLRewriterTypes.EndTag) {
         const sorted = topologicalSort(this.controller.popDefinitions());
         // language=javascript
-        const javascript = await bundleText(`import {Renderer, JSX2DOM} from "@bodar/dataflow/runtime.ts";
+        const javascript = await this.bundler.transform(`import {Renderer, JSX2DOM} from "@bodar/dataflow/runtime.ts";
 const renderer = new Renderer();
 renderer.register("jsx", [], [], () => new JSX2DOM());
 ${sorted.map((d: NodeDefinition) => `renderer.register(${d});`).join('\n')}
-renderer.render();`, 'js', import.meta.dir);
-        end.before(`<script type="importmap">${JSON.stringify(this.importmap)}</script><script type="module">${javascript}</script>`, {html: true})
-    }
-
-    importmap = {
-        imports: {
-            "@bodar/": "/",
-            "@observablehq/": "https://esm.run/@observablehq/"
-        }
+renderer.render();`);
+        end.before(`<script type="module">${javascript}</script>`, {html: true})
     }
 }

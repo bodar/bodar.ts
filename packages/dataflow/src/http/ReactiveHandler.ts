@@ -4,7 +4,7 @@ interface HttpHandler {
     (request: Request): Promise<Response>;
 }
 
-export function HTMLHandler(transformer: () => HTMLTransformer, http: HttpHandler): HttpHandler {
+export function ReactiveHandler(transformer: () => HTMLTransformer, http: HttpHandler): HttpHandler {
     return async (request: Request) => {
         const response = await http(request);
 
