@@ -22,7 +22,7 @@ const router = async (request: Request) => {
     }
 
     if (filePath.endsWith('.ts')) {
-        let bundled = await bundleFile(filePath);
+        let bundled = await bundleFile(filePath, false);
         return new Response(bundled, {
             headers: {'Content-Type': 'application/javascript'}
         });
@@ -44,7 +44,7 @@ function mimeTypeFor(path: string): string {
 }
 
 const app = CompressionHandler(ReactiveHandler(() => {
-    switch (Bun.env.NODE_ENV){
+    switch (Bun.env.NODE_ENV) {
         case 'production': {
             return new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: new BunBundler()});
         }
@@ -63,9 +63,7 @@ const app = CompressionHandler(ReactiveHandler(() => {
 
 Bun.serve({
     port: PORT,
-    async fetch(req) {
-        return app(req);
-    },
+    fetch: app
 });
 
 console.log(`Server running at http://localhost:${PORT}`);
