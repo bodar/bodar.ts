@@ -2,6 +2,7 @@ import {file, Glob, write} from "bun";
 import {join} from "path";
 import {HTMLTransformer} from "./src/html/HTMLTransformer.ts";
 import {BunBundler} from "./src/bundling/BunBundler.ts";
+import {bundleFile} from "./src/bundling/bundle.ts";
 
 const ROOT = import.meta.dir;
 const docsDir = join(ROOT, "docs");
@@ -19,3 +20,8 @@ for await (const path of new Glob("**/*").scan({cwd: docsDir, onlyFiles: true}))
         console.log(`Copied ${path}`);
     }
 }
+
+const runtime = await bundleFile(join(ROOT, 'src/runtime.ts'), true);
+const output = 'runtime.js';
+await Bun.write(join(outDir, output), runtime);
+console.log(`Bundled ${output}`);
