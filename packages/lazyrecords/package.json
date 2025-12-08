@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "Type-safe SQL query builder for TypeScript with support for PostgreSQL, template literals, and ANSI SQL standard",
   "type": "module",
+  "sideEffects": false,
   "dependencies": {
     "@bodar/totallylazy": "workspace:totallylazy"
   },

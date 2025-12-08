@@ -1,6 +1,7 @@
 {
   "name": "bodar",
   "private": true,
+  "sideEffects": false,
   "workspaces": [
     "packages/*"
   ],

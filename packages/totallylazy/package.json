@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "Functional programming utilities for TypeScript including lazy sequences, parsers, predicates, and transducers",
   "type": "module",
+  "sideEffects": false,
   "exports": {
     "./asserts/assertThat.ts": "./src/asserts/assertThat.ts",
     "./collections/Array.ts": "./src/collections/Array.ts",

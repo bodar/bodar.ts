@@ -2,6 +2,7 @@
   "name": "@bodar/yadic",
   "version": "0.0.0",
   "type": "module",
+  "sideEffects": false,
   "exports": {
     "./chain.ts": "./src/chain.ts",
     "./LazyMap.ts": "./src/LazyMap.ts",

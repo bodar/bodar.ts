@@ -2,6 +2,7 @@
   "name": "@bodar/dataflow",
   "version": "0.0.0",
   "type": "module",
+  "sideEffects": false,
   "dependencies": {
     "@bodar/jsx2dom": "workspace:jsx2dom",
     "acorn": "^8.15.0",
