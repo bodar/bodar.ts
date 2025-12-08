@@ -118,34 +118,25 @@ export function transformJSX(program: Program, options?: TransformOptions): Prog
         enter(node) {
             const anyNode = node as AnyNode;
 
-            if (anyNode.type === "JSXText") {
-                this.replace(literal((anyNode as any).value));
-                return;
-            }
-
-            if (anyNode.type === "JSXExpressionContainer") {
-                this.replace((anyNode as any).expression);
-                return;
-            }
-
-            if (anyNode.type === "JSXMemberExpression") {
-                this.replace(transformMemberExpression(anyNode as JSXMemberExpression));
-                return;
-            }
-
-            if (anyNode.type === "JSXIdentifier") {
-                this.replace(identifier((anyNode as any).name));
-                return;
-            }
-
-            if (anyNode.type === "JSXElement") {
-                this.replace(transformElement(anyNode as JSXElement, opts.factory));
-                return;
-            }
-
-            if (anyNode.type === "JSXFragment") {
-                this.replace(transformFragment(anyNode as JSXFragment, opts.factory));
-                return;
+            switch (anyNode.type) {
+                case "JSXText":
+                    this.replace(literal((anyNode as any).value));
+                    return;
+                case "JSXExpressionContainer":
+                    this.replace((anyNode as any).expression);
+                    return;
+                case "JSXMemberExpression":
+                    this.replace(transformMemberExpression(anyNode as JSXMemberExpression));
+                    return;
+                case "JSXIdentifier":
+                    this.replace(identifier((anyNode as any).name));
+                    return;
+                case "JSXElement":
+                    this.replace(transformElement(anyNode as JSXElement, opts.factory));
+                    return;
+                case "JSXFragment":
+                    this.replace(transformFragment(anyNode as JSXFragment, opts.factory));
+                    return;
             }
         }
     });
