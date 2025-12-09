@@ -68,24 +68,32 @@ class SharedAsyncIterator<T> implements AsyncIterator<T> {
         return !!this.resolve;
     }
 
+    reset(): void {
+        this.resolve = undefined;
+        this.result = undefined;
+    }
+
     async next(): Promise<IteratorResult<T, any>> {
         if (this.result) {
             try {
                 return this.result;
             } finally {
-                this.result = undefined;
+                this.reset();
             }
         }
-        return new Promise<IteratorResult<T, any>>((resolve) => {
-            this.resolve = resolve;
-            if (this.controller.ready) this.controller.sendNext();
-        })
+        const {promise, resolve} = Promise.withResolvers<IteratorResult<T, any>>();
+        this.resolve = resolve;
+        if (this.controller.ready) {
+            // Do NOT await this
+            this.controller.sendNext();
+        }
+        return promise;
     }
 
     sendNext(result: IteratorResult<T>): void {
         if (this.resolve) {
             this.resolve!(result);
-            this.resolve = undefined;
+            this.reset();
         } else {
             this.result = result;
         }

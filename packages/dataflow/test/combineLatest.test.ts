@@ -1,8 +1,9 @@
-import {describe, test} from "bun:test";
+import {describe, expect, test} from "bun:test";
 import {combineLatest} from "../src/combineLatest.ts";
 import {toPromiseArray} from "@bodar/totallylazy/collections/Array.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import v8 from "node:v8";
 
 async function* numbers(...values: number[]) {
     for (const v of values) yield v;
@@ -115,11 +116,62 @@ describe("combineLatest", () => {
         const result = await toPromiseArray(combineLatest([fast(), slow()]));
 
         assertThat(result, equals([
-                [1, 'a'],
-                [2, 'a'],
-                [3, 'a'],
-                [3, 'b']
-            ]));
+            [1, 'a'],
+            [2, 'a'],
+            [3, 'a'],
+            [3, 'b']
+        ]));
 
     });
+
+    async function* slow() {
+        let i = 0;
+        while (true) {
+            await new Promise(r => setTimeout(r, 1)); // slow - never resolves quickly
+            yield i++;
+        }
+    }
+
+    async function* fast(count: number) {
+        for (let i = 0; i < count; i++) {
+            yield i;
+            await Promise.resolve(); // yield to event loop
+        }
+    }
+
+    const iterations = 1000000;
+
+    async function garbageCollect() {
+        Bun.gc(true);
+        await new Promise(r => setTimeout(r, 1));
+    }
+
+    test.skip("Does not leak with infinite slow iterator", async () => {
+        await garbageCollect();
+
+        const before = process.memoryUsage().heapUsed;
+
+        let combined: any = combineLatest([slow(), fast(iterations)]);
+        let count = 0;
+        for await (const _ of combined) {
+            count++;
+            if (count >= iterations) break;
+        }
+
+        await garbageCollect();
+
+        const after = process.memoryUsage().heapUsed;
+        const growth = after - before;
+
+        console.log(`NEW - Heap before: ${(before / 1024 / 1024).toFixed(2)} MB`);
+        console.log(`NEW - Heap after: ${(after / 1024 / 1024).toFixed(2)} MB`);
+        console.log(`NEW - Growth: ${(growth / 1024 / 1024).toFixed(2)} MB`);
+
+        // Creates a heap snapshot file with an auto-generated name
+        const snapshotPath = v8.writeHeapSnapshot();
+        console.log(`Heap snapshot written to: ${snapshotPath}`);
+
+        expect(growth).toBeLessThan(5 * 1024 * 1024);
+    });
+
 });
