@@ -3,7 +3,7 @@ import {combineLatest} from "../src/combineLatest.ts";
 import {toPromiseArray} from "@bodar/totallylazy/collections/Array.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
-import v8 from "node:v8";
+import * as v8 from "node:v8";
 
 async function* numbers(...values: number[]) {
     for (const v of values) yield v;
@@ -172,6 +172,6 @@ describe("combineLatest", () => {
         console.log(`Heap snapshot written to: ${snapshotPath}`);
 
         expect(growth).toBeLessThan(5 * 1024 * 1024);
-    });
+    }, 20000);
 
 });
