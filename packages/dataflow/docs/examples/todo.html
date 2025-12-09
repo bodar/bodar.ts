@@ -31,7 +31,7 @@
             {id: "todo-2", name: "Repeat", completed: false},
         ]);
         const addTodo = (name) => todos.update(values => {
-            values.push({id: `todo-${values.length}`, name, completed: false});
+            values.push({id: `todo-${crypto.randomUUID()}`, name, completed: false});
             return values;
         });
         const deleteTodo = (id) => todos.update(values => values.filter(v => v.id !== id));
