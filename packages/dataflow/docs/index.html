@@ -39,7 +39,26 @@
     <script type="module" data-reactive data-echo="html">
         `The current time is ${new Date(now).toLocaleTimeString("en-GB")}.`
     </script>
-
+    <script type="module" data-reactive>
+        let count = 0;
+        const counter = function* () {
+            while (true) {
+                yield count++;
+            }
+        }
+    </script>
+    <script type="module" data-reactive>
+        if (typeof gc === 'function') gc();
+        const baseline = performance.memory?.usedJSHeapSize || 0;
+    </script>
+    <script type="module" data-reactive>
+        {
+            if (typeof gc === 'function') gc();
+            const current = performance.memory?.usedJSHeapSize || 0;
+            const growth = current - baseline;
+            display(`Iterations: ${counter} | Heap: ${(current / 1024 / 1024).toFixed(2)} MB | Growth:  ${(growth / 1024 / 1024).toFixed(2)} MB | GC: ${(typeof gc === 'function') ? 'forced' : 'no'}`);
+        }
+    </script>
 </div>
 
 <h2>Expressions and Display</h2>
@@ -250,7 +269,10 @@
 <h2>Examples</h2>
 
 <ul>
-    <li><a href="examples/todo.html"><strong>Todo App</strong></a> - A port of the <a href="https://mdn.github.io/todo-react/">MDN React Todo App</a>. ~17KB total (~5KB gzipped) vs React's ~150KB (~50KB gzipped).</li>
+    <li><a href="examples/todo.html"><strong>Todo App</strong></a> - A port of the <a
+            href="https://mdn.github.io/todo-react/">MDN React Todo App</a>. ~17KB total (~5KB gzipped) vs React's
+        ~150KB (~50KB gzipped).
+    </li>
 </ul>
 
 <script type="importmap">

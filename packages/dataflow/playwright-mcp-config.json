@@ -1,0 +1,11 @@
+{
+  "browser": {
+    "browserName": "chromium",
+    "launchOptions": {
+      "args": [
+        "--enable-precise-memory-info",
+        "--js-flags=--expose-gc"
+      ]
+    }
+  }
+}

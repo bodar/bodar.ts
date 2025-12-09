@@ -26,6 +26,7 @@ export class Backpressure {
 export class SharedAsyncIterable<T> implements AsyncIterable<T> {
     private iterator?: AsyncIterator<T>;
     private consumers: Set<SharedAsyncIterator<T>> = new Set();
+    private pending = false;
 
     constructor(private iterable: AsyncIterable<T>, private backpressure: BackpressureStrategy) {
         this.updateConsumers = this.updateConsumers.bind(this)
@@ -41,6 +42,7 @@ export class SharedAsyncIterable<T> implements AsyncIterable<T> {
     reset(): void {
         this.iterator = undefined;
         this.consumers.clear();
+        this.pending = false;
     }
 
     get ready(): boolean {
@@ -48,10 +50,13 @@ export class SharedAsyncIterable<T> implements AsyncIterable<T> {
     }
 
     sendNext(): void {
+        if (this.pending) return;
+        this.pending = true;
         this.iterator!.next().then(this.updateConsumers);
     }
 
     updateConsumers(result: IteratorResult<T>) {
+        this.pending = false;
         for (const consumer of this.consumers) {
             consumer.sendNext(result);
         }
