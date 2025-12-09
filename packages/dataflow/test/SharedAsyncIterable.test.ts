@@ -1,4 +1,4 @@
-import {describe, test} from "bun:test";
+import {describe, expect, test} from "bun:test";
 import {SharedAsyncIterable, Backpressure} from "../src/SharedAsyncIterable.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
@@ -304,5 +304,74 @@ describe("SharedAsyncIterator", () => {
             assertThat(second, equals([1, 2, 3]));
             assertThat(iteratorCount, equals(2));
         });
+    });
+
+    describe.skip("Memory", () => {
+        const iterations = 10000000;
+
+        async function garbageCollect() {
+            Bun.gc(true);
+            await new Promise(r => setTimeout(r, 1));
+        }
+
+        async function* infinite() {
+            let i = 0;
+            while (true) yield i++;
+        }
+
+        test("Does not leak promises from iterator (single consumer)", async () => {
+            await garbageCollect();
+            const baseline = process.memoryUsage().heapUsed;
+
+            const shared = new SharedAsyncIterable(infinite(), Backpressure.fastest);
+            const iter = shared[Symbol.asyncIterator]();
+
+            let maxGrowth = 0;
+            for (let i = 0; i < iterations; i++) {
+                await iter.next();
+
+                if (i % 10000 === 0 && i > 0) {
+                    await garbageCollect();
+                    const current = process.memoryUsage().heapUsed;
+                    const growth = current - baseline;
+                    maxGrowth = Math.max(maxGrowth, growth);
+
+                    if (i % 100000 === 0) {
+                        console.log(`${i} iterations: ${(growth / 1024 / 1024).toFixed(2)} MB growth`);
+                    }
+                }
+            }
+
+            console.log(`Max growth: ${(maxGrowth / 1024 / 1024).toFixed(2)} MB`);
+            expect(maxGrowth).toBeLessThan(5 * 1024 * 1024);
+        }, 120000);
+
+        test("Does not leak promises from iterator (multiple consumers)", async () => {
+            await garbageCollect();
+            const baseline = process.memoryUsage().heapUsed;
+
+            const shared = new SharedAsyncIterable(infinite(), Backpressure.slowest);
+            const iter1 = shared[Symbol.asyncIterator]();
+            const iter2 = shared[Symbol.asyncIterator]();
+
+            let maxGrowth = 0;
+            for (let i = 0; i < iterations; i++) {
+                await Promise.all([iter1.next(), iter2.next()]);
+
+                if (i % 10000 === 0 && i > 0) {
+                    await garbageCollect();
+                    const current = process.memoryUsage().heapUsed;
+                    const growth = current - baseline;
+                    maxGrowth = Math.max(maxGrowth, growth);
+
+                    if (i % 100000 === 0) {
+                        console.log(`${i} iterations: ${(growth / 1024 / 1024).toFixed(2)} MB growth`);
+                    }
+                }
+            }
+
+            console.log(`Max growth: ${(maxGrowth / 1024 / 1024).toFixed(2)} MB`);
+            expect(maxGrowth).toBeLessThan(5 * 1024 * 1024);
+        }, 120000);
     });
 });

@@ -45,6 +45,7 @@ export async function dev() {
 }
 
 export async function demo() {
+    await $`rm -rf packages/dataflow/out`;
     await $`bun run --watch packages/dataflow/server.ts`;
 }
 
@@ -79,6 +80,7 @@ export async function exports(packageGlob: string = "packages/*/package.json") {
 }
 
 export async function docs() {
+    await $`rm -rf packages/dataflow/out`;
     await $`bun run packages/dataflow/docs.ts`;
 }
 

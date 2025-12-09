@@ -28,6 +28,7 @@ export class SharedAsyncIterable<T> implements AsyncIterable<T> {
     private consumers: Set<SharedAsyncIterator<T>> = new Set();
 
     constructor(private iterable: AsyncIterable<T>, private backpressure: BackpressureStrategy) {
+        this.updateConsumers = this.updateConsumers.bind(this)
     }
 
     [Symbol.asyncIterator](): AsyncIterator<T> {
@@ -46,14 +47,15 @@ export class SharedAsyncIterable<T> implements AsyncIterable<T> {
         return this.backpressure(Array.from(this.consumers).map(v => v.ready));
     }
 
-    sendNext() : void {
-        // Do not make this into a async function, it causes a memory leak with the generator (iterator)
-        this.iterator!.next().then((result) => {
-            for (const consumer of this.consumers) {
-                consumer.sendNext(result);
-            }
-            if (result.done) this.reset();
-        })
+    sendNext(): void {
+        this.iterator!.next().then(this.updateConsumers);
+    }
+
+    updateConsumers(result: IteratorResult<T>) {
+        for (const consumer of this.consumers) {
+            consumer.sendNext(result);
+        }
+        if (result.done) this.reset();
     }
 }
 
