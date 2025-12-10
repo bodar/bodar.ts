@@ -29,7 +29,6 @@ export class SharedAsyncIterable<T> implements AsyncIterable<T> {
     private pending = false;
 
     constructor(private iterable: AsyncIterable<T>, private backpressure: BackpressureStrategy) {
-        this.updateConsumers = this.updateConsumers.bind(this)
     }
 
     [Symbol.asyncIterator](): AsyncIterator<T> {
@@ -49,13 +48,10 @@ export class SharedAsyncIterable<T> implements AsyncIterable<T> {
         return this.backpressure(Array.from(this.consumers).map(v => v.ready));
     }
 
-    sendNext(): void {
+    async sendNext(): Promise<void> {
         if (this.pending) return;
         this.pending = true;
-        this.iterator!.next().then(this.updateConsumers);
-    }
-
-    updateConsumers(result: IteratorResult<T>) {
+        const result = await this.iterator!.next();
         this.pending = false;
         for (const consumer of this.consumers) {
             consumer.sendNext(result);
@@ -92,7 +88,7 @@ class SharedAsyncIterator<T> implements AsyncIterator<T> {
         this.resolve = resolve;
         if (this.controller.ready) {
             // Do NOT await this
-            this.controller.sendNext();
+            void(this.controller.sendNext());
         }
         return promise;
     }
