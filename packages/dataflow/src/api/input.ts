@@ -7,8 +7,11 @@ import {observe} from "./observe.ts";
 export type SupportedInputs = HTMLInputElement | HTMLSelectElement;
 
 export function input<E extends SupportedInputs, R>(element: E, event: string = eventOf(element), value: (i: E) => R = valueOf): AsyncIterator<R> {
-    return observe((notify) =>
-        element.addEventListener(event, () => notify(value(element))), value(element));
+    return observe((notify) => {
+        const handler = () => notify(value(element));
+        element.addEventListener(event, handler);
+        return () => element.removeEventListener(event, handler);
+    }, value(element));
 }
 
 function valueOf(element: SupportedInputs): any {
