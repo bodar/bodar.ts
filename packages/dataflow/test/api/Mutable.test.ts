@@ -1,5 +1,5 @@
 import {describe, test} from "bun:test";
-import {Mutable} from "../../src/api/Mutable.ts";
+import {Mutable} from "../../src/api/mutable.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 

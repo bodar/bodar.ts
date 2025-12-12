@@ -23,9 +23,9 @@
     <h1>Todos</h1>
 
     <script type="module" data-reactive>
-        import {display, Mutable} from "@bodar/dataflow/runtime.ts";
+        import {display, mutable} from "@bodar/dataflow/runtime.ts";
 
-        const todos = new Mutable([
+        const todos = mutable([
             {id: "todo-0", name: "Eat", completed: true},
             {id: "todo-1", name: "Sleep", completed: false},
             {id: "todo-2", name: "Repeat", completed: false},
@@ -46,7 +46,7 @@
     </script>
 
     <script type="module" data-reactive>
-        const filter = new Mutable(v => v);
+        const filter = mutable(v => v);
         display(<div class="filters">
             <label><input type="radio" name="todo-filter" value="all" checked={true} onchange={() => filter.value = v => v}/><span>All</span></label>
             <label><input type="radio" name="todo-filter" value="active" onchange={() => filter.value = v => !v.completed}/><span>Active</span></label>

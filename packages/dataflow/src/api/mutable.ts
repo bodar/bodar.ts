@@ -15,7 +15,7 @@ export class Mutable<T> extends EventTarget implements AsyncIterable<T> {
         this.dispatchEvent(new CustomEvent<T>('change', {detail: value}));
     }
 
-    update(fun: (t:T) => T): this {
+    update(fun: (t: T) => T): this {
         this.value = fun(this.value);
         return this;
     }
@@ -24,7 +24,11 @@ export class Mutable<T> extends EventTarget implements AsyncIterable<T> {
         return observe(notify => {
             const handler = (ev: any) => notify(ev.detail);
             this.addEventListener('change', handler);
-            return () =>  this.removeEventListener('change', handler);
+            return () => this.removeEventListener('change', handler);
         }, this._value);
     }
+}
+
+export function mutable<T>(value: T): Mutable<T> {
+    return new Mutable<T>(value);
 }

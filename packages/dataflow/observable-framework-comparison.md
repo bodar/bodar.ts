@@ -14,7 +14,7 @@ The dataflow package already implements the **most frequently used** Observable 
 | `display()` | **60 uses** | `display.ts` | Value collector for rendering |
 | `Generators.input()` | **20 uses** | `input.ts` | DOM element → AsyncIterator |
 | `Generators.observe()` | **10 uses** | `observe.ts` | Callback → AsyncIterator |
-| `Mutable` | **3 uses** | `Mutable.ts` | Reactive value with EventTarget |
+| `Mutable` | **3 uses** | `mutable.ts` | Reactive value with EventTarget |
 
 ### Missing (Prioritized by Usage)
 

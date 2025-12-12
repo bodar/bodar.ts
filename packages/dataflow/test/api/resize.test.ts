@@ -1,6 +1,6 @@
 import {describe, test} from "bun:test";
 import {parseHTML} from "linkedom";
-import {type RenderFn, Resize} from "../../src/api/resize.ts";
+import {type Renderer, Resize} from "../../src/api/resize.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
@@ -36,13 +36,14 @@ class ManualResizeObserver {
     }
 }
 
-function setup(render: RenderFn) {
+function setup(render: Renderer) {
     const globals = parseHTML("...");
     const resize = new Resize({
+        render,
         document: globals.document,
         HTMLElement: globals.HTMLElement,
         ResizeObserver: ManualResizeObserver
-    }, render);
+    });
     return {document: globals.document, resize, observer: (resize.observer as ManualResizeObserver)};
 }
 

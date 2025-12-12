@@ -1,8 +1,7 @@
-/** @module */
-
-export type RenderFn = (width: number, height: number) => Node | string | null | Promise<Node | string | null>;
+export type Renderer = (width: number, height?: number) => Node | string | null | Promise<Node | string | null>;
 
 export interface ResizeDependencies {
+    render: Renderer;
     document: Document;
     HTMLElement: typeof HTMLElement;
     ResizeObserver: typeof ResizeObserver;
@@ -14,15 +13,9 @@ export class Resize {
     private renderCount = 0;
     private displayCount = 0;
     private lastWidth?: number;
-    private wasConnected = false;
 
     constructor(
-        private deps: ResizeDependencies = {
-            document: globalThis.document,
-            HTMLElement: globalThis.HTMLElement,
-            ResizeObserver: globalThis.ResizeObserver
-        },
-        private render: RenderFn,
+        private deps: ResizeDependencies
     ) {
         this.container = deps.document.createElement("div");
         this.container.style.position = "relative";
@@ -33,17 +26,15 @@ export class Resize {
     }
 
     private usesHeight(): boolean {
-        return this.render.length !== 1;
+        return this.deps.render.length !== 1;
     }
 
     private async onResize(entry: ResizeObserverEntry): Promise<void> {
         const {HTMLElement} = this.deps;
         const {width, height} = entry.contentRect;
-        const isConnected = entry.target.isConnected;
 
-        if (isConnected) this.wasConnected = true;
-        if (this.wasConnected && !isConnected) {
-            this.disconnect();
+        if (this.displayCount > 0 && !this.container.isConnected) {
+            this.observer.disconnect();
             return;
         }
 
@@ -53,7 +44,7 @@ export class Resize {
         if (width === 0) return;
 
         const renderId = ++this.renderCount;
-        const child = await this.render(width, height);
+        const child = await this.deps.render(width, height);
 
         if (this.displayCount > renderId) return;
         this.displayCount = renderId;
@@ -65,12 +56,13 @@ export class Resize {
         }
         this.container.append(child);
     }
-
-    private disconnect(): void {
-        this.observer.disconnect();
-    }
 }
 
-export function resize(render: RenderFn): Node {
-    return new Resize(render).container;
+export function resize(render: Renderer): Node {
+    return new Resize({
+        render,
+        document: globalThis.document,
+        HTMLElement: globalThis.HTMLElement,
+        ResizeObserver: globalThis.ResizeObserver
+    },).container;
 }
