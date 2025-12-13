@@ -1,8 +1,9 @@
 import {describe, expect, test} from "bun:test";
-import {SharedAsyncIterable, Backpressure} from "../src/SharedAsyncIterable.ts";
+import {Backpressure, SharedAsyncIterable} from "../src/SharedAsyncIterable.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {toPromiseArray} from "@bodar/totallylazy/collections/Array.ts";
+import {observableSource} from "./api/observe.test.ts";
 
 async function* numbers(...values: number[]) {
     for (const v of values) yield v;
@@ -305,6 +306,57 @@ describe("SharedAsyncIterator", () => {
             assertThat(iteratorCount, equals(2));
         });
     });
+
+    describe("life cycle", () => {
+        test("when we have finished observing, we clean up", async () => {
+            const source = observableSource(1, 2);
+
+            const result = await toPromiseArray(new SharedAsyncIterable(source, Backpressure.fastest));
+
+            assertThat(result, equals([1, 2]));
+            expect(source.disposed).toBe(true);
+        }, 100000);
+
+        test("if we break early, we still clean up", async () => {
+            const source = observableSource(1, 2);
+
+            for await (const input of new SharedAsyncIterable(source, Backpressure.fastest)) {
+                expect(input).toEqual(1);
+                break;
+            }
+
+            expect(source.disposed).toBe(true);
+        });
+
+        test("if we throw, we still clean up", async () => {
+            const source = observableSource(1, 2);
+
+            try {
+                for await (const input of new SharedAsyncIterable(source, Backpressure.fastest)) {
+                    expect(input).toEqual(1);
+                    throw new Error("we throw, we still clean up");
+                }
+            } catch (_) {
+                // ignore
+            }
+
+            expect(source.disposed).toBe(true);
+        });
+
+        test("when there are multiple consumers and one hasn't finished yet then do not cleanup", async () => {
+            const source = observableSource(1, 2);
+
+            const shared = new SharedAsyncIterable(source, Backpressure.fastest);
+            const consumerA = shared[Symbol.asyncIterator]();
+            const consumerB = shared[Symbol.asyncIterator]();
+            await consumerA.next();
+            await consumerB.next();
+            consumerA.return!();
+
+            expect(!!source.disposed).toBe(false);
+        });
+    })
+
 
     describe.skip("Memory", () => {
         const iterations = 10000000;
