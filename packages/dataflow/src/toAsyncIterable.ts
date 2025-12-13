@@ -16,12 +16,11 @@ export function toAsyncIterable<T>(value: any): AsyncIterable<T> | undefined {
             }
         };
     } else if (isGeneratorFunction(value) && value.length === 0) {
-        const iterator = value() as Generator<T>;
         return {
             async* [Symbol.asyncIterator]() {
                 yield* {
                     [Symbol.iterator]() {
-                        return iterator
+                        return value() as Generator<T>
                     }
                 }
             }
