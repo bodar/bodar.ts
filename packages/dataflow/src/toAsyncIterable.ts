@@ -1,6 +1,6 @@
 import {isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isGeneratorFunction} from "./type-guards.ts";
 
-export function toAsyncIterable<T>(value: any): AsyncIterable<T> | undefined {
+export function toAsyncIterable<T>(value: any): AsyncIterable<T> {
     if (isAsyncIterable(value)) {
         return value;
     } else if (isAsyncIterator(value)) {
@@ -25,5 +25,11 @@ export function toAsyncIterable<T>(value: any): AsyncIterable<T> | undefined {
                 }
             }
         };
+    } else {
+        return {
+            async* [Symbol.asyncIterator]() {
+                yield value;
+            }
+        }
     }
 }

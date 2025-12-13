@@ -32,23 +32,18 @@ export class PullNode<T> implements Node<T> {
 
     async* execute(newInputs: Version<any>[]): AsyncGenerator<T> {
         if (equal(this.inputs, newInputs)) {
-            yield* this.processResult(this.value);
+            yield* this.processResult();
         } else {
-            this.value = this.fun(...newInputs.map(v=> v.value));
+            this.value = this.fun(...newInputs.map(v => v.value));
             this.inputs = newInputs.slice();
-            yield* this.processResult(this.value);
+            yield* this.processResult();
         }
     }
 
-    async* processResult(result: any): AsyncGenerator<T> {
-        const iterable = toAsyncIterable<T>(result);
-        if (iterable) {
-            for await (const value of iterable) {
-                yield value;
-                await this.throttle();
-            }
-        } else {
-            yield result;
+    async* processResult(): AsyncGenerator<T> {
+        for await (const value of toAsyncIterable<T>(this.value)) {
+            yield value;
+            await this.throttle();
         }
     }
 }
@@ -102,7 +97,7 @@ function ascending<T>(a: T, b: T): number {
 
 function version<A>(fun: () => AsyncIterable<A>): AsyncIterable<Version<A>> {
     return {
-        async *[Symbol.asyncIterator]() {
+        async* [Symbol.asyncIterator]() {
             let index = 0;
             for await (const a of fun()) {
                 yield {value: a, version: index++};
