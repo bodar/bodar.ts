@@ -5,11 +5,7 @@ import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import * as v8 from "node:v8";
 
-async function* numbers(...values: number[]) {
-    for (const v of values) yield v;
-}
-
-async function* letters(...values: string[]) {
+async function* values<T>(...values: T[]) {
     for (const v of values) yield v;
 }
 
@@ -25,14 +21,14 @@ describe("combineLatest", () => {
             yield 1;
         }
 
-        const result = await toPromiseArray(combineLatest([numbers(1), delayed()]));
-        assertThat(result.length > 0, equals(true));
+        const result = await toPromiseArray(combineLatest([values(1), delayed()]));
+        assertThat(result.length === 1, equals(true));
         assertThat(result[0], equals([1, 1]));
     });
 
     test("emits latest values from all sources", async () => {
         const result = await toPromiseArray(
-            combineLatest([numbers(1, 2), letters('a', 'b')])
+            combineLatest([values(1, 2), values('a', 'b')])
         );
 
         assertThat(result, equals([
@@ -41,9 +37,9 @@ describe("combineLatest", () => {
         ]));
     });
 
-    test("emits when any source emits", async () => {
+    test("emits when any source emits and keeps last value from completed source", async () => {
         const result = await toPromiseArray(
-            combineLatest([numbers(1, 2, 3), letters('a')])
+            combineLatest([values(1, 2, 3), values('a')])
         );
 
         assertThat(result, equals([
@@ -53,33 +49,9 @@ describe("combineLatest", () => {
         ]));
     });
 
-    test("keeps last value from completed source", async () => {
-        const result = await toPromiseArray(
-            combineLatest([numbers(1), letters('a', 'b', 'c')])
-        );
-
-        assertThat(result, equals([
-            [1, 'a'],
-            [1, 'b'],
-            [1, 'c']
-        ]));
-    });
-
-    test("completes when all sources complete", async () => {
-        const result = await toPromiseArray(
-            combineLatest([numbers(1, 2), letters('a', 'b')])
-        );
-
-        assertThat(result.length, equals(2));
-    });
-
     test("works with three sources", async () => {
-        async function* booleans(...values: boolean[]) {
-            for (const v of values) yield v;
-        }
-
         const result = await toPromiseArray(
-            combineLatest([numbers(1, 2), letters('a'), booleans(true, false)])
+            combineLatest([values(1, 2), values('a'), values(true, false)])
         );
 
         assertThat(result, equals([
@@ -90,7 +62,7 @@ describe("combineLatest", () => {
 
     test("works with single source", async () => {
         const result = await toPromiseArray(
-            combineLatest([numbers(1, 2, 3)])
+            combineLatest([values(1, 2, 3)])
         );
 
         assertThat(result, equals([
