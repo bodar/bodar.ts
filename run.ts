@@ -29,7 +29,7 @@ export async function clean() {
 }
 
 export async function check() {
-    await $`bun run --bun tsc --noEmit`;
+    await $`bun run --bun tsgo --noEmit`;
 }
 
 export async function test(...args: string[]) {

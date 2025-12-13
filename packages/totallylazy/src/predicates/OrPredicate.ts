@@ -11,7 +11,7 @@ export interface OrPredicate<A> extends Predicate<A> {
 }
 
 /** Creates a predicate that returns true if any of the supplied predicates returns true. */
-export function or<A>(): typeof alwaysTrue;
+export function or(): typeof alwaysTrue;
 /** Creates a predicate that returns true if any of the supplied predicates returns true. */
 export function or<P extends Predicate<any>>(predicate: P): P;
 /** Creates a predicate that returns true if any of the supplied predicates returns true. */

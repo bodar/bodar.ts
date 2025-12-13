@@ -2,11 +2,11 @@
  * Reactive nodes that combine dependency streams and yield computed values
  * @module
  */
-import {isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isGeneratorFunction} from "./type-guards.ts";
 import {combineLatest} from "./combineLatest.ts";
 import {type BackpressureStrategy, SharedAsyncIterable} from "./SharedAsyncIterable.ts";
 import type {ThrottleStrategy} from "./Throttle.ts";
 import {type Node, type Version} from "./Node.ts";
+import {toAsyncIterable} from "./toAsyncIterable.ts";
 
 /** Node implementation that uses combineLatest to merge dependency streams and memoizes results */
 export class PullNode<T> implements Node<T> {
@@ -41,7 +41,7 @@ export class PullNode<T> implements Node<T> {
     }
 
     async* processResult(result: any): AsyncGenerator<T> {
-        const iterable = this.getIterable(result);
+        const iterable = toAsyncIterable<T>(result);
         if (iterable) {
             for await (const value of iterable) {
                 yield value;
@@ -49,35 +49,6 @@ export class PullNode<T> implements Node<T> {
             }
         } else {
             yield result;
-        }
-    }
-
-    getIterable(result: any): AsyncIterable<T> | undefined {
-        if (isAsyncIterable(result)) {
-            return result;
-        } else if (isAsyncIterator(result)) {
-            return {
-                [Symbol.asyncIterator]() {
-                    return result;
-                }
-            };
-        } else if (isAsyncGeneratorFunction(result) && result.length === 0) {
-            return {
-                [Symbol.asyncIterator]() {
-                    return result() as AsyncGenerator<T>;
-                }
-            };
-        } else if (isGeneratorFunction(result) && result.length === 0) {
-            const iterator = result() as Generator<T>;
-            return {
-                async* [Symbol.asyncIterator]() {
-                    yield* {
-                        [Symbol.iterator]() {
-                            return iterator
-                        }
-                    }
-                }
-            };
         }
     }
 }

@@ -11,7 +11,7 @@ export interface AndPredicate<A> extends Predicate<A> {
 }
 
 /** Creates a predicate that returns true only if all supplied predicates return true. */
-export function and<A>(): typeof alwaysTrue;
+export function and(): typeof alwaysTrue;
 /** Creates a predicate that returns true only if all supplied predicates return true. */
 export function and<P extends Predicate<any>>(predicate: P): P;
 /** Creates a predicate that returns true only if all supplied predicates return true. */
