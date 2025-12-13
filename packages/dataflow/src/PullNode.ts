@@ -31,16 +31,10 @@ export class PullNode<T> implements Node<T> {
     }
 
     async* execute(newInputs: Version<any>[]): AsyncGenerator<T> {
-        if (equal(this.inputs, newInputs)) {
-            yield* this.processResult();
-        } else {
+        if (!equal(this.inputs, newInputs)) {
             this.value = this.fun(...newInputs.map(v => v.value));
             this.inputs = newInputs.slice();
-            yield* this.processResult();
         }
-    }
-
-    async* processResult(): AsyncGenerator<T> {
         for await (const value of toAsyncIterable<T>(this.value)) {
             yield value;
             await this.throttle();
