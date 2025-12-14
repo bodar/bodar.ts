@@ -12,44 +12,30 @@ import {toAsyncIterable} from "./toAsyncIterable.ts";
 export class PullNode<T> implements Node<T> {
     public value: T | undefined;
     private inputs?: Version<any>[];
-    private shared: SharedAsyncIterable<Version<T>>;
-    private controller: AbortController = new AbortController();
+    private shared?: SharedAsyncIterable<Version<T>>;
 
     constructor(public key: string, public dependencies: PullNode<any>[], public fun: Function,
                 private backpressure: BackpressureStrategy,
                 private throttle: ThrottleStrategy) {
-        this.shared = new SharedAsyncIterable<Version<T>>(version(() => this.create()), this.backpressure);
     }
 
     [Symbol.asyncIterator](): AsyncIterator<Version<T>> {
+        if (!this.shared) this.shared = new SharedAsyncIterable<Version<T>>(version(() => this.create()), this.backpressure)
         return this.shared[Symbol.asyncIterator]();
     }
 
     async* create(): AsyncIterable<T> {
         for await (const currentInputs of combineLatest(this.dependencies)) {
-            console.log('new inputs', currentInputs.map(t => t.value));
             yield* this.execute(currentInputs);
         }
     }
 
-    setValue(value: any): void {
-        this.value = value;
-        this.controller = new AbortController();
-        if (value instanceof AbortController) this.controller = value;
-        else if (typeof value[Symbol.dispose] === 'function') this.controller.signal.onabort = () => value[Symbol.dispose]();
-        else if (typeof value[Symbol.asyncDispose] === 'function') this.controller.signal.onabort = () => value[Symbol.asyncDispose]();
-    }
-
     async* execute(newInputs: Version<any>[]): AsyncGenerator<T> {
         if (!equal(this.inputs, newInputs)) {
-            this.controller.abort();
-            this.setValue(this.fun(...newInputs.map(v => v.value)));
+            this.value = this.fun(...newInputs.map(v => v.value));
             this.inputs = newInputs.slice();
         }
-        // Capture the current controller so that if it is aborted we don't miss it
-        const controller = this.controller;
         for await (const value of toAsyncIterable<T>(this.value)) {
-            if (controller.signal.aborted) break;
             yield value;
             await this.throttle();
         }
@@ -103,9 +89,13 @@ function ascending<T>(a: T, b: T): number {
     return 0;
 }
 
-async function* version<A>(fun: () => AsyncIterable<A>): AsyncIterable<Version<A>> {
-    let index = 0;
-    for await (const a of fun()) {
-        yield {value: a, version: index++};
+function version<A>(fun: () => AsyncIterable<A>): AsyncIterable<Version<A>> {
+    return {
+        async* [Symbol.asyncIterator]() {
+            let index = 0;
+            for await (const a of fun()) {
+                yield {value: a, version: index++};
+            }
+        }
     }
 }

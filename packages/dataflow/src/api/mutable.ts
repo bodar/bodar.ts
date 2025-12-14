@@ -22,9 +22,7 @@ export class Mutable<T> extends EventTarget implements AsyncIterable<T> {
 
     [Symbol.asyncIterator](): AsyncIterator<T> {
         return observe(notify => {
-            const handler = (ev: any) => {
-                return notify(ev.detail);
-            };
+            const handler = (ev: any) => notify(ev.detail);
             this.addEventListener('change', handler);
             return () => this.removeEventListener('change', handler);
         }, this._value);
