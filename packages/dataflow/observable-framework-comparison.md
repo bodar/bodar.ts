@@ -2,7 +2,7 @@
 
 ## Summary
 
-The dataflow package already implements the **most frequently used** Observable Framework reactivity primitives. The main gaps are in lifecycle management and responsive layout helpers.
+The dataflow package implements the **most frequently used** Observable Framework reactivity primitives. The main gap is lifecycle management (`invalidation`).
 
 ## API Comparison
 
@@ -12,6 +12,7 @@ The dataflow package already implements the **most frequently used** Observable 
 |----------|-----------------|----------------|-------|
 | `view()` | **109 uses** | `view.ts` | Combines input + display |
 | `display()` | **60 uses** | `display.ts` | Value collector for rendering |
+| `resize()` | **57 uses** | `resize.ts` | Responsive container with ResizeObserver |
 | `Generators.input()` | **20 uses** | `input.ts` | DOM element → AsyncIterator |
 | `Generators.observe()` | **10 uses** | `observe.ts` | Callback → AsyncIterator |
 | `Mutable` | **3 uses** | `mutable.ts` | Reactive value with EventTarget |
@@ -20,13 +21,12 @@ The dataflow package already implements the **most frequently used** Observable 
 
 | Priority | Function | Usage | Description |
 |----------|----------|-------|-------------|
-| 1 | `resize()` | **57 uses** | Responsive container with ResizeObserver |
-| 2 | `invalidation` | **18 uses** | Promise for cleanup when block re-runs |
-| 3 | `visibility()` | **7 uses** | Promise resolving when element visible |
-| 4 | `Generators.width()` | **4 uses** | Element width as async generator |
-| 5 | `Generators.now()` | **3 uses** | Continuous Date.now() generator |
-| 6 | `Generators.queue()` | **2 uses** | Like observe but queues (no drops) |
-| 7 | `Generators.dark()` | **2 uses** | Dark mode preference generator |
+| 1 | `invalidation` | **18 uses** | Promise for cleanup when block re-runs |
+| 2 | `visibility()` | **7 uses** | Promise resolving when element visible |
+| 3 | `Generators.width()` | **4 uses** | Element width as async generator |
+| 4 | `Generators.now()` | **3 uses** | Continuous Date.now() generator |
+| 5 | `Generators.queue()` | **2 uses** | Like observe but queues (no drops) |
+| 6 | `Generators.dark()` | **2 uses** | Dark mode preference generator |
 
 ## Generator Lifecycle: When `return()` and `finally` Run
 
