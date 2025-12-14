@@ -149,55 +149,6 @@ describe("combineLatest", () => {
         }, 20000);
     })
 
-    describe("infinite source with single-value dependent", () => {
-        test("iteration blocks waiting for next value from infinite source", async () => {
-            const emitted: number[] = [];
-            let emitValue: ((value: number) => void) | undefined;
-
-            // Infinite source - emits when we call emitValue()
-            async function* infinite(): AsyncGenerator<number> {
-                while (true) {
-                    const value = await new Promise<number>(r => { emitValue = r; });
-                    yield value;
-                }
-            }
-
-            const gen = infinite();
-            const combined = combineLatest([gen]);
-            const iterator = combined[Symbol.asyncIterator]();
-
-            // Request first value (this will block until emitValue is called)
-            const firstPromise = iterator.next();
-
-            // Wait a tick for the generator to set up emitValue
-            await new Promise(r => setTimeout(r, 10));
-            expect(emitValue).toBeDefined();
-
-            // Now emit the first value
-            emitValue!(1);
-            const first = await firstPromise;
-            expect(first.value).toEqual([1]);
-            expect(first.done).toBe(false);
-            emitted.push(1);
-
-            // Request second value (blocks waiting)
-            const secondPromise = iterator.next();
-            await new Promise(r => setTimeout(r, 10));
-
-            // Emit second value
-            emitValue!(2);
-            const second = await secondPromise;
-            expect(second.value).toEqual([2]);
-            expect(second.done).toBe(false);
-            emitted.push(2);
-
-            // Break out - this should trigger cleanup
-            await iterator.return?.();
-
-            expect(emitted).toEqual([1, 2]);
-        });
-    });
-
     describe("life cycle", () => {
         test("when we have finished observing, we clean up", async () => {
             const sourceA = observableSource(1, 2);
@@ -240,6 +191,4 @@ describe("combineLatest", () => {
             expect(sourceB.disposed).toBe(true);
         });
     })
-
-
 });

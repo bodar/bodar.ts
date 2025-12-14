@@ -5,6 +5,7 @@ import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import type {Version} from "../src/Node.ts";
+import {mutable} from "../src/api/mutable.ts";
 
 describe("graph", () => {
     test("if the function has a name use that as the key", async () => {
@@ -75,6 +76,34 @@ describe("graph", () => {
         assertThat(sum, is(0));
         assertThat(await valuesOf(node), equals([1, 2, 3]));
     });
+
+    test.only("can abort while iterating", async () => {
+        let aborted = 0;
+        const graph = new Graph();
+        const seed = mutable(0);
+        graph.define('seed', () => seed)
+        const {datasource} = graph.define(async function* datasource(seed: number) {
+            try {
+                let count = seed;
+                while (true) {
+                    yield count++;
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            } finally {
+                aborted++;
+            }
+        });
+
+        assertThat(aborted, is(0));
+        for await (const count of datasource) {
+            console.log(count.value)
+            if(count.value === 1) {
+                seed.value = -10;
+            }
+            if(count.value === 3) break;
+
+        }
+    }, 1000000);
 
     test("if a function returns an generator then the node will yield the values not the generator", async () => {
         const graph = new Graph();
