@@ -5,8 +5,12 @@ export function toAsyncIterable<T>(value: any): AsyncIterable<T> {
         return value;
     } else if (isIterator(value)) {
         return {
-            [Symbol.asyncIterator]() {
-                return toAsyncIterator(value)
+            async* [Symbol.asyncIterator]() {
+                yield* {
+                    [Symbol.iterator]() {
+                        return value as Iterator<T>;
+                    }
+                }
             }
         };
     } else if (isAsyncGeneratorFunction(value) && value.length === 0) {
@@ -32,18 +36,4 @@ export function toAsyncIterable<T>(value: any): AsyncIterable<T> {
             }
         }
     }
-}
-
-function toAsyncIterator<T>(iterator: (AsyncIterator<T> | Iterator<T>)): AsyncIterator<T> {
-    return {
-        next(...args) {
-            return Promise.resolve(iterator.next(...args));
-        },
-        return(value) {
-            return Promise.resolve(iterator.return?.(value) ?? {done: true, value});
-        },
-        throw(e) {
-            return Promise.resolve(iterator.throw?.(e) ?? Promise.reject(e));
-        }
-    };
 }

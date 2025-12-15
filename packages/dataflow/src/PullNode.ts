@@ -7,7 +7,6 @@ import {type BackpressureStrategy, SharedAsyncIterable} from "./SharedAsyncItera
 import type {ThrottleStrategy} from "./Throttle.ts";
 import {type Node, type Version} from "./Node.ts";
 import {toAsyncIterable} from "./toAsyncIterable.ts";
-import {SwappableAsyncIterable} from "./SwappableAsyncIterable.ts";
 
 /** Node implementation that uses combineLatest to merge dependency streams and memoizes results */
 export class PullNode<T> implements Node<T> {
@@ -26,17 +25,8 @@ export class PullNode<T> implements Node<T> {
     }
 
     async* create(): AsyncIterable<T> {
-        const outputs = new SwappableAsyncIterable<T>(toAsyncIterable(this.value));
-
-        for await (const [inputs, output] of combineLatest([combineLatest(this.dependencies), outputs], false)) {
-            if (output === undefined || !equal(this.inputs, inputs)) {
-                this.inputs = inputs.slice();
-                this.value = this.fun(...inputs.map((v:Version<any>) => v.value));
-                outputs.swap(toAsyncIterable(this.value));
-            } else {
-                yield output;
-                await this.throttle();
-            }
+        for await (const currentInputs of combineLatest(this.dependencies)) {
+            yield* this.execute(currentInputs);
         }
     }
 
