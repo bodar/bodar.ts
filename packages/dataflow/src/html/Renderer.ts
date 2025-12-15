@@ -12,7 +12,7 @@ export interface RendererDependencies {
 
 export function rendererDependencies(global: any = globalThis):RendererDependencies {
     return {
-        graph: new BaseGraph(),
+        graph: new BaseGraph(undefined, undefined, global),
         document: global.document,
         Node: global.Node,
         DocumentFragment: global.DocumentFragment
