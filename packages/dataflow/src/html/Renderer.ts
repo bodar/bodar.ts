@@ -10,14 +10,18 @@ export interface RendererDependencies {
     DocumentFragment: typeof DocumentFragment,
 }
 
+export function rendererDependencies(global: any = globalThis):RendererDependencies {
+    return {
+        graph: new BaseGraph(),
+        document: global.document,
+        Node: global.Node,
+        DocumentFragment: global.DocumentFragment
+    }
+}
+
 /** Renderer **/
 export class Renderer {
-    constructor(private deps: RendererDependencies = {
-        graph: new BaseGraph(),
-        document: globalThis.document,
-        Node: globalThis.Node,
-        DocumentFragment: globalThis.DocumentFragment
-    }) {
+    constructor(private deps: RendererDependencies = rendererDependencies()) {
     }
 
     register(key: string, inputs: string[], outputs: string[], fun: Function): void {

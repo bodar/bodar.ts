@@ -14,9 +14,9 @@ export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementCon
     async endTag(end: HTMLRewriterTypes.EndTag) {
         const sorted = topologicalSort(this.controller.popDefinitions());
         // language=javascript
-        const javascript = await this.bundler.transform(`import {Renderer, JSX2DOM} from "@bodar/dataflow/runtime.ts";
-const renderer = new Renderer();
-renderer.register("jsx", [], [], () => new JSX2DOM());
+        const javascript = await this.bundler.transform(`import {Renderer, rendererDependencies, JSX2DOM} from "@bodar/dataflow/runtime.ts";
+const renderer = new Renderer(rendererDependencies(globalThis));
+renderer.register("jsx", [], [], () => new JSX2DOM(globalThis));
 ${sorted.map((d: NodeDefinition) => `renderer.register(${d});`).join('\n')}
 renderer.render();`);
         end.before(`<script type="module">${javascript}</script>`, {html: true})

@@ -8,5 +8,5 @@ export {observe} from './api/observe.ts';
 export {mutable} from './api/mutable.ts';
 export {resize} from './api/resize.ts';
 
-export {Renderer} from './html/Renderer.ts'
+export {Renderer, rendererDependencies} from './html/Renderer.ts'
 export {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
