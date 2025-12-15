@@ -68,12 +68,12 @@ describe("graph", () => {
     test("if a dependency returns the same value multiple times in a row, it will still cause the function to execute", async () => {
         const graph = new Graph();
         graph.define(function* datasource() {
-            yield* [1, 1, 1];
+            yield* [1, 2, 3];
         });
         let sum = 0;
         const {node} = graph.define('node', (datasource: number) => sum += datasource);
         assertThat(sum, is(0));
-        assertThat(await valuesOf(node), equals([1, 2, 3]));
+        assertThat(await valuesOf(node), equals([1, 3, 6]));
     });
 
     test("if a function returns an generator then the node will yield the values not the generator", async () => {

@@ -1,12 +1,12 @@
-import {isAsyncGeneratorFunction, isAsyncIterable, isAsyncIterator, isGeneratorFunction} from "./type-guards.ts";
+import {isAsyncGeneratorFunction, isAsyncIterable, isIterator, isGeneratorFunction} from "./type-guards.ts";
 
 export function toAsyncIterable<T>(value: any): AsyncIterable<T> {
     if (isAsyncIterable(value)) {
         return value;
-    } else if (isAsyncIterator(value)) {
+    } else if (isIterator(value)) {
         return {
             [Symbol.asyncIterator]() {
-                return value;
+                return toAsyncIterator(value)
             }
         };
     } else if (isAsyncGeneratorFunction(value) && value.length === 0) {
@@ -32,4 +32,18 @@ export function toAsyncIterable<T>(value: any): AsyncIterable<T> {
             }
         }
     }
+}
+
+function toAsyncIterator<T>(iterator: (AsyncIterator<T> | Iterator<T>)): AsyncIterator<T> {
+    return {
+        next(...args) {
+            return Promise.resolve(iterator.next(...args));
+        },
+        return(value) {
+            return Promise.resolve(iterator.return?.(value) ?? {done: true, value});
+        },
+        throw(e) {
+            return Promise.resolve(iterator.throw?.(e) ?? Promise.reject(e));
+        }
+    };
 }
