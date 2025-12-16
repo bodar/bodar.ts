@@ -8,11 +8,15 @@ import html from "../../docs/examples/todo.html" with {type: "text"}
 import type {Renderer} from "../../src/html/Renderer.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
+import type {Idle} from "../../src/Idle.ts";
+import type {BaseGraph} from "../../src/BaseGraph.ts";
 
 
 async function renderHTML(html: string, global: any = globalThis): Promise<{
     browser: (Window & typeof globalThis),
-    renderer: Renderer
+    renderer: Renderer,
+    idle: Idle,
+    graph: BaseGraph
 }> {
     const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
     const reactive = transformer.transform(html);
@@ -21,15 +25,15 @@ async function renderHTML(html: string, global: any = globalThis): Promise<{
     const module = browser.document.querySelector('script[type=module]')!;
     const definition = NodeDefinition.parse(module.textContent);
     const fun = new Function(...definition.inputs, `return (${definition.fun()})(${definition.inputs.join(',')});`);
-    const {renderer} = await fun(...definition.inputs.map(i => {
+    const {renderer, idle, graph} = await fun(...definition.inputs.map(i => {
         if (i === 'globalThis') return browser;
         return Reflect.get(browser, i) || Reflect.get(global, i);
     }));
     await new Promise(resolve => setTimeout(resolve, 0));
-    return {browser, renderer};
+    return {browser, renderer, idle, graph};
 }
 
-describe("todo", () => {
+describe("todo", async () => {
     test("can render the 3 built in todos", async () => {
         const {browser} = await renderHTML(html as any);
         assertThat(Array.from(browser.document.querySelectorAll<HTMLSpanElement>('.todo-item .todo-name')).map(s => s.innerText),
@@ -37,49 +41,48 @@ describe("todo", () => {
     });
 
     test("can add to new todo", async () => {
-        const {browser} = await renderHTML(html as any);
+        const {browser, idle} = await renderHTML(html as any);
 
         browser.document.querySelector<HTMLInputElement>('#todo-name')!.value = 'Take over the world';
         const form = fixForm(browser.document.querySelector<HTMLFormElement>('.todo-form')!);
         form.submit();
 
-        // TODO provide way to detect when DOM has settled (probably by decorating Throttle with debounce)
-        await new Promise(resolve => setTimeout(resolve, 5));
+        await idle.fired();
         assertThat(Array.from(browser.document.querySelectorAll<HTMLSpanElement>('.todo-item .todo-name')).map(s => s.innerText),
             equals(["Eat", "Sleep", "Repeat", 'Take over the world']));
     });
 
     test("can delete a todo", async () => {
-        const {browser} = await renderHTML(html as any);
+        const {browser, idle} = await renderHTML(html as any);
 
         browser.document.querySelector<HTMLButtonElement>('.todo-item .delete')!.click();
 
-        await new Promise(resolve => setTimeout(resolve, 5));
+        await idle.fired();
         assertThat(Array.from(browser.document.querySelectorAll<HTMLSpanElement>('.todo-item .todo-name')).map(s => s.innerText),
             equals(["Sleep", "Repeat"]));
     });
 
     test("can check a todo", async () => {
-        const {browser} = await renderHTML(html as any);
+        const {browser, idle} = await renderHTML(html as any);
 
         assertThat(Array.from(browser.document.querySelectorAll<HTMLInputElement>('.todo-item input[type=checkbox]'))
             .filter(i => i.getAttribute('checked') === 'true').length, is(1));
 
         browser.document.querySelector<HTMLInputElement>('.todo-item:nth-child(2) input[type=checkbox]')!.click();
 
-        await new Promise(resolve => setTimeout(resolve, 5));
+        await idle.fired();
         assertThat(Array.from(browser.document.querySelectorAll<HTMLInputElement>('.todo-item input[type=checkbox]'))
             .filter(i => i.getAttribute('checked') === 'true').length, is(2));
     });
 
     test("can edit a todo", async () => {
-        const {browser} = await renderHTML(html as any);
+        const {browser, idle} = await renderHTML(html as any);
 
         const span = browser.document.querySelector<HTMLSpanElement>('.todo-item:nth-child(2) .todo-name')!;
         span.textContent = 'Sleep more';
         span.blur();
 
-        await new Promise(resolve => setTimeout(resolve, 5));
+        await idle.fired();
         assertThat(Array.from(browser.document.querySelectorAll<HTMLSpanElement>('.todo-item .todo-name')).map(s => s.innerText),
             equals(["Eat", "Sleep more", "Repeat"]));
     });
@@ -101,7 +104,7 @@ function mixinForm(global: any) {
     }
     if (!HTMLFormElement.prototype.reset) {
         HTMLFormElement.prototype.reset = function () {
-            this.querySelectorAll('input').forEach((i:HTMLInputElement) => i.value = '');
+            this.querySelectorAll('input').forEach((i: HTMLInputElement) => i.value = '');
         };
     }
 }

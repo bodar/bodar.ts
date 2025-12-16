@@ -24,6 +24,10 @@ export class BaseGraph {
 
     private nodes = new Map<string, PullNode<any>>();
 
+    get(key: string): Node<any> | undefined {
+        return this.nodes.get(key)
+    }
+
     /** Creates and registers a node with explicit key, inputs, and function */
     set(key: string, inputs: string[], fun: Function): Node<any> {
         // Auto-register missing dependencies from globals (lazy lookup)

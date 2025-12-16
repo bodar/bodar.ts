@@ -8,5 +8,9 @@ export {observe} from './api/observe.ts';
 export {mutable} from './api/mutable.ts';
 export {resize} from './api/resize.ts';
 
-export {Renderer, rendererDependencies} from './html/Renderer.ts'
+export {BaseGraph} from './BaseGraph.ts'
+export {Idle} from './Idle.ts'
+export {Throttle} from './Throttle.ts'
+export {Renderer} from './html/Renderer.ts'
 export {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
+export {chain} from "@bodar/yadic/chain.ts";

@@ -19,7 +19,7 @@ export class Throttle {
         return () => new Promise(resolve => global.setTimeout(resolve, ms));
     }
 
-    static noThrottle(): ThrottleStrategy {
+    static microTasks(): ThrottleStrategy {
         return () => Promise.resolve();
     }
 
@@ -27,6 +27,7 @@ export class Throttle {
         if (global.requestAnimationFrame) return this.refreshRate(global);
         if (global.setImmediate) return this.eventLoop(global);
         if (global.setTimeout) return this.clamped(global);
-        return this.noThrottle();
+        return this.microTasks();
     }
 }
+
