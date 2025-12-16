@@ -1,6 +1,6 @@
 import type {ImportMap} from "./HTMLTransformer.ts";
 
-export class HeadTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
+export class StartTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
     constructor(private importMap: ImportMap) {
     }
 

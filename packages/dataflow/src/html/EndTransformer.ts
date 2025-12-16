@@ -3,7 +3,7 @@ import {NodeDefinition} from "./NodeDefinition.ts";
 import {HTMLTransformer} from "./HTMLTransformer.ts";
 import type {Bundler} from "../bundling/Bundler.ts";
 
-export class BodyTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
+export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
     constructor(private controller: HTMLTransformer, private bundler: Bundler) {
     }
 

@@ -1,7 +1,7 @@
 import {describe, expect, test} from "bun:test";
 import {HTMLTransformer} from "../../src/html/HTMLTransformer.ts";
 import {Bundler} from "../../src/bundling/Bundler.ts";
-import {scriptTemplate} from "../../src/html/BodyTransformer.ts";
+import {scriptTemplate} from "../../src/html/EndTransformer.ts";
 
 describe("HTMLTransformer", () => {
     test("constants are not rendered, so no placeholder slot", async () => {
@@ -78,5 +78,23 @@ return {input,name,iterator};
         expect(result).not.toContain('<pre><code');
         expect(result).not.toContain('hljs');
         expect(result).not.toContain('highlight.js');
+    });
+
+    test('can use is="reactive" attribute instead of data-reactive', async () => {
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+        const result = transformer.transform('<body><script is="reactive">const a = 1;</script></body>');
+        expect(result).toBe(`<body><script type="module">${scriptTemplate(`renderer.register("vge10p",[],["a"],() => {
+const a = 1;
+return {a};
+});`)}</script></body>`);
+    });
+
+    test('can choose where to place the graph code so that it can work nicer with server rendered content', async () => {
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp, selectors: {end: '#my-component'}});
+        const result = transformer.transform('<body><div id="my-component"><script is="reactive">const a = 1;</script></div></body>');
+        expect(result).toBe(`<body><div id="my-component"><script type="module">${scriptTemplate(`renderer.register("vge10p",[],["a"],() => {
+const a = 1;
+return {a};
+});`)}</script></div></body>`);
     });
 });
