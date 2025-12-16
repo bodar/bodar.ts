@@ -5,12 +5,12 @@ import {BaseGraph} from "../../src/BaseGraph.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import {assertFalse, assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {chain} from "@bodar/yadic/chain.ts";
 
 describe("Renderer", () => {
     async function render(fun: (doc: Document) => any, initalStart: string = ''): Promise<Element> {
         const globals = parseHTML(`<slot name="output">${initalStart}</slot>`);
-        Reflect.set(globals, 'graph', new BaseGraph());
-        const renderer = new Renderer(globals as any);
+        const renderer = new Renderer(chain({graph: new BaseGraph(undefined, undefined, globals)}, globals));
 
         renderer.register('output', [], [], () => fun(globals.document));
         renderer.render();
