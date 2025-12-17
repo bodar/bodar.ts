@@ -25,20 +25,19 @@ export class PullNode<T> implements Node<T> {
     }
 
     async* create(): AsyncIterable<T> {
-        const iterators: { inputs: AsyncIterator<any[]>, values: (AsyncIterator<any> | undefined) } = {
-            inputs: combineLatest(this.dependencies)[Symbol.asyncIterator](),
-            values: undefined,
-        }
-        const pending = new Map<string, Promise<any>>();
-        const resolved = new Map<string, IteratorResult<any>>();
+        const iterators = new Map<string, AsyncIterator<any>>();
+        const pending = new Map<string, Promise<void>>();
+        const resolved = new Map<string, any>();
         let {promise: signal, resolve: signalResolve} = Promise.withResolvers<void>();
 
+        iterators.set('inputs', combineLatest(this.dependencies)[Symbol.asyncIterator]());
+
         while (true) {
-            for (const [name, iterator] of Object.entries(iterators)) {
-                if (!pending.has(name) && iterator) {
+            for (const [name, iterator] of iterators) {
+                if (!pending.has(name)) {
                     pending.set(name, iterator.next().then(result => {
                         pending.delete(name);
-                        resolved.set(name, result);
+                        result.done ? iterators.delete(name) : resolved.set(name, result.value);
                         signalResolve();
                     }));
                 }
@@ -47,22 +46,17 @@ export class PullNode<T> implements Node<T> {
             await Promise.all([signal, Promise.resolve()]);
             ({promise: signal, resolve: signalResolve} = Promise.withResolvers<void>());
 
-            const inputsResult = resolved.get('inputs');
-            const valuesResult = resolved.get('values');
-            resolved.clear();
-
-            if (inputsResult?.done) iterators.inputs = undefined as any;
-            if (valuesResult?.done) iterators.values = undefined;
-
-            if(inputsResult && !inputsResult.done){
-                const newInputs = inputsResult.value;
+            if (resolved.has('inputs')) {
+                const newInputs = resolved.get('inputs');
+                resolved.delete('inputs');
                 if (!equal(this.inputs, newInputs)) {
                     this.value = this.fun(...newInputs.map((v: Version<any>) => v.value));
                     this.inputs = newInputs.slice();
                 }
-                iterators.values = toAsyncIterable<T>(this.value)[Symbol.asyncIterator]();
-            } else if (valuesResult && !valuesResult.done) {
-                yield valuesResult.value;
+                iterators.set('values', toAsyncIterable<T>(this.value)[Symbol.asyncIterator]());
+            } else if (resolved.has('values')) {
+                yield resolved.get('values');
+                resolved.delete('values');
                 await this.throttle();
             } else if (pending.size === 0) {
                 break;
