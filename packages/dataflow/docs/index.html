@@ -22,6 +22,8 @@
     <a href="examples/">Examples</a>
 </nav>
 
+<h1>Quick Start</h1>
+
 <p>Dataflow is a lightweight reactive JavaScript library heavily inspired by <a
         href="https://observablehq.com/framework/">Observable
     Framework</a>. It brings reactive programming to plain HTML pages with minimal overhead - the core library
@@ -36,9 +38,7 @@
 <p>Document order does not matter, all reactive scripts will be topologically sorted and turned into a DAG before
     execution.</p>
 
-<div class="tip">The transformation can happen at build time, at runtime on the server, at the edge, or even client-side
-    using a service worker.
-</div>
+<div class="tip">The transformation can happen at build time, at runtime on the server, at the edge, or even client-side using a service worker. See the <a href="setup.html">Setup</a> page for details.</div>
 
 <h2>Example</h2>
 
@@ -112,7 +112,7 @@
 
 <div class="example">
     <script type="module" is="reactive" data-echo="html">
-        import {display, view, input} from '@bodar/dataflow/runtime.ts';
+        import {display, view, input, now} from '@bodar/dataflow/runtime.ts';
     </script>
 </div>
 
@@ -169,30 +169,9 @@
     </script>
 </div>
 
-<h2>Reactivity with Generators</h2>
+<h2>Reactive Inputs</h2>
 
-<p>Code blocks automatically re-run when referenced reactive variables change. The block below references a
-    <code>now</code> variable representing the current time in milliseconds; because <code>now</code> is reactive
-    (defined as a generator), this block runs continuously.</p>
-
-<div class="example">
-    <script type="module" is="reactive" data-echo>
-        const now = function* () {
-            while (true) {
-                yield Date.now();
-            }
-        }
-    </script>
-    <script type="module" is="reactive" data-echo><span
-        style={`color: hsl(${(now / 10) % 360} 100% 50%)`}>Rainbow text!</span></script>
-</div>
-
-<h2>Reactive Inputs with view()</h2>
-
-<p>The <code>view</code> function combines <code>display</code> and <code>input</code> to create reactive inputs. When
-    the input changes, dependent code re-runs.</p>
-
-<h3>Using Plain JSX Inputs</h3>
+<p>The <code>view</code> function creates reactive inputs. When the input changes, dependent code re-runs:</p>
 
 <div class="example">
     <script type="module" is="reactive" data-echo>
@@ -201,84 +180,7 @@
     <script type="module" is="reactive" data-echo>`Hello, ${name}!`</script>
 </div>
 
-<h3>Using Observable Inputs</h3>
-
-<p>You can also use the <code>@observablehq/inputs</code> library for more sophisticated input controls.</p>
-
-<div class="example">
-    <script type="module" is="reactive" data-echo>
-        import {range} from "@observablehq/inputs";
-
-        const slider = view(range([0, 100], {label: "Value", step: 1, value: 50}));
-    </script>
-    <script type="module" is="reactive" data-echo>`The slider value is: ${slider}`</script>
-</div>
-
-<h3>Multiple Inputs</h3>
-
-<div class="example">
-    <script type="module" is="reactive" data-echo>
-        const a = view(<input type="number" value="10" style="width: 60px"/>);
-    </script>
-    <script type="module" is="reactive" data-echo>
-        const b = view(<input type="number" value="5" style="width: 60px"/>);
-    </script>
-    <script type="module" is="reactive" data-echo>
-        <span>{a} + {b} = {a + b}</span>
-    </script>
-</div>
-
-<h2>Different Input Types</h2>
-
-<h3>Checkbox</h3>
-
-<div class="example">
-    <script type="module" is="reactive" data-echo>
-        const checked = view(<input type="checkbox" id="feature"/>);
-    </script>
-    <label for="feature">
-        <script type="module" is="reactive" data-echo>`Feature is ${checked ? 'enabled' : 'disabled'}`</script>
-    </label>
-</div>
-
-<h3>Select</h3>
-
-<div class="example">
-    <script type="module" is="reactive" data-echo>
-        const color1 = view(<select>
-            <option value="red">Red</option>
-            <option value="green">Green</option>
-            <option value="blue">Blue</option>
-        </select>);
-    </script>
-    <script type="module" is="reactive" data-echo>
-        <span style={`color: ${color1}; font-weight: bold`}>Selected color: {color1}</span>
-    </script>
-</div>
-
-<h2>Combining Multiple Reactive Values</h2>
-
-<p>Reactive values can depend on multiple inputs. The dependent code re-runs whenever any input changes.</p>
-
-<div class="example">
-    <script type="module" is="reactive" data-echo>
-        const width = view(<input type="range" min="50" max="300" value="150"/>);
-    </script>
-    <script type="module" is="reactive" data-echo>
-        const height = view(<input type="range" min="50" max="200" value="100"/>);
-    </script>
-    <script type="module" is="reactive" data-echo>
-        const color2 = view(<input type="color" value="#4a90d9"/>);
-    </script>
-    <script type="module" is="reactive" data-echo>
-        <div style={`width: ${width}px; height: ${height}px; background: ${color2};
-    display: flex; align-items: center; justify-content: center; color: white;
-    text-shadow: 1px 1px 2px black`}>
-            {width} x {height}
-        </div>
-    </script>
-</div>
-
+<p>See the <a href="inputs.html">Inputs</a> page for more input types and patterns, and the <a href="reactivity.html">Reactivity</a> page for generators, invalidation, and other reactive patterns.</p>
 
 <script type="importmap">
     {

@@ -7,6 +7,7 @@ export {input} from './api/input.ts';
 export {observe} from './api/observe.ts';
 export {mutable} from './api/mutable.ts';
 export {resize} from './api/resize.ts';
+export {now} from './api/now.ts';
 
 export {BaseGraph} from './BaseGraph.ts'
 export {Idle} from './Idle.ts'

@@ -28,15 +28,14 @@
 
 <ul>
     <li>Easier interactivity because state is automatically kept in sync</li>
-    <li>Easier asynchronous programming via implicit await of promises</li>
     <li>Better performance with incremental re-rendering</li>
-    <li>Greater flexibility by writing code and prose in any order</li>
+    <li>Greater flexibility by writing code in any order</li>
 </ul>
 
 <p>Unlike reactive libraries that require special APIs, Dataflow's reactivity is implemented at the language layer: there's no new API or syntax to learn. It's vanilla JavaScript, but the code runs automatically. Code blocks run in topological order determined by variable references (a.k.a. <em>dataflow</em>), rather than in top-down document order.</p>
 
 <script type="module" is="reactive">
-    import {display, view, input, mutable, observe} from '@bodar/dataflow/runtime.ts';
+    import {display, view, input, mutable, observe, now} from '@bodar/dataflow/runtime.ts';
 </script>
 
 <h2>Top-level Variables</h2>
@@ -63,35 +62,6 @@
         }
     </script>
 </div>
-
-<h2>Promises</h2>
-
-<div class="tip">See <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises">MDN's <i>Using promises</i></a> for an introduction to promises.</div>
-
-<p>A <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">promise</a> represents the result of an asynchronous operation: data loaded from a file, a module imported dynamically, or the end of an animation.</p>
-
-<p>In Dataflow, when one code block refers to a promise defined in another code block, the referencing code block implicitly awaits the promise. This means promises are often invisible:</p>
-
-<div class="example">
-    <script type="module" is="reactive" data-echo>
-        const delayedValue = new Promise((resolve) => setTimeout(() => resolve(42), 1000));
-    </script>
-    <script type="module" is="reactive" data-echo>
-        `The delayed value is: ${delayedValue}`
-    </script>
-</div>
-
-<div class="note">
-    <strong>Note:</strong> Implicit <code>await</code> only applies <em>across</em> code blocks, not <em>within</em> a code block. Within a code block, a promise is just a promise.
-</div>
-
-<p>This pattern is especially useful for loading multiple files in parallel:</p>
-
-<pre><code class="language-javascript">const a = fetch("a.json").then(r => r.json());
-const b = fetch("b.json").then(r => r.json());
-const c = fetch("c.json").then(r => r.json());
-// All load in parallel, and referencing code blocks
-// only wait for the data they need</code></pre>
 
 <h2>Generators</h2>
 
@@ -150,11 +120,25 @@ const c = fetch("c.json").then(r => r.json());
     </script>
 </div>
 
+<h3>The now Generator</h3>
+
+<p>Dataflow provides a built-in <code>now</code> generator that yields the current timestamp (<code>Date.now()</code>) on every animation frame:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        `The current time is ${new Date(now).toLocaleTimeString("en-GB")}.`
+    </script>
+</div>
+
+<p>This is useful for animations, clocks, and any time-based reactive updates.</p>
+
 <h2>Invalidation</h2>
 
 <p>With reactive evaluation, code blocks can run multiple times in response to changing inputs. If a node returns a resource that needs cleanup when new inputs arrive, Dataflow handles this automatically.</p>
 
-<p>Unlike Observable Framework where you must manually await an <code>invalidation</code> promise, Dataflow automatically cleans up values that are:</p>
+<div class="note">
+    <strong>Note:</strong> Unlike Observable Framework where you must manually await an <code>invalidation</code> promise, Dataflow automatically cleans up values that are <code>AbortController</code>, <code>Symbol.dispose</code>, or <code>Symbol.asyncDispose</code>.
+</div>
 
 <ul>
     <li><strong>AbortController</strong> - <code>.abort()</code> is called</li>
@@ -195,12 +179,12 @@ const c = fetch("c.json").then(r => r.json());
         const resource = {
             value: triggerValue * 2,
             [Symbol.dispose]() {
-                console.log(`Disposing resource with value ${this.value}`);
+                display(`Disposed resource with value ${this.value}`);
             }
         };
     </script>
     <script type="module" is="reactive" data-echo>
-        `Resource value: ${resource.value} (check console when slider moves)`
+        `Resource value: ${resource.value}`
     </script>
 </div>
 

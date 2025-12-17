@@ -28,11 +28,17 @@
 
 <h2>Installation</h2>
 
-<pre><code class="language-bash"># Using JSR (recommended)
-npx jsr add @bodar/dataflow
+<pre><code class="language-bash">npx jsr add @bodar/dataflow
 
-# Or import directly in Deno/browsers
-import {HTMLTransformer} from 'jsr:@bodar/dataflow';</code></pre>
+bunx jsr add @bodar/dataflow
+
+deno add jsr:@bodar/dataflow
+
+pnpm i jsr:@bodar/dataflow
+
+yarn add jsr:@bodar/dataflow</code></pre>
+
+<p>For browsers, use an import map with the pre-minified runtime. See <a href="#service-worker">Service Worker</a> below.</p>
 
 <h2>Build Time</h2>
 
@@ -102,7 +108,7 @@ export default {
     fetch: ReactiveHandler(transformer, fetch)
 };</code></pre>
 
-<h3>Service Worker</h3>
+<h3 id="service-worker">Service Worker</h3>
 
 <p>Transform HTML client-side using the same pattern with an import map:</p>
 

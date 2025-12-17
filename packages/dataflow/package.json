@@ -13,6 +13,7 @@
   "exports": {
     "./api/display.ts": "./src/api/display.ts",
     "./api/input.ts": "./src/api/input.ts",
+    "./api/now.ts": "./src/api/now.ts",
     "./api/observe.ts": "./src/api/observe.ts",
     "./api/view.ts": "./src/api/view.ts",
     "./BaseGraph.ts": "./src/BaseGraph.ts",
