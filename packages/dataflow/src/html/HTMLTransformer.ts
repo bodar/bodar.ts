@@ -30,7 +30,7 @@ export interface HTMLTransformerDependencies {
 export const DefaultSelectors: HTMLTransformerSelectors = {
     start: 'head',
     script: 'script[data-reactive],script[is=reactive]',
-    end: 'body'
+    end: 'body,*[data-reactive-island],*[is=reactive-island]'
 }
 
 /** HTMLTransformer **/

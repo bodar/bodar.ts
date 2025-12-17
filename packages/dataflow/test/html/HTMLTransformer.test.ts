@@ -89,7 +89,30 @@ return {a};
 });`)}</script></body>`);
     });
 
-    test('can choose where to place the graph code so that it can work nicer with server rendered content', async () => {
+    test('can use is="reactive-island" determine where graph code is placed', async () => {
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+        const result = transformer.transform('<body><div is="reactive-island"><script is="reactive">const a = 1;</script></div></body>');
+        expect(result).toBe(`<body><div is="reactive-island"><script type="module">${scriptTemplate(`renderer.register("vge10p",[],["a"],() => {
+const a = 1;
+return {a};
+});`)}</script></div></body>`);
+    });
+
+    test('supports multiple isolated reactive islands on the same page', async () => {
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+        const result = transformer.transform('<body><div id="one" is="reactive-island"><script is="reactive">const a = 1;</script></div><div id="two" is="reactive-island"><script is="reactive">const a = 1;</script></div></body>');
+        expect(result).toBe(`<body><div id="one" is="reactive-island"><script type="module">${scriptTemplate(`renderer.register("vge10p",[],["a"],() => {
+const a = 1;
+return {a};
+});`)}</script></div><div id="two" is="reactive-island"><script type="module">${scriptTemplate(`renderer.register("vge10p",[],["a"],() => {
+const a = 1;
+return {a};
+});`)}</script></div></body>`);
+    });
+
+    //TODO work out a plan for how display slots will work inside islands (as they are not globally unique)
+
+    test('can use custom selector to determine where graph code is placed', async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp, selectors: {end: '#my-component'}});
         const result = transformer.transform('<body><div id="my-component"><script is="reactive">const a = 1;</script></div></body>');
         expect(result).toBe(`<body><div id="my-component"><script type="module">${scriptTemplate(`renderer.register("vge10p",[],["a"],() => {

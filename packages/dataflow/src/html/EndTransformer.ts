@@ -12,10 +12,13 @@ export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementCont
     }
 
     async endTag(end: HTMLRewriterTypes.EndTag) {
-        const sorted = topologicalSort(this.controller.popDefinitions());
-        const registrations = sorted.map((d: NodeDefinition) => `renderer.register(${d});`).join('\n');
-        const javascript = await this.bundler.transform(scriptTemplate(registrations));
-        end.before(`<script type="module">${javascript}</script>`, {html: true})
+        const definitions = this.controller.popDefinitions();
+        if(definitions.length > 0) {
+            const sorted = topologicalSort(definitions);
+            const registrations = sorted.map((d: NodeDefinition) => `renderer.register(${d});`).join('\n');
+            const javascript = await this.bundler.transform(scriptTemplate(registrations));
+            end.before(`<script type="module">${javascript}</script>`, {html: true})
+        }
     }
 }
 
