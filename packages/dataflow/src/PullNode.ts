@@ -25,19 +25,48 @@ export class PullNode<T> implements Node<T> {
     }
 
     async* create(): AsyncIterable<T> {
-        for await (const currentInputs of combineLatest(this.dependencies)) {
-            yield* this.execute(currentInputs);
+        const iterators: { inputs: AsyncIterator<any[]>, values: (AsyncIterator<any> | undefined) } = {
+            inputs: combineLatest(this.dependencies)[Symbol.asyncIterator](),
+            values: undefined,
         }
-    }
+        const pending = new Map<string, Promise<any>>();
+        const resolved = new Map<string, IteratorResult<any>>();
+        let {promise: signal, resolve: signalResolve} = Promise.withResolvers<void>();
 
-    async* execute(newInputs: Version<any>[]): AsyncGenerator<T> {
-        if (!equal(this.inputs, newInputs)) {
-            this.value = this.fun(...newInputs.map(v => v.value));
-            this.inputs = newInputs.slice();
-        }
-        for await (const value of toAsyncIterable<T>(this.value)) {
-            yield value;
-            await this.throttle();
+        while (true) {
+            for (const [name, iterator] of Object.entries(iterators)) {
+                if (!pending.has(name) && iterator) {
+                    pending.set(name, iterator.next().then(result => {
+                        pending.delete(name);
+                        resolved.set(name, result);
+                        signalResolve();
+                    }));
+                }
+            }
+
+            await Promise.all([signal, Promise.resolve()]);
+            ({promise: signal, resolve: signalResolve} = Promise.withResolvers<void>());
+
+            const inputsResult = resolved.get('inputs');
+            const valuesResult = resolved.get('values');
+            resolved.clear();
+
+            if (inputsResult?.done) iterators.inputs = undefined as any;
+            if (valuesResult?.done) iterators.values = undefined;
+
+            if(inputsResult && !inputsResult.done){
+                const newInputs = inputsResult.value;
+                if (!equal(this.inputs, newInputs)) {
+                    this.value = this.fun(...newInputs.map((v: Version<any>) => v.value));
+                    this.inputs = newInputs.slice();
+                }
+                iterators.values = toAsyncIterable<T>(this.value)[Symbol.asyncIterator]();
+            } else if (valuesResult && !valuesResult.done) {
+                yield valuesResult.value;
+                await this.throttle();
+            } else if (pending.size === 0) {
+                break;
+            }
         }
     }
 }
