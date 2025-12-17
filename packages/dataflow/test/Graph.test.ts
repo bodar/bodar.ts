@@ -157,6 +157,58 @@ describe("graph", () => {
         assertThat(graph.sources(), equals([a, c, e]));
     });
 
+    describe("invalidation", () => {
+        test("AbortController is aborted when new inputs arrive", async () => {
+            const graph = new Graph();
+            graph.define(function* datasource() {
+                yield* [1, 2];
+            });
+            const controllers: AbortController[] = [];
+            const {node} = graph.define('node', (datasource: number) => {
+                const controller = Object.assign(new AbortController(), {datasource});
+                controllers.push(controller);
+                return controller;
+            });
+            await valuesOf(node);
+            expect(controllers.length).toBe(2);
+            expect(controllers[0].signal.aborted).toBe(true);
+            expect(controllers[1].signal.aborted).toBe(false);
+        });
+
+        test("Symbol.dispose is called when new inputs arrive", async () => {
+            const graph = new Graph();
+            graph.define(function* datasource() {
+                yield* [1, 2];
+            });
+            const disposals: number[] = [];
+            const {node} = graph.define('node', (datasource: number) => ({
+                value: datasource,
+                [Symbol.dispose]() {
+                    disposals.push(datasource);
+                }
+            }));
+            await valuesOf(node);
+            expect(disposals).toEqual([1]);
+        });
+
+        test("Symbol.asyncDispose is awaited when new inputs arrive", async () => {
+            const graph = new Graph();
+            graph.define(function* datasource() {
+                yield* [1, 2];
+            });
+            const disposals: number[] = [];
+            const {node} = graph.define('node', (datasource: number) => ({
+                value: datasource,
+                async [Symbol.asyncDispose]() {
+                    await Promise.resolve();
+                    disposals.push(datasource);
+                }
+            }));
+            await valuesOf(node);
+            expect(disposals).toEqual([1]);
+        });
+    });
+
     describe("life cycle", () => {
         test("when we have finished observing, we clean up", async () => {
             const graph = new Graph();
