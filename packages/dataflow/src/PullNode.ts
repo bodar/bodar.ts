@@ -32,35 +32,40 @@ export class PullNode<T> implements Node<T> {
 
         iterators.set('inputs', combineLatest(this.dependencies)[Symbol.asyncIterator]());
 
-        while (true) {
-            for (const [name, iterator] of iterators) {
-                if (!pending.has(name)) {
-                    pending.set(name, iterator.next().then(result => {
-                        pending.delete(name);
-                        result.done ? iterators.delete(name) : resolved.set(name, result.value);
-                        signalResolve();
-                    }));
+        try {
+            while (true) {
+                for (const [name, iterator] of iterators) {
+                    if (!pending.has(name)) {
+                        pending.set(name, iterator.next().then(result => {
+                            pending.delete(name);
+                            result.done ? iterators.delete(name) : resolved.set(name, result.value);
+                            signalResolve();
+                        }));
+                    }
+                }
+
+                await Promise.all([signal, Promise.resolve()]);
+                ({promise: signal, resolve: signalResolve} = Promise.withResolvers<void>());
+
+                if (resolved.has('inputs')) {
+                    const newInputs = resolved.get('inputs');
+                    resolved.delete('inputs');
+                    if (!equal(this.inputs, newInputs)) {
+                        this.value = this.fun(...newInputs.map((v: Version<any>) => v.value));
+                        this.inputs = newInputs.slice();
+                    }
+                    iterators.set('values', toAsyncIterable<T>(this.value)[Symbol.asyncIterator]());
+                } else if (resolved.has('values')) {
+                    yield resolved.get('values');
+                    resolved.delete('values');
+                    await this.throttle();
+                } else if (pending.size === 0) {
+                    break;
                 }
             }
-
-            await Promise.all([signal, Promise.resolve()]);
-            ({promise: signal, resolve: signalResolve} = Promise.withResolvers<void>());
-
-            if (resolved.has('inputs')) {
-                const newInputs = resolved.get('inputs');
-                resolved.delete('inputs');
-                if (!equal(this.inputs, newInputs)) {
-                    this.value = this.fun(...newInputs.map((v: Version<any>) => v.value));
-                    this.inputs = newInputs.slice();
-                }
-                iterators.set('values', toAsyncIterable<T>(this.value)[Symbol.asyncIterator]());
-            } else if (resolved.has('values')) {
-                yield resolved.get('values');
-                resolved.delete('values');
-                await this.throttle();
-            } else if (pending.size === 0) {
-                break;
-            }
+        }
+        finally {
+            await Promise.all([...iterators.values()].map((iterator) => iterator.return?.()));
         }
     }
 }

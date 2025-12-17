@@ -51,6 +51,6 @@ export async function* combineLatest(iterables: AsyncIterable<any>[], filter: bo
             if (hadUpdates) yield currentValues.slice();
         }
     } finally {
-        iterators.forEach(({iterator}) => iterator.return?.());
+        await Promise.all(iterators.map(({iterator}) => iterator.return?.()));
     }
 }

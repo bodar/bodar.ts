@@ -1,10 +1,11 @@
-import {describe, test} from "bun:test";
+import {describe, expect, test} from "bun:test";
 import {Graph} from "../src/Graph.ts";
 import {toPromiseArray} from "@bodar/totallylazy/collections/Array.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import type {Version} from "../src/Node.ts";
+import {observableSource} from "./api/observe.test.ts";
 
 describe("graph", () => {
     test("if the function has a name use that as the key", async () => {
@@ -154,6 +155,50 @@ describe("graph", () => {
         graph.define('d', (b: number, c: number) => b + c + 4);
         const {e} = graph.define('e', () => 5);
         assertThat(graph.sources(), equals([a, c, e]));
+    });
+
+    describe("life cycle", () => {
+        test("when we have finished observing, we clean up", async () => {
+            const graph = new Graph();
+            const source = observableSource(1, 2);
+            graph.define('source', () => source);
+            const {node} = graph.define('node', (source: number) => source * 2);
+
+            assertThat(await valuesOf(node), equals([2, 4]));
+            expect(source.disposed).toBe(true);
+        });
+
+        test("if we break early, we still clean up", async () => {
+            const graph = new Graph();
+            const source = observableSource(1, 2);
+            graph.define('source', () => source);
+            const {node} = graph.define('node', (source: number) => source * 2);
+
+            for await (const v of node) {
+                expect(v.value).toBe(2);
+                break;
+            }
+
+            expect(source.disposed).toBe(true);
+        });
+
+        test("if we throw, we still clean up", async () => {
+            const graph = new Graph();
+            const source = observableSource(1, 2);
+            graph.define('source', () => source);
+            const {node} = graph.define('node', (source: number) => source * 2);
+
+            try {
+                for await (const v of node) {
+                    expect(v.value).toBe(2);
+                    throw new Error("we throw, we still clean up");
+                }
+            } catch (_) {
+                // ignore
+            }
+
+            expect(source.disposed).toBe(true);
+        });
     });
 })
 

@@ -59,10 +59,10 @@ export class SharedAsyncIterable<T> implements AsyncIterable<T> {
         if (result.done) this.reset();
     }
 
-    return(consumer: SharedAsyncIterator<T>, value?: any) {
+    async return(consumer: SharedAsyncIterator<T>, value?: any) {
         this.consumers.delete(consumer);
         if (this.consumers.size === 0) {
-            this.iterator?.return?.(value);
+            await this.iterator?.return?.(value);
             this.reset();
         }
     }
@@ -112,7 +112,7 @@ class SharedAsyncIterator<T> implements AsyncIterator<T> {
 
     async return(value?: any): Promise<IteratorResult<T, any>> {
         this.resolve?.({done: true, value});
-        this.controller.return(this, value);
+        await this.controller.return(this, value);
         this.reset();
         return {done: true, value};
     }
