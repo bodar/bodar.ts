@@ -15,6 +15,7 @@
 
 <nav class="docs-nav">
     <a href="index.html">Quick Start</a>
+    <a href="setup.html">Setup</a>
     <a href="reactivity.html">Reactivity</a>
     <a href="inputs.html">Inputs</a>
     <a href="islands.html" class="active">Islands</a>
@@ -161,59 +162,6 @@
     <li>Variables are scoped to the island - no conflicts with other islands or page-level scripts</li>
 </ol>
 
-<h2>Custom Selectors</h2>
-
-<p>You can customize which elements trigger island boundaries using the <code>selectors</code> option in the transformer:</p>
-
-<pre><code class="language-javascript">const transformer = new HTMLTransformer({
-    rewriter: new HTMLRewriter(),
-    bundler: Bundler.noOp,
-    selectors: {
-        // Custom selector for island boundaries
-        end: '#my-component, .reactive-widget'
-    }
-});</code></pre>
-
-<h2>Server-Side Transformation</h2>
-
-<p>The transformation can happen at various points in your stack:</p>
-
-<h3>At Build Time</h3>
-<pre><code class="language-javascript">import {HTMLTransformer} from '@bodar/dataflow';
-import {Bundler} from '@bodar/dataflow/bundling/Bundler.ts';
-
-const transformer = new HTMLTransformer({
-    rewriter: new HTMLRewriter(),
-    bundler: Bundler.noOp
-});
-
-const output = transformer.transform(htmlString);</code></pre>
-
-<h3>At the Edge (Cloudflare Workers)</h3>
-<pre><code class="language-javascript">export default {
-    async fetch(request) {
-        const response = await fetch(request);
-        const transformer = new HTMLTransformer({
-            rewriter: new HTMLRewriter(),
-            bundler: Bundler.noOp
-        });
-        return transformer.transform(response);
-    }
-};</code></pre>
-
-<h3>In a Service Worker</h3>
-<pre><code class="language-javascript">self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        fetch(event.request).then(response => {
-            const transformer = new HTMLTransformer({
-                rewriter: new HTMLRewriter(),
-                bundler: Bundler.noOp
-            });
-            return transformer.transform(response);
-        })
-    );
-});</code></pre>
-
 <h2>Benefits Over Full SPA Frameworks</h2>
 
 <table>
@@ -252,21 +200,6 @@ const output = transformer.transform(htmlString);</code></pre>
     </tr>
     </tbody>
 </table>
-
-<h2>Complete Example: Comment Widget</h2>
-
-<p>Here's a realistic example of a reactive island that could be loaded via HTMX. This widget demonstrates adding and deleting comments with proper state management.</p>
-
-<p><a href="examples/comments.html" class="example-link"><strong>View the Comments Widget Example &rarr;</strong></a></p>
-
-<p>The example demonstrates:</p>
-<ul>
-    <li>Using <code>mutable</code> for list state</li>
-    <li>Adding items with helper functions defined in the same block</li>
-    <li>Deleting items from the list</li>
-    <li>Form handling with <code>onsubmit</code></li>
-    <li>Completely self-contained - could be loaded via HTMX or Unpoly</li>
-</ul>
 
 <script type="importmap">
     {

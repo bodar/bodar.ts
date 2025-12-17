@@ -1,3 +1,5 @@
+/** @module */
+
 import {HTMLTransformer} from "../html/HTMLTransformer.ts";
 
 interface HttpHandler {

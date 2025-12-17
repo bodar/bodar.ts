@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Setup - Dataflow</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="site-header">
+    <h1>Dataflow</h1>
+    <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="GitHub" src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
+</div>
+
+<nav class="docs-nav">
+    <a href="index.html">Quick Start</a>
+    <a href="setup.html" class="active">Setup</a>
+    <a href="reactivity.html">Reactivity</a>
+    <a href="inputs.html">Inputs</a>
+    <a href="islands.html">Islands</a>
+    <a href="examples/">Examples</a>
+</nav>
+
+<h1>Setup</h1>
+
+<p>Dataflow transforms HTML containing <code>is="reactive"</code> scripts into interactive pages. The transformation can happen at build time or runtime.</p>
+
+<h2>Installation</h2>
+
+<pre><code class="language-bash"># Using JSR (recommended)
+npx jsr add @bodar/dataflow
+
+# Or import directly in Deno/browsers
+import {HTMLTransformer} from 'jsr:@bodar/dataflow';</code></pre>
+
+<h2>Build Time</h2>
+
+<p>For static site generation or build pipelines, use <code>HTMLTransformer</code> directly with <code>BunBundler</code> to bundle imports:</p>
+
+<pre><code class="language-javascript">import {HTMLTransformer} from '@bodar/dataflow';
+import {BunBundler} from '@bodar/dataflow/bundling/BunBundler.ts';
+
+const transformer = new HTMLTransformer({
+    rewriter: new HTMLRewriter(),
+    bundler: new BunBundler()
+});
+
+const output = transformer.transform(htmlString);</code></pre>
+
+<div class="note">
+    <strong>Note:</strong> <code>HTMLTransformer</code> is stateful and should be created fresh for each transformation.
+</div>
+
+<h2>Runtime with ReactiveHandler</h2>
+
+<p>For fetch-compatible systems, use <code>ReactiveHandler</code> middleware to automatically transform HTML responses. It handles the plumbing of checking content-type and status, and creates a fresh transformer per request.</p>
+
+<h3>Bun.serve</h3>
+
+<p>With Bun, use <code>BunBundler</code> to bundle imports at runtime:</p>
+
+<pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
+import {HTMLTransformer} from '@bodar/dataflow';
+import {BunBundler} from '@bodar/dataflow/bundling/BunBundler.ts';
+
+const transformer = () => new HTMLTransformer({
+    rewriter: new HTMLRewriter(),
+    bundler: new BunBundler()
+});
+
+Bun.serve({
+    fetch: ReactiveHandler(transformer, async (request) => {
+        // Your existing handler logic
+        return new Response('&lt;html&gt;...&lt;/html&gt;', {
+            headers: {'content-type': 'text/html'}
+        });
+    })
+});</code></pre>
+
+<h3>Cloudflare Workers</h3>
+
+<p>At the edge, use <code>Bundler.noOp</code> with an import map pointing to the pre-minified runtime. The <code>importMap</code> option automatically injects the import map into the HTML head:</p>
+
+<pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
+import {HTMLTransformer} from '@bodar/dataflow';
+import {Bundler} from '@bodar/dataflow/bundling/Bundler.ts';
+
+const importMap = {
+    imports: {
+        '@bodar/dataflow/runtime.ts': 'https://dataflow.bodar.com/runtime.js'
+    }
+};
+
+const transformer = () => new HTMLTransformer({
+    rewriter: new HTMLRewriter(),
+    bundler: Bundler.noOp,
+    importMap
+});
+
+export default {
+    fetch: ReactiveHandler(transformer, fetch)
+};</code></pre>
+
+<h3>Service Worker</h3>
+
+<p>Transform HTML client-side using the same pattern with an import map:</p>
+
+<pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
+import {HTMLTransformer} from '@bodar/dataflow';
+import {Bundler} from '@bodar/dataflow/bundling/Bundler.ts';
+
+const importMap = {
+    imports: {
+        '@bodar/dataflow/runtime.ts': 'https://dataflow.bodar.com/runtime.js'
+    }
+};
+
+const transformer = () => new HTMLTransformer({
+    rewriter: new HTMLRewriter(),
+    bundler: Bundler.noOp,
+    importMap
+});
+
+const handler = ReactiveHandler(transformer, fetch);
+
+self.addEventListener('fetch', (event) => {
+    event.respondWith(handler(event.request));
+});</code></pre>
+
+<p>The import map redirects imports to the pre-minified runtime (~3KB), avoiding the need for bundling.</p>
+
+<script type="importmap">
+    {
+        "imports": {
+            "highlight.js/": "https://esm.run/highlight.js/"
+        }
+    }
+</script>
+<script type="module">
+    import hljs from 'highlight.js/lib/core.js';
+    import javascript from 'highlight.js/lib/languages/javascript';
+    import bash from 'highlight.js/lib/languages/bash';
+    import xml from 'highlight.js/lib/languages/xml';
+
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = "https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/intellij-light.min.css";
+    document.head.appendChild(link);
+    hljs.registerLanguage('javascript', javascript);
+    hljs.registerLanguage('bash', bash);
+    hljs.registerLanguage('xml', xml);
+    hljs.highlightAll();
+</script>
+
+</body>
+</html>
