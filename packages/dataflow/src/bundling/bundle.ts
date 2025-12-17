@@ -11,6 +11,13 @@ export async function bundleFile(path: string, minify: boolean): Promise<string>
         entrypoints: [path],
         minify,
     });
+    if (!result.success) {
+        console.error('Build failed for:', path);
+        for (const log of result.logs) {
+            console.error(log);
+        }
+        throw new Error(`Build failed: ${result.logs.map(l => l.message).join(', ')}`);
+    }
     let bundled: string | undefined;
     for (const output of result.outputs) {
         bundled = await output.text();

@@ -1,13 +1,10 @@
 import {Imports, processImports} from "../javascript/Imports.ts";
-import {simpleHash} from "../simpleHash.ts";
-import {
-    parseScript,
-    processJSX, toScript
-} from "../javascript/script-parsing.ts";
+import {parseScript, processJSX, toScript} from "../javascript/script-parsing.ts";
 import {findUnresolvedReferences} from "../javascript/findUnresolvedReferences.ts";
 import {findTopLevelVariableDeclarations} from "../javascript/findTopLevelVariableDeclarations.ts";
 import {display} from "../api/display.ts";
 import {isSingleExpression} from "../javascript/isSingleExpression.ts";
+import {type IdGenerator, SimpleHashGenerator} from "../IdGenerator.ts";
 
 /** A definition of a Node but still in raw text format */
 export class NodeDefinition {
@@ -20,8 +17,8 @@ export class NodeDefinition {
     ) {
     }
 
-    static parse(javascript: string, id?: string): NodeDefinition {
-        const key = id || simpleHash(javascript);
+    static parse(javascript: string, id?: string, idGenerator: IdGenerator = SimpleHashGenerator): NodeDefinition {
+        const key = id || idGenerator.generate(javascript);
         try {
             const program = processJSX(parseScript(javascript));
             const inputs = findUnresolvedReferences(program);

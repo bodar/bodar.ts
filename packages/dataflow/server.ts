@@ -11,8 +11,9 @@ const ROOT = import.meta.dir;
 const router = async (request: Request) => {
     let path = new URL(request.url).pathname
     if (path.startsWith('/dataflow/')) path = path.replace('/dataflow/', '/../src/');
-    if (path.startsWith('/jsx2dom/')) path = path.replace('/jsx2dom/', '/../../jsx2dom/src/');
-    if (path.startsWith('/totallylazy/')) path = path.replace('/totallylazy/', '/../../totallylazy/src/');
+    else if (path.startsWith('/jsx2dom/')) path = path.replace('/jsx2dom/', '/../../jsx2dom/src/');
+    else if (path.startsWith('/totallylazy/')) path = path.replace('/totallylazy/', '/../../totallylazy/src/');
+    else if (path.startsWith('/yadic/')) path = path.replace('/yadic/', '/../../yadic/src/');
     if (path.endsWith('/')) path = `${path}index.html`;
     const filePath = `${ROOT}/docs/${path}`;
     const file = Bun.file(filePath);

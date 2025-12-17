@@ -6,7 +6,7 @@ import {ScriptTransformer} from "./ScriptTransformer.ts";
 import {EndTransformer} from "./EndTransformer.ts";
 import {StartTransformer} from "./StartTransformer.ts";
 import type {Bundler} from "../bundling/Bundler.ts";
-import {chain} from "@bodar/yadic/chain.ts";
+import {CountingIdGenerator, type IdGenerator} from "../IdGenerator.ts";
 
 export interface ImportMap {
     imports?: Record<string, string>;
@@ -25,6 +25,7 @@ export interface HTMLTransformerDependencies {
     bundler: Bundler;
     importMap?: ImportMap;
     selectors?: Partial<HTMLTransformerSelectors>;
+    idGenerator?: IdGenerator;
 }
 
 export const DefaultSelectors: HTMLTransformerSelectors = {
@@ -35,11 +36,14 @@ export const DefaultSelectors: HTMLTransformerSelectors = {
 
 /** HTMLTransformer **/
 export class HTMLTransformer {
+    private idGenerator: IdGenerator;
+
     constructor(private deps: HTMLTransformerDependencies) {
-        const selectors = chain(deps.selectors ?? {}, DefaultSelectors) as HTMLTransformerSelectors;
-        if (this.deps.importMap) this.deps.rewriter.on(selectors.start, new StartTransformer(this.deps.importMap))
-        this.deps.rewriter.on(selectors.script, new ScriptTransformer(this))
-        this.deps.rewriter.on(selectors.end, new EndTransformer(this, this.deps.bundler))
+        const selectors = {...DefaultSelectors, ...(deps.selectors ?? {})} as HTMLTransformerSelectors;
+        if (this.deps.importMap) this.deps.rewriter.on(selectors.start, new StartTransformer(this.deps.importMap));
+        this.deps.rewriter.on(selectors.script, new ScriptTransformer(this));
+        this.deps.rewriter.on(selectors.end, new EndTransformer(this, this.deps.bundler));
+        this.idGenerator = this.deps.idGenerator ?? new CountingIdGenerator();
     }
 
     transform(input: Response | Blob | Bun.BufferSource): Response;
@@ -52,7 +56,7 @@ export class HTMLTransformer {
     private definitions: NodeDefinition[] = [];
 
     addScript(javascript: string, id?: string): string[] {
-        const definition = NodeDefinition.parse(javascript, id);
+        const definition = NodeDefinition.parse(javascript, id, this.idGenerator);
         this.definitions.push(definition);
         return [definition.key, ...definition.outputs]
     }
