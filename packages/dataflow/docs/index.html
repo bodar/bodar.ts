@@ -17,7 +17,7 @@
     Framework</a>. It brings reactive programming to plain HTML pages with minimal overhead - the core library
     (including JSX support) is under 3KB compressed!</p>
 
-<p>Just add a single <code>data-reactive</code> attribute to any script tag and it becomes reactive. That's it.</p>
+<p>Just add a single <code>is="reactive"</code> attribute to any script tag and it becomes reactive. That's it.</p>
 
 <p>It works like a spreadsheet: just reference a value from another reactive script tag, and the plumbing happens
     automatically. No setState, no Redux, no reducers, no signals, no manual subscriptions. Just declarative
@@ -36,10 +36,10 @@
 
 
 <div class="example">
-    <script type="module" data-reactive data-echo="html">
+    <script type="module" is="reactive" data-echo="html">
         `The current time is ${new Date(now).toLocaleTimeString("en-GB")}.`
     </script>
-    <script type="module" data-reactive>
+    <script type="module" is="reactive">
         let count = 0;
         const counter = function* () {
             while (true) {
@@ -47,11 +47,11 @@
             }
         }
     </script>
-    <script type="module" data-reactive>
+    <script type="module" is="reactive">
         if (typeof gc === 'function') gc();
         const baseline = performance.memory?.usedJSHeapSize || 0;
     </script>
-    <script type="module" data-reactive>
+    <script type="module" is="reactive">
         {
             if (typeof gc === 'function') gc();
             const current = performance.memory?.usedJSHeapSize || 0;
@@ -66,7 +66,7 @@
 <p>A single expression automatically displays its result:</p>
 
 <div class="example">
-    <script type="module" data-reactive data-echo="html">1 + 2</script>
+    <script type="module" is="reactive" data-echo="html">1 + 2</script>
 </div>
 
 <div class="note">
@@ -79,7 +79,7 @@
 <p>Statements like variable declarations don't display anything - they just define values for other blocks to use:</p>
 
 <div class="example">
-    <script type="module" data-reactive data-echo="html">const foo = 1 + 2;</script>
+    <script type="module" is="reactive" data-echo="html">const foo = 1 + 2;</script>
     <p>The variable <code>foo</code> is defined but nothing is displayed.</p>
 </div>
 
@@ -87,7 +87,7 @@
 <p>For explicit control, import the <code>display</code> function. You can call it multiple times:</p>
 
 <div class="example">
-    <script type="module" data-reactive data-echo="html">
+    <script type="module" is="reactive" data-echo="html">
         for (let i = 0; i < 5; ++i) {
             display(i);
         }
@@ -101,7 +101,7 @@
     (document order does not matter)</p>
 
 <div class="example">
-    <script type="module" data-reactive data-echo="html">
+    <script type="module" is="reactive" data-echo="html">
         import {display, view, input} from '@bodar/dataflow/runtime.ts';
     </script>
 </div>
@@ -112,7 +112,7 @@
 </div>
 
 <div class="example">
-    <script type="module" data-reactive data-echo="html">
+    <script type="module" is="reactive" data-echo="html">
         display('Using previously imported display function');
     </script>
 </div>
@@ -126,7 +126,7 @@
 <p>If an expression evaluates to a DOM node, the node is inserted into the page. Use this to create dynamic content.</p>
 
 <div class="example">
-    <script type="module" data-reactive data-echo>document.createTextNode("[insert chart here]")</script>
+    <script type="module" is="reactive" data-echo>document.createTextNode("[insert chart here]")</script>
 </div>
 
 <h2>JSX</h2>
@@ -138,19 +138,19 @@
 <p>For example, here's a component that displays a greeting:</p>
 
 <div class="example">
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         const greeting = (name) => <i>Hello {name}!</i>
     </script>
-    <script type="module" data-reactive data-echo>greeting("World")</script>
+    <script type="module" is="reactive" data-echo>greeting("World")</script>
 </div>
 
 <p>JSX attributes work as expected, including dynamic values:</p>
 
 <div class="example">
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         const color = "blue";
     </script>
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         <span style={`color: ${color}; font-weight: bold`}>Styled with JSX</span>
     </script>
 </div>
@@ -162,14 +162,14 @@
     (defined as a generator), this block runs continuously.</p>
 
 <div class="example">
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         const now = function* () {
             while (true) {
                 yield Date.now();
             }
         }
     </script>
-    <script type="module" data-reactive data-echo><span
+    <script type="module" is="reactive" data-echo><span
         style={`color: hsl(${(now / 10) % 360} 100% 50%)`}>Rainbow text!</span></script>
 </div>
 
@@ -181,10 +181,10 @@
 <h3>Using Plain JSX Inputs</h3>
 
 <div class="example">
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         const name = view(<input name="name" type="text" value="World"/>);
     </script>
-    <script type="module" data-reactive data-echo>`Hello, ${name}!`</script>
+    <script type="module" is="reactive" data-echo>`Hello, ${name}!`</script>
 </div>
 
 <h3>Using Observable Inputs</h3>
@@ -192,24 +192,24 @@
 <p>You can also use the <code>@observablehq/inputs</code> library for more sophisticated input controls.</p>
 
 <div class="example">
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         import {range} from "@observablehq/inputs";
 
         const slider = view(range([0, 100], {label: "Value", step: 1, value: 50}));
     </script>
-    <script type="module" data-reactive data-echo>`The slider value is: ${slider}`</script>
+    <script type="module" is="reactive" data-echo>`The slider value is: ${slider}`</script>
 </div>
 
 <h3>Multiple Inputs</h3>
 
 <div class="example">
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         const a = view(<input type="number" value="10" style="width: 60px"/>);
     </script>
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         const b = view(<input type="number" value="5" style="width: 60px"/>);
     </script>
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         <span>{a} + {b} = {a + b}</span>
     </script>
 </div>
@@ -219,25 +219,25 @@
 <h3>Checkbox</h3>
 
 <div class="example">
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         const checked = view(<input type="checkbox" id="feature"/>);
     </script>
     <label for="feature">
-        <script type="module" data-reactive data-echo>`Feature is ${checked ? 'enabled' : 'disabled'}`</script>
+        <script type="module" is="reactive" data-echo>`Feature is ${checked ? 'enabled' : 'disabled'}`</script>
     </label>
 </div>
 
 <h3>Select</h3>
 
 <div class="example">
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         const color1 = view(<select>
             <option value="red">Red</option>
             <option value="green">Green</option>
             <option value="blue">Blue</option>
         </select>);
     </script>
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         <span style={`color: ${color1}; font-weight: bold`}>Selected color: {color1}</span>
     </script>
 </div>
@@ -247,16 +247,16 @@
 <p>Reactive values can depend on multiple inputs. The dependent code re-runs whenever any input changes.</p>
 
 <div class="example">
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         const width = view(<input type="range" min="50" max="300" value="150"/>);
     </script>
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         const height = view(<input type="range" min="50" max="200" value="100"/>);
     </script>
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         const color2 = view(<input type="color" value="#4a90d9"/>);
     </script>
-    <script type="module" data-reactive data-echo>
+    <script type="module" is="reactive" data-echo>
         <div style={`width: ${width}px; height: ${height}px; background: ${color2};
     display: flex; align-items: center; justify-content: center; color: white;
     text-shadow: 1px 1px 2px black`}>

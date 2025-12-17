@@ -22,7 +22,7 @@
 <div class="todo-app">
     <h1>Todos</h1>
 
-    <script type="module" data-reactive>
+    <script type="module" is="reactive">
         import {display, mutable} from "@bodar/dataflow/runtime.ts";
 
         const todos = mutable([
@@ -38,14 +38,14 @@
         const updateTodo = (todo) => todos.update(values => values.map(v => v.id === todo.id ? todo : v));
     </script>
 
-    <script type="module" data-reactive>
+    <script type="module" is="reactive">
         <form class="todo-form" onsubmit={(e) => { e.preventDefault(); addTodo(document.getElementById('todo-name').value); e.target.reset(); }}>
             <input type="text" id="todo-name" placeholder="What needs to be done?" required/>
             <button type="submit" class="btn-icon add" title="Add">+</button>
         </form>
     </script>
 
-    <script type="module" data-reactive>
+    <script type="module" is="reactive">
         const filter = mutable(v => v);
         display(<div class="filters">
             <label><input type="radio" name="todo-filter" value="all" checked={true} onchange={() => filter.value = v => v}/><span>All</span></label>
@@ -54,7 +54,7 @@
         </div>)
     </script>
 
-    <script type="module" data-reactive>
+    <script type="module" is="reactive">
         const filtered = todos.filter(filter)
 
         display(<p class="task-count">{filtered.length} task{filtered.length !== 1 ? 's' : ''} remaining</p>);
