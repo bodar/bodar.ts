@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reactivity - Dataflow</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="site-header">
+    <h1>Dataflow</h1>
+    <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="GitHub" src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
+</div>
+
+<nav class="docs-nav">
+    <a href="index.html">Quick Start</a>
+    <a href="reactivity.html" class="active">Reactivity</a>
+    <a href="inputs.html">Inputs</a>
+    <a href="islands.html">Islands</a>
+    <a href="examples/">Examples</a>
+</nav>
+
+<h1>Reactivity</h1>
+
+<p>Dataflow runs like a spreadsheet: code re-runs automatically when referenced variables change. This brings:</p>
+
+<ul>
+    <li>Easier interactivity because state is automatically kept in sync</li>
+    <li>Easier asynchronous programming via implicit await of promises</li>
+    <li>Better performance with incremental re-rendering</li>
+    <li>Greater flexibility by writing code and prose in any order</li>
+</ul>
+
+<p>Unlike reactive libraries that require special APIs, Dataflow's reactivity is implemented at the language layer: there's no new API or syntax to learn. It's vanilla JavaScript, but the code runs automatically. Code blocks run in topological order determined by variable references (a.k.a. <em>dataflow</em>), rather than in top-down document order.</p>
+
+<script type="module" is="reactive">
+    import {display, view, input, mutable, observe} from '@bodar/dataflow/runtime.ts';
+</script>
+
+<h2>Top-level Variables</h2>
+
+<p>A top-level variable declared in a reactive script tag can be referenced in another reactive script on the same page. So if you say:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>const x = 1, y = 2;</script>
+</div>
+
+<p>Then you can reference <code>x</code> and <code>y</code> elsewhere on the page. Top-level variable declarations are effectively <a href="https://developer.mozilla.org/en-US/docs/Glossary/Hoisting">hoisted</a>:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>x + y</script>
+</div>
+
+<p>To prevent variables from being visible outside the current block, make them local with a block statement (curly braces):</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        {
+            const z = 3;
+            display(`z is ${z} but not visible outside this block`);
+        }
+    </script>
+</div>
+
+<h2>Promises</h2>
+
+<div class="tip">See <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises">MDN's <i>Using promises</i></a> for an introduction to promises.</div>
+
+<p>A <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">promise</a> represents the result of an asynchronous operation: data loaded from a file, a module imported dynamically, or the end of an animation.</p>
+
+<p>In Dataflow, when one code block refers to a promise defined in another code block, the referencing code block implicitly awaits the promise. This means promises are often invisible:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const delayedValue = new Promise((resolve) => setTimeout(() => resolve(42), 1000));
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `The delayed value is: ${delayedValue}`
+    </script>
+</div>
+
+<div class="note">
+    <strong>Note:</strong> Implicit <code>await</code> only applies <em>across</em> code blocks, not <em>within</em> a code block. Within a code block, a promise is just a promise.
+</div>
+
+<p>This pattern is especially useful for loading multiple files in parallel:</p>
+
+<pre><code class="language-javascript">const a = fetch("a.json").then(r => r.json());
+const b = fetch("b.json").then(r => r.json());
+const c = fetch("c.json").then(r => r.json());
+// All load in parallel, and referencing code blocks
+// only wait for the data they need</code></pre>
+
+<h2>Generators</h2>
+
+<p>Values that change over time - such as interactive inputs, animation parameters, or streaming data - can be represented as <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator">generators</a>. When a top-level generator is declared, code in other blocks sees the generator's latest yielded value and re-runs each time the generator yields a new value.</p>
+
+<div class="note">As with implicit await and promises, implicit iteration of generators only applies <em>across</em> code blocks, not <em>within</em> a code block.</div>
+
+<h3>Synchronous Generators</h3>
+
+<p>A synchronous generator without any explicit delays will yield once every <a href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame">animation frame</a>, typically 60 times per second:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const i = function* () {
+            for (let i = 0; true; ++i) {
+                yield i;
+            }
+        }
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `Frame count: ${i}`
+    </script>
+</div>
+
+<h3>Async Generators</h3>
+
+<p>An async generator can control its own timing. Here's one that yields once per second:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const j = async function* () {
+            for (let j = 0; true; ++j) {
+                yield j;
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+            }
+        }
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `Seconds elapsed: ${j}`
+    </script>
+</div>
+
+<h3>Animation Example</h3>
+
+<p>Generators make animation declarative - the code runs automatically whenever the frame count changes:</p>
+
+<div class="example">
+    <canvas id="canvas0" width="640" height="30" style="max-width: 100%; height: 30px;"></canvas>
+    <script type="module" is="reactive">
+        const context0 = canvas0.getContext("2d");
+    </script>
+    <script type="module" is="reactive" data-echo>
+        context0.clearRect(0, 0, canvas0.width, canvas0.height);
+        context0.fillStyle = "#4269d0";
+        context0.fillRect((i % (640 + 32)) - 32, 0, 32, 32);
+    </script>
+</div>
+
+<h2>Invalidation</h2>
+
+<p>With reactive evaluation, code blocks can run multiple times in response to changing inputs. If a node returns a resource that needs cleanup when new inputs arrive, Dataflow handles this automatically.</p>
+
+<p>Unlike Observable Framework where you must manually await an <code>invalidation</code> promise, Dataflow automatically cleans up values that are:</p>
+
+<ul>
+    <li><strong>AbortController</strong> - <code>.abort()</code> is called</li>
+    <li><strong>Symbol.dispose</strong> - the dispose function is called</li>
+    <li><strong>Symbol.asyncDispose</strong> - the async dispose function is awaited</li>
+</ul>
+
+<h3>AbortController Example</h3>
+
+<p>This is the most common pattern for cancellable operations like fetch:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const searchTerm = view(<input type="text" placeholder="Search..." value="hello"/>);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        // This AbortController is automatically aborted when searchTerm changes
+        const controller = new AbortController();
+        const searchUrl = `https://api.github.com/search/repositories?q=${encodeURIComponent(searchTerm)}`;
+        const searchResult = fetch(searchUrl, { signal: controller.signal })
+            .then(r => r.json())
+            .catch(e => ({ items: [], message: e.message }));
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `Found ${searchResult.items?.length ?? 0} repositories for "${searchTerm}"`
+    </script>
+</div>
+
+<h3>Disposable Example</h3>
+
+<p>Using the standard <code>Symbol.dispose</code> protocol:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const triggerValue = view(<input type="range" min="1" max="10" value="5"/>);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        const resource = {
+            value: triggerValue * 2,
+            [Symbol.dispose]() {
+                console.log(`Disposing resource with value ${this.value}`);
+            }
+        };
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `Resource value: ${resource.value} (check console when slider moves)`
+    </script>
+</div>
+
+<h2>Observe</h2>
+
+<p>The <code>observe</code> function is a general way to create a generator that "pushes" events asynchronously. It takes an initializer function and passes it a <code>notify</code> callback. The optional second argument provides an initial value, and the initializer can return a disposal function for cleanup:</p>
+
+<div class="note">
+    <strong>Note:</strong> Dataflow's <code>observe(init, initialValue, terminate)</code> adds two arguments beyond Observable Framework's <code>Generators.observe(init)</code>: <code>initialValue</code> yields immediately without calling <code>notify()</code>, and <code>terminate</code> is a predicate to stop iteration (defaults to stopping on <code>undefined</code>).
+</div>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const pointer = observe((notify) => {
+            const handler = (event) => notify([event.clientX, event.clientY]);
+            document.addEventListener("pointermove", handler);
+            return () => document.removeEventListener("pointermove", handler);
+        }, [0, 0]);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        <span style="font-variant-numeric: tabular-nums">Pointer: [{pointer.join(", ")}]</span>
+    </script>
+</div>
+
+<h2>Mutable</h2>
+
+<p>Normally, only the code block that declares a variable can modify it. Use <code>mutable</code> to create a reactive value that can be modified from other code blocks:</p>
+
+<div class="note">
+    <strong>Note:</strong> In Observable Framework, <code>Mutable</code> is implicitly available. In Dataflow, you must import <code>mutable</code> from the runtime (like all other functions). Dataflow also adds an <code>update(fn)</code> method for functional updates, e.g. <code>list.update(arr => [...arr, item])</code>.
+</div>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const countMutable = mutable(0);
+        const increment = () => countMutable.value++;
+        const reset = () => countMutable.value = 0;
+    </script>
+    <script type="module" is="reactive" data-echo>
+        <div>
+            <button onclick={increment}>Increment</button>
+            <button onclick={reset}>Reset</button>
+            <span style="margin-left: 1em">Count: {countMutable}</span>
+        </div>
+    </script>
+</div>
+
+<p>Within the defining code block, <code>count</code> is a <code>Mutable</code> object and <code>count.value</code> can be read and written. In other code blocks, <code>count</code> yields the current value.</p>
+
+<script type="importmap">
+    {
+        "imports": {
+            "highlight.js/": "https://esm.run/highlight.js/"
+        }
+    }
+</script>
+<script type="module">
+    import hljs from 'highlight.js/lib/core.js';
+    import javascript from 'highlight.js/lib/languages/javascript';
+    import xml from 'highlight.js/lib/languages/xml';
+
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = "https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/intellij-light.min.css";
+    document.head.appendChild(link);
+    hljs.registerLanguage('javascript', javascript);
+    hljs.registerLanguage('xml', xml);
+    hljs.highlightAll();
+</script>
+
+</body>
+</html>

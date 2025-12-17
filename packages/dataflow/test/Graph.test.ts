@@ -165,7 +165,8 @@ describe("graph", () => {
             });
             const controllers: AbortController[] = [];
             const {node} = graph.define('node', (datasource: number) => {
-                const controller = Object.assign(new AbortController(), {datasource});
+                void(datasource);
+                const controller = new AbortController();
                 controllers.push(controller);
                 return controller;
             });

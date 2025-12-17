@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inputs - Dataflow</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="site-header">
+    <h1>Dataflow</h1>
+    <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="GitHub" src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
+</div>
+
+<nav class="docs-nav">
+    <a href="index.html">Quick Start</a>
+    <a href="reactivity.html">Reactivity</a>
+    <a href="inputs.html" class="active">Inputs</a>
+    <a href="islands.html">Islands</a>
+    <a href="examples/">Examples</a>
+</nav>
+
+<h1>Inputs</h1>
+
+<p>Inputs are UI elements that accept data from users and enable interaction via reactivity. They can be standard HTML elements like text boxes, sliders, and dropdowns, or custom elements like charts with interactive selection.</p>
+
+<script type="module" is="reactive">
+    import {display, view, input, mutable, observe} from '@bodar/dataflow/runtime.ts';
+</script>
+
+<h2>The view() Function</h2>
+
+<p>The <code>view</code> function is the primary way to create reactive inputs. It combines two operations:</p>
+
+<ol>
+    <li>Displays the given DOM element (via <code>display</code>)</li>
+    <li>Returns an async iterator of the element's values (via <code>input</code>)</li>
+</ol>
+
+<div class="note">
+    <strong>Note:</strong> Dataflow's <code>view()</code> works like Observable Framework's but supports JSX syntax for creating elements. Compare <code>view(&lt;input type="text"/&gt;)</code> vs Observable's <code>view(html\`&lt;input type=text&gt;\`)</code>.
+</div>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const name = view(<input type="text" value="World" placeholder="Enter your name"/>);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `Hello, ${name}!`
+    </script>
+</div>
+
+<h2>Supported Input Types</h2>
+
+<p>The <code>input</code> function automatically handles different input types with appropriate events and value extraction:</p>
+
+<h3>Text Input</h3>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const textValue = view(<input type="text" value="Edit me"/>);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `Text: "${textValue}"`
+    </script>
+</div>
+
+<h3>Number Input</h3>
+
+<p>Number inputs return actual numbers, not strings:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const numValue = view(<input type="number" value="42" style="width: 80px"/>);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `Number: ${numValue} (type: ${typeof numValue})`
+    </script>
+</div>
+
+<h3>Range Input (Slider)</h3>
+
+<p>Range inputs also return numbers:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const rangeValue = view(<input type="range" min="0" max="100" value="50"/>);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `Range: ${rangeValue}`
+    </script>
+</div>
+
+<h3>Checkbox</h3>
+
+<p>Checkboxes return boolean values:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const checked = view(<input type="checkbox" id="feature"/>);
+    </script>
+    <label for="feature">
+        <script type="module" is="reactive" data-echo>
+            `Feature is ${checked ? 'enabled' : 'disabled'}`
+        </script>
+    </label>
+</div>
+
+<h3>Select (Dropdown)</h3>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const color = view(<select>
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="blue">Blue</option>
+        </select>);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        <span style={`color: ${color}; font-weight: bold`}>Selected: {color}</span>
+    </script>
+</div>
+
+<h3>Multi-Select</h3>
+
+<p>Multi-select returns an array of selected values:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const colors = view(<select multiple style="height: 80px">
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="blue">Blue</option>
+            <option value="yellow">Yellow</option>
+        </select>);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `Selected colors: ${colors.join(', ') || 'none'}`
+    </script>
+</div>
+
+<h3>Date Input</h3>
+
+<p>Date inputs return Date objects:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const dateValue = view(<input type="date" value="2025-01-01"/>);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `Date: ${dateValue?.toLocaleDateString() ?? 'not set'}`
+    </script>
+</div>
+
+<h3>Color Input</h3>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const colorValue = view(<input type="color" value="#4a90d9"/>);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        <div style={`background: ${colorValue}; padding: 1em; color: white; text-shadow: 1px 1px 2px black`}>
+            Color: {colorValue}
+        </div>
+    </script>
+</div>
+
+<h2>The input() Function</h2>
+
+<p>The <code>input</code> function converts a DOM element into an async iterator without displaying it. This is useful when you want to control where and when the element is displayed:</p>
+
+<div class="note">
+    <strong>Note:</strong> Dataflow's <code>input(element, eventType?, getValue?)</code> adds optional parameters for custom event types and value extraction functions beyond Observable Framework's <code>Generators.input(element)</code>.
+</div>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const myInput = <input type="text" placeholder="Type here..." value="initial"/>;
+        const myValue = input(myInput);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        <div class="card" style="display: grid; gap: 0.5rem;">
+            <div>Enter text: {myInput}</div>
+            <div>You typed: <strong>{myValue}</strong></div>
+        </div>
+    </script>
+</div>
+
+<h3>Custom Events</h3>
+
+<p>By default, <code>input</code> listens for the appropriate event based on the input type. You can override this:</p>
+
+<pre><code class="language-javascript">// Listen to 'change' instead of 'input' for text
+input(element, 'change');
+
+// Custom value extraction
+input(element, 'input', (el) => el.value.toUpperCase());</code></pre>
+
+<h3>Event Types by Input</h3>
+
+<table>
+    <thead>
+    <tr>
+        <th>Input Type</th>
+        <th>Default Event</th>
+        <th>Value Returned</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr><td>text, search, email, url, tel</td><td>input</td><td>string</td></tr>
+    <tr><td>number, range</td><td>input</td><td>number</td></tr>
+    <tr><td>date, datetime-local</td><td>input</td><td>Date</td></tr>
+    <tr><td>checkbox</td><td>click</td><td>boolean</td></tr>
+    <tr><td>file</td><td>change</td><td>File or FileList</td></tr>
+    <tr><td>select</td><td>input</td><td>string</td></tr>
+    <tr><td>select[multiple]</td><td>input</td><td>string[]</td></tr>
+    <tr><td>button, submit</td><td>click</td><td>value</td></tr>
+    </tbody>
+</table>
+
+<h2>The observe() Function</h2>
+
+<p>For more complex scenarios, <code>observe</code> lets you create custom async iterators from any event source. Pass an initial value as the second argument:</p>
+
+<div class="note">
+    <strong>Note:</strong> Dataflow's <code>observe()</code> adds <code>initialValue</code> and <code>terminate</code> parameters beyond Observable Framework's <code>Generators.observe()</code>. This eliminates the need to call <code>notify()</code> inside the initializer for the initial value.
+</div>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const windowSize = observe((notify) => {
+            const handler = () => notify({
+                width: window.innerWidth,
+                height: window.innerHeight
+            });
+            window.addEventListener('resize', handler);
+            return () => window.removeEventListener('resize', handler);
+        }, {width: window.innerWidth, height: window.innerHeight});
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `Window size: ${windowSize.width} x ${windowSize.height}`
+    </script>
+</div>
+
+<h3>observe() Signature</h3>
+
+<pre><code class="language-typescript">function observe&lt;T&gt;(
+    init: (notify: (value: T | undefined) => void) => (() => void) | void,
+    initialValue?: T,
+    terminate?: (value: T | undefined) => boolean
+): AsyncGenerator&lt;T&gt;</code></pre>
+
+<p>Parameters:</p>
+<ul>
+    <li><strong>init</strong> - Function that sets up the event source. Receives a <code>notify</code> callback to push new values. Can return a cleanup function.</li>
+    <li><strong>initialValue</strong> - Optional initial value to yield before any events</li>
+    <li><strong>terminate</strong> - Optional predicate to stop iteration (defaults to stopping on <code>undefined</code>)</li>
+</ul>
+
+<h2>Using Observable Inputs</h2>
+
+<p>You can also use the <a href="https://github.com/observablehq/inputs">@observablehq/inputs</a> library for more sophisticated input controls:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        import {range, select, checkbox} from "@observablehq/inputs";
+
+        const obsSlider = view(range([0, 100], {label: "Volume", step: 1, value: 50}));
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `Volume: ${obsSlider}%`
+    </script>
+</div>
+
+<h2>Combining Multiple Inputs</h2>
+
+<p>Reactive values can depend on multiple inputs. The dependent code re-runs whenever any input changes:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const width = view(<input type="range" min="50" max="300" value="150"/>);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        const height = view(<input type="range" min="50" max="200" value="100"/>);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        const boxColor = view(<input type="color" value="#4a90d9"/>);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        <div style={`width: ${width}px; height: ${height}px; background: ${boxColor};
+            display: flex; align-items: center; justify-content: center; color: white;
+            text-shadow: 1px 1px 2px black`}>
+            {width} x {height}
+        </div>
+    </script>
+</div>
+
+<script type="importmap">
+    {
+        "imports": {
+            "highlight.js/": "https://esm.run/highlight.js/"
+        }
+    }
+</script>
+<script type="module">
+    import hljs from 'highlight.js/lib/core.js';
+    import javascript from 'highlight.js/lib/languages/javascript';
+    import xml from 'highlight.js/lib/languages/xml';
+    import typescript from 'highlight.js/lib/languages/typescript';
+
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = "https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/intellij-light.min.css";
+    document.head.appendChild(link);
+    hljs.registerLanguage('javascript', javascript);
+    hljs.registerLanguage('typescript', typescript);
+    hljs.registerLanguage('xml', xml);
+    hljs.highlightAll();
+</script>
+
+</body>
+</html>

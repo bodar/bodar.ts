@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Comments - Dataflow Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="comments.css">
+</head>
+<body>
+
+<div class="site-header">
+    <h1>Dataflow</h1>
+    <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="GitHub" src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
+</div>
+
+<nav class="docs-nav">
+    <a href="../index.html">Quick Start</a>
+    <a href="../reactivity.html">Reactivity</a>
+    <a href="../inputs.html">Inputs</a>
+    <a href="../islands.html">Islands</a>
+    <a href="./" class="active">Examples</a>
+</nav>
+
+<div class="intro">
+    <h2>Comments Widget</h2>
+    <p>A simple comments widget demonstrating reactive islands. This component is completely self-contained and could be loaded via HTMX, Unpoly, or any HTML-over-the-wire tool.</p>
+
+    <p>The widget uses <code>mutable</code> for state management and demonstrates how to handle lists with add operations.</p>
+
+    <p><a href="https://github.com/bodar/bodar.ts/blob/master/packages/dataflow/docs/examples/comments.html">View source on GitHub</a></p>
+</div>
+
+<div class="comments-widget" is="reactive-island">
+    <h2>Comments</h2>
+
+    <script type="module" is="reactive">
+        import {display, view, mutable} from "@bodar/dataflow/runtime.ts";
+
+        const comments = mutable([
+            {id: 1, author: "Alice", text: "Great article! Really helped me understand reactive programming.", time: "2 hours ago"},
+            {id: 2, author: "Bob", text: "Thanks for sharing. The examples are very clear.", time: "1 hour ago"},
+        ]);
+
+        const addComment = (author, text) => {
+            if (!text.trim()) return;
+            comments.update(list => [...list, {
+                id: Date.now(),
+                author: author || "Anonymous",
+                text: text.trim(),
+                time: "Just now"
+            }]);
+        };
+
+        const deleteComment = (id) => comments.update(list => list.filter(c => c.id !== id));
+    </script>
+
+    <script type="module" is="reactive">
+        <p class="comment-count">{comments.length} comment{comments.length !== 1 ? 's' : ''}</p>
+    </script>
+
+    <script type="module" is="reactive">
+        <div class="comment-list">
+            {comments.map(c =>
+                <div class="comment" key={c.id}>
+                    <div class="comment-header">
+                        <span class="comment-author">{c.author}</span>
+                        <span class="comment-time">{c.time}</span>
+                    </div>
+                    <p class="comment-text">{c.text}</p>
+                    <button class="delete-btn" onclick={() => deleteComment(c.id)} title="Delete comment">Delete</button>
+                </div>
+            )}
+        </div>
+    </script>
+
+    <script type="module" is="reactive">
+        <form class="comment-form" onsubmit={(e) => {
+            e.preventDefault();
+            const authorInput = document.getElementById('comment-author');
+            const textInput = document.getElementById('comment-text');
+            addComment(authorInput.value, textInput.value);
+            textInput.value = '';
+        }}>
+            <input type="text" id="comment-author" class="author-input" placeholder="Your name (optional)" />
+            <textarea id="comment-text" class="text-input" placeholder="Write a comment..." rows="3" required></textarea>
+            <button type="submit" class="submit-btn">Post Comment</button>
+        </form>
+    </script>
+</div>
+
+</body>
+</html>

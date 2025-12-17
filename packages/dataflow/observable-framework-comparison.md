@@ -2,7 +2,7 @@
 
 ## Summary
 
-The dataflow package implements the **most frequently used** Observable Framework reactivity primitives. The main gap is lifecycle management (`invalidation`).
+The dataflow package implements the **most frequently used** Observable Framework reactivity primitives, including automatic resource cleanup via invalidation.
 
 ## API Comparison
 
@@ -16,17 +16,17 @@ The dataflow package implements the **most frequently used** Observable Framewor
 | `Generators.input()` | **20 uses** | `input.ts` | DOM element → AsyncIterator |
 | `Generators.observe()` | **10 uses** | `observe.ts` | Callback → AsyncIterator |
 | `Mutable` | **3 uses** | `mutable.ts` | Reactive value with EventTarget |
+| `invalidation` | **18 uses** | `PullNode.ts` | Auto-cleanup via AbortController/Symbol.dispose |
 
 ### Missing (Prioritized by Usage)
 
 | Priority | Function | Usage | Description |
 |----------|----------|-------|-------------|
-| 1 | `invalidation` | **18 uses** | Promise for cleanup when block re-runs |
-| 2 | `visibility()` | **7 uses** | Promise resolving when element visible |
-| 3 | `Generators.width()` | **4 uses** | Element width as async generator |
-| 4 | `Generators.now()` | **3 uses** | Continuous Date.now() generator |
-| 5 | `Generators.queue()` | **2 uses** | Like observe but queues (no drops) |
-| 6 | `Generators.dark()` | **2 uses** | Dark mode preference generator |
+| 1 | `visibility()` | **7 uses** | Promise resolving when element visible |
+| 2 | `Generators.width()` | **4 uses** | Element width as async generator |
+| 3 | `Generators.now()` | **3 uses** | Continuous Date.now() generator |
+| 4 | `Generators.queue()` | **2 uses** | Like observe but queues (no drops) |
+| 5 | `Generators.dark()` | **2 uses** | Dark mode preference generator |
 
 ## Generator Lifecycle: When `return()` and `finally` Run
 
@@ -74,20 +74,14 @@ for await (const v of withCleanup(myIterator)) {
 // return() always called - whether loop breaks, throws, or completes normally
 ```
 
-## Dispose Pattern Comparison
+## Invalidation Pattern Comparison
 
 ### Observable Framework Approach
 
 ```javascript
-// Framework observe.js
-export async function* observe(initialize) {
-  const dispose = initialize((x) => { /* notify */ });
-  try {
-    while (true) { yield ... }
-  } finally {
-    if (dispose != null) dispose();
-  }
-}
+// User must await an invalidation promise
+const controller = new AbortController();
+invalidation.then(() => controller.abort());
 ```
 
 The Observable **Runtime** calls `generator.return()` when:
@@ -95,33 +89,26 @@ The Observable **Runtime** calls `generator.return()` when:
 2. The `invalidation` promise resolves
 3. Code block is re-run
 
-### Current Dataflow Approach
+### Dataflow Approach
 
 ```typescript
-// observe.ts - no dispose support
-export async function* observe<T>(init: (notify: (e: T) => any) => any, value?: T): AsyncIterator<T> {
-  init((v => resolve(value = v)));  // init return value ignored
-  // No finally block for cleanup
-}
+// Automatic - just return a disposable value
+graph.define('node', (input: number) => {
+  const controller = new AbortController();
+  // ... use controller.signal
+  return controller;  // Auto-aborted when inputs change
+});
 ```
 
-### Recommendation
+The `PullNode.setValue()` method automatically invalidates the old value before setting a new one. It handles:
+- `AbortController` - calls `.abort()`
+- `Symbol.dispose` - calls it synchronously
+- `Symbol.asyncDispose` - awaits it
 
-Add dispose support to `observe()`:
-
-```typescript
-export async function* observe<T>(
-  init: (notify: (e: T) => any) => (() => void) | void,
-  value?: T
-): AsyncIterator<T> {
-  const dispose = init((v => resolve(value = v)));
-  try {
-    // ... existing yield logic
-  } finally {
-    dispose?.();
-  }
-}
-```
+This is simpler than Observable Framework's approach because:
+1. No need to await a promise
+2. No need to manually wire up cleanup
+3. Just return a disposable value and it's handled automatically
 
 ## When Cleanup Actually Matters
 
@@ -137,4 +124,5 @@ Event listeners on DOM elements don't cause true memory leaks in modern browsers
 - Observable Framework `observe.js`: `framework/src/client/stdlib/generators/observe.js`
 - Observable Framework `resize.ts`: `framework/src/client/stdlib/resize.ts`
 - Observable Runtime: `observablehq/runtime` on GitHub - `src/runtime.js` contains `variable_return()` for generator cleanup
-- Test file: `packages/dataflow/test/api/generator-return.test.ts`
+- Dataflow invalidation: `packages/dataflow/src/PullNode.ts` - `invalidate()` function and `setValue()` method
+- Lifecycle tests: `packages/dataflow/test/Graph.test.ts` - "invalidation" and "life cycle" describe blocks

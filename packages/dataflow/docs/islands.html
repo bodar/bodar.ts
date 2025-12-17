@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reactive Islands - Dataflow</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="site-header">
+    <h1>Dataflow</h1>
+    <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="GitHub" src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
+</div>
+
+<nav class="docs-nav">
+    <a href="index.html">Quick Start</a>
+    <a href="reactivity.html">Reactivity</a>
+    <a href="inputs.html">Inputs</a>
+    <a href="islands.html" class="active">Islands</a>
+    <a href="examples/">Examples</a>
+</nav>
+
+<h1>Reactive Islands</h1>
+
+<div class="note">
+    <strong>Note:</strong> Reactive islands are a Dataflow-only feature. Observable Framework processes entire pages at build time and doesn't support isolated reactive scopes or runtime transformation. This makes Dataflow well-suited for progressive enhancement and HTML-over-the-wire architectures.
+</div>
+
+<p>Reactive islands allow you to create isolated, self-contained reactive components within a larger page. This is perfect for:</p>
+
+<ul>
+    <li><strong>Server-side rendering</strong> - Add interactivity to server-rendered HTML without a full page reload</li>
+    <li><strong>Partial hydration</strong> - Only hydrate the parts of the page that need interactivity</li>
+    <li><strong>HTMX / Unpoly / Datastar</strong> - Works seamlessly with HTML-over-the-wire tools</li>
+    <li><strong>Micro-frontends</strong> - Embed independent reactive components in any page</li>
+</ul>
+
+<h2>Basic Usage</h2>
+
+<p>Add <code>is="reactive-island"</code> to any container element to create an isolated reactive scope:</p>
+
+<pre><code class="language-html">&lt;div is="reactive-island"&gt;
+    &lt;script type="module" is="reactive"&gt;
+        const count = mutable(0);
+    &lt;/script&gt;
+    &lt;script type="module" is="reactive"&gt;
+        &lt;button onclick={() =&gt; count.value++}&gt;
+            Clicked {count.value} times
+        &lt;/button&gt;
+    &lt;/script&gt;
+&lt;/div&gt;</code></pre>
+
+<h2>Live Example: Multiple Islands</h2>
+
+<p>Each island below is completely independent - they each have their own <code>count</code> variable that doesn't conflict:</p>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+    <div class="card" is="reactive-island">
+        <h3>Island A</h3>
+        <script type="module" is="reactive">
+            import {display, view, mutable} from '@bodar/dataflow/runtime.ts';
+        </script>
+        <script type="module" is="reactive">
+            const countA = mutable(0);
+            const incrementA = () => countA.value++;
+            const decrementA = () => countA.value--;
+        </script>
+        <script type="module" is="reactive">
+            <div>
+                <button onclick={incrementA}>+</button>
+                <span style="margin: 0 1em">{countA}</span>
+                <button onclick={decrementA}>-</button>
+            </div>
+        </script>
+    </div>
+
+    <div class="card" is="reactive-island">
+        <h3>Island B</h3>
+        <script type="module" is="reactive">
+            import {display, view, mutable} from '@bodar/dataflow/runtime.ts';
+        </script>
+        <script type="module" is="reactive">
+            const countB = mutable(100);
+            const incrementB = () => countB.value++;
+            const decrementB = () => countB.value--;
+        </script>
+        <script type="module" is="reactive">
+            <div>
+                <button onclick={incrementB}>+</button>
+                <span style="margin: 0 1em">{countB}</span>
+                <button onclick={decrementB}>-</button>
+            </div>
+        </script>
+    </div>
+
+    <div class="card" is="reactive-island">
+        <h3>Island C</h3>
+        <script type="module" is="reactive">
+            import {display, view, mutable} from '@bodar/dataflow/runtime.ts';
+        </script>
+        <script type="module" is="reactive">
+            const countC = mutable(1000);
+            const incrementC = () => countC.value++;
+            const decrementC = () => countC.value--;
+        </script>
+        <script type="module" is="reactive">
+            <div>
+                <button onclick={incrementC}>+</button>
+                <span style="margin: 0 1em">{countC}</span>
+                <button onclick={decrementC}>-</button>
+            </div>
+        </script>
+    </div>
+</div>
+
+<h2>Integration with HTMX</h2>
+
+<p>Reactive islands work perfectly with <a href="https://htmx.org/">HTMX</a>. When HTMX swaps in new HTML containing a reactive island, the island automatically initializes:</p>
+
+<pre><code class="language-html">&lt;!-- Server returns this HTML fragment --&gt;
+&lt;div is="reactive-island" hx-swap-oob="true" id="widget"&gt;
+    &lt;script type="module" is="reactive"&gt;
+        import {view} from '@bodar/dataflow/runtime.ts';
+        const value = view(&lt;input type="range" min="0" max="100"/&gt;);
+    &lt;/script&gt;
+    &lt;script type="module" is="reactive"&gt;
+        `Value: ${value}`
+    &lt;/script&gt;
+&lt;/div&gt;</code></pre>
+
+<h2>Integration with Unpoly</h2>
+
+<p><a href="https://unpoly.com/">Unpoly</a> can swap reactive islands just like any other fragment:</p>
+
+<pre><code class="language-html">&lt;a href="/widget" up-target="#widget"&gt;Load Widget&lt;/a&gt;
+
+&lt;div id="widget"&gt;
+    &lt;!-- This will be replaced with a reactive island --&gt;
+&lt;/div&gt;</code></pre>
+
+<h2>Integration with Datastar</h2>
+
+<p><a href="https://data-star.dev/">Datastar</a> uses Server-Sent Events to stream HTML updates. Reactive islands can be streamed as complete components:</p>
+
+<pre><code class="language-html">&lt;!-- Streamed via SSE --&gt;
+&lt;div is="reactive-island" data-star-swap="innerHTML"&gt;
+    &lt;script type="module" is="reactive"&gt;
+        // Self-contained reactive component
+    &lt;/script&gt;
+&lt;/div&gt;</code></pre>
+
+<h2>How It Works</h2>
+
+<p>When the HTML transformer encounters a <code>is="reactive-island"</code> element:</p>
+
+<ol>
+    <li>All <code>is="reactive"</code> scripts within are collected</li>
+    <li>A dependency graph is built for just those scripts</li>
+    <li>The runtime code is injected at the end of the island (not the body)</li>
+    <li>Variables are scoped to the island - no conflicts with other islands or page-level scripts</li>
+</ol>
+
+<h2>Custom Selectors</h2>
+
+<p>You can customize which elements trigger island boundaries using the <code>selectors</code> option in the transformer:</p>
+
+<pre><code class="language-javascript">const transformer = new HTMLTransformer({
+    rewriter: new HTMLRewriter(),
+    bundler: Bundler.noOp,
+    selectors: {
+        // Custom selector for island boundaries
+        end: '#my-component, .reactive-widget'
+    }
+});</code></pre>
+
+<h2>Server-Side Transformation</h2>
+
+<p>The transformation can happen at various points in your stack:</p>
+
+<h3>At Build Time</h3>
+<pre><code class="language-javascript">import {HTMLTransformer} from '@bodar/dataflow';
+import {Bundler} from '@bodar/dataflow/bundling/Bundler.ts';
+
+const transformer = new HTMLTransformer({
+    rewriter: new HTMLRewriter(),
+    bundler: Bundler.noOp
+});
+
+const output = transformer.transform(htmlString);</code></pre>
+
+<h3>At the Edge (Cloudflare Workers)</h3>
+<pre><code class="language-javascript">export default {
+    async fetch(request) {
+        const response = await fetch(request);
+        const transformer = new HTMLTransformer({
+            rewriter: new HTMLRewriter(),
+            bundler: Bundler.noOp
+        });
+        return transformer.transform(response);
+    }
+};</code></pre>
+
+<h3>In a Service Worker</h3>
+<pre><code class="language-javascript">self.addEventListener('fetch', (event) => {
+    event.respondWith(
+        fetch(event.request).then(response => {
+            const transformer = new HTMLTransformer({
+                rewriter: new HTMLRewriter(),
+                bundler: Bundler.noOp
+            });
+            return transformer.transform(response);
+        })
+    );
+});</code></pre>
+
+<h2>Benefits Over Full SPA Frameworks</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Aspect</th>
+        <th>Full SPA</th>
+        <th>Reactive Islands</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Initial page load</td>
+        <td>Blank until JS loads</td>
+        <td>Instant server-rendered content</td>
+    </tr>
+    <tr>
+        <td>SEO</td>
+        <td>Requires SSR setup</td>
+        <td>Works out of the box</td>
+    </tr>
+    <tr>
+        <td>Bundle size</td>
+        <td>Large framework overhead</td>
+        <td>~3KB for core library</td>
+    </tr>
+    <tr>
+        <td>Hydration</td>
+        <td>Full page hydration</td>
+        <td>Only interactive parts</td>
+    </tr>
+    <tr>
+        <td>Complexity</td>
+        <td>Build pipeline required</td>
+        <td>Optional - works at runtime</td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Complete Example: Comment Widget</h2>
+
+<p>Here's a realistic example of a reactive island that could be loaded via HTMX. This widget demonstrates adding and deleting comments with proper state management.</p>
+
+<p><a href="examples/comments.html" class="example-link"><strong>View the Comments Widget Example &rarr;</strong></a></p>
+
+<p>The example demonstrates:</p>
+<ul>
+    <li>Using <code>mutable</code> for list state</li>
+    <li>Adding items with helper functions defined in the same block</li>
+    <li>Deleting items from the list</li>
+    <li>Form handling with <code>onsubmit</code></li>
+    <li>Completely self-contained - could be loaded via HTMX or Unpoly</li>
+</ul>
+
+<script type="importmap">
+    {
+        "imports": {
+            "highlight.js/": "https://esm.run/highlight.js/"
+        }
+    }
+</script>
+<script type="module">
+    import hljs from 'highlight.js/lib/core.js';
+    import javascript from 'highlight.js/lib/languages/javascript';
+    import xml from 'highlight.js/lib/languages/xml';
+
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = "https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/intellij-light.min.css";
+    document.head.appendChild(link);
+    hljs.registerLanguage('javascript', javascript);
+    hljs.registerLanguage('xml', xml);
+    hljs.highlightAll();
+</script>
+
+</body>
+</html>

@@ -8,9 +8,18 @@
 </head>
 <body>
 
-<h1>Dataflow <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="logo: GitHub"
-                                                                                            src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
-</h1>
+<div class="site-header">
+    <h1>Dataflow</h1>
+    <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="GitHub" src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
+</div>
+
+<nav class="docs-nav">
+    <a href="index.html" class="active">Quick Start</a>
+    <a href="reactivity.html">Reactivity</a>
+    <a href="inputs.html">Inputs</a>
+    <a href="islands.html">Islands</a>
+    <a href="examples/">Examples</a>
+</nav>
 
 <p>Dataflow is a lightweight reactive JavaScript library heavily inspired by <a
         href="https://observablehq.com/framework/">Observable
@@ -134,6 +143,10 @@
 <p>JSX is supported for creating DOM elements with a familiar syntax. Under the hood, JSX compiles directly to native
     DOM methods using the <a href="https://jsr.io/@bodar/jsx2dom">@bodar/jsx2dom</a> library - no virtual DOM, no
     framework overhead.</p>
+
+<div class="note">
+    <strong>Note:</strong> Observable Framework uses template literals (<code>html\`...\`</code>) for HTML. Dataflow uses JSX which provides better IDE support, type checking, and a more React-like developer experience.
+</div>
 
 <p>For example, here's a component that displays a greeting:</p>
 
@@ -265,15 +278,6 @@
     </script>
 </div>
 
-
-<h2>Examples</h2>
-
-<ul>
-    <li><a href="examples/todo.html"><strong>Todo App</strong></a> - A port of the <a
-            href="https://mdn.github.io/todo-react/">MDN React Todo App</a>. ~17KB total (~5KB gzipped) vs React's
-        ~150KB (~50KB gzipped).
-    </li>
-</ul>
 
 <script type="importmap">
     {

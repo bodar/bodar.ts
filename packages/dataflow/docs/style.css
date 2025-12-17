@@ -6,6 +6,33 @@ body {
     line-height: 1.6;
 }
 
+/* Links */
+a {
+    color: #1976d2;
+}
+
+a:hover {
+    color: #1565c0;
+}
+
+/* Site header */
+.site-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.site-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.site-header a {
+    display: flex;
+    align-items: center;
+}
+
 h1, h2, h3 {
     margin-top: 2rem;
 }
@@ -57,4 +84,89 @@ input:focus, select:focus {
     outline: none;
     border-color: #1976d2;
     box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
+/* Navigation */
+.docs-nav {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 1rem;
+}
+
+.docs-nav a {
+    color: #555;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.25rem 0;
+    border-bottom: 2px solid transparent;
+}
+
+.docs-nav a:hover {
+    color: #1976d2;
+}
+
+.docs-nav a.active {
+    color: #1976d2;
+    border-bottom-color: #1976d2;
+}
+
+/* Card styling */
+.card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #fff;
+}
+
+/* Table styling */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+th {
+    background: #f5f5f5;
+}
+
+/* Button styling */
+button {
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #f5f5f5;
+}
+
+button:active {
+    background: #eee;
+}
+
+/* Example links */
+.example-link {
+    display: inline-block;
+    padding: 0.75rem 1.25rem;
+    background: #1976d2;
+    color: #fff !important;
+    text-decoration: none;
+    border-radius: 6px;
+    margin: 0.5rem 0;
+}
+
+.example-link:hover {
+    background: #1565c0;
 }
