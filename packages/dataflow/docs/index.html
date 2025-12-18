@@ -26,8 +26,8 @@
 
 <p>Dataflow is a lightweight reactive JavaScript library heavily inspired by <a
         href="https://observablehq.com/framework/">Observable
-    Framework</a>. It brings reactive programming to plain HTML pages with minimal overhead - the core library
-    (including JSX support) is under 3KB compressed!</p>
+    Framework</a>. It brings reactive programming to plain HTML pages with minimal overhead - the runtime
+    (including JSX support) is only <script type="module" is="reactive">runtimeSize</script> compressed!</p>
 
 <p>Just add a single <code>is="reactive"</code> attribute to any script tag and it becomes reactive. That's it.</p>
 
@@ -179,6 +179,11 @@
 </div>
 
 <p>See the <a href="inputs.html">Inputs</a> page for more input types and patterns, and the <a href="reactivity.html">Reactivity</a> page for generators, invalidation, and other reactive patterns.</p>
+
+<script type="module" is="reactive">
+    const runtimeSize = fetch('https://dataflow.bodar.com/runtime.js', {method: 'HEAD'})
+        .then(r => `~${Math.round(r.headers.get('content-length') / 1024)}KB`);
+</script>
 
 <script type="importmap">
     {

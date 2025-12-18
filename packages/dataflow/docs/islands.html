@@ -115,7 +115,7 @@
 </div>
 
 <div class="note">
-    <strong>Deployment tip:</strong> When using islands, prefer import maps over bundling. With a bundler, each island gets its own copy of the runtime. With an import map, all islands share the same pre-minified runtime (~3KB). See <a href="setup.html#choosing-your-approach">Setup</a> for details.
+    <strong>Deployment tip:</strong> When using islands, prefer import maps over bundling. With a bundler, each island gets its own copy of the runtime. With an import map, all islands share the same pre-minified runtime (<script type="module" is="reactive">runtimeSize</script>). See <a href="setup.html#choosing-your-approach">Setup</a> for details.
 </div>
 
 <h2>Integration with HTMX</h2>
@@ -189,7 +189,7 @@
     <tr>
         <td>Bundle size</td>
         <td>Large framework overhead</td>
-        <td>~3KB for core library</td>
+        <td><script type="module" is="reactive">runtimeSize</script> for runtime</td>
     </tr>
     <tr>
         <td>Hydration</td>
@@ -203,6 +203,11 @@
     </tr>
     </tbody>
 </table>
+
+<script type="module" is="reactive">
+    const runtimeSize = fetch('https://dataflow.bodar.com/runtime.js', {method: 'HEAD'})
+        .then(r => `~${Math.round(r.headers.get('content-length') / 1024)}KB`);
+</script>
 
 <script type="importmap">
     {
