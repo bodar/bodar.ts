@@ -114,6 +114,10 @@
     </div>
 </div>
 
+<div class="note">
+    <strong>Deployment tip:</strong> When using islands, prefer import maps over bundling. With a bundler, each island gets its own copy of the runtime. With an import map, all islands share the same pre-minified runtime (~3KB). See <a href="setup.html#choosing-your-approach">Setup</a> for details.
+</div>
+
 <h2>Integration with HTMX</h2>
 
 <p>Reactive islands work perfectly with <a href="https://htmx.org/">HTMX</a>. When HTMX swaps in new HTML containing a reactive island, the island automatically initializes:</p>

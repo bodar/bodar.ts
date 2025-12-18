@@ -42,9 +42,53 @@ yarn add jsr:@bodar/dataflow</code></pre>
 
 <p>For browsers, use an import map with the pre-minified runtime. See <a href="#service-worker">Service Worker</a> below.</p>
 
-<h2>Build Time</h2>
+<h2 id="choosing-your-approach">Choosing Your Approach</h2>
 
-<p>For static site generation or build pipelines, use <code>HTMLTransformer</code> directly with <code>BunBundler</code> to bundle imports:</p>
+<p>Each deployment option has different trade-offs:</p>
+
+<table>
+    <thead>
+    <tr>
+        <th>Approach</th>
+        <th>Best For</th>
+        <th>Considerations</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><a href="#build-time">Build Time</a></td>
+        <td>Static sites, maximum control</td>
+        <td>Requires build step; can use bundler or import map</td>
+    </tr>
+    <tr>
+        <td><a href="#bun-serve">Bun.serve</a></td>
+        <td>Full-stack TypeScript apps</td>
+        <td>Can bundle imports for minification; use import map with <a href="islands.html">islands</a></td>
+    </tr>
+    <tr>
+        <td><a href="#cloudflare-workers">Cloudflare Workers</a></td>
+        <td>Any backend language, edge deployment</td>
+        <td>Import map only (no bundler); runtime is pre-minified</td>
+    </tr>
+    <tr>
+        <td><a href="#service-worker">Service Worker</a></td>
+        <td>Progressive enhancement, offline-first</td>
+        <td>Larger client bundle (~15KB); doesn't transform initial page load</td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="note">
+    <strong>Islands and Bundling:</strong> When using <a href="islands.html">reactive islands</a>, prefer import maps over bundling. With a bundler, each island gets its own copy of the runtime. With an import map, all islands share the same pre-minified runtime (~3KB).
+</div>
+
+<h2 id="build-time">Build Time</h2>
+
+<p>For static site generation or build pipelines, use <code>HTMLTransformer</code> directly:</p>
+
+<h3>With Bundler</h3>
+
+<p>Use <code>BunBundler</code> to bundle and minify reactive imports:</p>
 
 <div class="example">
     <pre><code class="language-javascript">import {HTMLTransformer} from '@bodar/dataflow';
@@ -58,6 +102,27 @@ const transformer = new HTMLTransformer({
 const output = transformer.transform(htmlString);</code></pre>
 </div>
 
+<h3>With Import Map</h3>
+
+<p>For pages using <a href="islands.html">reactive islands</a>, use an import map to share the runtime across islands:</p>
+
+<div class="example">
+    <pre><code class="language-javascript">import {HTMLTransformer} from '@bodar/dataflow';
+
+const importMap = {
+    imports: {
+        '@bodar/dataflow/runtime.ts': 'https://dataflow.bodar.com/runtime.js'
+    }
+};
+
+const transformer = new HTMLTransformer({
+    rewriter: new HTMLRewriter(),
+    importMap
+});
+
+const output = transformer.transform(htmlString);</code></pre>
+</div>
+
 <div class="note">
     <strong>Note:</strong> <code>HTMLTransformer</code> is stateful and should be created fresh for each transformation.
 </div>
@@ -66,9 +131,9 @@ const output = transformer.transform(htmlString);</code></pre>
 
 <p>For fetch-compatible systems, use <code>ReactiveHandler</code> middleware to automatically transform HTML responses. It handles the plumbing of checking content-type and status, and creates a fresh transformer per request.</p>
 
-<h3>Bun.serve</h3>
+<h3 id="bun-serve">Bun.serve</h3>
 
-<p>With Bun, use <code>BunBundler</code> to bundle imports at runtime:</p>
+<p>With Bun, you can use <code>BunBundler</code> to bundle and minify imports at runtime:</p>
 
 <div class="example">
     <pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
@@ -90,9 +155,35 @@ Bun.serve({
 });</code></pre>
 </div>
 
-<h3>Cloudflare Workers</h3>
+<p>For pages using <a href="islands.html">reactive islands</a>, use an import map instead to share the runtime:</p>
 
-<p>At the edge, use an import map pointing to the pre-minified runtime. The <code>importMap</code> option automatically injects the import map into the HTML head:</p>
+<div class="example">
+    <pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
+import {HTMLTransformer} from '@bodar/dataflow';
+
+const importMap = {
+    imports: {
+        '@bodar/dataflow/runtime.ts': 'https://dataflow.bodar.com/runtime.js'
+    }
+};
+
+const transformer = () => new HTMLTransformer({
+    rewriter: new HTMLRewriter(),
+    importMap
+});
+
+Bun.serve({
+    fetch: ReactiveHandler(transformer, async (request) => {
+        return new Response('&lt;html&gt;...&lt;/html&gt;', {
+            headers: {'content-type': 'text/html'}
+        });
+    })
+});</code></pre>
+</div>
+
+<h3 id="cloudflare-workers">Cloudflare Workers</h3>
+
+<p>Cloudflare Workers run at the edge and work with any backend - your HTML can come from any language or framework. Use an import map pointing to the pre-minified runtime:</p>
 
 <div class="example">
     <pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
@@ -116,7 +207,7 @@ export default {
 
 <h3 id="service-worker">Service Worker</h3>
 
-<p>Transform HTML client-side using the same pattern with an import map:</p>
+<p>Transform HTML client-side for progressive enhancement and offline-first applications:</p>
 
 <div class="example">
     <pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
@@ -140,7 +231,14 @@ self.addEventListener('fetch', (event) => {
 });</code></pre>
 </div>
 
-<p>The import map redirects imports to the pre-minified runtime (~3KB), avoiding the need for bundling.</p>
+<div class="note">
+    <strong>Considerations:</strong>
+    <ul>
+        <li>Service workers only transform pages <em>after</em> initial registration - the first page load won't be transformed unless you force a reload</li>
+        <li>The service worker bundle is larger (~15KB) because it includes the HTML transformer and JavaScript parser (Acorn)</li>
+        <li>Point the import map to your own bundled runtime rather than the CDN if you're already bundling the transformer</li>
+    </ul>
+</div>
 
 <script type="importmap">
     {
