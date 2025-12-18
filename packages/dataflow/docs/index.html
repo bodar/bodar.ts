@@ -32,8 +32,8 @@
 <p>Just add a single <code>is="reactive"</code> attribute to any script tag and it becomes reactive. That's it.</p>
 
 <p>It works like a spreadsheet: just reference a value from another reactive script tag, and the plumbing happens
-    automatically. No setState, no Redux, no reducers, no signals, no manual subscriptions. Just declarative
-    dependencies.</p>
+    automatically. For most cases, you don't need setState, Redux, or manual subscriptions - just declarative
+    dependencies. When you do need state that flows back up the graph, there's <a href="reactivity.html#mutable">mutable</a>.</p>
 
 <p>Document order does not matter, all reactive scripts will be topologically sorted and turned into a DAG before
     execution.</p>
@@ -106,9 +106,7 @@
 
 <h2>Imports</h2>
 
-<p>Any import in a reactive script is available to all other reactive scripts. So the imported display function is now
-    available
-    (document order does not matter)</p>
+<p>All top-level declarations (including imports) are shared within the same <a href="reactivity.html#reactive-scope">reactive scope</a>. By default, the whole page is a single scope, so the imported <code>display</code> function is available to all other reactive scripts (document order does not matter). For isolated scopes, see <a href="islands.html">Reactive Islands</a>.</p>
 
 <div class="example">
     <script type="module" is="reactive" data-echo="html">

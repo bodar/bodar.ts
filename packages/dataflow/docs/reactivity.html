@@ -32,15 +32,21 @@
     <li>Greater flexibility by writing code in any order</li>
 </ul>
 
-<p>Unlike reactive libraries that require special APIs, Dataflow's reactivity is implemented at the language layer: there's no new API or syntax to learn. It's vanilla JavaScript, but the code runs automatically. Code blocks run in topological order determined by variable references (a.k.a. <em>dataflow</em>), rather than in top-down document order.</p>
+<p>Unlike reactive libraries that require special APIs for every reactive value, Dataflow's core reactivity is implemented at the language layer with a minimal API. It's vanilla JavaScript, but the code runs automatically. Code blocks run in topological order determined by variable references (a.k.a. <em>dataflow</em>), rather than in top-down document order.</p>
 
 <script type="module" is="reactive">
     import {display, view, input, mutable, observe, now} from '@bodar/dataflow/runtime.ts';
 </script>
 
-<h2>Top-level Variables</h2>
+<h2 id="reactive-scope">Reactive Scope</h2>
 
-<p>A top-level variable declared in a reactive script tag can be referenced in another reactive script on the same page. So if you say:</p>
+<p>All top-level variables declared in reactive scripts are shared within the same <strong>reactive scope</strong>. By default, the entire page is a single reactive scope - any top-level variable can be referenced from any other reactive script on the page.</p>
+
+<p>For isolated scopes (useful with server-side rendering and HTML-over-the-wire tools like HTMX), see <a href="islands.html">Reactive Islands</a>.</p>
+
+<h3>Top-level Variables</h3>
+
+<p>A top-level variable declared in one reactive script can be referenced in another. So if you say:</p>
 
 <div class="example">
     <script type="module" is="reactive" data-echo>const x = 1, y = 2;</script>
@@ -63,11 +69,25 @@
     </script>
 </div>
 
+<h2>Promises</h2>
+
+<p>Any promise declared in a reactive script is implicitly awaited when referenced from another code block. This means you can write asynchronous code without explicit <code>await</code> keywords across block boundaries.</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const data = fetch('https://api.github.com/repos/octocat/Hello-World')
+            .then(r => r.json());
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `${data.name}: ${data.description}`
+    </script>
+</div>
+
 <h2>Generators</h2>
 
 <p>Values that change over time - such as interactive inputs, animation parameters, or streaming data - can be represented as <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator">generators</a>. When a top-level generator is declared, code in other blocks sees the generator's latest yielded value and re-runs each time the generator yields a new value.</p>
 
-<div class="note">As with implicit await and promises, implicit iteration of generators only applies <em>across</em> code blocks, not <em>within</em> a code block.</div>
+<div class="note">As with promises, implicit iteration of generators only applies <em>across</em> code blocks, not <em>within</em> a code block.</div>
 
 <h3>Synchronous Generators</h3>
 
@@ -109,14 +129,12 @@
 <p>Generators make animation declarative - the code runs automatically whenever the frame count changes:</p>
 
 <div class="example">
-    <canvas id="canvas0" width="640" height="30" style="max-width: 100%; height: 30px;"></canvas>
-    <script type="module" is="reactive">
-        const context0 = canvas0.getContext("2d");
-    </script>
+    <canvas id="canvas0" width="798" height="30" style="max-width: 100%; height: 30px;"></canvas>
     <script type="module" is="reactive" data-echo>
+        const context0 = canvas0.getContext("2d");
         context0.clearRect(0, 0, canvas0.width, canvas0.height);
         context0.fillStyle = "#4269d0";
-        context0.fillRect((i % (640 + 32)) - 32, 0, 32, 32);
+        context0.fillRect((i % (canvas0.width + 32)) - 32, 0, 32, 32);
     </script>
 </div>
 
@@ -209,9 +227,9 @@
     </script>
 </div>
 
-<h2>Mutable</h2>
+<h2 id="mutable">Mutable</h2>
 
-<p>Normally, only the code block that declares a variable can modify it. Use <code>mutable</code> to create a reactive value that can be modified from other code blocks:</p>
+<p>Normally, only the code block that declares a variable can modify it. Use <code>mutable</code> to create a reactive value that can be modified from other code blocks. This is similar to signals in other frameworks or <code>setState</code> in React - use it when you need state changes to flow back up the dependency graph:</p>
 
 <div class="note">
     <strong>Note:</strong> In Observable Framework, <code>Mutable</code> is implicitly available. In Dataflow, you must import <code>mutable</code> from the runtime (like all other functions). Dataflow also adds an <code>update(fn)</code> method for functional updates, e.g. <code>list.update(arr => [...arr, item])</code>.

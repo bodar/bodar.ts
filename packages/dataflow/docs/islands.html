@@ -28,7 +28,7 @@
     <strong>Note:</strong> Reactive islands are a Dataflow-only feature. Observable Framework processes entire pages at build time and doesn't support isolated reactive scopes or runtime transformation. This makes Dataflow well-suited for progressive enhancement and HTML-over-the-wire architectures.
 </div>
 
-<p>Reactive islands allow you to create isolated, self-contained reactive components within a larger page. This is perfect for:</p>
+<p>By default, all reactive scripts on a page share a single <a href="reactivity.html#reactive-scope">reactive scope</a> - top-level variables can be referenced from anywhere. Reactive islands create isolated scopes where variables are contained within the island. This is perfect for:</p>
 
 <ul>
     <li><strong>Server-side rendering</strong> - Add interactivity to server-rendered HTML without a full page reload</li>
@@ -43,35 +43,38 @@
 
 <pre><code class="language-html">&lt;div is="reactive-island"&gt;
     &lt;script type="module" is="reactive"&gt;
+        import {mutable} from '@bodar/dataflow/runtime.ts';
         const count = mutable(0);
+        const increment = () =&gt; count.value++;
+        const decrement = () =&gt; count.value--;
     &lt;/script&gt;
     &lt;script type="module" is="reactive"&gt;
-        &lt;button onclick={() =&gt; count.value++}&gt;
-            Clicked {count.value} times
-        &lt;/button&gt;
+        &lt;div&gt;
+            &lt;button onclick={decrement}&gt;-&lt;/button&gt;
+            &lt;span style="margin: 0 1em"&gt;{count}&lt;/span&gt;
+            &lt;button onclick={increment}&gt;+&lt;/button&gt;
+        &lt;/div&gt;
     &lt;/script&gt;
 &lt;/div&gt;</code></pre>
 
 <h2>Live Example: Multiple Islands</h2>
 
-<p>Each island below is completely independent - they each have their own <code>count</code> variable that doesn't conflict:</p>
+<p>Each island below contains identical code - the same <code>count</code>, <code>increment</code>, and <code>decrement</code> declarations. Because each island has its own reactive scope, these variables don't conflict:</p>
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
     <div class="card" is="reactive-island">
         <h3>Island A</h3>
         <script type="module" is="reactive">
-            import {display, view, mutable} from '@bodar/dataflow/runtime.ts';
-        </script>
-        <script type="module" is="reactive">
-            const countA = mutable(0);
-            const incrementA = () => countA.value++;
-            const decrementA = () => countA.value--;
+            import {mutable} from '@bodar/dataflow/runtime.ts';
+            const count = mutable(0);
+            const increment = () => count.value++;
+            const decrement = () => count.value--;
         </script>
         <script type="module" is="reactive">
             <div>
-                <button onclick={incrementA}>+</button>
-                <span style="margin: 0 1em">{countA}</span>
-                <button onclick={decrementA}>-</button>
+                <button onclick={decrement}>-</button>
+                <span style="margin: 0 1em">{count}</span>
+                <button onclick={increment}>+</button>
             </div>
         </script>
     </div>
@@ -79,18 +82,16 @@
     <div class="card" is="reactive-island">
         <h3>Island B</h3>
         <script type="module" is="reactive">
-            import {display, view, mutable} from '@bodar/dataflow/runtime.ts';
-        </script>
-        <script type="module" is="reactive">
-            const countB = mutable(100);
-            const incrementB = () => countB.value++;
-            const decrementB = () => countB.value--;
+            import {mutable} from '@bodar/dataflow/runtime.ts';
+            const count = mutable(100);
+            const increment = () => count.value++;
+            const decrement = () => count.value--;
         </script>
         <script type="module" is="reactive">
             <div>
-                <button onclick={incrementB}>+</button>
-                <span style="margin: 0 1em">{countB}</span>
-                <button onclick={decrementB}>-</button>
+                <button onclick={decrement}>-</button>
+                <span style="margin: 0 1em">{count}</span>
+                <button onclick={increment}>+</button>
             </div>
         </script>
     </div>
@@ -98,18 +99,16 @@
     <div class="card" is="reactive-island">
         <h3>Island C</h3>
         <script type="module" is="reactive">
-            import {display, view, mutable} from '@bodar/dataflow/runtime.ts';
-        </script>
-        <script type="module" is="reactive">
-            const countC = mutable(1000);
-            const incrementC = () => countC.value++;
-            const decrementC = () => countC.value--;
+            import {mutable} from '@bodar/dataflow/runtime.ts';
+            const count = mutable(1000);
+            const increment = () => count.value++;
+            const decrement = () => count.value--;
         </script>
         <script type="module" is="reactive">
             <div>
-                <button onclick={incrementC}>+</button>
-                <span style="margin: 0 1em">{countC}</span>
-                <button onclick={decrementC}>-</button>
+                <button onclick={decrement}>-</button>
+                <span style="margin: 0 1em">{count}</span>
+                <button onclick={increment}>+</button>
             </div>
         </script>
     </div>
