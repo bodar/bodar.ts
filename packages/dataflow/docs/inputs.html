@@ -137,7 +137,13 @@
         </select>);
     </script>
     <script type="module" is="reactive" data-echo>
-        `Selected colors: ${colors.join(', ') || 'none'}`
+        <div style="font-weight: bold">
+            Selected: {colors.length ? colors.map((c, i) =>
+                <span>
+                    <span style={`color: ${c}`}>{c}</span>{i < colors.length - 1 ? ', ' : ''}
+                </span>
+            ) : 'none'}
+        </div>
     </script>
 </div>
 
