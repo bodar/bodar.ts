@@ -237,20 +237,20 @@
 
 <div class="example">
     <script type="module" is="reactive" data-echo>
-        const countMutable = mutable(0);
-        const increment = () => countMutable.value++;
-        const reset = () => countMutable.value = 0;
+        const count = mutable(0);
+        const increment = () => count.value++;
+        const reset = () => count.value = 0;
     </script>
     <script type="module" is="reactive" data-echo>
         <div>
             <button onclick={increment}>Increment</button>
             <button onclick={reset}>Reset</button>
-            <span style="margin-left: 1em">Count: {countMutable}</span>
+            <span style="margin-left: 1em">Count: {count}</span>
         </div>
     </script>
 </div>
 
-<p>Within the defining code block, <code>count</code> is a <code>Mutable</code> object and <code>count.value</code> can be read and written. In other code blocks, <code>count</code> yields the current value.</p>
+<p>Within the defining code block, <code>count</code> is a <code>Mutable</code> object and <code>.value</code> can be read and written. In other code blocks, <code>count</code> yields the current value (not the Mutable object). To modify a mutable from another block, expose functions like <code>increment</code> and <code>reset</code> above.</p>
 
 <script type="importmap">
     {
