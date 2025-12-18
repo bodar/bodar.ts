@@ -1,11 +1,10 @@
 import {describe, expect, test} from "bun:test";
 import {HTMLTransformer} from "../../src/html/HTMLTransformer.ts";
-import {Bundler} from "../../src/bundling/Bundler.ts";
 import {scriptTemplate} from "../../src/html/EndTransformer.ts";
 
 describe("HTMLTransformer", () => {
     test("constants are not rendered, so no placeholder slot", async () => {
-        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><script data-reactive>const a = 1;</script></body>');
         expect(result).toBe(`<body><script type="module">${scriptTemplate(`renderer.register("vge10p_0",[],["a"],() => {
 const a = 1;
@@ -14,7 +13,7 @@ return {a};
     });
 
     test("can transform multiple reactive scripts", async () => {
-        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><script data-reactive>const a = 1;</script><script data-reactive>const b = a + 1;</script></body>');
         expect(result).toBe(`<body><script type="module">${scriptTemplate(`renderer.register("vge10p_0",[],["a"],() => {
 const a = 1;
@@ -27,7 +26,7 @@ return {b};
     });
 
     test("single expressions will create a placeholder display slot", async () => {
-        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><script data-reactive>const a = 1;</script><script data-reactive>`Some text ${a}`</script></body>');
         expect(result).toBe(`<body><slot name="_display_4vhz4q_1"></slot><script type="module">${scriptTemplate(`renderer.register("vge10p_0",[],["a"],() => {
 const a = 1;
@@ -37,19 +36,19 @@ renderer.register("_display_4vhz4q_1",["a"],[],(a) => \`Some text \${a}\`);`)}</
     });
 
     test("can provide an id/key via HTML id attribute", async () => {
-        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><script data-reactive id="constant">1</script></body>');
         expect(result).toBe(`<body><slot name="_display_constant"></slot><script type="module">${scriptTemplate(`renderer.register("_display_constant",[],[],() => 1);`)}</script></body>`);
     });
 
     test("if the javascript is invalid, report the error in the slot", async () => {
-        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><script data-reactive>=</script></body>');
         expect(result).toBe(`<body><slot name="_display_00001p_0"></slot><script type="module">${scriptTemplate(`renderer.register("_display_00001p_0",[],[],() => "Unexpected token (1:0)");`)}</script></body>`);
     });
 
     test("can use an import inside a cell", async () => {
-        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform(`<body><script type="module" data-reactive>
 import {iterator} from "@bodar/dataflow/observe.ts";
 const input = <input name="name" type="text" />;
@@ -65,21 +64,21 @@ return {input,name,iterator};
     });
 
     test("data-echo inserts escaped code block after output", async () => {
-        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><script type="module" data-reactive data-echo>1 + 2</script></body>');
 
         expect(result).toBe(`<body><pre><code class="language-javascript">1 + 2</code></pre><slot name="_display_0rj9ce_0"></slot><script type="module">${scriptTemplate(`renderer.register("_display_0rj9ce_0",[],[],() => 1 + 2);`)}</script></body>`);
     });
 
     test("data-echo is not included when not present", async () => {
-        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><script data-reactive>1 + 2</script></body>');
 
         expect(result).not.toContain('<pre><code');
     });
 
     test('can use is="reactive" attribute instead of data-reactive', async () => {
-        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><script is="reactive">const a = 1;</script></body>');
         expect(result).toBe(`<body><script type="module">${scriptTemplate(`renderer.register("vge10p_0",[],["a"],() => {
 const a = 1;
@@ -88,7 +87,7 @@ return {a};
     });
 
     test('can use is="reactive-island" determine where graph code is placed', async () => {
-        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><div is="reactive-island"><script is="reactive">const a = 1;</script></div></body>');
         expect(result).toBe(`<body><div is="reactive-island"><script type="module">${scriptTemplate(`renderer.register("vge10p_0",[],["a"],() => {
 const a = 1;
@@ -97,7 +96,7 @@ return {a};
     });
 
     test('supports multiple isolated reactive islands on the same page', async () => {
-        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><div id="one" is="reactive-island"><script is="reactive">const a = 1;</script></div><div id="two" is="reactive-island"><script is="reactive">const a = 1;</script></div></body>');
         expect(result).toBe(`<body><div id="one" is="reactive-island"><script type="module">${scriptTemplate(`renderer.register("vge10p_0",[],["a"],() => {
 const a = 1;
@@ -110,7 +109,7 @@ return {a};
 
 
     test('can use custom selector to determine where graph code is placed', async () => {
-        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp, selectors: {end: '#my-component'}});
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), selectors: {end: '#my-component'}});
         const result = transformer.transform('<body><div id="my-component"><script is="reactive">const a = 1;</script></div></body>');
         expect(result).toBe(`<body><div id="my-component"><script type="module">${scriptTemplate(`renderer.register("vge10p_0",[],["a"],() => {
 const a = 1;

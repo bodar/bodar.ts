@@ -1,7 +1,6 @@
 import {describe, test} from "bun:test";
 import {parseHTML} from "linkedom";
 import {HTMLTransformer} from "../../src/html/HTMLTransformer.ts";
-import {Bundler} from "../../src/bundling/Bundler.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {NodeDefinition} from "../../src/html/NodeDefinition.ts";
 import html from "../../docs/examples/todo.html" with {type: "text"}
@@ -18,7 +17,7 @@ async function renderHTML(html: string, global: any = globalThis): Promise<{
     idle: Idle,
     graph: BaseGraph
 }> {
-    const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp});
+    const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
     const reactive = transformer.transform(html);
     const browser = parseHTML(reactive);
 

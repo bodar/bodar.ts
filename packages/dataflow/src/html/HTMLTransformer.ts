@@ -5,7 +5,7 @@ import {NodeDefinition} from "./NodeDefinition.ts";
 import {ScriptTransformer} from "./ScriptTransformer.ts";
 import {EndTransformer} from "./EndTransformer.ts";
 import {StartTransformer} from "./StartTransformer.ts";
-import type {Bundler} from "../bundling/Bundler.ts";
+import {Bundler} from "../bundling/Bundler.ts";
 import {CountingIdGenerator, type IdGenerator} from "../IdGenerator.ts";
 
 export interface ImportMap {
@@ -22,7 +22,7 @@ export interface HTMLTransformerSelectors {
 
 export interface HTMLTransformerDependencies {
     rewriter: HTMLRewriter;
-    bundler: Bundler;
+    bundler?: Bundler;
     importMap?: ImportMap;
     selectors?: Partial<HTMLTransformerSelectors>;
     idGenerator?: IdGenerator;
@@ -40,9 +40,10 @@ export class HTMLTransformer {
 
     constructor(private deps: HTMLTransformerDependencies) {
         const selectors = {...DefaultSelectors, ...(deps.selectors ?? {})} as HTMLTransformerSelectors;
+        const bundler = deps.bundler ?? Bundler.noOp;
         if (this.deps.importMap) this.deps.rewriter.on(selectors.start, new StartTransformer(this.deps.importMap));
         this.deps.rewriter.on(selectors.script, new ScriptTransformer(this));
-        this.deps.rewriter.on(selectors.end, new EndTransformer(this, this.deps.bundler));
+        this.deps.rewriter.on(selectors.end, new EndTransformer(this, bundler));
         this.idGenerator = this.deps.idGenerator ?? new CountingIdGenerator();
     }
 

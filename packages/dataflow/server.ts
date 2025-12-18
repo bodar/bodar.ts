@@ -2,7 +2,6 @@ import {bundleFile} from "./src/bundling/bundle.ts";
 import {ReactiveHandler} from "./src/http/ReactiveHandler.ts";
 import {CompressionHandler} from "./src/http/CompressionHandler.ts";
 import {HTMLTransformer} from "./src/html/HTMLTransformer.ts";
-import {Bundler} from "./src/bundling/Bundler.ts";
 import {BunBundler} from "./src/bundling/BunBundler.ts";
 
 const PORT = 3000;
@@ -51,13 +50,12 @@ const app = CompressionHandler(ReactiveHandler(() => {
         }
         case 'development':
         default: {
-            const importMap = {
-                imports: {
-                    "@bodar/": "/",
-                    "@observablehq/": "https://esm.run/@observablehq/"
-                }
-            };
-            return new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: Bundler.noOp, importMap});
+            return new HTMLTransformer({rewriter: new HTMLRewriter(), importMap: {
+                    imports: {
+                        "@bodar/": "/",
+                        "@observablehq/": "https://esm.run/@observablehq/"
+                    }
+                }});
         }
     }
 }, router));

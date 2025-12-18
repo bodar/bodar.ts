@@ -92,12 +92,11 @@ Bun.serve({
 
 <h3>Cloudflare Workers</h3>
 
-<p>At the edge, use <code>Bundler.noOp</code> with an import map pointing to the pre-minified runtime. The <code>importMap</code> option automatically injects the import map into the HTML head:</p>
+<p>At the edge, use an import map pointing to the pre-minified runtime. The <code>importMap</code> option automatically injects the import map into the HTML head:</p>
 
 <div class="example">
     <pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
 import {HTMLTransformer} from '@bodar/dataflow';
-import {Bundler} from '@bodar/dataflow/bundling/Bundler.ts';
 
 const importMap = {
     imports: {
@@ -107,7 +106,6 @@ const importMap = {
 
 const transformer = () => new HTMLTransformer({
     rewriter: new HTMLRewriter(),
-    bundler: Bundler.noOp,
     importMap
 });
 
@@ -123,7 +121,6 @@ export default {
 <div class="example">
     <pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
 import {HTMLTransformer} from '@bodar/dataflow';
-import {Bundler} from '@bodar/dataflow/bundling/Bundler.ts';
 
 const importMap = {
     imports: {
@@ -133,7 +130,6 @@ const importMap = {
 
 const transformer = () => new HTMLTransformer({
     rewriter: new HTMLRewriter(),
-    bundler: Bundler.noOp,
     importMap
 });
 
