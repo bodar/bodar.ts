@@ -235,7 +235,7 @@ self.addEventListener('fetch', (event) => {
     <strong>Considerations:</strong>
     <ul>
         <li>Service workers only transform pages <em>after</em> initial registration - the first page load won't be transformed unless you force a reload</li>
-        <li>The service worker bundle is larger (~15KB) because it includes the HTML transformer and JavaScript parser (Acorn)</li>
+        <li>The service worker bundle is larger because it includes the HTML transformer and JavaScript parser (Acorn)</li>
         <li>Point the import map to your own bundled runtime rather than the CDN if you're already bundling the transformer</li>
     </ul>
 </div>

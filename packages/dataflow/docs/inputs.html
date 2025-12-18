@@ -40,12 +40,12 @@
 </ol>
 
 <div class="note">
-    <strong>Note:</strong> Dataflow's <code>view()</code> works like Observable Framework's but supports JSX syntax for creating elements. Compare <code>view(&lt;input type="text"/&gt;)</code> vs Observable's <code>view(html\`&lt;input type=text&gt;\`)</code>.
+    <strong>Note:</strong> Dataflow's <code>view()</code> works like Observable Framework's but supports JSX syntax for creating elements. Compare <code>view(&lt;input type="text"/&gt;)</code> vs Observable's <code>view(html`&lt;input type=text&gt;`)</code>.
 </div>
 
 <div class="example">
     <script type="module" is="reactive" data-echo>
-        const name = view(<input type="text" value="World" placeholder="Enter your name"/>);
+        const name = view(<input type="text" placeholder="Enter your name"/>);
     </script>
     <script type="module" is="reactive" data-echo>
         `Hello, ${name}!`
@@ -177,16 +177,13 @@
 
 <div class="example">
     <script type="module" is="reactive" data-echo>
-        const myInput = <input type="text" placeholder="Type here..." value="initial"/>;
+        const myInput = <input type="text" placeholder="Type here..."/>;
         const myValue = input(myInput);
     </script>
-    <script type="module" is="reactive" data-echo>
-        <div class="card" style="display: grid; gap: 0.5rem;">
-        <div class="card" style="display: grid; gap: 0.5rem;">
-            <div>Enter text: {myInput}</div>
-            <div>You typed: <strong>{myValue}</strong></div>
-        </div>
-    </script>
+    <div class="card">
+        <div>Enter text: <script type="module" is="reactive">myInput</script></div>
+        <div>You typed: <strong><script type="module" is="reactive">myValue</script></strong></div>
+    </div>
 </div>
 
 <h3>Custom Events</h3>
