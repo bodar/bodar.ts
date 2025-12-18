@@ -57,23 +57,23 @@ yarn add jsr:@bodar/dataflow</code></pre>
     <tbody>
     <tr>
         <td><a href="#build-time">Build Time</a></td>
-        <td>Static sites, maximum control</td>
+        <td>Static sites</td>
         <td>Requires build step; can use bundler or import map</td>
     </tr>
     <tr>
         <td><a href="#bun-serve">Bun.serve</a></td>
         <td>Full-stack TypeScript apps</td>
-        <td>Can bundle imports for minification; use import map with <a href="islands.html">islands</a></td>
+        <td>Can use bundler or import map</td>
     </tr>
     <tr>
         <td><a href="#cloudflare-workers">Cloudflare Workers</a></td>
         <td>Any backend language, edge deployment</td>
-        <td>Import map only (no bundler); runtime is pre-minified</td>
+        <td>Import map only (no bundler)</td>
     </tr>
     <tr>
         <td><a href="#service-worker">Service Worker</a></td>
-        <td>Progressive enhancement, offline-first</td>
-        <td>Larger client bundle (~15KB); doesn't transform initial page load</td>
+        <td>No build or server available</td>
+        <td>Larger runtime; doesn't transform initial page load</td>
     </tr>
     </tbody>
 </table>
