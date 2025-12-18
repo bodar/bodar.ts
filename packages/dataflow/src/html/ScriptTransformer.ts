@@ -24,7 +24,7 @@ export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementC
     private getJavascript() {
         const javascript = this.chunks.join('');
         this.chunks.length = 0;
-        return javascript.trim();
+        return trimIndent(javascript);
     }
 
     text(chunk: HTMLRewriterTypes.Text): void | Promise<void> {
@@ -47,5 +47,24 @@ export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementC
             return ` ${key}${value ? `="${value}"` : ''}`;
         }).join('');
     }
+}
 
+export function trimIndent(text: string): string {
+    const lines = text.split('\n');
+    const firstNonEmptyIndex = lines.findIndex(line => line.trim().length > 0);
+    if (firstNonEmptyIndex === -1) return '';
+
+    const firstNonEmptyLine = lines[firstNonEmptyIndex];
+    const match = firstNonEmptyLine.match(/^(\s*)/);
+    const indent = match ? match[1] : '';
+    const indentLength = indent.length;
+
+    const relevantLines = lines.slice(firstNonEmptyIndex);
+
+    if (indentLength === 0) return relevantLines.map(line => line.trimEnd()).join('\n').trimEnd();
+
+    return relevantLines
+        .map(line => (line.startsWith(indent) ? line.slice(indentLength) : line.trimStart()).trimEnd())
+        .join('\n')
+        .trimEnd();
 }

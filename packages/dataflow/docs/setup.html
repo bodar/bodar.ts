@@ -28,7 +28,8 @@
 
 <h2>Installation</h2>
 
-<pre><code class="language-bash">npx jsr add @bodar/dataflow
+<div class="example">
+    <pre><code class="language-bash">npx jsr add @bodar/dataflow
 
 bunx jsr add @bodar/dataflow
 
@@ -37,6 +38,7 @@ deno add jsr:@bodar/dataflow
 pnpm i jsr:@bodar/dataflow
 
 yarn add jsr:@bodar/dataflow</code></pre>
+</div>
 
 <p>For browsers, use an import map with the pre-minified runtime. See <a href="#service-worker">Service Worker</a> below.</p>
 
@@ -44,7 +46,8 @@ yarn add jsr:@bodar/dataflow</code></pre>
 
 <p>For static site generation or build pipelines, use <code>HTMLTransformer</code> directly with <code>BunBundler</code> to bundle imports:</p>
 
-<pre><code class="language-javascript">import {HTMLTransformer} from '@bodar/dataflow';
+<div class="example">
+    <pre><code class="language-javascript">import {HTMLTransformer} from '@bodar/dataflow';
 import {BunBundler} from '@bodar/dataflow/bundling/BunBundler.ts';
 
 const transformer = new HTMLTransformer({
@@ -53,6 +56,7 @@ const transformer = new HTMLTransformer({
 });
 
 const output = transformer.transform(htmlString);</code></pre>
+</div>
 
 <div class="note">
     <strong>Note:</strong> <code>HTMLTransformer</code> is stateful and should be created fresh for each transformation.
@@ -66,7 +70,8 @@ const output = transformer.transform(htmlString);</code></pre>
 
 <p>With Bun, use <code>BunBundler</code> to bundle imports at runtime:</p>
 
-<pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
+<div class="example">
+    <pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
 import {HTMLTransformer} from '@bodar/dataflow';
 import {BunBundler} from '@bodar/dataflow/bundling/BunBundler.ts';
 
@@ -83,12 +88,14 @@ Bun.serve({
         });
     })
 });</code></pre>
+</div>
 
 <h3>Cloudflare Workers</h3>
 
 <p>At the edge, use <code>Bundler.noOp</code> with an import map pointing to the pre-minified runtime. The <code>importMap</code> option automatically injects the import map into the HTML head:</p>
 
-<pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
+<div class="example">
+    <pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
 import {HTMLTransformer} from '@bodar/dataflow';
 import {Bundler} from '@bodar/dataflow/bundling/Bundler.ts';
 
@@ -107,12 +114,14 @@ const transformer = () => new HTMLTransformer({
 export default {
     fetch: ReactiveHandler(transformer, fetch)
 };</code></pre>
+</div>
 
 <h3 id="service-worker">Service Worker</h3>
 
 <p>Transform HTML client-side using the same pattern with an import map:</p>
 
-<pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
+<div class="example">
+    <pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
 import {HTMLTransformer} from '@bodar/dataflow';
 import {Bundler} from '@bodar/dataflow/bundling/Bundler.ts';
 
@@ -133,6 +142,7 @@ const handler = ReactiveHandler(transformer, fetch);
 self.addEventListener('fetch', (event) => {
     event.respondWith(handler(event.request));
 });</code></pre>
+</div>
 
 <p>The import map redirects imports to the pre-minified runtime (~3KB), avoiding the need for bundling.</p>
 
