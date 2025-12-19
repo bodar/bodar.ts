@@ -28,23 +28,29 @@ return {b};
     test("single expressions will create a placeholder display slot", async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><script data-reactive>const a = 1;</script><script data-reactive>`Some text ${a}`</script></body>');
-        expect(result).toBe(`<body><slot name="_display_4vhz4q_1"></slot><script type="module">${scriptTemplate(`renderer.register("vge10p_0",[],["a"],() => {
+        expect(result).toBe(`<body><slot name="4vhz4q_1"></slot><script type="module">${scriptTemplate(`renderer.register("vge10p_0",[],["a"],() => {
 const a = 1;
 return {a};
 });
-renderer.register("_display_4vhz4q_1",["a"],[],(a) => \`Some text \${a}\`);`)}</script></body>`);
+renderer.register("4vhz4q_1",["a"],[],(a) => {
+return \`Some text \${a}\`;
+});`)}</script></body>`);
     });
 
     test("can provide an id/key via HTML id attribute", async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><script data-reactive id="constant">1</script></body>');
-        expect(result).toBe(`<body><slot name="_display_constant"></slot><script type="module">${scriptTemplate(`renderer.register("_display_constant",[],[],() => 1);`)}</script></body>`);
+        expect(result).toBe(`<body><slot name="constant"></slot><script type="module">${scriptTemplate(`renderer.register("constant",[],[],() => {
+return 1;
+});`)}</script></body>`);
     });
 
     test("if the javascript is invalid, report the error in the slot", async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><script data-reactive>=</script></body>');
-        expect(result).toBe(`<body><slot name="_display_00001p_0"></slot><script type="module">${scriptTemplate(`renderer.register("_display_00001p_0",[],[],() => "Unexpected token (1:0)");`)}</script></body>`);
+        expect(result).toBe(`<body><slot name="00001p_0"></slot><script type="module">${scriptTemplate(`renderer.register("00001p_0",[],[],() => {
+return "Unexpected token (1:0)"
+});`)}</script></body>`);
     });
 
     test("can use an import inside a cell", async () => {
@@ -67,7 +73,9 @@ return {input,name,iterator};
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><script type="module" data-reactive data-echo>1 + 2</script></body>');
 
-        expect(result).toBe(`<body><pre><code class="language-javascript">1 + 2</code></pre><slot name="_display_0rj9ce_0"></slot><script type="module">${scriptTemplate(`renderer.register("_display_0rj9ce_0",[],[],() => 1 + 2);`)}</script></body>`);
+        expect(result).toBe(`<body><pre><code class="language-javascript">1 + 2</code></pre><slot name="0rj9ce_0"></slot><script type="module">${scriptTemplate(`renderer.register("0rj9ce_0",[],[],() => {
+return 1 + 2;
+});`)}</script></body>`);
     });
 
     test("data-echo is not included when not present", async () => {
