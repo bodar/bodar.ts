@@ -2,7 +2,7 @@
  * Entry point for runtime
  * */
 export {display, Display} from './api/display.ts';
-export {view} from './api/view.ts';
+export {view, View} from './api/view.ts';
 export {input} from './api/input.ts';
 export {observe} from './api/observe.ts';
 export {mutable} from './api/mutable.ts';

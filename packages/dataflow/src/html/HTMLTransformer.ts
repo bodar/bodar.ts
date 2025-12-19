@@ -56,10 +56,10 @@ export class HTMLTransformer {
 
     private definitions: NodeDefinition[] = [];
 
-    addScript(javascript: string, id?: string): string[] {
+    addScript(javascript: string, id?: string): NodeDefinition {
         const definition = NodeDefinition.parse(javascript, id, this.idGenerator);
         this.definitions.push(definition);
-        return [definition.key, ...definition.outputs]
+        return definition;
     }
 
     popDefinitions(): NodeDefinition[] {

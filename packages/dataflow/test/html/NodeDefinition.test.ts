@@ -14,11 +14,11 @@ describe("NodeDefinition", () => {
             const input = display(<input name="name" type="text" value="Dan"/>);
         `, '1234');
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["jsx"],["input","Display","_display_1234"],async(jsx) => {
+        expect(definition.toString()).toBe(`"1234",["jsx"],["input","Display"],async(jsx) => {
 const [{Display}] = await Promise.all([import('@bodar/dataflow/api/display.ts')]);
 const display = Display.for("1234");
 const input = display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
-return {input,Display,_display_1234:display.pop()};
+return {input,Display};
 }`)
     });
 
@@ -29,10 +29,11 @@ return {input,Display,_display_1234:display.pop()};
             const input = view(<input name="name" type="text" value="Dan"/>);
         `, '1234');
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["jsx"],["input","view","_display_1234"],async(jsx) => {
-const [{view}] = await Promise.all([import('@bodar/dataflow/api/view.ts')]);
+        expect(definition.toString()).toBe(`"1234",["jsx"],["input","View"],async(jsx) => {
+const [{View}] = await Promise.all([import('@bodar/dataflow/api/view.ts')]);
+const view = View.for("1234");
 const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
-return {input,view,_display_1234:view.pop()};
+return {input,View};
 }`)
     });
 
@@ -42,17 +43,22 @@ return {input,view,_display_1234:view.pop()};
             const input = view(<input name="name" type="text" value="Dan"/>);
         `, '1234');
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["view","jsx"],["input","_display_1234"],(view,jsx) => {
+        expect(definition.toString()).toBe(`"1234",["View","jsx"],["input"],(View,jsx) => {
+const view = View.for("1234");
 const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
-return {input,_display_1234:view.pop()};
+return {input};
 }`)
     });
 
-    test("when the javascript is a single expression, prefix the key with _display_", async () => {
+    test("when the javascript is a single expression it has implicit display", async () => {
         // language=JavaScript
         const definition = NodeDefinition.parse(`<input name="name" type="text" value="Dan"/>`, '1234');
+        expect(definition.hasImplicitDisplay()).toBe(true);
+        expect(definition.hasDisplay()).toBe(true);
         // language=JavaScript
-        expect(definition.toString()).toBe(`"_display_1234",["jsx"],[],(jsx) => jsx.createElement("input", {"name": "name","type": "text","value": "Dan"})`);
+        expect(definition.toString()).toBe(`"1234",["jsx"],[],(jsx) => {
+return jsx.createElement("input", {"name": "name","type": "text","value": "Dan"});
+}`);
     });
 
     test("any import becomes an output", async () => {
@@ -73,6 +79,24 @@ return {Renderer};
         expect(definition.toString()).toBe(`"1234",["jsx"],["greeting"],(jsx) => {
 const greeting = name => jsx.createElement("i", null, ["Hello ", name, "!"]);
 return {greeting};
+}`);
+    });
+
+    test("does not blow up with single for statement", async () => {
+        // language=JavaScript
+        const definition = NodeDefinition.parse(`for (let i = 0; i < 5; ++i) {alert(i);}`, '1234');
+        // language=JavaScript
+        expect(definition.toString()).toBe(`"1234",["alert"],[],(alert) => {
+for (let i = 0; i < 5; ++i) {alert(i);}
+}`);
+    });
+
+    test("does not blow up with single block statement", async () => {
+        // language=JavaScript
+        const definition = NodeDefinition.parse(`{ if (typeof gc === 'function') gc(); }`, '1234');
+        // language=JavaScript
+        expect(definition.toString()).toBe(`"1234",["gc"],[],(gc) => {
+{if (typeof gc === 'function') gc();}
 }`);
     });
 });

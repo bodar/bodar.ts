@@ -2,6 +2,8 @@
  * Renderer module
  * **/
 import {BaseGraph} from "../BaseGraph.ts";
+import type {Node as GraphNode} from "../Node.ts";
+import {Display} from "../api/display.ts";
 
 export interface RendererDependencies {
     graph: BaseGraph,
@@ -21,11 +23,17 @@ export class Renderer {
 
     render(): void {
         const {document, DocumentFragment} = this.deps;
-        this.deps.graph.sinks().forEach(async (node) => {
-            const slot = document.querySelector(`slot[name="${node.key}"]`);
+        const display = Array.from(document.querySelectorAll<HTMLSlotElement>(`slot[name]`))
+            .map(slot => this.deps.graph.get(slot.name))
+            .filter(n => n) as GraphNode<any>[];
+        const nodes = new Set<GraphNode<any>>([...display, ...this.deps.graph.sinks()]);
+        nodes.forEach(async node => {
+            const slot = document.querySelector<HTMLSlotElement>(`slot[name="${node.key}"]`);
             for await (const {value: update} of node) {
                 if (slot) {
-                    const newNode = this.createUpdateNode(update);
+                    const displays = Display.for(node.key).pop();
+                    const updates = [...(Array.isArray(update) ? update : [update]), ...displays];
+                    const newNode = this.createUpdateNode(updates);
                     if (!newNode) continue;
                     if (newNode instanceof DocumentFragment) {
                         while (slot.childNodes.length > newNode.childNodes.length) slot.removeChild(slot.lastChild!);
@@ -43,7 +51,6 @@ export class Renderer {
                     } else {
                         slot.replaceChildren(newNode);
                     }
-
                 }
             }
         });

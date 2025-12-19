@@ -1,5 +1,4 @@
 import {HTMLTransformer} from "./HTMLTransformer.ts";
-import {display} from "../api/display.ts";
 
 export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
     private chunks: string[] = [];
@@ -15,8 +14,8 @@ export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementC
 
     endTag(end: HTMLRewriterTypes.EndTag, attributes: Map<string, string>) {
         const javascript = this.getJavascript();
-        const names = this.controller.addScript(javascript, attributes.get('id'));
-        end.after(names.filter(name => name.startsWith(display.prefix)).map(name => `<slot name="${name}"></slot>`).join(""), {html: true});
+        const definition = this.controller.addScript(javascript, attributes.get('id'));
+        if (definition.hasDisplay()) end.after(`<slot name="${definition.key}"></slot>`, {html: true});
         if (attributes.has('data-echo')) this.echoScript(end, attributes, javascript)
         end.remove();
     }
@@ -35,9 +34,9 @@ export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementC
     private echoScript(end: HTMLRewriterTypes.EndTag, attributes: Map<string, string>, javascript: string): void {
         const echo = attributes.get('data-echo') || 'javascript';
         end.after('</code></pre>', {html: true});
-        if(echo === 'html') end.after('\n</script>');
+        if (echo === 'html') end.after('\n</script>');
         end.after(javascript);
-        if(echo === 'html') end.after(`<script${(this.formatAttributes(attributes))}>` + '\n');
+        if (echo === 'html') end.after(`<script${(this.formatAttributes(attributes))}>` + '\n');
         end.after(`<pre><code class="language-${echo}">`, {html: true});
     }
 
