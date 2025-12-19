@@ -6,6 +6,7 @@ import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import type {Version} from "../src/Node.ts";
 import {observableSource} from "./api/observe.test.ts";
+import {mutable} from "../src/api/mutable.ts";
 
 describe("graph", () => {
     test("if the function has a name use that as the key", async () => {
@@ -251,6 +252,40 @@ describe("graph", () => {
             }
 
             expect(source.disposed).toBe(true);
+        });
+
+        test("if a source yields a new input while we are yielding it interrupts and cleans up", async () => {
+            const graph = new Graph();
+            const source = mutable(1);
+            graph.define('source', () => source);
+            let disposed = 0;
+            let count = 0;
+            const {generator} = graph.define(function* generator(source: number) {
+                try {
+                    while (true) {
+                        yield source * count++;
+                    }
+                } finally {
+                    disposed++;
+                }
+            });
+
+            const iterator = generator[Symbol.asyncIterator]();
+            expect(await iterator.next()).toEqual({done: false, value: {value: 0, version: 0}});
+            expect(await iterator.next()).toEqual({done: false, value: {value: 1, version: 1}});
+            expect(await iterator.next()).toEqual({done: false, value: {value: 2, version: 2}});
+            expect(disposed).toEqual(0);
+            source.value = 10;
+            expect(disposed).toEqual(0);
+            // Ideally this would be 30 here but because the pull is eager, each iterator locks
+            // in the next value before the input can bubble up (it's a race condition)
+            // If the result was async the source could beat it
+            expect(await iterator.next()).toEqual({done: false, value: {value: 3, version: 3}});
+            expect(disposed).toEqual(1);
+            expect(await iterator.next()).toEqual({done: false, value: {value: 40, version: 4}});
+            expect(disposed).toEqual(1);
+            expect(await iterator.next()).toEqual({done: false, value: {value: 50, version: 5}});
+            expect(disposed).toEqual(1);
         });
     });
 })
