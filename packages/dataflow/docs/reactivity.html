@@ -124,6 +124,25 @@
     </script>
 </div>
 
+<h3>Display Inside Generators</h3>
+
+<p>Testing whether <code>display()</code> works inside a generator body:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const genWithDisplay = async function* () {
+            for (let k = 0; k < 5; ++k) {
+                display(`Generator iteration ${k}`);
+                yield k;
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+            }
+        }
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `Current value: ${genWithDisplay}`
+    </script>
+</div>
+
 <h3>Animation Example</h3>
 
 <p>Generators make animation declarative - the code runs automatically whenever the frame count changes:</p>

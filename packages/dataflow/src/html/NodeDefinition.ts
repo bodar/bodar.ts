@@ -37,11 +37,12 @@ export class NodeDefinition {
     }
 
     get inputs(): string[] {
-        return this._inputs;
+        return this._inputs.map(i => i === 'display' ? 'Display' : i);
     }
 
     get outputs(): string[] {
-        return [...this._outputs, ...(this.hasExplicitDisplay() || this.hasExplicitView() ? [display.format(this.key)] : [])];
+        const transformed = this._outputs.map(o => o === 'display' ? 'Display' : o);
+        return [...transformed, ...(this.hasExplicitDisplay() || this.hasExplicitView() ? [display.format(this.key)] : [])];
     }
 
     get returnStatement(): string {
@@ -52,9 +53,32 @@ export class NodeDefinition {
         return this._imports;
     }
 
+    private convertImports(): string {
+        if (this._imports.isEmpty()) return "";
+
+        const entries = Array.from(this._imports.data.entries());
+
+        const specifierStrings = entries.map(([source, imp]) => {
+            if (source.startsWith('@bodar/dataflow/')) {
+                return imp.specifier.replace(/\bdisplay\b/, 'Display');
+            }
+            return imp.specifier;
+        });
+
+        const importStrings = entries.map(([source]) => `import('${source}')`);
+        return `const [${specifierStrings.join(', ')}] = await Promise.all([${importStrings.join(', ')}]);\n`;
+    }
+
     get body(): string {
         if (this.isSingleExpression() && this._body.endsWith(';')) return this._body.slice(0, -1);
-        return this.imports + this._body;
+
+        let result = this.convertImports();
+
+        if (this.hasExplicitDisplay()) {
+            result += `const display = Display.for(${JSON.stringify(this._key)});\n`;
+        }
+
+        return result + this._body;
     }
 
     isSingleExpression(): boolean {

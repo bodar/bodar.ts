@@ -12,7 +12,7 @@ export class Import {
 }
 
 export class Imports {
-    constructor(private data: Map<string, Import>) {
+    constructor(public data: Map<string, Import>) {
     }
 
     static from(program: Program): Imports {

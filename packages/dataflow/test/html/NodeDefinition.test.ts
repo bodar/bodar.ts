@@ -14,10 +14,11 @@ describe("NodeDefinition", () => {
             const input = display(<input name="name" type="text" value="Dan"/>);
         `, '1234');
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["jsx"],["input","display","_display_1234"],async(jsx) => {
-const [{display}] = await Promise.all([import('@bodar/dataflow/api/display.ts')]);
+        expect(definition.toString()).toBe(`"1234",["jsx"],["input","Display","_display_1234"],async(jsx) => {
+const [{Display}] = await Promise.all([import('@bodar/dataflow/api/display.ts')]);
+const display = Display.for("1234");
 const input = display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
-return {input,display,_display_1234:display.pop()};
+return {input,Display,_display_1234:display.pop()};
 }`)
     });
 
