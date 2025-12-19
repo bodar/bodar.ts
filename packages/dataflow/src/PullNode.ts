@@ -142,6 +142,6 @@ async function invalidate(value: unknown): Promise<void> {
             }
         }
     } catch (e) {
-        console.error('Error during dispose:', e);
+        console.error('Error during invalidate:', e);
     }
 }
