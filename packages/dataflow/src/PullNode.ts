@@ -64,8 +64,7 @@ export class PullNode<T> implements Node<T> {
                     break;
                 }
             }
-        }
-        finally {
+        } finally {
             await Promise.all([...iterators.values()].map((iterator) => iterator.return?.()));
         }
     }
@@ -129,17 +128,15 @@ function version<A>(fun: () => AsyncIterable<A>): AsyncIterable<Version<A>> {
     }
 }
 
-async function invalidate(value: unknown): Promise<void> {
-    if (value === undefined || value === null) return;
+async function invalidate(value: any): Promise<void> {
     try {
+        if (value === undefined || value === null) return;
         if (value instanceof AbortController) {
             value.abort();
-        } else if (typeof value === 'object') {
-            if (Symbol.asyncDispose in value) {
-                await (value as AsyncDisposable)[Symbol.asyncDispose]();
-            } else if (Symbol.dispose in value) {
-                (value as Disposable)[Symbol.dispose]();
-            }
+        } else if (typeof value[Symbol.dispose] === 'function') {
+            value[Symbol.dispose]();
+        } else if (typeof value[Symbol.asyncDispose] === 'function') {
+            await value[Symbol.asyncDispose]();
         }
     } catch (e) {
         console.error('Error during invalidate:', e);
