@@ -24,11 +24,6 @@ export class PullNode<T> implements Node<T> {
         return this.shared[Symbol.asyncIterator]();
     }
 
-    private async setValue(newValue: T): Promise<void> {
-        await invalidate(this.value);
-        this.value = newValue;
-    }
-
     async* create(): AsyncIterable<T> {
         const iterators = new Map<string, AsyncIterator<any>>();
         const pending = new Map<string, Promise<void>>();
@@ -56,7 +51,8 @@ export class PullNode<T> implements Node<T> {
                     const newInputs = resolved.get('inputs');
                     resolved.delete('inputs');
                     if (!equal(this.inputs, newInputs)) {
-                        await this.setValue(this.fun(...newInputs.map((v: Version<any>) => v.value)));
+                        await invalidate(this.value);
+                        this.value = this.fun(...newInputs.map((v: Version<any>) => v.value));
                         this.inputs = newInputs.slice();
                     }
                     iterators.set('values', toAsyncIterable<T>(this.value)[Symbol.asyncIterator]());
@@ -135,13 +131,17 @@ function version<A>(fun: () => AsyncIterable<A>): AsyncIterable<Version<A>> {
 
 async function invalidate(value: unknown): Promise<void> {
     if (value === undefined || value === null) return;
-    if (value instanceof AbortController) {
-        value.abort();
-    } else if (typeof value === 'object') {
-        if (Symbol.asyncDispose in value) {
-            await (value as AsyncDisposable)[Symbol.asyncDispose]();
-        } else if (Symbol.dispose in value) {
-            (value as Disposable)[Symbol.dispose]();
+    try {
+        if (value instanceof AbortController) {
+            value.abort();
+        } else if (typeof value === 'object') {
+            if (Symbol.asyncDispose in value) {
+                await (value as AsyncDisposable)[Symbol.asyncDispose]();
+            } else if (Symbol.dispose in value) {
+                (value as Disposable)[Symbol.dispose]();
+            }
         }
+    } catch (e) {
+        console.error('Error during dispose:', e);
     }
 }
