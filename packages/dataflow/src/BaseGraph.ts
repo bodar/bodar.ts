@@ -57,6 +57,10 @@ export class BaseGraph {
     sources(): Node<any>[] {
         return Array.from(this.nodes.values().filter(n => n.dependencies.length === 0));
     }
+
+    dependents(node: Node<any>): Node<any>[] {
+        return Array.from(this.nodes.values().filter(n => n.dependencies.some(d => d.key === node.key)));
+    }
 }
 
 

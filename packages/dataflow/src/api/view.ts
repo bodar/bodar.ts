@@ -3,7 +3,7 @@
  */
 
 import {input, type SupportedInputs} from "./input.ts";
-import {Display, display, type SupportedValue} from "./display.ts";
+import {Display, display, type DisplayDependencies, type SupportedValue} from "./display.ts";
 
 export function view(value: HTMLElement): AsyncIterator<any> {
     return input(display(value as SupportedInputs));
@@ -16,9 +16,10 @@ export interface ViewContract {
 }
 
 export class View {
-    static for(key: string): ViewContract {
+    static for(key: string, deps: DisplayDependencies): ViewContract {
+        const display = Display.for(key, deps);
         return (value: HTMLElement) => {
-            return input(Display.for(key)(value as SupportedInputs));
+            return input(display(value as SupportedInputs));
         };
     }
 }

@@ -158,6 +158,27 @@ describe("graph", () => {
         assertThat(graph.sources(), equals([a, c, e]));
     });
 
+    test("can detect direct dependents of a node", async () => {
+        const graph = new Graph();
+        const {a} = graph.define('a', () => 1);
+        const {b} = graph.define('b', (a: number) => a + 2);
+        const {c} = graph.define('c', () => 3);
+        const {d} = graph.define('d', (b: number, c: number) => b + c + 4);
+        assertThat(graph.dependents(a), equals([b]));
+        assertThat(graph.dependents(b), equals([d]));
+        assertThat(graph.dependents(c), equals([d]));
+        assertThat(graph.dependents(d), equals([]));
+    });
+
+    test("dependents returns multiple nodes when node has multiple dependents", async () => {
+        const graph = new Graph();
+        const {a} = graph.define('a', () => 1);
+        const {b} = graph.define('b', (a: number) => a + 2);
+        const {c} = graph.define('c', (a: number) => a + 3);
+        const {d} = graph.define('d', (a: number) => a + 4);
+        assertThat(graph.dependents(a), equals([b, c, d]));
+    });
+
     describe("invalidation", () => {
         test("AbortController is aborted when new inputs arrive", async () => {
             const graph = new Graph();

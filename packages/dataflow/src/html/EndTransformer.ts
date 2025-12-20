@@ -24,11 +24,12 @@ export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementCont
 
 export function scriptTemplate(registrations: string):string {
     // language=javascript
-    return `import {Renderer, JSX2DOM, BaseGraph, Idle, Throttle, chain} from "@bodar/dataflow/runtime.ts";
-const idle = new Idle(Throttle.auto());
-const graph = new BaseGraph(undefined, idle.strategy, globalThis);
-const renderer = new Renderer(chain(globalThis, {graph}));
-renderer.register("jsx", [], [], () => new JSX2DOM(globalThis));
-${registrations}
-renderer.render();`;
+    return `import {Display, View, Renderer, JSX2DOM, BaseGraph, Idle, Throttle, chain} from "@bodar/dataflow/runtime.ts";
+    const throttle = Throttle.auto();
+    const idle = new Idle(throttle);
+    const graph = new BaseGraph(undefined, idle.strategy, globalThis);
+    const renderer = new Renderer(chain(globalThis, {graph}));
+    renderer.register("jsx", [], [], () => new JSX2DOM(globalThis));
+    ${registrations}
+    renderer.render();`;
 }

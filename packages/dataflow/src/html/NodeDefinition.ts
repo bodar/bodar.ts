@@ -67,9 +67,9 @@ export class NodeDefinition {
     get body(): string {
         return [
             this.importsExpressions(),
-            this.hasExplicitDisplay() ? `const display = Display.for(${JSON.stringify(this._key)});` : undefined,
-            this.hasExplicitView() ? `const view = View.for(${JSON.stringify(this._key)});` : undefined,
-            this.outputs.length ? `${this._body}\nreturn {${this.outputs.join(',')}};` : this._singleStatement ? this._body : `return ${this._body}`
+            this.hasImplicitDisplay() || this.hasExplicitDisplay() ? `const display = Display.for(${JSON.stringify(this._key)}, chain({throttle}, globalThis));` : undefined,
+            this.hasExplicitView() ? `const view = View.for(${JSON.stringify(this._key)}, chain({throttle}, globalThis));` : undefined,
+            this.outputs.length ? `${this._body}\nreturn {${this.outputs.join(',')}};` : this._singleStatement ? this._body : `return display(${this._body.replace(/;$/, '')})`
         ].filter(l => l).join('\n');
     }
 

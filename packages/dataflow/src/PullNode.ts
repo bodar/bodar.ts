@@ -44,7 +44,7 @@ export class PullNode<T> implements Node<T> {
                     }
                 }
 
-                await Promise.all([signal, Promise.resolve()]);
+                await signal;
                 ({promise: signal, resolve: signalResolve} = Promise.withResolvers<void>());
 
                 if (resolved.has('inputs')) {
