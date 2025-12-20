@@ -8,6 +8,7 @@ export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementCont
     }
 
     element(start: HTMLRewriterTypes.Element): void | Promise<void> {
+        this.controller.pushScope();
         start.onEndTag(endTag => this.endTag(endTag));
     }
 

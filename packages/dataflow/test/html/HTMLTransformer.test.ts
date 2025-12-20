@@ -128,4 +128,17 @@ const a = 1;
 return {a};
 });`)}</script></div></body>`);
     });
+
+    test('supports nested reactive islands with isolated scopes', async () => {
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
+        const result = transformer.transform('<body><script is="reactive">const a = 1;</script><div is="reactive-island"><script is="reactive">const b = 2;</script></div></body>');
+        // Inner island should have only 'b', outer body should have only 'a'
+        expect(result).toBe(`<body><div is="reactive-island"><script type="module">${scriptTemplate(`renderer.register("vxfnfr_1",[],["b"],() => {
+const b = 2;
+return {b};
+});`)}</script></div><script type="module">${scriptTemplate(`renderer.register("vge10p_0",[],["a"],() => {
+const a = 1;
+return {a};
+});`)}</script></body>`);
+    });
 });

@@ -54,18 +54,20 @@ export class HTMLTransformer {
         return this.deps.rewriter.transform(input)
     }
 
-    private definitions: NodeDefinition[] = [];
+    private definitions: NodeDefinition[][] = [];
+
+    pushScope(): void {
+        this.definitions.push([]);
+    }
 
     addScript(javascript: string, id?: string): NodeDefinition {
         const definition = NodeDefinition.parse(javascript, id, this.idGenerator);
-        this.definitions.push(definition);
+        this.definitions[this.definitions.length - 1].push(definition);
         return definition;
     }
 
     popDefinitions(): NodeDefinition[] {
-        const definitions = this.definitions.slice();
-        this.definitions.length = 0;
-        return definitions;
+        return this.definitions.pop() ?? [];
     }
 }
 
