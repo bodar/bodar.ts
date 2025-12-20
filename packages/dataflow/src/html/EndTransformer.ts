@@ -1,5 +1,5 @@
 import {topologicalSort} from "./TopologicalSort.ts";
-import {NodeDefinition} from "./NodeDefinition.ts";
+import {NodeDefinition, type SerializeOptions} from "./NodeDefinition.ts";
 import {HTMLTransformer} from "./HTMLTransformer.ts";
 import type {Bundler} from "../bundling/Bundler.ts";
 
@@ -15,7 +15,14 @@ export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementCont
         const definitions = this.controller.popDefinitions();
         if(definitions.length > 0) {
             const sorted = topologicalSort(definitions);
-            const registrations = sorted.map((d: NodeDefinition) => `renderer.register(${d});`).join('\n');
+
+            // Check if any definition imports display/view from runtime
+            const options: SerializeOptions = {
+                stripDisplay: definitions.some(d => d.hasExplicitDisplay()),
+                stripView: definitions.some(d => d.hasExplicitView())
+            };
+
+            const registrations = sorted.map((d: NodeDefinition) => `renderer.register(${d.toString(options)});`).join('\n');
             const javascript = await this.bundler.transform(scriptTemplate(registrations));
             end.before(`<script type="module">${javascript}</script>`, {html: true})
         }

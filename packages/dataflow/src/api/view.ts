@@ -3,13 +3,12 @@
  */
 
 import {input, type SupportedInputs} from "./input.ts";
-import {Display, display, type DisplayDependencies, type SupportedValue} from "./display.ts";
+import {Display, type DisplayDependencies} from "./display.ts";
 
-export function view(value: HTMLElement): AsyncIterator<any> {
-    return input(display(value as SupportedInputs));
+/** Placeholder function - should be rewritten by the transformer */
+export function view(_value: HTMLElement): AsyncIterator<any> {
+    throw new Error('view() is a placeholder - it should have been rewritten by the transformer. Did you import it from @bodar/dataflow/runtime.ts?');
 }
-
-view.pop = (): SupportedValue[]=> display.pop();
 
 export interface ViewContract {
     (value: HTMLElement): AsyncIterator<any>;

@@ -9,6 +9,14 @@ import type {
 export class Import {
     constructor(public specifier: string, public locals: string[]) {
     }
+
+    /** Remove a specifier by name, returns null if no specifiers remain */
+    removeSpecifier(name: string): Import | null {
+        const newLocals = this.locals.filter(l => l !== name);
+        if (newLocals.length === 0) return null;
+        const newSpecifier = `{${newLocals.join(',')}}`;
+        return new Import(newSpecifier, newLocals);
+    }
 }
 
 export class Imports {
@@ -52,6 +60,23 @@ export class Imports {
 
     locals(): string[] {
         return Array.from(this.data.values()).flatMap(i => i.locals)
+    }
+
+    /** Clone this Imports instance */
+    clone(): Imports {
+        return new Imports(new Map(this.data));
+    }
+
+    /** Remove a specifier from a source, removes entire import if no specifiers remain */
+    removeSpecifier(source: string, name: string): void {
+        const imp = this.data.get(source);
+        if (!imp) return;
+        const newImp = imp.removeSpecifier(name);
+        if (newImp) {
+            this.data.set(source, newImp);
+        } else {
+            this.data.delete(source);
+        }
     }
 }
 

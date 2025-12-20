@@ -1,25 +1,12 @@
-import {beforeEach, describe, expect, test} from "bun:test";
+import {describe, expect, test} from "bun:test";
 import {display, Display} from "../../src/api/display.ts";
 import {parseHTML} from "linkedom";
 import {chain} from "@bodar/yadic/chain.ts";
 import {Throttle} from "../../src/Throttle.ts";
 
 describe("display", () => {
-    beforeEach(() => {
-        display.clear();
-    });
-
-    test("stores the value for later retrieval", async () => {
-        const hello = display('Hello');
-        expect(hello).toEqual('Hello');
-        expect(display.values).toEqual(['Hello']);
-    });
-
-    test("popping will get the values and then clear", async () => {
-        display('Hello');
-
-        expect(display.pop()).toEqual(['Hello']);
-        expect(display.values).toEqual([]);
+    test("placeholder throws an error when called directly", () => {
+        expect(() => display('Hello')).toThrow('display() is a placeholder');
     });
 })
 

@@ -6,23 +6,9 @@ import type {ThrottleStrategy} from "../Throttle.ts";
 
 export type SupportedValue = Node | string | number;
 
-export function display<T extends SupportedValue>(value: T): T {
-    display.values.push(value);
-    return value;
-}
-
-display.prefix = '_display_';
-display.values = [] as SupportedValue[];
-display.clear = (): void => {
-    display.values.length = 0;
-}
-display.format = (key: string): string => display.prefix + key
-display.pop = (): SupportedValue[] => {
-    try {
-        return display.values.slice();
-    } finally {
-        display.clear();
-    }
+/** Placeholder function - should be rewritten by the transformer */
+export function display<T extends SupportedValue>(_value: T): T {
+    throw new Error('display() is a placeholder - it should have been rewritten by the transformer. Did you import it from @bodar/dataflow/runtime.ts?');
 }
 
 export interface DisplayContract {
@@ -89,5 +75,15 @@ export class Display {
         const newInstance = Object.assign((value: any) => display.call(value), display);
         this.instances.set(key, new WeakRef(newInstance));
         return newInstance;
+    }
+
+    /** Remove a cached Display instance by key (useful for testing) */
+    static delete(key: string): boolean {
+        return this.instances.delete(key);
+    }
+
+    /** Clear all cached Display instances (useful for testing) */
+    static clearAll(): void {
+        this.instances.clear();
     }
 }

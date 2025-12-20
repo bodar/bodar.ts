@@ -1,4 +1,4 @@
-import {describe, test} from "bun:test";
+import {beforeEach, describe, test} from "bun:test";
 import {parseHTML} from "linkedom";
 import {HTMLTransformer} from "../../src/html/HTMLTransformer.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
@@ -9,6 +9,7 @@ import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import type {Idle} from "../../src/Idle.ts";
 import type {BaseGraph} from "../../src/BaseGraph.ts";
+import {Display} from "../../src/api/display.ts";
 
 
 async function renderHTML(html: string, global: any = globalThis): Promise<{
@@ -33,6 +34,10 @@ async function renderHTML(html: string, global: any = globalThis): Promise<{
 }
 
 describe("todo", async () => {
+    beforeEach(() => {
+        Display.clearAll();
+    });
+
     test("can render the 3 built in todos", async () => {
         const {browser} = await renderHTML(html as any);
         assertThat(Array.from(browser.document.querySelectorAll<HTMLSpanElement>('.todo-item .todo-name')).map(s => s.innerText),

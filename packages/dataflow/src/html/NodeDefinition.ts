@@ -5,6 +5,11 @@ import {findTopLevelVariableDeclarations} from "../javascript/findTopLevelVariab
 import {isSingleStatement, isSingleExpression} from "../javascript/isSingleExpression.ts";
 import {type IdGenerator, SimpleHashGenerator} from "../IdGenerator.ts";
 
+export interface SerializeOptions {
+    stripDisplay?: boolean;
+    stripView?: boolean;
+}
+
 /** A definition of a Node but still in raw text format */
 export class NodeDefinition {
     constructor(private _key: string,
@@ -38,63 +43,81 @@ export class NodeDefinition {
     }
 
     get inputs(): string[] {
-        return this._inputs.map(i => i === 'display' ? 'Display' : i === 'view' ? 'View' : i);
+        return this._inputs;
     }
 
     get outputs(): string[] {
-        const transformed = this._outputs.map(o => o === 'display' ? 'Display' : o === 'view' ? 'View' :o);
-        return [...transformed];
+        return this._outputs;
     }
 
     get imports(): Imports {
         return this._imports;
     }
 
-    importsExpressions(): string {
-        if (this._imports.isEmpty()) return "";
+    importsExpressions(imports: Imports = this._imports): string {
+        if (imports.isEmpty()) return "";
 
-        const entries = Array.from(this._imports.data.entries());
-
-        const specifierStrings = entries.map(([source, imp]) =>
-            source.startsWith('@bodar/dataflow/') ?
-                imp.specifier.replace(/\bdisplay\b/, 'Display').replace(/\bview\b/, 'View') :
-                imp.specifier);
-
+        const entries = Array.from(imports.data.entries());
+        const specifierStrings = entries.map(([, imp]) => imp.specifier);
         const importStrings = entries.map(([source]) => `import('${source}')`);
         return `const [${specifierStrings.join(', ')}] = await Promise.all([${importStrings.join(', ')}]);`;
-    }
-
-    get body(): string {
-        return [
-            this.importsExpressions(),
-            this.hasImplicitDisplay() || this.hasExplicitDisplay() ? `const display = Display.for(${JSON.stringify(this._key)}, chain({throttle}, globalThis));` : undefined,
-            this.hasExplicitView() ? `const view = View.for(${JSON.stringify(this._key)}, chain({throttle}, globalThis));` : undefined,
-            this.outputs.length ? `${this._body}\nreturn {${this.outputs.join(',')}};` : this._singleStatement ? this._body : `return display(${this._body.replace(/;$/, '')})`
-        ].filter(l => l).join('\n');
     }
 
     isSingleExpression(): boolean {
         return this._singleExpression;
     }
 
-    get arguments(): string {
-        return `(${this.inputs.join(',')})`;
-    }
-
     isLambda(): boolean {
         return this.isSingleExpression() && this.outputs.length === 0 && this.imports.isEmpty();
     }
 
-    isAsync(): boolean {
-        return !this.imports.isEmpty();
+    isAsync(options?: SerializeOptions): boolean {
+        return !this.getImports(options).isEmpty();
     }
 
-    toString(): string {
-        return `${JSON.stringify(this.key)},${JSON.stringify(this.inputs)},${JSON.stringify(this.outputs)},${this.fun()}`;
+    toString(options?: SerializeOptions): string {
+        const inputs = this.getInputs(options);
+        const outputs = this.getOutputs(options);
+        return `${JSON.stringify(this.key)},${JSON.stringify(inputs)},${JSON.stringify(outputs)},${this.fun(options)}`;
     }
 
-    fun(): string {
-        return `${this.isAsync() ? 'async' : ''}${this.arguments} => {\n${this.body}\n}`;
+    fun(options?: SerializeOptions): string {
+        const inputs = this.getInputs(options);
+        return `${this.isAsync(options) ? 'async' : ''}(${inputs.join(',')}) => {\n${this.getBody(options)}\n}`;
+    }
+
+    private getInputs(options?: SerializeOptions): string[] {
+        let inputs = this._inputs;
+        if (options?.stripDisplay) inputs = inputs.filter(i => i !== 'display');
+        if (options?.stripView) inputs = inputs.filter(i => i !== 'view');
+        return inputs;
+    }
+
+    private getOutputs(options?: SerializeOptions): string[] {
+        let outputs = this._outputs;
+        if (options?.stripDisplay) outputs = outputs.filter(o => o !== 'display');
+        if (options?.stripView) outputs = outputs.filter(o => o !== 'view');
+        return outputs;
+    }
+
+    private getImports(options?: SerializeOptions): Imports {
+        if (!options?.stripDisplay && !options?.stripView) return this._imports;
+
+        const imports = this._imports.clone();
+        if (options?.stripDisplay) imports.removeSpecifier('@bodar/dataflow/runtime.ts', 'display');
+        if (options?.stripView) imports.removeSpecifier('@bodar/dataflow/runtime.ts', 'view');
+        return imports;
+    }
+
+    private getBody(options?: SerializeOptions): string {
+        const imports = this.getImports(options);
+        const outputs = this.getOutputs(options);
+        return [
+            this.importsExpressions(imports),
+            this.hasImplicitDisplay() || this.hasExplicitDisplay() ? `const display = Display.for(${JSON.stringify(this._key)}, chain({throttle}, globalThis));` : undefined,
+            this.hasExplicitView() ? `const view = View.for(${JSON.stringify(this._key)}, chain({throttle}, globalThis));` : undefined,
+            outputs.length ? `${this._body}\nreturn {${outputs.join(',')}};` : this._singleStatement ? this._body : `return display(${this._body.replace(/;$/, '')})`
+        ].filter(l => l).join('\n');
     }
 
     hasImplicitDisplay(): boolean {
@@ -102,11 +125,11 @@ export class NodeDefinition {
     }
 
     hasExplicitDisplay(): boolean {
-        return !!this._imports.get('@bodar/dataflow/api/display.ts') || this._inputs.some(v => v === 'display');
+        return this._imports.get('@bodar/dataflow/runtime.ts')?.locals.includes('display') || this._inputs.some(v => v === 'display');
     }
 
     hasExplicitView(): boolean {
-        return !!this._imports.get('@bodar/dataflow/api/view.ts') || this._inputs.some(v => v === 'view');
+        return this._imports.get('@bodar/dataflow/runtime.ts')?.locals.includes('view') || this._inputs.some(v => v === 'view');
     }
 
     hasDisplay(): boolean {

@@ -1,59 +1,61 @@
 import {describe, it} from "bun:test";
 import {parseHTML} from "linkedom";
-import {Renderer} from "../../src/html/Renderer.ts";
-import {BaseGraph} from "../../src/BaseGraph.ts";
+import {Display} from "../../src/api/display.ts";
+import {Throttle} from "../../src/Throttle.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import {assertFalse, assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {chain} from "@bodar/yadic/chain.ts";
 
 describe("Renderer", () => {
-    async function render(fun: (doc: Document) => any, initalStart: string = ''): Promise<Element> {
-        const globals = parseHTML(`<slot name="output">${initalStart}</slot>`);
-        const renderer = new Renderer(chain({graph: new BaseGraph(undefined, undefined, globals)}, globals));
+    async function render(fun: (doc: Document, display: (v: any) => any) => any, initialSlot: string = ''): Promise<Element> {
+        // Clear any cached Display instance for this key
+        Display.delete('output');
 
-        renderer.register('output', [], [], () => fun(globals.document));
-        renderer.render();
+        const globals = parseHTML(`<slot name="output">${initialSlot}</slot>`);
+        const throttle = Throttle.auto();
+        const display = Display.for('output', chain({throttle}, globals));
 
-        await new Promise(resolve => setTimeout(resolve, 0));
+        // Execute the function which should call display() to render values
+        fun(globals.document, display);
+
+        // Wait for throttle to flush
+        await throttle();
         return globals.document.querySelector('slot[name="output"]')!;
     }
 
     it("Can render a string", async () => {
-        assertThat((await render(() => 'Hello, world!')).innerHTML, is('Hello, world!'));
+        assertThat((await render((_, display) => display('Hello, world!'))).innerHTML, is('Hello, world!'));
     });
 
     it("Can render a number", async () => {
-        assertThat((await render(() => 123)).innerHTML, is('123'));
+        assertThat((await render((_, display) => display(123))).innerHTML, is('123'));
     });
 
     it("Can render a element", async () => {
-        assertThat((await render(document => document.createElement('div'))).innerHTML, is('<div></div>'));
+        assertThat((await render((document, display) => display(document.createElement('div')))).innerHTML, is('<div></div>'));
     });
 
     it("Can render an array of nodes", async () => {
-        assertThat((await render(document => [
+        assertThat((await render((document, display) => display([
             document.createElement('div'),
             document.createTextNode('Hello, world!'),
             document.createElement('span')
-        ])).innerHTML, is('<div></div>Hello, world!<span></span>'));
+        ]))).innerHTML, is('<div></div>Hello, world!<span></span>'));
     });
 
     const tag = Symbol('tag');
     const tagValue = 'new';
 
-    function tagAsNew(fun: (document: Document) => any) {
-        return (doc: Document) => {
-            const result = fun(doc);
-            if (Array.isArray(result)) {
-                for (const resultElement of result) {
-                    Reflect.set(resultElement, tag, tagValue);
-                }
-            } else {
-                Reflect.set(result, tag, tagValue);
+    function tagAsNew<T>(value: T): T {
+        if (Array.isArray(value)) {
+            for (const element of value) {
+                Reflect.set(element, tag, tagValue);
             }
-            return result;
-        };
+        } else {
+            Reflect.set(value as object, tag, tagValue);
+        }
+        return value;
     }
 
     function isNew(instance: any): boolean {
@@ -61,38 +63,38 @@ describe("Renderer", () => {
     }
 
     it("Only updates nodes if they are different", async () => {
-        const [child] = Array.from((await render(tagAsNew(document =>
-            document.createElement('div')), '<div></div>')).childNodes);
+        const [child] = Array.from((await render((document, display) =>
+            display(tagAsNew(document.createElement('div'))), '<div></div>')).childNodes);
         assertFalse(isNew(child));
     });
 
     it("Also does the diff when there are multiple nodes", async () => {
-        const updated = (await render(tagAsNew(document => [
+        const updated = (await render((document, display) => display(tagAsNew([
                 document.createElement('div'),
                 document.createTextNode('different'),
                 document.createElement('span')
-            ]),
+            ])),
             '<div></div>Will-be-replaced<span></span>'));
         assertThat(updated.innerHTML, equals('<div></div>different<span></span>'));
         assertThat(Array.from(updated.childNodes).map(isNew), equals([false, true, false]));
     });
 
     it("Supports diffing even if the lengths don't match", async () => {
-        const updated = (await render(tagAsNew(document => [
+        const updated = (await render((document, display) => display(tagAsNew([
                 document.createElement('div'),
                 document.createTextNode('different'),
                 document.createElement('span'),
                 document.createElement('img')
-            ]),
+            ])),
             '<div></div>Will-be-replaced'));
         assertThat(updated.innerHTML, equals('<div></div>different<span></span><img>'));
         assertThat(Array.from(updated.childNodes).map(isNew), equals([false, true, true, true]));
     });
 
     it("Will remove excess nodes", async () => {
-        const updated = (await render(tagAsNew(document => [
+        const updated = (await render((document, display) => display(tagAsNew([
                 document.createTextNode('different'),
-            ]),
+            ])),
             '<div></div>Will-be-replaced<div></div>'));
 
         assertThat(updated.innerHTML, equals('different'));

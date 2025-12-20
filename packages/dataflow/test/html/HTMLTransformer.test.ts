@@ -33,7 +33,8 @@ const a = 1;
 return {a};
 });
 renderer.register("4vhz4q_1",["a"],[],(a) => {
-return \`Some text \${a}\`;
+const display = Display.for("4vhz4q_1", chain({throttle}, globalThis));
+return display(\`Some text \${a}\`)
 });`)}</script></body>`);
     });
 
@@ -41,7 +42,8 @@ return \`Some text \${a}\`;
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><script data-reactive id="constant">1</script></body>');
         expect(result).toBe(`<body><slot name="constant"></slot><script type="module">${scriptTemplate(`renderer.register("constant",[],[],() => {
-return 1;
+const display = Display.for("constant", chain({throttle}, globalThis));
+return display(1)
 });`)}</script></body>`);
     });
 
@@ -49,7 +51,8 @@ return 1;
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
         const result = transformer.transform('<body><script data-reactive>=</script></body>');
         expect(result).toBe(`<body><slot name="00001p_0"></slot><script type="module">${scriptTemplate(`renderer.register("00001p_0",[],[],() => {
-return "Unexpected token (1:0)"
+const display = Display.for("00001p_0", chain({throttle}, globalThis));
+return display("Unexpected token (1:0)")
 });`)}</script></body>`);
     });
 
@@ -74,7 +77,8 @@ return {input,name,iterator};
         const result = transformer.transform('<body><script type="module" data-reactive data-echo>1 + 2</script></body>');
 
         expect(result).toBe(`<body><pre><code class="language-javascript">1 + 2</code></pre><slot name="0rj9ce_0"></slot><script type="module">${scriptTemplate(`renderer.register("0rj9ce_0",[],[],() => {
-return 1 + 2;
+const display = Display.for("0rj9ce_0", chain({throttle}, globalThis));
+return display(1 + 2)
 });`)}</script></body>`);
     });
 

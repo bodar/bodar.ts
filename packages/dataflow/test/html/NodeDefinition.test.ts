@@ -1,50 +1,66 @@
-import {beforeEach, describe, expect, test} from "bun:test";
+import {describe, expect, test} from "bun:test";
 import {NodeDefinition} from "../../src/html/NodeDefinition.ts";
-import {display} from "../../src/api/display.ts";
 
 describe("NodeDefinition", () => {
-    beforeEach(() => {
-        display.clear();
-    });
-
-    test("detects explicit display function usage", async () => {
+    test("detects explicit display function from runtime import", async () => {
         // language=JavaScript
         const definition = NodeDefinition.parse(`
-            import {display} from "@bodar/dataflow/api/display.ts";
+            import {display} from "@bodar/dataflow/runtime.ts";
             const input = display(<input name="name" type="text" value="Dan"/>);
         `, '1234');
+
+        expect(definition.hasExplicitDisplay()).toBe(true);
+
+        // Without strip options, display remains in inputs/outputs/imports
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["jsx"],["input","Display"],async(jsx) => {
-const [{Display}] = await Promise.all([import('@bodar/dataflow/api/display.ts')]);
-const display = Display.for("1234");
+        expect(definition.toString()).toBe(`"1234",["jsx"],["input","display"],async(jsx) => {
+const [{display}] = await Promise.all([import('@bodar/dataflow/runtime.ts')]);
+const display = Display.for("1234", chain({throttle}, globalThis));
 const input = display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
-return {input,Display};
+return {input,display};
+}`)
+
+        // With strip options (as EndTransformer would pass), display is stripped
+        // Becomes synchronous because the only import (runtime.ts) is stripped
+        // language=JavaScript
+        expect(definition.toString({stripDisplay: true})).toBe(`"1234",["jsx"],["input"],(jsx) => {
+const display = Display.for("1234", chain({throttle}, globalThis));
+const input = display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
+return {input};
 }`)
     });
 
-    test("detects explicit view function usage", async () => {
+    test("detects explicit view function from runtime import", async () => {
         // language=JavaScript
         const definition = NodeDefinition.parse(`
-            import {view} from "@bodar/dataflow/api/view.ts";
+            import {view} from "@bodar/dataflow/runtime.ts";
             const input = view(<input name="name" type="text" value="Dan"/>);
         `, '1234');
+
+        expect(definition.hasExplicitView()).toBe(true);
+
+        // With strip options (as EndTransformer would pass), view is stripped
+        // Becomes synchronous because the only import (runtime.ts) is stripped
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["jsx"],["input","View"],async(jsx) => {
-const [{View}] = await Promise.all([import('@bodar/dataflow/api/view.ts')]);
-const view = View.for("1234");
+        expect(definition.toString({stripView: true})).toBe(`"1234",["jsx"],["input"],(jsx) => {
+const view = View.for("1234", chain({throttle}, globalThis));
 const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
-return {input,View};
+return {input};
 }`)
     });
 
-    test("detects explicit view function usage even without an import", async () => {
+    test("detects view as unresolved reference (input parameter)", async () => {
         // language=JavaScript
         const definition = NodeDefinition.parse(`
             const input = view(<input name="name" type="text" value="Dan"/>);
         `, '1234');
+
+        expect(definition.hasExplicitView()).toBe(true); // detected as input
+
+        // With strip options, view is removed from inputs
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["View","jsx"],["input"],(View,jsx) => {
-const view = View.for("1234");
+        expect(definition.toString({stripView: true})).toBe(`"1234",["jsx"],["input"],(jsx) => {
+const view = View.for("1234", chain({throttle}, globalThis));
 const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input};
 }`)
@@ -55,9 +71,11 @@ return {input};
         const definition = NodeDefinition.parse(`<input name="name" type="text" value="Dan"/>`, '1234');
         expect(definition.hasImplicitDisplay()).toBe(true);
         expect(definition.hasDisplay()).toBe(true);
+        // Implicit display still injects Display.for() and wraps in display()
         // language=JavaScript
         expect(definition.toString()).toBe(`"1234",["jsx"],[],(jsx) => {
-return jsx.createElement("input", {"name": "name","type": "text","value": "Dan"});
+const display = Display.for("1234", chain({throttle}, globalThis));
+return display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}))
 }`);
     });
 
