@@ -5,6 +5,14 @@
     <title>Setup - Dataflow</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/intellij-light.min.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "highlight.js/": "https://esm.run/highlight.js/"
+            }
+        }
+    </script>
 </head>
 <body>
 
@@ -252,23 +260,12 @@ self.addEventListener('fetch', (event) => {
         });
 </script>
 
-<script type="importmap">
-    {
-        "imports": {
-            "highlight.js/": "https://esm.run/highlight.js/"
-        }
-    }
-</script>
 <script type="module">
     import hljs from 'highlight.js/lib/core.js';
     import javascript from 'highlight.js/lib/languages/javascript';
     import bash from 'highlight.js/lib/languages/bash';
     import xml from 'highlight.js/lib/languages/xml';
 
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = "https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/intellij-light.min.css";
-    document.head.appendChild(link);
     hljs.registerLanguage('javascript', javascript);
     hljs.registerLanguage('bash', bash);
     hljs.registerLanguage('xml', xml);
