@@ -15,7 +15,7 @@ describe("NodeDefinition", () => {
         // language=JavaScript
         expect(definition.toString()).toBe(`"1234",["jsx"],["input","display"],async(jsx) => {
 const [{display}] = await Promise.all([import('@bodar/dataflow/runtime.ts')]);
-const display = Display.for("1234", chain({throttle}, globalThis));
+const display = Display.for("1234", _runtime_);
 const input = display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input,display};
 }`)
@@ -24,7 +24,7 @@ return {input,display};
         // Becomes synchronous because the only import (runtime.ts) is stripped
         // language=JavaScript
         expect(definition.toString({stripDisplay: true})).toBe(`"1234",["jsx"],["input"],(jsx) => {
-const display = Display.for("1234", chain({throttle}, globalThis));
+const display = Display.for("1234", _runtime_);
 const input = display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input};
 }`)
@@ -43,7 +43,7 @@ return {input};
         // Becomes synchronous because the only import (runtime.ts) is stripped
         // language=JavaScript
         expect(definition.toString({stripView: true})).toBe(`"1234",["jsx"],["input"],(jsx) => {
-const view = View.for("1234", chain({throttle}, globalThis));
+const view = View.for("1234", _runtime_);
 const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input};
 }`)
@@ -60,7 +60,7 @@ return {input};
         // With strip options, view is removed from inputs
         // language=JavaScript
         expect(definition.toString({stripView: true})).toBe(`"1234",["jsx"],["input"],(jsx) => {
-const view = View.for("1234", chain({throttle}, globalThis));
+const view = View.for("1234", _runtime_);
 const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input};
 }`)
@@ -74,7 +74,7 @@ return {input};
         // Implicit display still injects Display.for() and wraps in display()
         // language=JavaScript
         expect(definition.toString()).toBe(`"1234",["jsx"],[],(jsx) => {
-const display = Display.for("1234", chain({throttle}, globalThis));
+const display = Display.for("1234", _runtime_);
 return display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}))
 }`);
     });

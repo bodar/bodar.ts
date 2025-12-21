@@ -77,13 +77,11 @@ export class Display {
         return newInstance;
     }
 
-    /** Remove a cached Display instance by key (useful for testing) */
     static delete(key: string): boolean {
         return this.instances.delete(key);
     }
 
-    /** Clear all cached Display instances (useful for testing) */
-    static clearAll(): void {
+    static deleteAll(): void {
         this.instances.clear();
     }
 }

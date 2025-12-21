@@ -11,7 +11,7 @@ import {Throttle, type ThrottleStrategy} from "./Throttle.ts";
 export class BaseGraph {
     constructor(private backpressure: BackpressureStrategy = Backpressure.fastest,
                 private throttle: ThrottleStrategy = Throttle.auto(),
-                private globals: object = globalThis) {
+                private globals: any = globalThis) {
     }
 
     /** Creates nodes explicit parameters */
@@ -60,6 +60,12 @@ export class BaseGraph {
 
     dependents(node: Node<any>): Node<any>[] {
         return Array.from(this.nodes.values().filter(n => n.dependencies.some(d => d.key === node.key)));
+    }
+
+    run(): void {
+        this.sinks().forEach(async node => {
+            for await (const {value} of node) void (value);
+        });
     }
 }
 

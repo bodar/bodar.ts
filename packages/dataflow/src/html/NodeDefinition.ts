@@ -114,8 +114,8 @@ export class NodeDefinition {
         const outputs = this.getOutputs(options);
         return [
             this.importsExpressions(imports),
-            this.hasImplicitDisplay() || this.hasExplicitDisplay() ? `const display = Display.for(${JSON.stringify(this._key)}, chain({throttle}, globalThis));` : undefined,
-            this.hasExplicitView() ? `const view = View.for(${JSON.stringify(this._key)}, chain({throttle}, globalThis));` : undefined,
+            this.hasImplicitDisplay() || this.hasExplicitDisplay() ? `const display = Display.for(${JSON.stringify(this._key)}, _runtime_);` : undefined,
+            this.hasExplicitView() ? `const view = View.for(${JSON.stringify(this._key)}, _runtime_);` : undefined,
             outputs.length ? `${this._body}\nreturn {${outputs.join(',')}};` : this._singleStatement ? this._body : `return display(${this._body.replace(/;$/, '')})`
         ].filter(l => l).join('\n');
     }

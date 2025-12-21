@@ -23,21 +23,19 @@ export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementCont
                 stripView: definitions.some(d => d.hasExplicitView())
             };
 
-            const registrations = sorted.map((d: NodeDefinition) => `renderer.register(${d.toString(options)});`).join('\n');
+            const registrations = sorted.map((d: NodeDefinition) => `_runtime_.graph.define(${d.toString(options)});`).join('\n');
             const javascript = await this.bundler.transform(scriptTemplate(registrations));
-            end.before(`<script type="module">${javascript}</script>`, {html: true})
+            end.before(`<script type="module" is="reactive-runtime">${javascript}</script>`, {html: true})
         }
     }
 }
 
 export function scriptTemplate(registrations: string):string {
     // language=javascript
-    return `import {Display, View, Renderer, JSX2DOM, BaseGraph, Idle, Throttle, chain} from "@bodar/dataflow/runtime.ts";
-    const throttle = Throttle.auto();
-    const idle = new Idle(throttle);
-    const graph = new BaseGraph(undefined, idle.strategy, globalThis);
-    const renderer = new Renderer(chain(globalThis, {graph}));
-    renderer.register("jsx", [], [], () => new JSX2DOM(globalThis));
+    return `import {Display, View, JSX2DOM, runtime} from "@bodar/dataflow/runtime.ts";
+
+    const _runtime_ = runtime(globalThis);
+    _runtime_.graph.define("jsx", [], [], () => new JSX2DOM(globalThis));
     ${registrations}
-    renderer.render();`;
+    _runtime_.graph.run();`;
 }
