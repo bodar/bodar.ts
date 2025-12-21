@@ -20,7 +20,6 @@
     "./bundling/bundle.ts": "./src/bundling/bundle.ts",
     "./Graph.ts": "./src/Graph.ts",
     "./html/HTMLTransformer.ts": "./src/html/HTMLTransformer.ts",
-    "./html/Renderer.ts": "./src/html/Renderer.ts",
     "./http/ReactiveHandler.ts": "./src/http/ReactiveHandler.ts",
     "./Node.ts": "./src/Node.ts",
     "./PullNode.ts": "./src/PullNode.ts",

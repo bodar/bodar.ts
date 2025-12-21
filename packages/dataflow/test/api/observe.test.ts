@@ -4,8 +4,8 @@ import {observe} from "../../src/api/observe.ts";
 
 export function observableSource<T>(...values: T[]): AsyncGenerator<T> & { disposed?: boolean } {
     const source = observe<T>((notify) => {
-        values.forEach((value, index) => setTimeout(() => notify(value), index));
-        setTimeout(() => notify(undefined), values.length);
+        values.forEach((value, index) => setTimeout(() => notify(value), index * 5));
+        setTimeout(() => notify(undefined), values.length * 5);
         return () => Reflect.set(source, 'disposed', true);
     });
     return source;

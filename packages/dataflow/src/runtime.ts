@@ -19,7 +19,6 @@ export {now} from './api/now.ts';
 export {BaseGraph} from './BaseGraph.ts'
 export {Idle} from './Idle.ts'
 export {Throttle} from './Throttle.ts'
-export {Renderer} from './html/Renderer.ts'
 export {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
 export {chain} from "@bodar/yadic/chain.ts";
 
@@ -32,9 +31,9 @@ export interface RuntimeExports {
 
 export function runtime<G = object>(global: G = globalThis as G): RuntimeExports & G {
     return chain(LazyMap.create()
-        .set('throttle', () => Throttle.auto())
         .set('backpressure', () => Backpressure.fastest)
-        .set('idle', ({throttle}: { throttle: ThrottleStrategy }) => new Idle(throttle))
+        .set('idle', () => new Idle(Throttle.auto()))
+        .set('throttle', ({idle}: {idle: Idle}) => idle.strategy)
         .set('graph', ({throttle, backpressure}: {
             throttle: ThrottleStrategy,
             backpressure: BackpressureStrategy

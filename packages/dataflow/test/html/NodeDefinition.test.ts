@@ -81,10 +81,10 @@ return display(jsx.createElement("input", {"name": "name","type": "text","value"
 
     test("any import becomes an output", async () => {
         // language=JavaScript
-        const definition = NodeDefinition.parse(`import {Renderer} from "@bodar/dataflow/html/Renderer.ts";`, '1234');
+        const definition = NodeDefinition.parse(`import {Renderer} from "@bodar/dataflow/html/HTMLTransformer.ts";`, '1234');
         // language=JavaScript
         expect(definition.toString()).toBe(`"1234",[],["Renderer"],async() => {
-const [{Renderer}] = await Promise.all([import('@bodar/dataflow/html/Renderer.ts')]);
+const [{Renderer}] = await Promise.all([import('@bodar/dataflow/html/HTMLTransformer.ts')]);
 
 return {Renderer};
 }`)
