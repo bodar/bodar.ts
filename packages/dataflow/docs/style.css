@@ -47,6 +47,8 @@ pre {
 
 code {
     font-family: ui-monospace, monospace;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
 .example {
