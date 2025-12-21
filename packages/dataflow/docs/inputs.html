@@ -312,9 +312,11 @@ input(element, 'input', (el) => el.value.toUpperCase());</code></pre>
 <script type="module">
     import hljs from 'highlight.js/lib/core.js';
     import javascript from 'highlight.js/lib/languages/javascript';
+    import typescript from 'highlight.js/lib/languages/typescript';
     import xml from 'highlight.js/lib/languages/xml';
 
     hljs.registerLanguage('javascript', javascript);
+    hljs.registerLanguage('typescript', typescript);
     hljs.registerLanguage('xml', xml);
     hljs.highlightAll();
 </script>
