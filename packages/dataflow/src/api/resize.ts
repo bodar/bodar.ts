@@ -25,6 +25,10 @@ export class Resize {
         this.observer.observe(this.container);
     }
 
+    [Symbol.dispose]() {
+        this.observer.disconnect();
+    }
+
     private usesHeight(): boolean {
         return this.deps.render.length !== 1;
     }
@@ -34,7 +38,7 @@ export class Resize {
         const {width, height} = entry.contentRect;
 
         if (this.displayCount > 0 && !this.container.isConnected) {
-            this.observer.disconnect();
+            this[Symbol.dispose]();
             return;
         }
 

@@ -17,6 +17,7 @@ The dataflow package implements the **most frequently used** Observable Framewor
 | `Generators.observe()` | **10 uses** | `observe.ts` | Callback → AsyncIterator |
 | `Mutable` | **3 uses** | `mutable.ts` | Reactive value with EventTarget |
 | `invalidation` | **18 uses** | `PullNode.ts` | Auto-cleanup via AbortController/Symbol.dispose |
+| `Generators.now()` | **3 uses** | `now.ts` | Continuous Date.now() generator |
 
 ### Missing (Prioritized by Usage)
 
@@ -24,9 +25,8 @@ The dataflow package implements the **most frequently used** Observable Framewor
 |----------|----------|-------|-------------|
 | 1 | `visibility()` | **7 uses** | Promise resolving when element visible |
 | 2 | `Generators.width()` | **4 uses** | Element width as async generator |
-| 3 | `Generators.now()` | **3 uses** | Continuous Date.now() generator |
-| 4 | `Generators.queue()` | **2 uses** | Like observe but queues (no drops) |
-| 5 | `Generators.dark()` | **2 uses** | Dark mode preference generator |
+| 3 | `Generators.queue()` | **2 uses** | Like observe but queues (no drops) |
+| 4 | `Generators.dark()` | **2 uses** | Dark mode preference generator |
 
 ## Generator Lifecycle: When `return()` and `finally` Run
 
