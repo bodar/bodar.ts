@@ -156,7 +156,7 @@
 <div class="example">
     <script type="module" is="reactive" data-echo>
         resize((width) => {
-            const canvas = <canvas width={width} height="30"></canvas>;
+            const canvas = <canvas width={width} height="32"></canvas>;
             const context = canvas.getContext("2d");
             context.fillStyle = "#4269d0";
             context.fillRect((i % (canvas.width + 32)) - 32, 0, 32, 32);
