@@ -143,12 +143,12 @@ export class NodeDefinition {
         return this.hasWidthImport() || this.hasWidthInput();
     }
 
-    hasWidthInput() {
+    hasWidthInput(): boolean {
         return this._inputs.some(v => v === 'width');
     }
 
-    hasWidthImport() {
-        return this._imports.get(this.Runtime)?.locals.includes('width');
+    hasWidthImport(): boolean {
+        return !!this._imports.get(this.Runtime)?.locals.includes('width');
     }
 
     hasDisplay(): boolean {
