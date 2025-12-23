@@ -15,7 +15,7 @@ export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementC
     endTag(end: HTMLRewriterTypes.EndTag, attributes: Map<string, string>) {
         const javascript = this.getJavascript();
         const definition = this.controller.addScript(javascript, attributes.get('id'));
-        if (definition.hasDisplay()) end.after(`<slot name="${definition.key}"></slot>`, {html: true});
+        if (definition.hasDisplay() || definition.hasWidth()) end.after(`<slot name="${definition.key}"></slot>`, {html: true});
         if (attributes.has('data-echo')) this.echoScript(end, attributes, javascript)
         end.remove();
     }

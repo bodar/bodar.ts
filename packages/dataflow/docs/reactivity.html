@@ -47,7 +47,7 @@
     top-down document order.</p>
 
 <script type="module" is="reactive">
-    import {display, view, input, mutable, observe, now, resize} from '@bodar/dataflow/runtime.ts';
+    import {display, view, input, mutable, observe, now, width} from '@bodar/dataflow/runtime.ts';
 </script>
 
 <h2 id="reactive-scope">Reactive Scope</h2>
@@ -155,13 +155,13 @@
 
 <div class="example">
     <script type="module" is="reactive" data-echo>
-        resize((width) => {
-            const canvas = <canvas width={width} height="32"></canvas>;
-            const context = canvas.getContext("2d");
-            context.fillStyle = "#4269d0";
-            context.fillRect((i % (canvas.width + 32)) - 32, 0, 32, 32);
-            return canvas;
-        })
+        const canvas = display(<canvas width={width} height="32"></canvas>);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        const context = canvas.getContext("2d");
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "#4269d0";
+        context.fillRect((i % (canvas.width + 32)) - 32, 0, 32, 32);
     </script>
 </div>
 
@@ -177,6 +177,44 @@
 </div>
 
 <p>This is useful for animations, clocks, and any time-based reactive updates.</p>
+
+<h3>The width Reactive Value</h3>
+
+<p>Dataflow provides a built-in <code>width</code> reactive value that tracks the width of the code block's parent
+    container. When the container resizes, any code referencing <code>width</code> automatically re-runs:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        <div style="background: linear-gradient(90deg, #4269d0, #9ecae9); color: white; padding: 1rem; box-sizing: border-box; width: 100%;">
+            Container width: {width}px
+        </div>
+    </script>
+</div>
+
+<p>Try resizing your browser window to see the value update.</p>
+
+<div class="note">
+    <strong>Note:</strong> Dataflow's <code>width</code> tracks the <em>parent container's</em> width, not the window
+    width. This is more useful for responsive components that need to adapt to their actual available space. It replaces
+    Observable Framework's <code>resize()</code> function with a simpler API - just use <code>width</code> as a value.
+</div>
+
+<h4>Comparison with Observable Framework</h4>
+
+<p>In Observable Framework, the implicit <code>width</code> variable tracks the <em>window</em> width (specifically the
+    <code>&lt;main&gt;</code> element). Dataflow's <code>width</code> instead tracks each code block's parent container,
+    which is more flexible for embedded components.</p>
+
+<p>If you need window-level width (like Observable Framework), you can use <code>input</code> to create your own:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const windowWidth = input(window, "resize", w => w.innerWidth);
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `Window width: ${windowWidth}px`
+    </script>
+</div>
 
 <h2>Invalidation</h2>
 
@@ -197,7 +235,10 @@
 
 <h3>AbortController Example</h3>
 
-<p>This example simulates a search API where broad queries (like "a") return more results and take longer, while specific queries (like "apple") return fewer results faster. Without cancellation, a slow broad query could return <em>after</em> a fast specific query and overwrite the results. Try typing quickly to see requests being aborted:</p>
+<p>This example simulates a search API where broad queries (like "a") return more results and take longer, while
+    specific queries (like "apple") return fewer results faster. Without cancellation, a slow broad query could return
+    <em>after</em> a fast specific query and overwrite the results. Try typing quickly to see requests being aborted:
+</p>
 
 <div class="example">
     <script type="module" is="reactive" data-echo>
@@ -210,10 +251,10 @@
             const delay = length * 20;
 
             return new Promise((resolve) => {
-                const id = setTimeout(() => resolve({ query, length, delay }), delay);
+                const id = setTimeout(() => resolve({query, length, delay}), delay);
                 signal.addEventListener('abort', () => {
                     clearTimeout(id);
-                    resolve({ aborted: true, query } );
+                    resolve({aborted: true, query});
                 }, {once: true});
             })
         };
@@ -225,7 +266,7 @@
     </script>
     <script type="module" is="reactive" data-echo>
         results.aborted ? `Aborted: "${results.query}"` :
-        `Found ${results.length} results for "${results.query}" (${results.delay}ms)`
+            `Found ${results.length} results for "${results.query}" (${results.delay}ms)`
     </script>
 </div>
 
@@ -275,71 +316,6 @@
         <span style="font-variant-numeric: tabular-nums">Pointer: [{pointer.map(Math.round).join(", ")}]</span>
     </script>
 </div>
-
-<h2>Resize</h2>
-
-<p>The <code>resize</code> function creates a responsive container that automatically re-renders when its size changes.
-    Pass a render function that receives the container's width (and optionally height) and returns a DOM node:</p>
-
-<div class="note">
-    <strong>Note:</strong> These examples just use a div for simplicity but you would not do this in practice as you
-    could just use CSS, however if you had a chart that needed pixels
-</div>
-
-<div class="example">
-    <script type="module" is="reactive" data-echo>
-        resize((width) =>
-            <div style={`box-sizing: border-box; width:${width}px; background: #4269d0; color: white; padding: 1em`}>
-                Container width: {Math.round(width)}px
-            </div>
-        )
-    </script>
-</div>
-
-<h3>resize() Signature</h3>
-
-<pre><code class="language-typescript">function resize(
-    render: (width: number, height?: number) => Node | string | null | Promise&lt;Node | string | null&gt;
-): Node</code></pre>
-
-<p>Parameters:</p>
-<ul>
-    <li><strong>render</strong> - Function called whenever the container resizes. Receives <code>width</code> and
-        optionally <code>height</code>. If the function signature includes a second parameter, height tracking is
-        enabled.
-    </li>
-</ul>
-
-<h3>Width Only vs Width + Height</h3>
-
-<p>The resize function inspects your render function's arity to determine behavior:</p>
-
-<ul>
-    <li><strong>1 parameter</strong> (<code>width</code>) - Only re-renders when width changes</li>
-    <li><strong>2 parameters</strong> (<code>width, height</code>) - Re-renders on any size change; container has <code>height:
-        100%</code>
-    </li>
-</ul>
-
-<div class="example">
-    <script type="module" is="reactive" data-echo>
-        <div style="height: 10vh">
-            {resize((width, height) =>
-                <div style={`box-sizing: border-box; width:${width}px; height:${height}px; background: #4269d0; color: white; padding: 1em`}>
-                    {Math.round(width)} x {Math.round(height)}
-                </div>
-            )}
-        </div>
-    </script>
-</div>
-
-<h3>Common Use Cases</h3>
-
-<ul>
-    <li><strong>Charts</strong> - Render SVG or Canvas at the container's exact dimensions</li>
-    <li><strong>Responsive layouts</strong> - Adjust content based on available space</li>
-    <li><strong>Animations</strong> - Combine with generators for responsive animated content</li>
-</ul>
 
 <h2 id="mutable">Mutable</h2>
 

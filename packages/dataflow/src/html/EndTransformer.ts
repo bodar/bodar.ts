@@ -20,10 +20,14 @@ export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementCont
             // Check if any definition imports display/view from runtime
             const options: SerializeOptions = {
                 stripDisplay: definitions.some(d => d.hasExplicitDisplay()),
-                stripView: definitions.some(d => d.hasExplicitView())
+                stripView: definitions.some(d => d.hasExplicitView()),
+                stripWidth: definitions.some(d => d.hasWidth()),
             };
 
-            const registrations = sorted.map((d: NodeDefinition) => `_runtime_.graph.define(${d.toString(options)});`).join('\n');
+            const registrations = sorted.map((d: NodeDefinition) => {
+                return (d.hasWidth() ? `_runtime_.graph.define("width_${d.key}",[],[],() => Width.for("${d.key}", _runtime_));` : '')
+                    + `_runtime_.graph.define(${d.toString(options)});`;
+            }).join('\n');
             const javascript = await this.bundler.transform(scriptTemplate(registrations));
             end.before(`<script type="module" is="reactive-runtime">${javascript}</script>`, {html: true})
         }
@@ -32,7 +36,7 @@ export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementCont
 
 export function scriptTemplate(registrations: string):string {
     // language=javascript
-    return `import {Display, View, JSX2DOM, runtime} from "@bodar/dataflow/runtime.ts";
+    return `import {Display, View, Width, JSX2DOM, runtime} from "@bodar/dataflow/runtime.ts";
 
     const _runtime_ = runtime(globalThis);
     _runtime_.graph.define("jsx", [], [], () => new JSX2DOM(globalThis));

@@ -8,10 +8,13 @@ import {type IdGenerator, SimpleHashGenerator} from "../IdGenerator.ts";
 export interface SerializeOptions {
     stripDisplay?: boolean;
     stripView?: boolean;
+    stripWidth?: boolean;
 }
 
 /** A definition of a Node but still in raw text format */
 export class NodeDefinition {
+    private readonly Runtime = '@bodar/dataflow/runtime.ts';
+
     constructor(private _key: string,
                 private _inputs: string[],
                 private _outputs: string[],
@@ -90,6 +93,7 @@ export class NodeDefinition {
         let inputs = this._inputs;
         if (options?.stripDisplay) inputs = inputs.filter(i => i !== 'display');
         if (options?.stripView) inputs = inputs.filter(i => i !== 'view');
+        if (options?.stripWidth) inputs = inputs.map(i => i === 'width' ? `width_${this.key}` : i);
         return inputs;
     }
 
@@ -97,6 +101,7 @@ export class NodeDefinition {
         let outputs = this._outputs;
         if (options?.stripDisplay) outputs = outputs.filter(o => o !== 'display');
         if (options?.stripView) outputs = outputs.filter(o => o !== 'view');
+        if (options?.stripWidth) outputs = outputs.filter(o => o !== 'width');
         return outputs;
     }
 
@@ -104,8 +109,9 @@ export class NodeDefinition {
         if (!options?.stripDisplay && !options?.stripView) return this._imports;
 
         const imports = this._imports.clone();
-        if (options?.stripDisplay) imports.removeSpecifier('@bodar/dataflow/runtime.ts', 'display');
-        if (options?.stripView) imports.removeSpecifier('@bodar/dataflow/runtime.ts', 'view');
+        if (options?.stripDisplay) imports.removeSpecifier(this.Runtime, 'display');
+        if (options?.stripView) imports.removeSpecifier(this.Runtime, 'view');
+        if (options?.stripWidth) imports.removeSpecifier(this.Runtime, 'width');
         return imports;
     }
 
@@ -116,6 +122,7 @@ export class NodeDefinition {
             this.importsExpressions(imports),
             this.hasImplicitDisplay() || this.hasExplicitDisplay() ? `const display = Display.for(${JSON.stringify(this._key)}, _runtime_);` : undefined,
             this.hasExplicitView() ? `const view = View.for(${JSON.stringify(this._key)}, _runtime_);` : undefined,
+            this.hasWidthInput() ? `const width = width_${this._key};` : undefined,
             outputs.length ? `${this._body}\nreturn {${outputs.join(',')}};` : this._singleStatement ? this._body : `return display(${this._body.replace(/;$/, '')})`
         ].filter(l => l).join('\n');
     }
@@ -125,11 +132,23 @@ export class NodeDefinition {
     }
 
     hasExplicitDisplay(): boolean {
-        return this._imports.get('@bodar/dataflow/runtime.ts')?.locals.includes('display') || this._inputs.some(v => v === 'display');
+        return this._imports.get(this.Runtime)?.locals.includes('display') || this._inputs.some(v => v === 'display');
     }
 
     hasExplicitView(): boolean {
-        return this._imports.get('@bodar/dataflow/runtime.ts')?.locals.includes('view') || this._inputs.some(v => v === 'view');
+        return this._imports.get(this.Runtime)?.locals.includes('view') || this._inputs.some(v => v === 'view');
+    }
+
+    hasWidth(): boolean {
+        return this.hasWidthImport() || this.hasWidthInput();
+    }
+
+    hasWidthInput() {
+        return this._inputs.some(v => v === 'width');
+    }
+
+    hasWidthImport() {
+        return this._imports.get(this.Runtime)?.locals.includes('width');
     }
 
     hasDisplay(): boolean {

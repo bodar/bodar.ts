@@ -12,7 +12,7 @@ The dataflow package implements the **most frequently used** Observable Framewor
 |----------|-----------------|----------------|-------|
 | `view()` | **109 uses** | `view.ts` | Combines input + display |
 | `display()` | **60 uses** | `display.ts` | Value collector for rendering |
-| `resize()` | **57 uses** | `resize.ts` | Responsive container with ResizeObserver |
+| `width` | **57+4 uses** | `width.ts` | Container width as reactive value (replaces resize & Generators.width) |
 | `Generators.input()` | **20 uses** | `input.ts` | DOM element → AsyncIterator |
 | `Generators.observe()` | **10 uses** | `observe.ts` | Callback → AsyncIterator |
 | `Mutable` | **3 uses** | `mutable.ts` | Reactive value with EventTarget |
@@ -24,9 +24,8 @@ The dataflow package implements the **most frequently used** Observable Framewor
 | Priority | Function | Usage | Description |
 |----------|----------|-------|-------------|
 | 1 | `visibility()` | **7 uses** | Promise resolving when element visible |
-| 2 | `Generators.width()` | **4 uses** | Element width as async generator |
-| 3 | `Generators.queue()` | **2 uses** | Like observe but queues (no drops) |
-| 4 | `Generators.dark()` | **2 uses** | Dark mode preference generator |
+| 2 | `Generators.queue()` | **2 uses** | Like observe but queues (no drops) |
+| 3 | `Generators.dark()` | **2 uses** | Dark mode preference generator |
 
 ## Generator Lifecycle: When `return()` and `finally` Run
 
@@ -122,7 +121,7 @@ Event listeners on DOM elements don't cause true memory leaks in modern browsers
 ## Source References
 
 - Observable Framework `observe.js`: `framework/src/client/stdlib/generators/observe.js`
-- Observable Framework `resize.ts`: `framework/src/client/stdlib/resize.ts`
+- Dataflow width: `packages/dataflow/src/api/width.ts`
 - Observable Runtime: `observablehq/runtime` on GitHub - `src/runtime.js` contains `variable_return()` for generator cleanup
 - Dataflow invalidation: `packages/dataflow/src/PullNode.ts` - `invalidate()` function and `setValue()` method
 - Lifecycle tests: `packages/dataflow/test/Graph.test.ts` - "invalidation" and "life cycle" describe blocks

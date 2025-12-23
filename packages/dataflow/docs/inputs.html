@@ -292,19 +292,19 @@ input(element, 'input', (el) => el.value.toUpperCase());</code></pre>
 
 <div class="example">
     <script type="module" is="reactive" data-echo>
-        const width = view(<input type="range" min="50" max="300" value="150"/>);
+        const w = view(<input type="range" min="50" max="300" value="150"/>);
     </script>
     <script type="module" is="reactive" data-echo>
-        const height = view(<input type="range" min="50" max="200" value="100"/>);
+        const h = view(<input type="range" min="50" max="200" value="100"/>);
     </script>
     <script type="module" is="reactive" data-echo>
         const boxColor = view(<input type="color" value="#4a90d9"/>);
     </script>
     <script type="module" is="reactive" data-echo>
-        <div style={`width: ${width}px; height: ${height}px; background: ${boxColor};
+        <div style={`width: ${w}px; height: ${h}px; background: ${boxColor};
             display: flex; align-items: center; justify-content: center; color: white;
             text-shadow: 1px 1px 2px black`}>
-            {width} x {height}
+            {w} x {h}
         </div>
     </script>
 </div>
