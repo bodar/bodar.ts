@@ -57,6 +57,7 @@ describe("combineLatest", () => {
 
         assertThat(result, equals([
             [1, 'a', true],
+            [2, 'a', true],
             [2, 'a', false]
         ]));
     });

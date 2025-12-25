@@ -23,7 +23,7 @@ export async function* combineLatest(iterables: AsyncIterable<any>[], filter: bo
 
         while (true) {
             for (const {iterator, index} of iterators) {
-                if (!pending.has(index)) {
+                if (!pending.has(index) && !resolved.has(index)) {
                     pending.set(index, iterator.next().then(result => {
                         pending.delete(index);
                         resolved.set(index, result);
@@ -32,7 +32,7 @@ export async function* combineLatest(iterables: AsyncIterable<any>[], filter: bo
                 }
             }
 
-            await Promise.all([signal, Promise.resolve()]); // Let other microtasks complete for batching
+            await signal;
             // This must be done before yielding otherwise we can miss a sync update
             ({promise: signal, resolve: signalResolve} = Promise.withResolvers<void>());
 

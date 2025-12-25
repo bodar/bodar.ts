@@ -35,7 +35,7 @@ export class PullNode<T> implements Node<T> {
         try {
             while (true) {
                 for (const [name, iterator] of iterators) {
-                    if (!pending.has(name)) {
+                    if (!pending.has(name) && !resolved.has(name)) {
                         pending.set(name, iterator.next().then(result => {
                             pending.delete(name);
                             result.done ? iterators.delete(name) : resolved.set(name, result.value);
