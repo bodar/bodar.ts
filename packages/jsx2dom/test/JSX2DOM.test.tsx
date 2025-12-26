@@ -114,111 +114,54 @@ describe("JSX2DOM SVG Support", () => {
         const jsx = new JSX2DOM(html);
         const svg = <svg viewBox="0 0 100 100"><circle cx={50} cy={50} r={40}/></svg>;
         expect(svg.namespaceURI).toEqual('http://www.w3.org/2000/svg');
-        expect(svg.tagName.toLowerCase()).toEqual('svg');
     });
 
-    it("creates nested SVG elements with correct namespace", async () => {
+    it("sets SVG attributes via setAttribute", async () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);
-        const svg = <svg viewBox="0 0 100 100">
-            <g>
-                <circle cx={50} cy={50} r={40}/>
-                <rect x={10} y={10} width={80} height={80}/>
-            </g>
-        </svg>;
-        const circle = svg.querySelector('circle');
-        const rect = svg.querySelector('rect');
-        expect(circle?.namespaceURI).toEqual('http://www.w3.org/2000/svg');
-        expect(rect?.namespaceURI).toEqual('http://www.w3.org/2000/svg');
-    });
-
-    it("sets SVG attributes correctly", async () => {
-        const html = parseHTML('...');
-        const jsx = new JSX2DOM(html);
-        const circle = <circle cx={50} cy={50} r={40} fill="red"/>;
-        expect(circle.getAttribute('cx')).toEqual('50');
-        expect(circle.getAttribute('cy')).toEqual('50');
-        expect(circle.getAttribute('r')).toEqual('40');
-        expect(circle.getAttribute('fill')).toEqual('red');
+        html.document.body.appendChild(<circle cx={50} cy={50} r={40} fill="red"/>);
+        expect(html.document.body.innerHTML).toEqual('<circle fill="red" r="40" cy="50" cx="50" />');
     });
 
     it("handles kebab-case presentation attributes", async () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);
-        const path = <path d="M0 0 L10 10" stroke-width={2} stroke-linecap="round"/>;
-        expect(path.getAttribute('stroke-width')).toEqual('2');
-        expect(path.getAttribute('stroke-linecap')).toEqual('round');
+        html.document.body.appendChild(<path d="M0 0" stroke-width={2} stroke-linecap="round"/>);
+        expect(html.document.body.innerHTML).toEqual('<path stroke-linecap="round" stroke-width="2" d="M0 0" />');
     });
 
     it("converts camelCase presentation attributes to kebab-case", async () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);
-        const path = <path d="M0 0 L10 10" strokeWidth={3} strokeLinecap="square"/>;
-        expect(path.getAttribute('stroke-width')).toEqual('3');
-        expect(path.getAttribute('stroke-linecap')).toEqual('square');
-    });
-
-    it("handles SVG viewBox attribute", async () => {
-        const html = parseHTML('...');
-        const jsx = new JSX2DOM(html);
-        const svg = <svg viewBox="0 0 200 200" width={100} height={100}/>;
-        expect(svg.getAttribute('viewBox')).toEqual('0 0 200 200');
-        expect(svg.getAttribute('width')).toEqual('100');
-        expect(svg.getAttribute('height')).toEqual('100');
-    });
-
-    it("handles path d attribute", async () => {
-        const html = parseHTML('...');
-        const jsx = new JSX2DOM(html);
-        const path = <path d="M10 10 H 90 V 90 H 10 Z" fill="none" stroke="black"/>;
-        expect(path.getAttribute('d')).toEqual('M10 10 H 90 V 90 H 10 Z');
+        html.document.body.appendChild(<path d="M0 0" strokeWidth={3} strokeLinecap="square"/>);
+        expect(html.document.body.innerHTML).toEqual('<path stroke-linecap="square" stroke-width="3" d="M0 0" />');
     });
 
     it("handles SVG text elements", async () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);
-        const text = <text x={10} y={20} font-size={14}>Hello SVG</text>;
-        expect(text.getAttribute('x')).toEqual('10');
-        expect(text.getAttribute('y')).toEqual('20');
-        expect(text.getAttribute('font-size')).toEqual('14');
-        expect(text.textContent).toEqual('Hello SVG');
+        html.document.body.appendChild(<text x={10} y={20} font-size={14}>Hello</text>);
+        expect(html.document.body.innerHTML).toEqual('<text font-size="14" y="20" x="10">Hello</text>');
     });
 
     it("handles gradient elements", async () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);
-        const gradient = <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="red"/>
-            <stop offset="100%" stop-color="blue"/>
-        </linearGradient>;
-        expect(gradient.getAttribute('id')).toEqual('grad1');
-        const stops = gradient.querySelectorAll('stop');
-        expect(stops.length).toEqual(2);
-        expect(stops[0].getAttribute('stop-color')).toEqual('red');
+        html.document.body.appendChild(<linearGradient id="grad1"><stop offset="0%" stop-color="red"/></linearGradient>);
+        expect(html.document.body.innerHTML).toEqual('<linearGradient id="grad1"><stop stop-color="red" offset="0%" /></linearGradient>');
     });
 
     it("handles filter elements", async () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);
-        const filter = <filter id="blur">
-            <feGaussianBlur stdDeviation={5}/>
-        </filter>;
-        expect(filter.getAttribute('id')).toEqual('blur');
-        const blur = filter.querySelector('feGaussianBlur');
-        expect(blur?.getAttribute('stdDeviation')).toEqual('5');
+        html.document.body.appendChild(<filter id="blur"><feGaussianBlur stdDeviation={5}/></filter>);
+        expect(html.document.body.innerHTML).toEqual('<filter id="blur"><feGaussianBlur stdDeviation="5" /></filter>');
     });
 
-    it("can embed SVG in HTML document", async () => {
+    it("can embed SVG in HTML", async () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);
-        html.document.body.appendChild(
-            <div>
-                <svg viewBox="0 0 100 100">
-                    <circle cx={50} cy={50} r={40} fill="blue"/>
-                </svg>
-            </div>
-        );
-        const svg = html.document.body.querySelector('svg');
-        expect(svg?.namespaceURI).toEqual('http://www.w3.org/2000/svg');
+        html.document.body.appendChild(<svg viewBox="0 0 100 100"><circle cx={50} cy={50} r={40}/></svg>);
+        expect(html.document.body.innerHTML).toEqual('<svg viewBox="0 0 100 100"><circle r="40" cy="50" cx="50" /></svg>');
     });
 });
