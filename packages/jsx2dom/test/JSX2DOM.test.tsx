@@ -70,4 +70,42 @@ describe("JSX2DOM", () => {
         html.document.body.appendChild(<form><input checked={true}/><input checked={false}/></form>);
         expect(html.document.body.innerHTML).toEqual('<form><input checked/><input/></form>');
     });
+
+    it("maps 'class' attribute to className property", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        const div = <div class="test-class"/>;
+        expect((div as HTMLElement).className).toEqual('test-class');
+    });
+
+    // Linkedom doesn't implement htmlFor, so we test it sets via the property path
+    it("maps 'for' attribute to htmlFor property on labels", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<label for="input-id">Label</label>);
+        // linkedom doesn't implement htmlFor, but it should set the attribute
+        expect(html.document.body.innerHTML).toContain('for="input-id"');
+    });
+
+    it("handles style as a string", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<div style="color: red; font-size: 14px">Styled</div>);
+        expect(html.document.body.innerHTML).toContain('style="color: red; font-size: 14px"');
+    });
+
+    it("handles style as an object", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        const div = <div style={{ color: 'blue', fontSize: '16px' }}>Styled</div>;
+        expect((div as HTMLElement).style.color).toEqual('blue');
+        expect((div as HTMLElement).style.fontSize).toEqual('16px');
+    });
+
+    it("maps tabindex attribute to tabIndex property", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        const div = <div tabindex={5}>Focusable</div>;
+        expect((div as HTMLElement).tabIndex).toEqual(5);
+    });
 });

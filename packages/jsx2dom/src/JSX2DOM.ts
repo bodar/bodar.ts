@@ -1,10 +1,11 @@
 /** @module
  * Super light weight JSX to Native DOM
  */
-/// <reference path="./types.d.ts" />
+import './types.d.ts';
+import { attributeToProperty } from './attribute-mapping.ts';
 
-/** a JSX attribute, currently only a string */
-export type Attributes = { [key: string]: string | boolean } | null;
+/** JSX attributes - can be strings, booleans, numbers, functions, or style objects */
+export type Attributes = { [key: string]: unknown } | null;
 /** Supported nested JSX content */
 export type Content = string | number | Node | Content[];
 
@@ -32,20 +33,44 @@ export class JSX2DOM {
 
     private addAttributes(node: Node, attributes: Attributes) {
         const {HTMLElement} = this.deps;
-        if (attributes !== null) {
-            for (const [key, value] of Object.entries(attributes)) {
-                if (key.startsWith('on') && typeof value === 'function') {
-                    node.addEventListener(key.substring(2), value);
-                } else {
-                    if (key in node) {
-                        try {
-                            Reflect.set(node, key, value);
-                        } catch (e) {
-                            if (node instanceof HTMLElement) node.setAttribute(key, String(value))
+        if (attributes === null) return;
+
+        for (const [key, value] of Object.entries(attributes)) {
+            if (value === undefined || value === null) continue;
+
+            // Event handlers
+            if (key.startsWith('on') && typeof value === 'function') {
+                node.addEventListener(key.substring(2), value as EventListener);
+                continue;
+            }
+
+            // Style support (object or string)
+            if (key === 'style' && node instanceof HTMLElement) {
+                if (typeof value === 'object') {
+                    const style = node.style as unknown as Record<string, string>;
+                    for (const [prop, val] of Object.entries(value as object)) {
+                        if (val !== undefined && val !== null) {
+                            style[prop] = String(val);
                         }
                     }
-                    else if (node instanceof HTMLElement) node.setAttribute(key, String(value));
+                } else if (typeof value === 'string') {
+                    node.style.cssText = value;
                 }
+                continue;
+            }
+
+            // Map HTML attribute names to DOM property names
+            const propertyName = (attributeToProperty as Record<string, string>)[key] ?? key;
+
+            // Try to set as property first, fall back to setAttribute
+            if (propertyName in node) {
+                try {
+                    Reflect.set(node, propertyName, value);
+                } catch {
+                    if (node instanceof HTMLElement) node.setAttribute(key, String(value));
+                }
+            } else if (node instanceof HTMLElement) {
+                node.setAttribute(key, String(value));
             }
         }
     }

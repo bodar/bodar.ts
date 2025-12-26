@@ -1,516 +1,266 @@
-type PickStartingWith<T, S extends string> = {
-    [K in keyof T as K extends `${S}${string}` ? K : never]: T[K]
+import type { AttributeToProperty } from './attribute-mapping.js';
+
+// =============================================================================
+// Type Utilities
+// =============================================================================
+
+/** Remap property names using a mapping object, extracting types from DOM element */
+type Remap<T, M extends Record<string, string>> = {
+    [K in keyof M as M[K] extends keyof T ? K : never]?:
+        M[K] extends keyof T ? T[M[K]] : never
 };
 
-namespace JSX {
-    type Element = HTMLElement;
+/** Pick all properties starting with a prefix */
+type PickStartingWith<T, S extends string> = {
+    [K in keyof T as K extends `${S}${string}` ? K : never]?: T[K]
+};
 
-    interface HtmlTag extends Partial<PickStartingWith<HTMLElement, 'on'>>{
-        accesskey?: string;
-        class?: string;
-        contenteditable?: string;
-        dir?: string;
-        hidden?: string | boolean;
-        id?: string;
-        role?: string;
-        lang?: string;
-        draggable?: string | boolean;
-        spellcheck?: string | boolean;
-        style?: string;
-        tabindex?: string;
-        title?: string;
-        translate?: string | boolean;
-        is?: string;
-    }
+/** Filter out methods (functions) from a type */
+type NonMethods<T> = {
+    [K in keyof T as T[K] extends Function ? never : K]: T[K]
+};
 
-    interface HtmlAnchorTag extends HtmlTag {
-        href?: string;
-        target?: string;
-        download?: string;
-        ping?: string;
-        rel?: string;
-        media?: string;
-        hreflang?: string;
-        type?: string;
-    }
+/** Filter out UPPER_CASE constants */
+type NonConstants<T> = {
+    [K in keyof T as Uppercase<string & K> extends K ? never : K]: T[K]
+};
 
-    interface HtmlAreaTag extends HtmlTag {
-        alt?: string;
-        coords?: string;
-        shape?: string;
-        href?: string;
-        target?: string;
-        ping?: string;
-        rel?: string;
-        media?: string;
-        hreflang?: string;
-        type?: string;
-    }
+// =============================================================================
+// Exclusion Lists
+// =============================================================================
 
-    interface HtmlAudioTag extends HtmlTag, Partial<PickStartingWith<HTMLAudioElement, 'on'>> {
-        src?: string;
-        autobuffer?: string;
-        autoplay?: string;
-        loop?: string;
-        controls?: string;
-    }
+/** Readonly/internal properties to exclude from all elements */
+type BaseExclusions =
+    // Node readonly
+    | 'baseURI' | 'childNodes' | 'firstChild' | 'isConnected' | 'lastChild'
+    | 'nextSibling' | 'nodeName' | 'nodeType' | 'nodeValue' | 'ownerDocument'
+    | 'parentElement' | 'parentNode' | 'previousSibling' | 'textContent'
+    // Element readonly
+    | 'attributes' | 'classList' | 'clientHeight' | 'clientLeft' | 'clientTop'
+    | 'clientWidth' | 'innerHTML' | 'localName' | 'namespaceURI' | 'outerHTML'
+    | 'scrollHeight' | 'scrollWidth' | 'shadowRoot' | 'tagName' | 'prefix'
+    | 'scrollLeft' | 'scrollTop' | 'slot' | 'assignedSlot'
+    // HTMLElement readonly
+    | 'accessKeyLabel' | 'offsetHeight' | 'offsetLeft' | 'offsetParent'
+    | 'offsetTop' | 'offsetWidth' | 'innerText' | 'outerText'
+    // Other internal
+    | 'dataset' | 'style' | 'part' | 'attributeStyleMap' | 'isContentEditable';
 
-    interface BaseTag extends HtmlTag {
-        href?: string;
-        target?: string;
-    }
+/** Element-specific exclusions */
+type InputExclusions = 'files' | 'form' | 'labels' | 'list' | 'validity' | 'validationMessage' | 'willValidate'
+    | 'selectionStart' | 'selectionEnd' | 'selectionDirection' | 'valueAsDate' | 'valueAsNumber';
+type ButtonExclusions = 'form' | 'labels' | 'validity' | 'validationMessage' | 'willValidate';
+type SelectExclusions = 'form' | 'labels' | 'options' | 'selectedOptions' | 'validity' | 'validationMessage' | 'willValidate';
+type TextAreaExclusions = 'form' | 'labels' | 'validity' | 'validationMessage' | 'willValidate'
+    | 'selectionStart' | 'selectionEnd' | 'selectionDirection' | 'textLength';
+type FormExclusions = 'elements' | 'length';
+type AnchorExclusions = 'origin' | 'relList' | 'hash' | 'host' | 'hostname' | 'password' | 'pathname' | 'port' | 'protocol' | 'search' | 'username';
+type ImageExclusions = 'complete' | 'currentSrc' | 'naturalHeight' | 'naturalWidth' | 'x' | 'y';
+type TableExclusions = 'caption' | 'rows' | 'tBodies' | 'tFoot' | 'tHead';
+type TableRowExclusions = 'cells' | 'rowIndex' | 'sectionRowIndex';
+type TableCellExclusions = 'cellIndex';
 
-    interface HtmlQuoteTag extends HtmlTag {
-        cite?: string;
-    }
+// =============================================================================
+// Base Element Attributes (derived from HTMLElement)
+// =============================================================================
 
-    interface HtmlBodyTag extends HtmlTag, Partial<PickStartingWith<HTMLBodyElement, 'on'>> {
-    }
+type ElementProps<T extends HTMLElement, E extends string = never> =
+    & Partial<Omit<NonMethods<NonConstants<T>>, BaseExclusions | E | keyof AttributeToProperty>>
+    & Remap<T, AttributeToProperty>
+    & Partial<PickStartingWith<T, 'on'>>
+    & { style?: Partial<CSSStyleDeclaration> | string };
 
-    interface HtmlButtonTag extends HtmlTag {
-        action?: string;
-        autofocus?: string;
-        disabled?: string;
-        enctype?: string;
-        form?: string;
-        method?: string;
-        name?: string;
-        novalidate?: string | boolean;
-        target?: string;
-        type?: string;
-        value?: string;
-    }
+// =============================================================================
+// Element-Specific Interfaces
+// =============================================================================
 
-    interface HtmlDataListTag extends HtmlTag {
-    }
+interface HtmlTag extends ElementProps<HTMLElement> {}
+interface HtmlAnchorTag extends ElementProps<HTMLAnchorElement, AnchorExclusions> {}
+interface HtmlAreaTag extends ElementProps<HTMLAreaElement> {}
+interface HtmlAudioTag extends ElementProps<HTMLAudioElement> {}
+interface HtmlBaseTag extends ElementProps<HTMLBaseElement> {}
+interface HtmlQuoteTag extends ElementProps<HTMLQuoteElement> {}
+interface HtmlBodyTag extends ElementProps<HTMLBodyElement> {}
+interface HtmlBRTag extends ElementProps<HTMLBRElement> {}
+interface HtmlButtonTag extends ElementProps<HTMLButtonElement, ButtonExclusions> {}
+interface HtmlCanvasTag extends ElementProps<HTMLCanvasElement> {}
+interface HtmlTableCaptionTag extends ElementProps<HTMLTableCaptionElement> {}
+interface HtmlTableColTag extends ElementProps<HTMLTableColElement> {}
+interface HtmlDataTag extends ElementProps<HTMLDataElement> {}
+interface HtmlDataListTag extends ElementProps<HTMLDataListElement> {}
+interface HtmlModTag extends ElementProps<HTMLModElement> {}
+interface HtmlDetailsTag extends ElementProps<HTMLDetailsElement> {}
+interface HtmlDialogTag extends ElementProps<HTMLDialogElement> {}
+interface HtmlDivTag extends ElementProps<HTMLDivElement> {}
+interface HtmlDListTag extends ElementProps<HTMLDListElement> {}
+interface HtmlEmbedTag extends ElementProps<HTMLEmbedElement> {}
+interface HtmlFieldSetTag extends ElementProps<HTMLFieldSetElement> {}
+interface HtmlFormTag extends ElementProps<HTMLFormElement, FormExclusions> {}
+interface HtmlHeadingTag extends ElementProps<HTMLHeadingElement> {}
+interface HtmlHeadTag extends ElementProps<HTMLHeadElement> {}
+interface HtmlHRTag extends ElementProps<HTMLHRElement> {}
+interface HtmlHtmlTag extends ElementProps<HTMLHtmlElement> {}
+interface HtmlIFrameTag extends ElementProps<HTMLIFrameElement> {}
+interface HtmlImageTag extends ElementProps<HTMLImageElement, ImageExclusions> {}
+interface HtmlInputTag extends ElementProps<HTMLInputElement, InputExclusions> {}
+interface HtmlLabelTag extends ElementProps<HTMLLabelElement> {}
+interface HtmlLegendTag extends ElementProps<HTMLLegendElement> {}
+interface HtmlLITag extends ElementProps<HTMLLIElement> {}
+interface HtmlLinkTag extends ElementProps<HTMLLinkElement> {}
+interface HtmlMapTag extends ElementProps<HTMLMapElement> {}
+interface HtmlMenuTag extends ElementProps<HTMLMenuElement> {}
+interface HtmlMetaTag extends ElementProps<HTMLMetaElement> {}
+interface HtmlMeterTag extends ElementProps<HTMLMeterElement> {}
+interface HtmlObjectTag extends ElementProps<HTMLObjectElement> {}
+interface HtmlOListTag extends ElementProps<HTMLOListElement> {}
+interface HtmlOptGroupTag extends ElementProps<HTMLOptGroupElement> {}
+interface HtmlOptionTag extends ElementProps<HTMLOptionElement> {}
+interface HtmlOutputTag extends ElementProps<HTMLOutputElement> {}
+interface HtmlParagraphTag extends ElementProps<HTMLParagraphElement> {}
+interface HtmlPictureTag extends ElementProps<HTMLPictureElement> {}
+interface HtmlPreTag extends ElementProps<HTMLPreElement> {}
+interface HtmlProgressTag extends ElementProps<HTMLProgressElement> {}
+interface HtmlScriptTag extends ElementProps<HTMLScriptElement> {}
+interface HtmlSelectTag extends ElementProps<HTMLSelectElement, SelectExclusions> {}
+interface HtmlSlotTag extends ElementProps<HTMLSlotElement> {}
+interface HtmlSourceTag extends ElementProps<HTMLSourceElement> {}
+interface HtmlSpanTag extends ElementProps<HTMLSpanElement> {}
+interface HtmlStyleTag extends ElementProps<HTMLStyleElement> {}
+interface HtmlTableTag extends ElementProps<HTMLTableElement, TableExclusions> {}
+interface HtmlTableSectionTag extends ElementProps<HTMLTableSectionElement> {}
+interface HtmlTableCellTag extends ElementProps<HTMLTableCellElement, TableCellExclusions> {}
+interface HtmlTemplateTag extends ElementProps<HTMLTemplateElement> {}
+interface HtmlTextAreaTag extends ElementProps<HTMLTextAreaElement, TextAreaExclusions> {}
+interface HtmlTimeTag extends ElementProps<HTMLTimeElement> {}
+interface HtmlTitleTag extends ElementProps<HTMLTitleElement> {}
+interface HtmlTableRowTag extends ElementProps<HTMLTableRowElement, TableRowExclusions> {}
+interface HtmlTrackTag extends ElementProps<HTMLTrackElement> {}
+interface HtmlUListTag extends ElementProps<HTMLUListElement> {}
+interface HtmlVideoTag extends ElementProps<HTMLVideoElement> {}
 
-    interface HtmlCanvasTag extends HtmlTag {
-        width?: string;
-        height?: string;
-    }
+// =============================================================================
+// JSX Namespace
+// =============================================================================
 
-    interface HtmlTableColTag extends HtmlTag {
-        span?: string;
-    }
+declare global {
+    namespace JSX {
+        type Element = HTMLElement;
 
-    interface HtmlTableSectionTag extends HtmlTag {
-    }
-
-    interface HtmlTableRowTag extends HtmlTag {
-    }
-
-    interface DataTag extends HtmlTag {
-        value?: string;
-    }
-
-    interface HtmlEmbedTag extends HtmlTag, Partial<PickStartingWith<HTMLEmbedElement, 'on'>> {
-        src?: string;
-        type?: string;
-        width?: string;
-        height?: string;
-
-        [anything: string]: string | boolean | undefined;
-    }
-
-    interface HtmlFieldSetTag extends HtmlTag {
-        disabled?: string;
-        form?: string;
-        name?: string;
-    }
-
-    interface HtmlFormTag extends HtmlTag, Partial<PickStartingWith<HTMLFormElement, 'on'>> {
-        acceptCharset?: string;
-        action?: string;
-        autocomplete?: string;
-        enctype?: string;
-        method?: string;
-        name?: string;
-        novalidate?: string | boolean;
-        target?: string;
-    }
-
-    interface HtmlHtmlTag extends HtmlTag {
-        manifest?: string;
-    }
-
-    interface HtmlIFrameTag extends HtmlTag {
-        src?: string;
-        srcdoc?: string;
-        name?: string;
-        sandbox?: string;
-        seamless?: string;
-        width?: string;
-        height?: string;
-    }
-
-    interface HtmlImageTag extends HtmlTag, Partial<PickStartingWith<HTMLImageElement, 'on'>> {
-        alt?: string;
-        src?: string;
-        crossorigin?: string;
-        usemap?: string;
-        ismap?: string;
-        width?: string;
-        height?: string;
-        loading?: 'lazy' | 'eager';
-    }
-
-    interface HtmlInputTag extends HtmlTag, Partial<PickStartingWith<HTMLInputElement, 'on'>> {
-        accept?: string;
-        action?: string;
-        alt?: string;
-        autocomplete?: string;
-        autofocus?: string;
-        checked?: string | boolean;
-        disabled?: string | boolean;
-        enctype?: string;
-        form?: string;
-        height?: string;
-        list?: string;
-        max?: string;
-        maxlength?: string;
-        method?: string;
-        min?: string;
-        multiple?: string;
-        name?: string;
-        novalidate?: string | boolean;
-        pattern?: string;
-        placeholder?: string;
-        readonly?: string;
-        required?: string;
-        size?: string;
-        src?: string;
-        step?: string;
-        target?: string;
-        type?: string;
-        value?: string;
-        width?: string;
-    }
-
-    interface HtmlModTag extends HtmlTag {
-        cite?: string;
-        datetime?: string | Date;
-    }
-
-    interface KeygenTag extends HtmlTag {
-        autofocus?: string;
-        challenge?: string;
-        disabled?: string;
-        form?: string;
-        keytype?: string;
-        name?: string;
-    }
-
-    interface HtmlLabelTag extends HtmlTag {
-        form?: string;
-        for?: string;
-    }
-
-    interface HtmlLITag extends HtmlTag {
-        value?: string | number;
-    }
-
-    interface HtmlLinkTag extends HtmlTag {
-        href?: string;
-        crossorigin?: string;
-        rel?: string;
-        media?: string;
-        hreflang?: string;
-        type?: string;
-        sizes?: string;
-        integrity?: string;
-        as?: string;
-    }
-
-    interface HtmlMapTag extends HtmlTag {
-        name?: string;
-    }
-
-    interface HtmlMetaTag extends HtmlTag {
-        name?: string;
-        httpEquiv?: string;
-        content?: string;
-        charset?: string;
-    }
-
-    interface HtmlMeterTag extends HtmlTag {
-        value?: string | number;
-        min?: string | number;
-        max?: string | number;
-        low?: string | number;
-        high?: string | number;
-        optimum?: string | number;
-    }
-
-    interface HtmlObjectTag extends HtmlTag, Partial<PickStartingWith<HTMLObjectElement, 'on'>> {
-        data?: string;
-        type?: string;
-        name?: string;
-        usemap?: string;
-        form?: string;
-        width?: string;
-        height?: string;
-    }
-
-    interface HtmlOListTag extends HtmlTag {
-        reversed?: string;
-        start?: string | number;
-    }
-
-    interface HtmlOptgroupTag extends HtmlTag {
-        disabled?: string;
-        label?: string;
-    }
-
-    interface HtmlOptionTag extends HtmlTag {
-        disabled?: string;
-        label?: string;
-        selected?: string;
-        value?: string;
-    }
-
-    interface HtmlOutputTag extends HtmlTag {
-        for?: string;
-        form?: string;
-        name?: string;
-    }
-
-    interface HtmlParamTag extends HtmlTag {
-        name?: string;
-        value?: string;
-    }
-
-    interface HtmlProgressTag extends HtmlTag {
-        value?: string | number;
-        max?: string | number;
-    }
-
-    interface HtmlCommandTag extends HtmlTag {
-        type?: string;
-        label?: string;
-        icon?: string;
-        disabled?: string;
-        checked?: string;
-        radiogroup?: string;
-        default?: string;
-    }
-
-    interface HtmlLegendTag extends HtmlTag {
-    }
-
-    interface HtmlBrowserButtonTag extends HtmlTag {
-        type?: string;
-    }
-
-    interface HtmlMenuTag extends HtmlTag {
-        type?: string;
-        label?: string;
-    }
-
-    interface HtmlScriptTag extends HtmlTag {
-        src?: string;
-        type?: string;
-        charset?: string;
-        async?: string;
-        defer?: string;
-        crossorigin?: string;
-        integrity?: string;
-        text?: string;
-    }
-
-    interface HtmlDetailsTag extends HtmlTag {
-        open?: string;
-    }
-
-    interface HtmlSelectTag extends HtmlTag {
-        autofocus?: string;
-        disabled?: string;
-        form?: string;
-        multiple?: string;
-        name?: string;
-        required?: string;
-        size?: string;
-    }
-
-    interface HtmlSourceTag extends HtmlTag {
-        src?: string;
-        type?: string;
-        media?: string;
-    }
-
-    interface HtmlStyleTag extends HtmlTag {
-        media?: string;
-        type?: string;
-        disabled?: string;
-        scoped?: string;
-    }
-
-    interface HtmlTableTag extends HtmlTag {
-    }
-
-    interface HtmlTableDataCellTag extends HtmlTag {
-        colspan?: string | number;
-        rowspan?: string | number;
-        headers?: string;
-    }
-
-    interface HtmlTextAreaTag extends HtmlTag {
-        autofocus?: string;
-        cols?: string;
-        dirname?: string;
-        disabled?: string;
-        form?: string;
-        maxlength?: string;
-        minlength?: string;
-        name?: string;
-        placeholder?: string;
-        readonly?: string;
-        required?: string;
-        rows?: string;
-        wrap?: string;
-    }
-
-    interface HtmlTableHeaderCellTag extends HtmlTag {
-        colspan?: string | number;
-        rowspan?: string | number;
-        headers?: string;
-        scope?: string;
-    }
-
-    interface HtmlTimeTag extends HtmlTag {
-        datetime?: string | Date;
-    }
-
-    interface HtmlTrackTag extends HtmlTag {
-        default?: string;
-        kind?: string;
-        label?: string;
-        src?: string;
-        srclang?: string;
-    }
-
-    interface HtmlVideoTag extends HtmlTag, Partial<PickStartingWith<HTMLVideoElement, 'on'>> {
-        src?: string;
-        poster?: string;
-        autobuffer?: string;
-        autoplay?: string;
-        loop?: string;
-        controls?: string;
-        width?: string;
-        height?: string;
-    }
-
-    interface IntrinsicElements {
-        a: HtmlAnchorTag;
-        abbr: HtmlTag;
-        address: HtmlTag;
-        area: HtmlAreaTag;
-        article: HtmlTag;
-        aside: HtmlTag;
-        audio: HtmlAudioTag;
-        b: HtmlTag;
-        bb: HtmlBrowserButtonTag;
-        base: BaseTag;
-        bdi: HtmlTag;
-        bdo: HtmlTag;
-        blockquote: HtmlQuoteTag;
-        body: HtmlBodyTag;
-        br: HtmlTag;
-        button: HtmlButtonTag;
-        canvas: HtmlCanvasTag;
-        caption: HtmlTag;
-        cite: HtmlTag;
-        code: HtmlTag;
-        col: HtmlTableColTag;
-        colgroup: HtmlTableColTag;
-        commands: HtmlCommandTag;
-        data: DataTag;
-        datalist: HtmlDataListTag;
-        dd: HtmlTag;
-        del: HtmlModTag;
-        details: HtmlDetailsTag;
-        dfn: HtmlTag;
-        div: HtmlTag;
-        dl: HtmlTag;
-        dt: HtmlTag;
-        em: HtmlTag;
-        embed: HtmlEmbedTag;
-        fieldset: HtmlFieldSetTag;
-        figcaption: HtmlTag;
-        figure: HtmlTag;
-        footer: HtmlTag;
-        form: HtmlFormTag;
-        h1: HtmlTag;
-        h2: HtmlTag;
-        h3: HtmlTag;
-        h4: HtmlTag;
-        h5: HtmlTag;
-        h6: HtmlTag;
-        head: HtmlTag;
-        header: HtmlTag;
-        hr: HtmlTag;
-        html: HtmlHtmlTag;
-        i: HtmlTag;
-        iframe: HtmlIFrameTag;
-        img: HtmlImageTag;
-        input: HtmlInputTag;
-        ins: HtmlModTag;
-        kbd: HtmlTag;
-        keygen: KeygenTag;
-        label: HtmlLabelTag;
-        legend: HtmlLegendTag;
-        li: HtmlLITag;
-        link: HtmlLinkTag;
-        main: HtmlTag;
-        map: HtmlMapTag;
-        mark: HtmlTag;
-        menu: HtmlMenuTag;
-        meta: HtmlMetaTag;
-        meter: HtmlMeterTag;
-        nav: HtmlTag;
-        noscript: HtmlTag;
-        object: HtmlObjectTag;
-        ol: HtmlOListTag;
-        optgroup: HtmlOptgroupTag;
-        option: HtmlOptionTag;
-        output: HtmlOutputTag;
-        p: HtmlTag;
-        param: HtmlParamTag;
-        pre: HtmlTag;
-        progress: HtmlProgressTag;
-        q: HtmlQuoteTag;
-        rb: HtmlTag;
-        rp: HtmlTag;
-        rt: HtmlTag;
-        rtc: HtmlTag;
-        ruby: HtmlTag;
-        s: HtmlTag;
-        samp: HtmlTag;
-        script: HtmlScriptTag;
-        section: HtmlTag;
-        select: HtmlSelectTag;
-        small: HtmlTag;
-        source: HtmlSourceTag;
-        span: HtmlTag;
-        strong: HtmlTag;
-        style: HtmlStyleTag;
-        sub: HtmlTag;
-        sup: HtmlTag;
-        table: HtmlTableTag;
-        tbody: HtmlTag;
-        td: HtmlTableDataCellTag;
-        template: HtmlTag;
-        textarea: HtmlTextAreaTag;
-        tfoot: HtmlTableSectionTag;
-        th: HtmlTableHeaderCellTag;
-        thead: HtmlTableSectionTag;
-        time: HtmlTimeTag;
-        title: HtmlTag;
-        tr: HtmlTableRowTag;
-        track: HtmlTrackTag;
-        u: HtmlTag;
-        ul: HtmlTag;
-        var: HtmlTag;
-        video: HtmlVideoTag;
-        wbr: HtmlTag;
+        interface IntrinsicElements {
+            a: HtmlAnchorTag;
+            abbr: HtmlTag;
+            address: HtmlTag;
+            area: HtmlAreaTag;
+            article: HtmlTag;
+            aside: HtmlTag;
+            audio: HtmlAudioTag;
+            b: HtmlTag;
+            base: HtmlBaseTag;
+            bdi: HtmlTag;
+            bdo: HtmlTag;
+            blockquote: HtmlQuoteTag;
+            body: HtmlBodyTag;
+            br: HtmlBRTag;
+            button: HtmlButtonTag;
+            canvas: HtmlCanvasTag;
+            caption: HtmlTableCaptionTag;
+            cite: HtmlTag;
+            code: HtmlTag;
+            col: HtmlTableColTag;
+            colgroup: HtmlTableColTag;
+            data: HtmlDataTag;
+            datalist: HtmlDataListTag;
+            dd: HtmlTag;
+            del: HtmlModTag;
+            details: HtmlDetailsTag;
+            dfn: HtmlTag;
+            dialog: HtmlDialogTag;
+            div: HtmlDivTag;
+            dl: HtmlDListTag;
+            dt: HtmlTag;
+            em: HtmlTag;
+            embed: HtmlEmbedTag;
+            fieldset: HtmlFieldSetTag;
+            figcaption: HtmlTag;
+            figure: HtmlTag;
+            footer: HtmlTag;
+            form: HtmlFormTag;
+            h1: HtmlHeadingTag;
+            h2: HtmlHeadingTag;
+            h3: HtmlHeadingTag;
+            h4: HtmlHeadingTag;
+            h5: HtmlHeadingTag;
+            h6: HtmlHeadingTag;
+            head: HtmlHeadTag;
+            header: HtmlTag;
+            hgroup: HtmlTag;
+            hr: HtmlHRTag;
+            html: HtmlHtmlTag;
+            i: HtmlTag;
+            iframe: HtmlIFrameTag;
+            img: HtmlImageTag;
+            input: HtmlInputTag;
+            ins: HtmlModTag;
+            kbd: HtmlTag;
+            label: HtmlLabelTag;
+            legend: HtmlLegendTag;
+            li: HtmlLITag;
+            link: HtmlLinkTag;
+            main: HtmlTag;
+            map: HtmlMapTag;
+            mark: HtmlTag;
+            menu: HtmlMenuTag;
+            meta: HtmlMetaTag;
+            meter: HtmlMeterTag;
+            nav: HtmlTag;
+            noscript: HtmlTag;
+            object: HtmlObjectTag;
+            ol: HtmlOListTag;
+            optgroup: HtmlOptGroupTag;
+            option: HtmlOptionTag;
+            output: HtmlOutputTag;
+            p: HtmlParagraphTag;
+            picture: HtmlPictureTag;
+            pre: HtmlPreTag;
+            progress: HtmlProgressTag;
+            q: HtmlQuoteTag;
+            rp: HtmlTag;
+            rt: HtmlTag;
+            ruby: HtmlTag;
+            s: HtmlTag;
+            samp: HtmlTag;
+            script: HtmlScriptTag;
+            search: HtmlTag;
+            section: HtmlTag;
+            select: HtmlSelectTag;
+            slot: HtmlSlotTag;
+            small: HtmlTag;
+            source: HtmlSourceTag;
+            span: HtmlSpanTag;
+            strong: HtmlTag;
+            style: HtmlStyleTag;
+            sub: HtmlTag;
+            summary: HtmlTag;
+            sup: HtmlTag;
+            table: HtmlTableTag;
+            tbody: HtmlTableSectionTag;
+            td: HtmlTableCellTag;
+            template: HtmlTemplateTag;
+            textarea: HtmlTextAreaTag;
+            tfoot: HtmlTableSectionTag;
+            th: HtmlTableCellTag;
+            thead: HtmlTableSectionTag;
+            time: HtmlTimeTag;
+            title: HtmlTitleTag;
+            tr: HtmlTableRowTag;
+            track: HtmlTrackTag;
+            u: HtmlTag;
+            ul: HtmlUListTag;
+            var: HtmlTag;
+            video: HtmlVideoTag;
+            wbr: HtmlTag;
+        }
     }
 }
+
+export {};
