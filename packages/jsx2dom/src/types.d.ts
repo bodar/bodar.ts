@@ -25,11 +25,26 @@ type NonConstants<T> = {
     [K in keyof T as Uppercase<string & K> extends K ? never : K]: T[K]
 };
 
+/** Unwrap SVG animated types to their base value types */
+type UnwrapAnimated<T> =
+    T extends SVGAnimatedLength ? number | string :
+    T extends SVGAnimatedNumber ? number :
+    T extends SVGAnimatedString ? string :
+    T extends SVGAnimatedBoolean ? boolean :
+    T extends SVGAnimatedEnumeration ? number :
+    T extends SVGAnimatedInteger ? number :
+    T extends SVGAnimatedRect ? string :
+    T extends SVGAnimatedLengthList ? string :
+    T extends SVGAnimatedNumberList ? string :
+    T extends SVGAnimatedPreserveAspectRatio ? string :
+    T extends SVGAnimatedTransformList ? string :
+    T;
+
 // =============================================================================
-// Exclusion Lists
+// HTML Exclusion Lists
 // =============================================================================
 
-/** Readonly/internal properties to exclude from all elements */
+/** Readonly/internal properties to exclude from all HTML elements */
 type BaseExclusions =
     // Node readonly
     | 'baseURI' | 'childNodes' | 'firstChild' | 'isConnected' | 'lastChild'
@@ -61,7 +76,7 @@ type TableRowExclusions = 'cells' | 'rowIndex' | 'sectionRowIndex';
 type TableCellExclusions = 'cellIndex';
 
 // =============================================================================
-// Base Element Attributes (derived from HTMLElement)
+// HTML Element Attributes (derived from HTMLElement)
 // =============================================================================
 
 type ElementProps<T extends HTMLElement, E extends string = never> =
@@ -71,7 +86,7 @@ type ElementProps<T extends HTMLElement, E extends string = never> =
     & { style?: Partial<CSSStyleDeclaration> | string };
 
 // =============================================================================
-// Element-Specific Interfaces
+// HTML Element-Specific Interfaces
 // =============================================================================
 
 interface HtmlTag extends ElementProps<HTMLElement> {}
@@ -139,14 +154,274 @@ interface HtmlUListTag extends ElementProps<HTMLUListElement> {}
 interface HtmlVideoTag extends ElementProps<HTMLVideoElement> {}
 
 // =============================================================================
+// SVG Exclusion Lists
+// =============================================================================
+
+/** Readonly/internal properties to exclude from all SVG elements */
+type SvgBaseExclusions =
+    // Node readonly (same as HTML)
+    | 'baseURI' | 'childNodes' | 'firstChild' | 'isConnected' | 'lastChild'
+    | 'nextSibling' | 'nodeName' | 'nodeType' | 'nodeValue' | 'ownerDocument'
+    | 'parentElement' | 'parentNode' | 'previousSibling' | 'textContent'
+    // Element readonly
+    | 'attributes' | 'classList' | 'clientHeight' | 'clientLeft' | 'clientTop'
+    | 'clientWidth' | 'innerHTML' | 'localName' | 'namespaceURI' | 'outerHTML'
+    | 'scrollHeight' | 'scrollWidth' | 'shadowRoot' | 'tagName' | 'prefix'
+    | 'scrollLeft' | 'scrollTop' | 'slot' | 'assignedSlot'
+    // SVG specific readonly
+    | 'ownerSVGElement' | 'viewportElement' | 'correspondingElement' | 'correspondingUseElement'
+    // Other internal
+    | 'dataset' | 'style' | 'part' | 'attributeStyleMap';
+
+// =============================================================================
+// SVG Presentation Attributes
+// =============================================================================
+
+/** camelCase presentation attributes with corrected types for SVG */
+interface SvgPresentationCamel {
+    fill?: string;
+    fillOpacity?: string | number;
+    fillRule?: string;
+    stroke?: string;
+    strokeWidth?: string | number;
+    strokeLinecap?: string;
+    strokeLinejoin?: string;
+    strokeDasharray?: string;
+    strokeDashoffset?: string | number;
+    strokeMiterlimit?: string | number;
+    strokeOpacity?: string | number;
+    opacity?: string | number;
+    clipPath?: string;
+    clipRule?: string;
+    mask?: string;
+    filter?: string;
+    transform?: string;
+    transformOrigin?: string;
+    visibility?: string;
+    display?: string;
+    overflow?: string;
+    cursor?: string;
+}
+
+/** kebab-case presentation attributes */
+interface SvgPresentationKebab {
+    'fill-opacity'?: string | number;
+    'fill-rule'?: string;
+    'stroke-width'?: string | number;
+    'stroke-linecap'?: string;
+    'stroke-linejoin'?: string;
+    'stroke-dasharray'?: string;
+    'stroke-dashoffset'?: string | number;
+    'stroke-miterlimit'?: string | number;
+    'stroke-opacity'?: string | number;
+    'clip-path'?: string;
+    'clip-rule'?: string;
+    'transform-origin'?: string;
+    // Text presentation
+    'dominant-baseline'?: string;
+    'text-anchor'?: string;
+    'text-decoration'?: string;
+    'font-family'?: string;
+    'font-size'?: string | number;
+    'font-style'?: string;
+    'font-weight'?: string | number;
+    'letter-spacing'?: string | number;
+    'word-spacing'?: string | number;
+    // Other presentation
+    'color-interpolation'?: string;
+    'color-interpolation-filters'?: string;
+    'flood-color'?: string;
+    'flood-opacity'?: string | number;
+    'lighting-color'?: string;
+    'stop-color'?: string;
+    'stop-opacity'?: string | number;
+    'shape-rendering'?: string;
+    'text-rendering'?: string;
+    'image-rendering'?: string;
+    'pointer-events'?: string;
+    'marker-start'?: string;
+    'marker-mid'?: string;
+    'marker-end'?: string;
+}
+
+/** Combined presentation attributes (both camelCase and kebab-case) */
+type SvgPresentationAttributes = SvgPresentationCamel & SvgPresentationKebab;
+
+// =============================================================================
+// SVG Core Attributes (not in DOM but needed for JSX)
+// =============================================================================
+
+/** Common SVG attributes available on all elements */
+interface SvgCoreAttributes {
+    id?: string;
+    class?: string;
+    style?: Partial<CSSStyleDeclaration> | string;
+    tabindex?: number;
+}
+
+/** Positional attributes for elements that support x/y */
+interface SvgPositionalAttributes {
+    x?: number | string;
+    y?: number | string;
+}
+
+/** Dimensional attributes */
+interface SvgDimensionalAttributes {
+    width?: number | string;
+    height?: number | string;
+}
+
+// =============================================================================
+// SVG Element Attributes (derived from SVGElement with unwrapping)
+// =============================================================================
+
+type SvgElementProps<T extends SVGElement, E extends string = never> =
+    & { [K in keyof NonMethods<NonConstants<T>> as K extends (SvgBaseExclusions | E) ? never : K]?: UnwrapAnimated<T[K]> }
+    & SvgPresentationAttributes
+    & SvgCoreAttributes
+    & Partial<PickStartingWith<T, 'on'>>;
+
+// =============================================================================
+// SVG Element-Specific Interfaces
+// =============================================================================
+
+// Container elements
+interface SvgSvgTag extends SvgElementProps<SVGSVGElement>, SvgPositionalAttributes, SvgDimensionalAttributes {
+    viewBox?: string;
+    preserveAspectRatio?: string;
+    xmlns?: string;
+}
+interface SvgGTag extends SvgElementProps<SVGGElement> {}
+interface SvgDefsTag extends SvgElementProps<SVGDefsElement> {}
+interface SvgSymbolTag extends SvgElementProps<SVGSymbolElement> {
+    viewBox?: string;
+    preserveAspectRatio?: string;
+}
+interface SvgUseTag extends SvgElementProps<SVGUseElement>, SvgPositionalAttributes, SvgDimensionalAttributes {
+    href?: string;
+}
+interface SvgSwitchTag extends SvgElementProps<SVGSwitchElement> {}
+
+// Shape elements
+interface SvgCircleTag extends SvgElementProps<SVGCircleElement> {}
+interface SvgEllipseTag extends SvgElementProps<SVGEllipseElement> {}
+interface SvgLineTag extends SvgElementProps<SVGLineElement> {}
+interface SvgPathTag extends SvgElementProps<SVGPathElement> {
+    d?: string;
+}
+interface SvgPolygonTag extends SvgElementProps<SVGPolygonElement> {
+    points?: string;
+}
+interface SvgPolylineTag extends SvgElementProps<SVGPolylineElement> {
+    points?: string;
+}
+interface SvgRectTag extends SvgElementProps<SVGRectElement> {}
+
+// Text elements (exclude x, y, dx, dy from derived - they're SVGAnimatedLengthList which maps to string)
+interface SvgTextTag extends SvgElementProps<SVGTextElement, 'x' | 'y' | 'dx' | 'dy'> {
+    x?: number | string;
+    y?: number | string;
+    dx?: number | string;
+    dy?: number | string;
+}
+interface SvgTspanTag extends SvgElementProps<SVGTSpanElement, 'x' | 'y' | 'dx' | 'dy'> {
+    x?: number | string;
+    y?: number | string;
+    dx?: number | string;
+    dy?: number | string;
+}
+interface SvgTextPathTag extends SvgElementProps<SVGTextPathElement> {
+    href?: string;
+    startOffset?: number | string;
+}
+
+// Gradient elements
+interface SvgLinearGradientTag extends SvgElementProps<SVGLinearGradientElement> {
+    x1?: number | string;
+    y1?: number | string;
+    x2?: number | string;
+    y2?: number | string;
+    gradientUnits?: string;
+    gradientTransform?: string;
+}
+interface SvgRadialGradientTag extends SvgElementProps<SVGRadialGradientElement> {
+    cx?: number | string;
+    cy?: number | string;
+    r?: number | string;
+    fx?: number | string;
+    fy?: number | string;
+    gradientUnits?: string;
+    gradientTransform?: string;
+}
+interface SvgStopTag extends SvgElementProps<SVGStopElement> {
+    offset?: number | string;
+}
+
+// Clipping/masking
+interface SvgClipPathTag extends SvgElementProps<SVGClipPathElement> {}
+interface SvgMaskTag extends SvgElementProps<SVGMaskElement> {}
+
+// Markers/patterns
+interface SvgMarkerTag extends SvgElementProps<SVGMarkerElement> {}
+interface SvgPatternTag extends SvgElementProps<SVGPatternElement> {}
+
+// Filter elements
+interface SvgFilterTag extends SvgElementProps<SVGFilterElement> {}
+interface SvgFeBlendTag extends SvgElementProps<SVGFEBlendElement> {}
+interface SvgFeColorMatrixTag extends SvgElementProps<SVGFEColorMatrixElement> {}
+interface SvgFeComponentTransferTag extends SvgElementProps<SVGFEComponentTransferElement> {}
+interface SvgFeCompositeTag extends SvgElementProps<SVGFECompositeElement> {}
+interface SvgFeConvolveMatrixTag extends SvgElementProps<SVGFEConvolveMatrixElement> {}
+interface SvgFeDiffuseLightingTag extends SvgElementProps<SVGFEDiffuseLightingElement> {}
+interface SvgFeDisplacementMapTag extends SvgElementProps<SVGFEDisplacementMapElement> {}
+interface SvgFeDistantLightTag extends SvgElementProps<SVGFEDistantLightElement> {}
+interface SvgFeDropShadowTag extends SvgElementProps<SVGFEDropShadowElement> {}
+interface SvgFeFloodTag extends SvgElementProps<SVGFEFloodElement> {}
+interface SvgFeFuncATag extends SvgElementProps<SVGFEFuncAElement> {}
+interface SvgFeFuncBTag extends SvgElementProps<SVGFEFuncBElement> {}
+interface SvgFeFuncGTag extends SvgElementProps<SVGFEFuncGElement> {}
+interface SvgFeFuncRTag extends SvgElementProps<SVGFEFuncRElement> {}
+interface SvgFeGaussianBlurTag extends SvgElementProps<SVGFEGaussianBlurElement> {
+    stdDeviation?: number | string;
+}
+interface SvgFeImageTag extends SvgElementProps<SVGFEImageElement> {}
+interface SvgFeMergeTag extends SvgElementProps<SVGFEMergeElement> {}
+interface SvgFeMergeNodeTag extends SvgElementProps<SVGFEMergeNodeElement> {}
+interface SvgFeMorphologyTag extends SvgElementProps<SVGFEMorphologyElement> {}
+interface SvgFeOffsetTag extends SvgElementProps<SVGFEOffsetElement> {}
+interface SvgFePointLightTag extends SvgElementProps<SVGFEPointLightElement> {}
+interface SvgFeSpecularLightingTag extends SvgElementProps<SVGFESpecularLightingElement> {}
+interface SvgFeSpotLightTag extends SvgElementProps<SVGFESpotLightElement> {}
+interface SvgFeTileTag extends SvgElementProps<SVGFETileElement> {}
+interface SvgFeTurbulenceTag extends SvgElementProps<SVGFETurbulenceElement> {}
+
+// Other elements
+interface SvgImageTag extends SvgElementProps<SVGImageElement> {}
+interface SvgForeignObjectTag extends SvgElementProps<SVGForeignObjectElement> {}
+interface SvgViewTag extends SvgElementProps<SVGViewElement> {}
+
+// Descriptive elements (use base SVGElement)
+interface SvgTitleTag extends SvgElementProps<SVGTitleElement> {}
+interface SvgDescTag extends SvgElementProps<SVGDescElement> {}
+interface SvgMetadataTag extends SvgElementProps<SVGMetadataElement> {}
+
+// Animation elements
+interface SvgAnimateTag extends SvgElementProps<SVGAnimateElement> {}
+interface SvgAnimateMotionTag extends SvgElementProps<SVGAnimateMotionElement> {}
+interface SvgAnimateTransformTag extends SvgElementProps<SVGAnimateTransformElement> {}
+interface SvgMpathTag extends SvgElementProps<SVGMPathElement> {}
+interface SvgSetTag extends SvgElementProps<SVGSetElement> {}
+
+// =============================================================================
 // JSX Namespace
 // =============================================================================
 
 declare global {
     namespace JSX {
-        type Element = HTMLElement;
+        type Element = HTMLElement | SVGElement;
 
         interface IntrinsicElements {
+            // HTML elements
             a: HtmlAnchorTag;
             abbr: HtmlTag;
             address: HtmlTag;
@@ -259,6 +534,67 @@ declare global {
             var: HtmlTag;
             video: HtmlVideoTag;
             wbr: HtmlTag;
+
+            // SVG elements
+            svg: SvgSvgTag;
+            g: SvgGTag;
+            defs: SvgDefsTag;
+            symbol: SvgSymbolTag;
+            use: SvgUseTag;
+            switch: SvgSwitchTag;
+            circle: SvgCircleTag;
+            ellipse: SvgEllipseTag;
+            line: SvgLineTag;
+            path: SvgPathTag;
+            polygon: SvgPolygonTag;
+            polyline: SvgPolylineTag;
+            rect: SvgRectTag;
+            text: SvgTextTag;
+            tspan: SvgTspanTag;
+            textPath: SvgTextPathTag;
+            linearGradient: SvgLinearGradientTag;
+            radialGradient: SvgRadialGradientTag;
+            stop: SvgStopTag;
+            clipPath: SvgClipPathTag;
+            mask: SvgMaskTag;
+            marker: SvgMarkerTag;
+            pattern: SvgPatternTag;
+            filter: SvgFilterTag;
+            feBlend: SvgFeBlendTag;
+            feColorMatrix: SvgFeColorMatrixTag;
+            feComponentTransfer: SvgFeComponentTransferTag;
+            feComposite: SvgFeCompositeTag;
+            feConvolveMatrix: SvgFeConvolveMatrixTag;
+            feDiffuseLighting: SvgFeDiffuseLightingTag;
+            feDisplacementMap: SvgFeDisplacementMapTag;
+            feDistantLight: SvgFeDistantLightTag;
+            feDropShadow: SvgFeDropShadowTag;
+            feFlood: SvgFeFloodTag;
+            feFuncA: SvgFeFuncATag;
+            feFuncB: SvgFeFuncBTag;
+            feFuncG: SvgFeFuncGTag;
+            feFuncR: SvgFeFuncRTag;
+            feGaussianBlur: SvgFeGaussianBlurTag;
+            feImage: SvgFeImageTag;
+            feMerge: SvgFeMergeTag;
+            feMergeNode: SvgFeMergeNodeTag;
+            feMorphology: SvgFeMorphologyTag;
+            feOffset: SvgFeOffsetTag;
+            fePointLight: SvgFePointLightTag;
+            feSpecularLighting: SvgFeSpecularLightingTag;
+            feSpotLight: SvgFeSpotLightTag;
+            feTile: SvgFeTileTag;
+            feTurbulence: SvgFeTurbulenceTag;
+            image: SvgImageTag;
+            foreignObject: SvgForeignObjectTag;
+            view: SvgViewTag;
+            desc: SvgDescTag;
+            metadata: SvgMetadataTag;
+            animate: SvgAnimateTag;
+            animateMotion: SvgAnimateMotionTag;
+            animateTransform: SvgAnimateTransformTag;
+            mpath: SvgMpathTag;
+            set: SvgSetTag;
         }
     }
 }
