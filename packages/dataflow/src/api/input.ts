@@ -2,19 +2,16 @@
  * Functions that can be used inside a reactive element
  */
 
-import {observe} from "./observe.ts";
+
+import {event} from "./event.ts";
 
 export type SupportedInputs = HTMLInputElement | HTMLSelectElement;
 
-export function input<E extends SupportedInputs, R>(element: E, event: string = eventOf(element), value: (i: E) => R = valueOf): AsyncIterator<R> {
-    return observe((notify) => {
-        const handler = () => notify(value(element));
-        element.addEventListener(event, handler);
-        return () => element.removeEventListener(event, handler);
-    }, value(element));
+export function input<E extends SupportedInputs, R>(element: E, eventType: string = eventOf(element), value: (i: E) => R = valueOf): AsyncIterator<R> {
+    return event(element, eventType, () => value(element), value(element));
 }
 
-function valueOf(element: SupportedInputs): any {
+function valueOf(element: any): any {
     switch (element.type) {
         case "range":
         case "number":
@@ -32,7 +29,7 @@ function valueOf(element: SupportedInputs): any {
     }
 }
 
-function eventOf(element: SupportedInputs): 'click' | 'change' | 'input' {
+function eventOf(element: any): 'click' | 'change' | 'input' {
     switch (element.type) {
         case "button":
         case "submit":

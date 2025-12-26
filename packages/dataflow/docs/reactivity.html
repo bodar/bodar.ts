@@ -47,7 +47,7 @@
     top-down document order.</p>
 
 <script type="module" is="reactive">
-    import {display, view, input, mutable, observe, now, width} from '@bodar/dataflow/runtime.ts';
+    import {display, view, input, event, mutable, observe, now, width} from '@bodar/dataflow/runtime.ts';
 </script>
 
 <h2 id="reactive-scope">Reactive Scope</h2>
@@ -185,7 +185,7 @@
 
 <div class="example">
     <script type="module" is="reactive" data-echo>
-        <div style="background: linear-gradient(90deg, #4269d0, #9ecae9); color: white; padding: 1rem; box-sizing: border-box; width: 100%;">
+        <div style="background-color: #4269d0; color: white; padding: 1rem; box-sizing: border-box; width: 100%;">
             Container width: {width}px
         </div>
     </script>
@@ -205,11 +205,11 @@
     <code>&lt;main&gt;</code> element). Dataflow's <code>width</code> instead tracks each code block's parent container,
     which is more flexible for embedded components.</p>
 
-<p>If you need window-level width (like Observable Framework), you can use <code>input</code> to create your own:</p>
+<p>If you need window-level width (like Observable Framework), you can use <code>event</code> to create your own:</p>
 
 <div class="example">
     <script type="module" is="reactive" data-echo>
-        const windowWidth = input(window, "resize", w => w.innerWidth);
+        const windowWidth = event(window, "resize", () => window.innerWidth, window.innerWidth);
     </script>
     <script type="module" is="reactive" data-echo>
         `Window width: ${windowWidth}px`
@@ -311,9 +311,11 @@
             document.addEventListener("pointermove", handler);
             return () => document.removeEventListener("pointermove", handler);
         }, [0, 0]);
+        // NB: This can be also be defined with event function as a one-liner
+        // const pointer = event(document, 'pointermove', ev => [ev.clientX, ev.clientY], [0, 0])
     </script>
     <script type="module" is="reactive" data-echo>
-        <span style="font-variant-numeric: tabular-nums">Pointer: [{pointer.map(Math.round).join(", ")}]</span>
+        <>Pointer: [{pointer.map(Math.round).join(", ")}]</>
     </script>
 </div>
 

@@ -2,7 +2,7 @@
  * Combines multiple async iterables into a single async iterable that emits
  * an array of the latest values whenever any source emits.
  */
-export async function* combineLatest(iterables: AsyncIterable<any>[], filter: boolean = true): AsyncIterableIterator<any[]> {
+export async function* combineLatest(iterables: AsyncIterable<any>[]): AsyncIterableIterator<any[]> {
     let iterators = iterables.map(((it, index) => ({iterator: it[Symbol.asyncIterator](), index})));
 
     if (iterators.length === 0) {
@@ -46,7 +46,7 @@ export async function* combineLatest(iterables: AsyncIterable<any>[], filter: bo
             const hadUpdates = resolved.values().some(result => !result.done);
             resolved.clear();
 
-            if (filter) iterators = iterators.filter(({index}) => !complete[index]);
+            iterators = iterators.filter(({index}) => !complete[index]);
             if (complete.every(c => c)) break;
             if (hadUpdates) yield currentValues.slice();
         }
