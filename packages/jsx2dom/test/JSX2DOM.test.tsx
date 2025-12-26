@@ -75,31 +75,29 @@ describe("JSX2DOM", () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);
         const div = <div class="test-class"/>;
-        expect((div as HTMLElement).className).toEqual('test-class');
+        expect(div.className).toEqual('test-class');
     });
 
-    // Linkedom doesn't implement htmlFor, so we test it sets via the property path
+    // Linkedom doesn't implement htmlFor, but it will just fall back to setAttribute
     it("maps 'for' attribute to htmlFor property on labels", async () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);
         html.document.body.appendChild(<label for="input-id">Label</label>);
-        // linkedom doesn't implement htmlFor, but it should set the attribute
-        expect(html.document.body.innerHTML).toContain('for="input-id"');
+        expect(html.document.body.innerHTML).toEqual('<label for="input-id">Label</label>');
     });
 
     it("handles style as a string", async () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);
         html.document.body.appendChild(<div style="color: red; font-size: 14px">Styled</div>);
-        expect(html.document.body.innerHTML).toContain('style="color: red; font-size: 14px"');
+        expect(html.document.body.innerHTML).toEqual('<div style="color: red; font-size: 14px">Styled</div>')
     });
 
     it("handles style as an object", async () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);
-        const div = <div style={{ color: 'blue', fontSize: '16px' }}>Styled</div>;
-        expect((div as HTMLElement).style.color).toEqual('blue');
-        expect((div as HTMLElement).style.fontSize).toEqual('16px');
+        html.document.body.appendChild(<div style={{ color: 'blue', fontSize: '16px' }}>Styled</div>);
+        expect(html.document.body.innerHTML).toEqual('<div style="color:blue;font-size:16px">Styled</div>')
     });
 
     it("maps tabindex attribute to tabIndex property", async () => {
