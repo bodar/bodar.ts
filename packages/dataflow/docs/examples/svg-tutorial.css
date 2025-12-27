@@ -1,0 +1,237 @@
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    line-height: 1.6;
+}
+
+/* Links */
+a {
+    color: #1976d2;
+}
+
+a:hover {
+    color: #1565c0;
+}
+
+/* Site header */
+.site-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.site-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.site-header a {
+    display: flex;
+    align-items: center;
+}
+
+/* Navigation */
+.docs-nav {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 1.5rem;
+}
+
+.docs-nav a {
+    color: #555;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.25rem 0;
+    border-bottom: 2px solid transparent;
+}
+
+.docs-nav a:hover {
+    color: #1976d2;
+}
+
+.docs-nav a.active {
+    color: #1976d2;
+    border-bottom-color: #1976d2;
+}
+
+/* Intro section */
+.intro {
+    margin-bottom: 2rem;
+}
+
+.intro p {
+    margin-bottom: 0.75rem;
+}
+
+/* Two column layout */
+.tutorial-layout {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 2rem;
+}
+
+/* Global controls - left column */
+.global-controls {
+    position: sticky;
+    top: 1rem;
+    align-self: start;
+}
+
+.global-controls h2 {
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #334155;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.control-group {
+    margin-bottom: 1.5rem;
+}
+
+.control-group h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Control row */
+.control-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+}
+
+.control-row label {
+    order: -1;
+    min-width: 50px;
+    font-size: 0.75rem;
+    color: #475569;
+}
+
+.control-row input[type="range"] {
+    flex: 1;
+    min-width: 50px;
+}
+
+.control-row input[type="color"] {
+    width: 32px;
+    height: 24px;
+    padding: 2px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.control-row .value {
+    min-width: 28px;
+    font-size: 0.7rem;
+    color: #64748b;
+    text-align: right;
+    font-family: ui-monospace, monospace;
+}
+
+/* Main content - right column */
+.main-content {
+    min-width: 0;
+}
+
+/* Element sections */
+.element-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #fafafa;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.element-section h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    color: #1e293b;
+}
+
+.element-section > p {
+    margin: 0 0 1rem 0;
+    color: #475569;
+    font-size: 0.95rem;
+}
+
+.element-section code {
+    font-family: ui-monospace, monospace;
+    background: #e2e8f0;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.85em;
+}
+
+/* SVG preview container */
+.svg-preview {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 1rem;
+    margin: 1rem 0;
+    overflow: hidden;
+}
+
+.svg-preview svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: repeating-conic-gradient(#f0f0f0 0% 25%, white 0% 50%) 50% / 16px 16px;
+}
+
+/* Local controls grid */
+.controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.5rem;
+}
+
+/* Input styling */
+input, select {
+    font-family: inherit;
+    font-size: inherit;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 0.3em 0.5em;
+    background-color: #fff;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+    .tutorial-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .global-controls {
+        position: relative;
+        top: 0;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+    }
+
+    .control-group {
+        margin-bottom: 1rem;
+    }
+}
