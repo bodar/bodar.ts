@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SVG Chart - Dataflow Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="chart.css">
+</head>
+<body>
+
+<div class="site-header">
+    <h1>Dataflow</h1>
+    <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="GitHub" src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
+</div>
+
+<nav class="docs-nav">
+    <a href="../index.html">Quick Start</a>
+    <a href="../setup.html">Setup</a>
+    <a href="../reactivity.html">Reactivity</a>
+    <a href="../inputs.html">Inputs</a>
+    <a href="../islands.html">Islands</a>
+    <a href="./" class="active">Examples</a>
+</nav>
+
+<h1>Interactive SVG Chart</h1>
+
+<div class="intro">
+    <p>This example demonstrates <strong>jsx2dom's SVG support</strong> combined with Dataflow's reactivity. Click bars to select them, or add new data points.</p>
+
+    <p>Key features shown:</p>
+    <ul>
+        <li>SVG elements created via JSX with correct namespace</li>
+        <li>Reactive attributes: bar heights and colors update automatically</li>
+        <li>Click handlers on SVG elements</li>
+        <li>camelCase attributes (<code>strokeWidth</code>) converted to kebab-case</li>
+    </ul>
+
+    <p><a href="https://github.com/bodar/bodar.ts/blob/master/packages/dataflow/docs/examples/chart.html">View source on GitHub</a></p>
+</div>
+
+<div class="chart-app">
+    <h2>Weekly Sales</h2>
+
+    <script type="module" is="reactive">
+        import {display, mutable} from "@bodar/dataflow/runtime.ts";
+
+        const data = mutable([
+            {label: 'Mon', value: 30},
+            {label: 'Tue', value: 45},
+            {label: 'Wed', value: 25},
+            {label: 'Thu', value: 60},
+            {label: 'Fri', value: 40}
+        ]);
+
+        const selected = mutable(null);
+
+        const addData = (label, value) => data.update(items => {
+            items.push({label, value: Number(value)});
+            return items;
+        });
+
+        const removeData = (label) => data.update(items => items.filter(d => d.label !== label));
+
+        const selectData = (label) => selected.value = label;
+        const clearSelection = () => selected.value = null;
+    </script>
+
+    <script type="module" is="reactive">
+        const chartWidth = 500;
+        const chartHeight = 250;
+        const padding = {top: 20, right: 20, bottom: 40, left: 50};
+        const innerWidth = chartWidth - padding.left - padding.right;
+        const innerHeight = chartHeight - padding.top - padding.bottom;
+
+        const maxValue = Math.max(...data.map(d => d.value), 1);
+        const barWidth = Math.max(20, innerWidth / data.length - 10);
+
+        display(<div class="chart-container">
+            <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`}>
+                <line
+                    x1={padding.left}
+                    y1={padding.top}
+                    x2={padding.left}
+                    y2={chartHeight - padding.bottom}
+                    stroke="#94a3b8"
+                    strokeWidth={1}
+                />
+                <line
+                    x1={padding.left}
+                    y1={chartHeight - padding.bottom}
+                    x2={chartWidth - padding.right}
+                    y2={chartHeight - padding.bottom}
+                    stroke="#94a3b8"
+                    strokeWidth={1}
+                />
+                {data.map((d, i) => {
+                    const barHeight = (d.value / maxValue) * innerHeight;
+                    const x = padding.left + (innerWidth / data.length) * i + (innerWidth / data.length - barWidth) / 2;
+                    const y = chartHeight - padding.bottom - barHeight;
+                    const isSelected = selected === d.label;
+
+                    return <g onclick={() => isSelected ? clearSelection() : selectData(d.label)} style={{cursor: 'pointer'}}>
+                        <rect
+                            x={x}
+                            y={y}
+                            width={barWidth}
+                            height={barHeight}
+                            fill={isSelected ? '#2563eb' : '#3b82f6'}
+                            rx={4}
+                        />
+                        <text x={x + barWidth / 2} y={chartHeight - padding.bottom + 20} textAnchor="middle" fontSize={12} fill="#334155">{d.label}</text>
+                        <text x={x + barWidth / 2} y={y - 8} textAnchor="middle" fontSize={11} fill="#64748b">{d.value}</text>
+                    </g>;
+                })}
+            </svg>
+        </div>);
+    </script>
+
+    <script type="module" is="reactive">
+        display(selected !== null
+            ? <div class="selection-info">
+                Selected: <strong>{selected}</strong> — {data.find(d => d.label === selected)?.value} sales
+                <button onclick={() => {removeData(selected); clearSelection();}} style={{marginLeft: '1rem', padding: '0.25rem 0.5rem', fontSize: '0.8rem'}}>Remove</button>
+              </div>
+            : <div class="selection-info no-selection">Click a bar to select it</div>
+        );
+    </script>
+
+    <script type="module" is="reactive">
+        <form class="chart-controls" onsubmit={(e) => {
+            e.preventDefault();
+            const form = e.target;
+            addData(form.label.value, form.value.value);
+            form.reset();
+        }}>
+            <input type="text" name="label" placeholder="Label (e.g. Sat)" required/>
+            <input type="number" name="value" placeholder="Value" min="0" required/>
+            <button type="submit">Add</button>
+        </form>
+    </script>
+</div>
+
+</body>
+</html>
