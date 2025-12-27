@@ -416,11 +416,10 @@ interface SvgSetTag extends SvgElementProps<SVGSetElement> {}
 // JSX Namespace
 // =============================================================================
 
-declare global {
-    namespace JSX {
-        type Element = HTMLElement | SVGElement;
+export namespace JSX {
+    export type Element = HTMLElement | SVGElement;
 
-        interface IntrinsicElements {
+    export interface IntrinsicElements {
             // HTML elements
             a: HtmlAnchorTag;
             abbr: HtmlTag;
@@ -595,8 +594,5 @@ declare global {
             animateTransform: SvgAnimateTransformTag;
             mpath: SvgMpathTag;
             set: SvgSetTag;
-        }
     }
 }
-
-export {};
