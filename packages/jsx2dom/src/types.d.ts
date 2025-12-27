@@ -1,4 +1,46 @@
-import type { AttributeToProperty } from './attribute-mapping.js';
+// =============================================================================
+// Attribute to Property Mapping (inlined to keep this an ambient declaration file)
+// =============================================================================
+
+/** Maps HTML attribute names to DOM property names */
+type AttributeToProperty = {
+    'class': 'className';
+    'for': 'htmlFor';
+    'readonly': 'readOnly';
+    'maxlength': 'maxLength';
+    'minlength': 'minLength';
+    'tabindex': 'tabIndex';
+    'colspan': 'colSpan';
+    'rowspan': 'rowSpan';
+    'datetime': 'dateTime';
+    'enctype': 'encType';
+    'formaction': 'formAction';
+    'formmethod': 'formMethod';
+    'formtarget': 'formTarget';
+    'formnovalidate': 'formNoValidate';
+    'contenteditable': 'contentEditable';
+    'accesskey': 'accessKey';
+    'autocomplete': 'autoComplete';
+    'autofocus': 'autoFocus';
+    'autoplay': 'autoPlay';
+    'cellpadding': 'cellPadding';
+    'cellspacing': 'cellSpacing';
+    'charset': 'charSet';
+    'classname': 'className';
+    'crossorigin': 'crossOrigin';
+    'defaultchecked': 'defaultChecked';
+    'defaultvalue': 'defaultValue';
+    'frameborder': 'frameBorder';
+    'hreflang': 'hrefLang';
+    'htmlfor': 'htmlFor';
+    'httpequiv': 'httpEquiv';
+    'inputmode': 'inputMode';
+    'novalidate': 'noValidate';
+    'srcset': 'srcSet';
+    'srclang': 'srcLang';
+    'srcdoc': 'srcDoc';
+    'usemap': 'useMap';
+};
 
 // =============================================================================
 // Type Utilities
@@ -416,10 +458,10 @@ interface SvgSetTag extends SvgElementProps<SVGSetElement> {}
 // JSX Namespace
 // =============================================================================
 
-export namespace JSX {
-    export type Element = HTMLElement | SVGElement;
+namespace JSX {
+    type Element = HTMLElement | SVGElement;
 
-    export interface IntrinsicElements {
+    interface IntrinsicElements {
             // HTML elements
             a: HtmlAnchorTag;
             abbr: HtmlTag;
