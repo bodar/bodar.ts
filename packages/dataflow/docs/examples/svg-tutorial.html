@@ -41,58 +41,58 @@
     <div class="control-group">
         <h3>viewBox</h3>
         <div class="control-row">
+            <script type="module" is="reactive"><label>min-x {viewBoxMinX}</label></script>
             <script type="module" is="reactive">
                 const viewBoxMinX = view(<input type="range" min="-100" max="100" value="0"/>);
             </script>
-            <script type="module" is="reactive"><label>min-x {viewBoxMinX}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>min-y {viewBoxMinY}</label></script>
             <script type="module" is="reactive">
                 const viewBoxMinY = view(<input type="range" min="-100" max="100" value="0"/>);
             </script>
-            <script type="module" is="reactive"><label>min-y {viewBoxMinY}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>width {viewBoxWidth}</label></script>
             <script type="module" is="reactive">
                 const viewBoxWidth = view(<input type="range" min="50" max="400" value="200"/>);
             </script>
-            <script type="module" is="reactive"><label>width {viewBoxWidth}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>height {viewBoxHeight}</label></script>
             <script type="module" is="reactive">
                 const viewBoxHeight = view(<input type="range" min="50" max="400" value="100"/>);
             </script>
-            <script type="module" is="reactive"><label>height {viewBoxHeight}</label></script>
         </div>
     </div>
     <div class="control-group">
         <h3>Colors</h3>
         <div class="control-row">
+            <label>fill</label>
             <script type="module" is="reactive">
                 const globalFill = view(<input type="color" value="#3b82f6"/>);
             </script>
-            <label>fill</label>
         </div>
         <div class="control-row">
+            <label>stroke</label>
             <script type="module" is="reactive">
                 const globalStroke = view(<input type="color" value="#1e40af"/>);
             </script>
-            <label>stroke</label>
         </div>
     </div>
     <div class="control-group">
         <h3>Stroke</h3>
         <div class="control-row">
+            <script type="module" is="reactive"><label>width {globalStrokeWidth}</label></script>
             <script type="module" is="reactive">
                 const globalStrokeWidth = view(<input type="range" min="0" max="20" value="2"/>);
             </script>
-            <script type="module" is="reactive"><label>width {globalStrokeWidth}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>opacity {globalOpacity}</label></script>
             <script type="module" is="reactive">
                 const globalOpacity = view(<input type="range" min="0" max="1" step="0.1" value="1"/>);
             </script>
-            <script type="module" is="reactive"><label>opacity {globalOpacity}</label></script>
         </div>
     </div>
 </aside>
@@ -106,7 +106,7 @@
     <p>A rectangle defined by position (<code>x</code>, <code>y</code>), dimensions (<code>width</code>, <code>height</code>), and optional corner radius (<code>rx</code>, <code>ry</code>).</p>
 
     <script type="module" is="reactive">
-        display(<div class="svg-preview">
+        <div class="svg-preview">
             <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
                 <rect
                     x={rectX}
@@ -120,39 +120,39 @@
                     opacity={globalOpacity}
                 />
             </svg>
-        </div>);
+        </div>
     </script>
 
     <div class="controls-grid">
         <div class="control-row">
+            <script type="module" is="reactive"><label>x {rectX}</label></script>
             <script type="module" is="reactive">
                 const rectX = view(<input type="range" min="0" max="150" value="20"/>);
             </script>
-            <script type="module" is="reactive"><label>x {rectX}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>y {rectY}</label></script>
             <script type="module" is="reactive">
                 const rectY = view(<input type="range" min="0" max="80" value="10"/>);
             </script>
-            <script type="module" is="reactive"><label>y {rectY}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>width {rectWidth}</label></script>
             <script type="module" is="reactive">
                 const rectWidth = view(<input type="range" min="10" max="180" value="80"/>);
             </script>
-            <script type="module" is="reactive"><label>width {rectWidth}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>height {rectHeight}</label></script>
             <script type="module" is="reactive">
                 const rectHeight = view(<input type="range" min="10" max="90" value="50"/>);
             </script>
-            <script type="module" is="reactive"><label>height {rectHeight}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>rx {rectRx}</label></script>
             <script type="module" is="reactive">
                 const rectRx = view(<input type="range" min="0" max="50" value="0"/>);
             </script>
-            <script type="module" is="reactive"><label>rx {rectRx}</label></script>
         </div>
     </div>
 </section>
@@ -163,7 +163,7 @@
     <p>A circle defined by center position (<code>cx</code>, <code>cy</code>) and radius (<code>r</code>).</p>
 
     <script type="module" is="reactive">
-        display(<div class="svg-preview">
+        <div class="svg-preview">
             <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
                 <circle
                     cx={circleX}
@@ -175,27 +175,27 @@
                     opacity={globalOpacity}
                 />
             </svg>
-        </div>);
+        </div>
     </script>
 
     <div class="controls-grid">
         <div class="control-row">
+            <script type="module" is="reactive"><label>cx {circleX}</label></script>
             <script type="module" is="reactive">
                 const circleX = view(<input type="range" min="0" max="200" value="100"/>);
             </script>
-            <script type="module" is="reactive"><label>cx {circleX}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>cy {circleY}</label></script>
             <script type="module" is="reactive">
                 const circleY = view(<input type="range" min="0" max="100" value="50"/>);
             </script>
-            <script type="module" is="reactive"><label>cy {circleY}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>r {circleR}</label></script>
             <script type="module" is="reactive">
                 const circleR = view(<input type="range" min="5" max="50" value="35"/>);
             </script>
-            <script type="module" is="reactive"><label>r {circleR}</label></script>
         </div>
     </div>
 </section>
@@ -206,7 +206,7 @@
     <p>An ellipse defined by center (<code>cx</code>, <code>cy</code>) and two radii (<code>rx</code>, <code>ry</code>) for horizontal and vertical axes.</p>
 
     <script type="module" is="reactive">
-        display(<div class="svg-preview">
+        <div class="svg-preview">
             <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
                 <ellipse
                     cx={ellipseX}
@@ -219,33 +219,33 @@
                     opacity={globalOpacity}
                 />
             </svg>
-        </div>);
+        </div>
     </script>
 
     <div class="controls-grid">
         <div class="control-row">
+            <script type="module" is="reactive"><label>cx {ellipseX}</label></script>
             <script type="module" is="reactive">
                 const ellipseX = view(<input type="range" min="0" max="200" value="100"/>);
             </script>
-            <script type="module" is="reactive"><label>cx {ellipseX}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>cy {ellipseY}</label></script>
             <script type="module" is="reactive">
                 const ellipseY = view(<input type="range" min="0" max="100" value="50"/>);
             </script>
-            <script type="module" is="reactive"><label>cy {ellipseY}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>rx {ellipseRx}</label></script>
             <script type="module" is="reactive">
                 const ellipseRx = view(<input type="range" min="5" max="100" value="60"/>);
             </script>
-            <script type="module" is="reactive"><label>rx {ellipseRx}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>ry {ellipseRy}</label></script>
             <script type="module" is="reactive">
                 const ellipseRy = view(<input type="range" min="5" max="50" value="30"/>);
             </script>
-            <script type="module" is="reactive"><label>ry {ellipseRy}</label></script>
         </div>
     </div>
 </section>
@@ -256,7 +256,7 @@
     <p>A line from point (<code>x1</code>, <code>y1</code>) to point (<code>x2</code>, <code>y2</code>). Lines have no fill, only stroke.</p>
 
     <script type="module" is="reactive">
-        display(<div class="svg-preview">
+        <div class="svg-preview">
             <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
                 <line
                     x1={lineX1}
@@ -269,35 +269,36 @@
                     opacity={globalOpacity}
                 />
             </svg>
-        </div>);
+        </div>
     </script>
 
     <div class="controls-grid">
         <div class="control-row">
+            <script type="module" is="reactive"><label>x1 {lineX1}</label></script>
             <script type="module" is="reactive">
                 const lineX1 = view(<input type="range" min="0" max="200" value="20"/>);
             </script>
-            <script type="module" is="reactive"><label>x1 {lineX1}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>y1 {lineY1}</label></script>
             <script type="module" is="reactive">
                 const lineY1 = view(<input type="range" min="0" max="100" value="10"/>);
             </script>
-            <script type="module" is="reactive"><label>y1 {lineY1}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>x2 {lineX2}</label></script>
             <script type="module" is="reactive">
                 const lineX2 = view(<input type="range" min="0" max="200" value="180"/>);
             </script>
-            <script type="module" is="reactive"><label>x2 {lineX2}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>y2 {lineY2}</label></script>
             <script type="module" is="reactive">
                 const lineY2 = view(<input type="range" min="0" max="100" value="90"/>);
             </script>
-            <script type="module" is="reactive"><label>y2 {lineY2}</label></script>
         </div>
         <div class="control-row">
+            <label>linecap</label>
             <script type="module" is="reactive">
                 const lineCap = view(<select>
                     <option value="butt">butt</option>
@@ -305,7 +306,6 @@
                     <option value="square">square</option>
                 </select>);
             </script>
-            <label>linecap</label>
         </div>
     </div>
 </section>
@@ -316,7 +316,7 @@
     <p>Connected line segments defined by a <code>points</code> attribute. Polylines are open (not auto-closed) and typically show stroke only.</p>
 
     <script type="module" is="reactive">
-        display(<div class="svg-preview">
+        <div class="svg-preview">
             <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
                 <polyline
                     points={polyPoints}
@@ -327,17 +327,18 @@
                     opacity={globalOpacity}
                 />
             </svg>
-        </div>);
+        </div>
     </script>
 
     <div class="controls-grid">
         <div class="control-row" style="grid-column: 1 / -1">
+            <label>points</label>
             <script type="module" is="reactive">
                 const polyPoints = view(<input type="text" value="20,90 60,30 100,60 140,20 180,50" style="flex: 1"/>);
             </script>
-            <label>points</label>
         </div>
         <div class="control-row">
+            <label>linejoin</label>
             <script type="module" is="reactive">
                 const lineJoin = view(<select>
                     <option value="miter">miter</option>
@@ -345,7 +346,6 @@
                     <option value="bevel">bevel</option>
                 </select>);
             </script>
-            <label>linejoin</label>
         </div>
     </div>
 </section>
@@ -356,7 +356,7 @@
     <p>Like polyline but auto-closes, connecting the last point back to the first. Fill is visible since the shape is closed.</p>
 
     <script type="module" is="reactive">
-        display(<div class="svg-preview">
+        <div class="svg-preview">
             <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
                 <polygon
                     points={polygonPoints}
@@ -367,15 +367,15 @@
                     opacity={globalOpacity}
                 />
             </svg>
-        </div>);
+        </div>
     </script>
 
     <div class="controls-grid">
         <div class="control-row" style="grid-column: 1 / -1">
+            <label>points</label>
             <script type="module" is="reactive">
                 const polygonPoints = view(<input type="text" value="100,5 143,36 126,86 74,86 57,36" style="flex: 1"/>);
             </script>
-            <label>points</label>
         </div>
     </div>
 </section>
@@ -387,7 +387,9 @@
 
     <script type="module" is="reactive">
         const transform = `translate(${translateX}, ${translateY}) rotate(${rotate}, 100, 50) scale(${scaleX}, ${scaleY})`;
-        display(<div class="svg-preview">
+    </script>
+    <script type="module" is="reactive">
+        <div class="svg-preview">
             <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
                 <line x1="100" y1="0" x2="100" y2="100" stroke="#ddd" strokeWidth="1"/>
                 <line x1="0" y1="50" x2="200" y2="50" stroke="#ddd" strokeWidth="1"/>
@@ -403,39 +405,39 @@
                     transform={transform}
                 />
             </svg>
-        </div>);
+        </div>
     </script>
 
     <div class="controls-grid">
         <div class="control-row">
+            <script type="module" is="reactive"><label>translateX {translateX}</label></script>
             <script type="module" is="reactive">
                 const translateX = view(<input type="range" min="-100" max="100" value="0"/>);
             </script>
-            <script type="module" is="reactive"><label>translateX {translateX}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>translateY {translateY}</label></script>
             <script type="module" is="reactive">
                 const translateY = view(<input type="range" min="-100" max="100" value="0"/>);
             </script>
-            <script type="module" is="reactive"><label>translateY {translateY}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>rotate {rotate}</label></script>
             <script type="module" is="reactive">
                 const rotate = view(<input type="range" min="0" max="360" value="0"/>);
             </script>
-            <script type="module" is="reactive"><label>rotate {rotate}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>scaleX {scaleX}</label></script>
             <script type="module" is="reactive">
                 const scaleX = view(<input type="range" min="0.1" max="2" step="0.1" value="1"/>);
             </script>
-            <script type="module" is="reactive"><label>scaleX {scaleX}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>scaleY {scaleY}</label></script>
             <script type="module" is="reactive">
                 const scaleY = view(<input type="range" min="0.1" max="2" step="0.1" value="1"/>);
             </script>
-            <script type="module" is="reactive"><label>scaleY {scaleY}</label></script>
         </div>
     </div>
 </section>
@@ -446,7 +448,7 @@
     <p>Text that flows along a <code>&lt;path&gt;</code>. The <code>startOffset</code> controls where text begins on the path.</p>
 
     <script type="module" is="reactive">
-        display(<div class="svg-preview">
+        <div class="svg-preview">
             <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
                 <defs>
                     <path id="textCurve" d={`M 10,${curveY} Q 100,${curveY - curveHeight} 190,${curveY}`} fill="none"/>
@@ -459,39 +461,39 @@
                     </textPath>
                 </text>
             </svg>
-        </div>);
+        </div>
     </script>
 
     <div class="controls-grid">
         <div class="control-row">
+            <script type="module" is="reactive"><label>startOffset {textOffset}%</label></script>
             <script type="module" is="reactive">
                 const textOffset = view(<input type="range" min="0" max="100" value="0"/>);
             </script>
-            <script type="module" is="reactive"><label>startOffset {textOffset}%</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>fontSize {textSize}</label></script>
             <script type="module" is="reactive">
                 const textSize = view(<input type="range" min="8" max="24" value="14"/>);
             </script>
-            <script type="module" is="reactive"><label>fontSize {textSize}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>curve {curveHeight}</label></script>
             <script type="module" is="reactive">
                 const curveHeight = view(<input type="range" min="0" max="60" value="30"/>);
             </script>
-            <script type="module" is="reactive"><label>curve {curveHeight}</label></script>
         </div>
         <div class="control-row">
+            <script type="module" is="reactive"><label>y {curveY}</label></script>
             <script type="module" is="reactive">
                 const curveY = view(<input type="range" min="20" max="80" value="60"/>);
             </script>
-            <script type="module" is="reactive"><label>y {curveY}</label></script>
         </div>
         <div class="control-row" style="grid-column: 1 / -1">
+            <label>text</label>
             <script type="module" is="reactive">
                 const textContent = view(<input type="text" value="Text flows along a path!" style="flex: 1"/>);
             </script>
-            <label>text</label>
         </div>
     </div>
 </section>

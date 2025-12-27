@@ -113,7 +113,6 @@ a:hover {
 }
 
 .control-row label {
-    order: -1;
     min-width: 50px;
     font-size: 0.75rem;
     color: #475569;
