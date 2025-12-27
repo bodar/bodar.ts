@@ -440,6 +440,62 @@
     </div>
 </section>
 
+<!-- textPath Section -->
+<section class="element-section">
+    <h2>&lt;textPath&gt;</h2>
+    <p>Text that flows along a <code>&lt;path&gt;</code>. The <code>startOffset</code> controls where text begins on the path.</p>
+
+    <script type="module" is="reactive">
+        display(<div class="svg-preview">
+            <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
+                <defs>
+                    <path id="textCurve" d={`M 10,${curveY} Q 100,${curveY - curveHeight} 190,${curveY}`} fill="none"/>
+                </defs>
+                <path d={`M 10,${curveY} Q 100,${curveY - curveHeight} 190,${curveY}`}
+                      fill="none" stroke="#ddd" strokeWidth="1"/>
+                <text fill={globalFill} fontSize={textSize} opacity={globalOpacity}>
+                    <textPath href="#textCurve" startOffset={`${textOffset}%`}>
+                        {textContent}
+                    </textPath>
+                </text>
+            </svg>
+        </div>);
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive">
+                const textOffset = view(<input type="range" min="0" max="100" value="0"/>);
+            </script>
+            <script type="module" is="reactive"><label>startOffset {textOffset}%</label></script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive">
+                const textSize = view(<input type="range" min="8" max="24" value="14"/>);
+            </script>
+            <script type="module" is="reactive"><label>fontSize {textSize}</label></script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive">
+                const curveHeight = view(<input type="range" min="0" max="60" value="30"/>);
+            </script>
+            <script type="module" is="reactive"><label>curve {curveHeight}</label></script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive">
+                const curveY = view(<input type="range" min="20" max="80" value="60"/>);
+            </script>
+            <script type="module" is="reactive"><label>y {curveY}</label></script>
+        </div>
+        <div class="control-row" style="grid-column: 1 / -1">
+            <script type="module" is="reactive">
+                const textContent = view(<input type="text" value="Text flows along a path!" style="flex: 1"/>);
+            </script>
+            <label>text</label>
+        </div>
+    </div>
+</section>
+
 </main>
 </div>
 
