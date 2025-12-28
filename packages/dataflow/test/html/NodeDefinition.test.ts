@@ -43,7 +43,8 @@ return {input};
         // Becomes synchronous because the only import (runtime.ts) is stripped
         // language=JavaScript
         expect(definition.toString({stripView: true})).toBe(`"1234",["jsx"],["input"],(jsx) => {
-const view = View.for("1234", _runtime_);
+const display = Display.for("1234", _runtime_);
+const view = View.for(display);
 const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input};
 }`)
@@ -60,7 +61,8 @@ return {input};
         // With strip options, view is removed from inputs
         // language=JavaScript
         expect(definition.toString({stripView: true})).toBe(`"1234",["jsx"],["input"],(jsx) => {
-const view = View.for("1234", _runtime_);
+const display = Display.for("1234", _runtime_);
+const view = View.for(display);
 const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input};
 }`)

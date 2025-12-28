@@ -314,6 +314,7 @@
 <section class="element-section">
     <h2>&lt;polyline&gt;</h2>
     <p>Connected line segments defined by a <code>points</code> attribute. Polylines are open (not auto-closed) and typically show stroke only.</p>
+    <p class="format-note"><strong>Points format:</strong> pairs of <code>x,y</code> coordinates separated by spaces: <code>x1,y1 x2,y2 x3,y3...</code></p>
 
     <script type="module" is="reactive">
         <div class="svg-preview">
@@ -354,6 +355,7 @@
 <section class="element-section">
     <h2>&lt;polygon&gt;</h2>
     <p>Like polyline but auto-closes, connecting the last point back to the first. Fill is visible since the shape is closed.</p>
+    <p class="format-note"><strong>Points format:</strong> same as polyline — pairs of <code>x,y</code> coordinates: <code>x1,y1 x2,y2 x3,y3...</code></p>
 
     <script type="module" is="reactive">
         <div class="svg-preview">
@@ -375,6 +377,80 @@
             <label>points</label>
             <script type="module" is="reactive">
                 const polygonPoints = view(<input type="text" value="100,5 143,36 126,86 74,86 57,36" style="flex: 1"/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+<!-- Path Section -->
+<section class="element-section">
+    <h2>&lt;path&gt;</h2>
+    <p>The most powerful SVG element — draws complex shapes using the <code>d</code> attribute with path commands.</p>
+    <p class="format-note"><strong>Common commands:</strong> <code>M</code> move to, <code>L</code> line to, <code>H</code> horizontal, <code>V</code> vertical, <code>C</code> cubic bezier, <code>Q</code> quadratic bezier, <code>A</code> arc, <code>Z</code> close path. Lowercase = relative coordinates.</p>
+
+    <script type="module" is="reactive">
+        const pathD = `M ${pathStartX},${pathStartY} Q ${pathControlX},${pathControlY} ${pathEndX},${pathEndY}`;
+    </script>
+    <script type="module" is="reactive" id="svg-path">
+        <div class="svg-preview">
+            <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
+                <circle cx={pathStartX} cy={pathStartY} r="4" fill="#888" opacity="0.5"/>
+                <circle cx={pathControlX} cy={pathControlY} r="4" fill="#f59e0b" opacity="0.7"/>
+                <circle cx={pathEndX} cy={pathEndY} r="4" fill="#888" opacity="0.5"/>
+                <line x1={pathStartX} y1={pathStartY} x2={pathControlX} y2={pathControlY} stroke="#ddd" strokeWidth="1"/>
+                <line x1={pathControlX} y1={pathControlY} x2={pathEndX} y2={pathEndY} stroke="#ddd" strokeWidth="1"/>
+                <path
+                    d={pathD}
+                    fill="none"
+                    stroke={globalStroke}
+                    strokeWidth={globalStrokeWidth}
+                    opacity={globalOpacity}
+                />
+            </svg>
+        </div>
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row" style="grid-column: 1 / -1">
+            <label>d</label>
+            <script type="module" is="reactive">
+                <code style="flex: 1; font-size: 0.85em">{pathD}</code>
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>start x {pathStartX}</label></script>
+            <script type="module" is="reactive">
+                const pathStartX = view(<input type="range" min="0" max="200" value="20"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>start y {pathStartY}</label></script>
+            <script type="module" is="reactive">
+                const pathStartY = view(<input type="range" min="0" max="100" value="80"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>control x {pathControlX}</label></script>
+            <script type="module" is="reactive">
+                const pathControlX = view(<input type="range" min="0" max="200" value="100"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>control y {pathControlY}</label></script>
+            <script type="module" is="reactive">
+                const pathControlY = view(<input type="range" min="0" max="100" value="10"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>end x {pathEndX}</label></script>
+            <script type="module" is="reactive">
+                const pathEndX = view(<input type="range" min="0" max="200" value="180"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>end y {pathEndY}</label></script>
+            <script type="module" is="reactive">
+                const pathEndY = view(<input type="range" min="0" max="100" value="80"/>);
             </script>
         </div>
     </div>

@@ -9,9 +9,6 @@ import {chain} from "@bodar/yadic/chain.ts";
 
 describe("Renderer", () => {
     async function render(fun: (doc: Document, display: (v: any) => any) => any, initialSlot: string = ''): Promise<Element> {
-        // Clear any cached Display instance for this key
-        Display.delete('output');
-
         const globals = parseHTML(`<slot name="output">${initialSlot}</slot>`);
         const throttle = Throttle.auto();
         const display = Display.for('output', chain({throttle}, globals));

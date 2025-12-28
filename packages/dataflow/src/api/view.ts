@@ -3,7 +3,7 @@
  */
 
 import {input, type SupportedInputs} from "./input.ts";
-import {Display, type DisplayDependencies} from "./display.ts";
+import type {DisplayContract} from "./display.ts";
 
 /** Placeholder function - should be rewritten by the transformer */
 export function view(_value: HTMLElement): AsyncIterator<any> {
@@ -15,8 +15,7 @@ export interface ViewContract {
 }
 
 export class View {
-    static for(key: string, deps: DisplayDependencies): ViewContract {
-        const display = Display.for(key, deps);
+    static for(display: DisplayContract): ViewContract {
         return (value: HTMLElement) => {
             return input(display(value as SupportedInputs));
         };

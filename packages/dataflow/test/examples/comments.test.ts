@@ -1,4 +1,4 @@
-import {beforeEach, describe, test} from "bun:test";
+import {describe, test} from "bun:test";
 import {parseHTML} from "linkedom";
 import {HTMLTransformer} from "../../src/html/HTMLTransformer.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
@@ -8,7 +8,6 @@ import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import type {Idle} from "../../src/Idle.ts";
 import type {BaseGraph} from "../../src/BaseGraph.ts";
-import {Display} from "../../src/api/display.ts";
 
 
 async function renderHTML(html: string, global: any = globalThis): Promise<{
@@ -32,10 +31,6 @@ async function renderHTML(html: string, global: any = globalThis): Promise<{
 }
 
 describe("comments", async () => {
-    beforeEach(() => {
-        Display.deleteAll();
-    });
-
     test("can render the 2 built in comments", async () => {
         const {browser} = await renderHTML(html as any);
         assertThat(Array.from(browser.document.querySelectorAll<HTMLSpanElement>('.comment .comment-author')).map(s => s.innerText),

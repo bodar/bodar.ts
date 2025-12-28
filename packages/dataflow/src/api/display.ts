@@ -66,22 +66,8 @@ export class Display {
         this.values.length = 0
     }
 
-    private static instances = new Map<string, WeakRef<DisplayContract>>();
-
     static for(key: string, deps: DisplayDependencies): DisplayContract {
-        const instance = this.instances.get(key)?.deref();
-        if (instance) return instance;
         const display = new Display(deps, key);
-        const newInstance = Object.assign((value: any) => display.call(value), display);
-        this.instances.set(key, new WeakRef(newInstance));
-        return newInstance;
-    }
-
-    static delete(key: string): boolean {
-        return this.instances.delete(key);
-    }
-
-    static deleteAll(): void {
-        this.instances.clear();
+        return Object.assign((value: any) => display.call(value), display);
     }
 }
