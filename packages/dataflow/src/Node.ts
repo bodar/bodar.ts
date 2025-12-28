@@ -3,11 +3,13 @@
  * @module
  */
 
+/** Versioned value wrapper for tracking changes */
 export interface Version<T> {
     value: T;
     version: number;
 }
 
+/** Reactive node that yields versioned values as dependencies change */
 export interface Node<T> extends AsyncIterable<Version<T>> {
     key: string;
     dependencies: Node<T>[];

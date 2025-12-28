@@ -7,6 +7,7 @@
  * @module
  */
 
+/** Function that determines when to advance based on consumer readiness */
 export type BackpressureStrategy = (ready: boolean[]) => boolean;
 
 /** Backpressure is a collection of built-in strategies */

@@ -10,10 +10,12 @@ export function view(_value: HTMLElement): AsyncIterator<any> {
     throw new Error('view() is a placeholder - it should have been rewritten by the transformer. Did you import it from @bodar/dataflow/runtime.ts?');
 }
 
+/** Contract for view function that displays and tracks input values */
 export interface ViewContract {
     (value: HTMLElement): AsyncIterator<any>;
 }
 
+/** Combines display and input to render an element and track its value */
 export class View {
     static for(display: DisplayContract): ViewContract {
         return (value: HTMLElement) => {

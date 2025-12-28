@@ -23,6 +23,7 @@ export {Throttle} from './Throttle.ts'
 export {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
 export {chain} from "@bodar/yadic/chain.ts";
 
+/** Dependencies and services provided by the runtime */
 export interface RuntimeExports {
     throttle: ThrottleStrategy;
     backpressure: BackpressureStrategy;
@@ -30,6 +31,7 @@ export interface RuntimeExports {
     graph: BaseGraph;
 }
 
+/** Creates a runtime with lazy-initialized dependencies */
 export function runtime<G = object>(global: G = globalThis as G): RuntimeExports & G {
     return chain(LazyMap.create()
         .set('backpressure', () => Backpressure.fastest)

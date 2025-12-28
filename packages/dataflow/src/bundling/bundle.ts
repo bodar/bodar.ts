@@ -26,6 +26,7 @@ export async function bundleFile(path: string, minify: boolean): Promise<string>
     return bundled!;
 }
 
+/** Bundles source code text by writing to temp file and bundling */
 export async function bundleText(source: string, extension: string, minify: boolean = true, temp: string = import.meta.dir): Promise<string> {
     const key = simpleHash(source);
     const path = join(temp, `${key}.${extension}`);

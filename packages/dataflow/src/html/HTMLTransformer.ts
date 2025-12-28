@@ -8,18 +8,21 @@ import {StartTransformer} from "./StartTransformer.ts";
 import {Bundler} from "../bundling/Bundler.ts";
 import {CountingIdGenerator, type IdGenerator} from "../IdGenerator.ts";
 
+/** Import map configuration for module resolution */
 export interface ImportMap {
     imports?: Record<string, string>;
     scopes?: Record<string, Record<string, string>>;
     integrity?: Record<string, string>;
 }
 
+/** CSS selectors for HTML transformation targets */
 export interface HTMLTransformerSelectors {
     start: string;
     script: string;
     end: string;
 }
 
+/** Dependencies required by HTMLTransformer */
 export interface HTMLTransformerDependencies {
     rewriter: HTMLRewriter;
     bundler?: Bundler;
@@ -28,13 +31,14 @@ export interface HTMLTransformerDependencies {
     idGenerator?: IdGenerator;
 }
 
+/** Default CSS selectors for head, reactive scripts, and body/islands */
 export const DefaultSelectors: HTMLTransformerSelectors = {
     start: 'head',
     script: 'script[data-reactive],script[is=reactive]',
     end: 'body,*[data-reactive-island],*[is=reactive-island]'
 }
 
-/** HTMLTransformer **/
+/** Transforms HTML by processing reactive scripts and injecting runtime code */
 export class HTMLTransformer {
     private idGenerator: IdGenerator;
 

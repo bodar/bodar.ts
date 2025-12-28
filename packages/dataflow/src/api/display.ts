@@ -4,6 +4,7 @@
 import {SlotRenderer, type SlotRendererDependencies} from "../html/SlotRenderer.ts";
 import type {ThrottleStrategy} from "../Throttle.ts";
 
+/** Values that can be rendered to a slot */
 export type SupportedValue = Node | string | number;
 
 /** Placeholder function - should be rewritten by the transformer */
@@ -11,6 +12,7 @@ export function display<T extends SupportedValue>(_value: T): T {
     throw new Error('display() is a placeholder - it should have been rewritten by the transformer. Did you import it from @bodar/dataflow/runtime.ts?');
 }
 
+/** Contract for display function with value collection */
 export interface DisplayContract {
     <T extends SupportedValue>(value: T): T;
 
@@ -20,10 +22,12 @@ export interface DisplayContract {
     clear: () => void;
 }
 
+/** Dependencies required by Display */
 export interface DisplayDependencies extends SlotRendererDependencies {
     throttle: ThrottleStrategy;
 }
 
+/** Collects values and renders them to a named slot with throttling */
 export class Display {
     public values: SupportedValue[] = [];
     private pending = false;

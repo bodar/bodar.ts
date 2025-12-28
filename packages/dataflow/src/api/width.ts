@@ -7,12 +7,14 @@ import {observe} from "./observe.ts";
 /** Placeholder value - should be rewritten by the transformer */
 export const width = -1;
 
+/** Dependencies required by Width */
 export interface WidthDependencies {
     document: Document;
     window: Window;
     ResizeObserver: typeof ResizeObserver;
 }
 
+/** Observes slot width changes using ResizeObserver */
 export class Width {
     static for(key: string, deps: WidthDependencies): AsyncIterable<number> {
         const {document, window, ResizeObserver} = deps;
