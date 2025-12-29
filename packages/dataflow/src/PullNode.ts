@@ -26,13 +26,13 @@ export class PullNode<T> implements Node<T> {
     }
 
     async* create(): AsyncIterable<T> {
-            await using racer = new AsyncIteratorRacer<string, any>([['inputs', combineLatest(this.dependencies)[Symbol.asyncIterator]()]]);
+        await using racer = new AsyncIteratorRacer<string, any>([['inputs', combineLatest(this.dependencies)[Symbol.asyncIterator]()]]);
 
         while (racer.continue) {
             const resolved = await racer.race();
 
-            const newInputs = resolved.get('inputs')?.value;
-            if (newInputs) {
+            if (resolved.has('inputs')) {
+                const newInputs = resolved.get('inputs')!.value;
                 if (!equal(this.inputs, newInputs)) {
                     await invalidate(this.value);
                     this.value = this.fun(...newInputs.map((v: Version<any>) => v.value));
@@ -40,9 +40,8 @@ export class PullNode<T> implements Node<T> {
                 }
                 racer.set('values', toAsyncIterable<T>(this.value)[Symbol.asyncIterator]());
             }
-            const values = resolved.get('values')?.value;
-            if (values) {
-                yield values;
+            if (resolved.has('values')) {
+                yield resolved.get('values')!.value;
                 await this.throttle();
             }
         }
