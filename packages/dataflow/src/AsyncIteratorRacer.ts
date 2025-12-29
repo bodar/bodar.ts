@@ -15,13 +15,11 @@ export class AsyncIteratorRacer<K, V> {
         this.iterators = new Map<K, AsyncIterator<V>>(entries)
     }
 
-    // Map-like iterator management
     set(key: K, iterator: AsyncIterator<V>): this {
         this.iterators.set(key, iterator);
         return this;
     }
 
-    /** Start .next() for all iterators not currently pending or resolved */
     pull(): void {
         for (const [key, iterator] of this.iterators) {
             if (!this.pending.has(key) && !this.resolved.has(key)) {
