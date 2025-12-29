@@ -89,54 +89,46 @@
     <script type="module" is="reactive">
         {
             const maxSamples = Math.max(100, width - 100);
-            const latest = samples[samples.length - 1];
-            if (latest) {
-                display(<div class="stats">
-                    <span>Samples: {samples.length}/{maxSamples}</span>
-                    <span>Used: {(latest.used / 1024 / 1024).toFixed(2)} MB</span>
-                    <span>Allocated: {(latest.total / 1024 / 1024).toFixed(2)} MB</span>
-                    <span>FPS: {latest.fps.toFixed(0)}</span>
-                </div>);
-            } else {
-                display(<div class="stats">Waiting for data...</div>);
-            }
+            const latest = samples[samples.length - 1] || {used: 0, total: 0, fps: 0};
+            display(<div class="stats">
+                <span>Samples: {samples.length}/{maxSamples}</span>
+                <span>Used: {(latest.used / 1024 / 1024).toFixed(2)} MB</span>
+                <span>Allocated: {(latest.total / 1024 / 1024).toFixed(2)} MB</span>
+                <span>FPS: {latest.fps.toFixed(0)}</span>
+            </div>);
         }
     </script>
 
     <script type="module" is="reactive">
         {
-            if (samples.length > 1) {
-                const memoryChart = Plot.plot({
-                    width,
-                    height: width / 3,
-                    y: {grid: true, label: "Memory (MB)"},
-                    x: {label: null},
-                    marks: [
-                        Plot.areaY(samples, {y: d => d.total / 1024 / 1024, fillOpacity: 0.15, fill: "#f59e0b"}),
-                        Plot.lineY(samples, {y: d => d.total / 1024 / 1024, stroke: "#f59e0b", strokeWidth: 1.5}),
-                        Plot.areaY(samples, {y: d => d.used / 1024 / 1024, fillOpacity: 0.3, fill: "#3b82f6"}),
-                        Plot.lineY(samples, {y: d => d.used / 1024 / 1024, stroke: "#3b82f6", strokeWidth: 2}),
-                        Plot.tip(samples, Plot.pointerX({y: d => d.used / 1024 / 1024, title: d => `Used: ${(d.used/1024/1024).toFixed(2)} MB\nAllocated: ${(d.total/1024/1024).toFixed(2)} MB`}))
-                    ]
-                });
+            const memoryChart = Plot.plot({
+                width,
+                height: width / 3,
+                y: {grid: true, label: "Memory (MB)"},
+                x: {label: null},
+                marks: [
+                    Plot.areaY(samples, {y: d => d.total / 1024 / 1024, fillOpacity: 0.15, fill: "#f59e0b"}),
+                    Plot.lineY(samples, {y: d => d.total / 1024 / 1024, stroke: "#f59e0b", strokeWidth: 1.5}),
+                    Plot.areaY(samples, {y: d => d.used / 1024 / 1024, fillOpacity: 0.3, fill: "#3b82f6"}),
+                    Plot.lineY(samples, {y: d => d.used / 1024 / 1024, stroke: "#3b82f6", strokeWidth: 2}),
+                    Plot.tip(samples, Plot.pointerX({y: d => d.used / 1024 / 1024, title: d => `Used: ${(d.used/1024/1024).toFixed(2)} MB\nAllocated: ${(d.total/1024/1024).toFixed(2)} MB`}))
+                ]
+            });
 
-                const fpsChart = Plot.plot({
-                    width,
-                    height: width / 6,
-                    y: {grid: true, label: "FPS"},
-                    x: {label: null},
-                    marks: [
-                        Plot.areaY(samples, {y: "fps", fillOpacity: 0.2, fill: "#10b981"}),
-                        Plot.lineY(samples, {y: "fps", stroke: "#10b981", strokeWidth: 2}),
-                        Plot.tip(samples, Plot.pointerX({y: "fps", title: d => `FPS: ${d.fps.toFixed(0)}`}))
-                    ]
-                });
+            const fpsChart = Plot.plot({
+                width,
+                height: width / 6,
+                y: {grid: true, label: "FPS"},
+                x: {label: null},
+                marks: [
+                    Plot.areaY(samples, {y: "fps", fillOpacity: 0.2, fill: "#10b981"}),
+                    Plot.lineY(samples, {y: "fps", stroke: "#10b981", strokeWidth: 2}),
+                    Plot.tip(samples, Plot.pointerX({y: "fps", title: d => `FPS: ${d.fps.toFixed(0)}`}))
+                ]
+            });
 
-                display(<div class="chart-container">{memoryChart}</div>);
-                display(<div class="chart-container">{fpsChart}</div>);
-            } else {
-                display(<div class="chart-container placeholder">Collecting initial samples...</div>);
-            }
+            display(<div class="chart-container">{memoryChart}</div>);
+            display(<div class="chart-container">{fpsChart}</div>);
         }
     </script>
 </div>
