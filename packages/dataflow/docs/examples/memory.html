@@ -106,33 +106,34 @@
     <script type="module" is="reactive">
         {
             if (samples.length > 1) {
-                // Transform data for faceting
-                const data = samples.flatMap((d, i) => [
-                    {i, metric: "Memory", value: d.used / 1024 / 1024, series: "Used"},
-                    {i, metric: "Memory", value: d.total / 1024 / 1024, series: "Allocated"},
-                    {i, metric: "FPS", value: d.fps, series: "FPS"}
-                ]);
-
-                const chart = Plot.plot({
-                    width: width,
-                    height: width / 2,
-                    y: {grid: true},
+                const memoryChart = Plot.plot({
+                    width,
+                    height: width / 3,
+                    y: {grid: true, label: "Memory (MB)"},
                     x: {label: null},
-                    fy: {label: null, domain: ["Memory", "FPS"]},
-                    color: {
-                        domain: ["Used", "Allocated", "FPS"],
-                        range: ["#3b82f6", "#f59e0b", "#10b981"]
-                    },
                     marks: [
-                        Plot.ruleY([0]),
-                        Plot.areaY(data, {x: "i", y: "value", fy: "metric", fill: "series", fillOpacity: 0.2}),
-                        Plot.lineY(data, {x: "i", y: "value", fy: "metric", stroke: "series", strokeWidth: 2}),
-                        Plot.tip(data, Plot.pointerX({x: "i", y: "value", fy: "metric", title: d => `${d.series}: ${d.value.toFixed(d.metric === "FPS" ? 0 : 2)}${d.metric === "Memory" ? " MB" : ""}`}))
-                    ],
-                    facet: {data, y: "metric"}
+                        Plot.areaY(samples, {y: d => d.total / 1024 / 1024, fillOpacity: 0.15, fill: "#f59e0b"}),
+                        Plot.lineY(samples, {y: d => d.total / 1024 / 1024, stroke: "#f59e0b", strokeWidth: 1.5}),
+                        Plot.areaY(samples, {y: d => d.used / 1024 / 1024, fillOpacity: 0.3, fill: "#3b82f6"}),
+                        Plot.lineY(samples, {y: d => d.used / 1024 / 1024, stroke: "#3b82f6", strokeWidth: 2}),
+                        Plot.tip(samples, Plot.pointerX({y: d => d.used / 1024 / 1024, title: d => `Used: ${(d.used/1024/1024).toFixed(2)} MB\nAllocated: ${(d.total/1024/1024).toFixed(2)} MB`}))
+                    ]
                 });
 
-                display(<div class="chart-container">{chart}</div>);
+                const fpsChart = Plot.plot({
+                    width,
+                    height: width / 6,
+                    y: {grid: true, label: "FPS"},
+                    x: {label: null},
+                    marks: [
+                        Plot.areaY(samples, {y: "fps", fillOpacity: 0.2, fill: "#10b981"}),
+                        Plot.lineY(samples, {y: "fps", stroke: "#10b981", strokeWidth: 2}),
+                        Plot.tip(samples, Plot.pointerX({y: "fps", title: d => `FPS: ${d.fps.toFixed(0)}`}))
+                    ]
+                });
+
+                display(<div class="chart-container">{memoryChart}</div>);
+                display(<div class="chart-container">{fpsChart}</div>);
             } else {
                 display(<div class="chart-container placeholder">Collecting initial samples...</div>);
             }
