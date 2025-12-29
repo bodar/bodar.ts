@@ -1,6 +1,9 @@
 /**
  * Races multiple async iterators, yielding results as they resolve.
- * Generic over key type K and value type V.
+ * Benefits over Promise.race:
+ *  1. No memory leaks
+ *  2. Races multiple at a time
+ *  3. Allows micro tasks to settle in same iteration (solves diamond shaped dependencies)
  */
 export class AsyncIteratorRacer<K, V> {
     private iterators: Map<K, AsyncIterator<V>>;
@@ -31,13 +34,11 @@ export class AsyncIteratorRacer<K, V> {
         }
     }
 
-    /** Wait for any iterator to resolve, then reset the signal */
     async wait(): Promise<void> {
         await Promise.all([this.signal.promise, Promise.resolve()]);
         this.signal = Promise.withResolvers();
     }
 
-    /** Get and clear all resolved results */
     take(): Map<K, IteratorResult<V>> {
         const result = this.resolved;
         this.resolved = new Map();
@@ -56,5 +57,16 @@ export class AsyncIteratorRacer<K, V> {
 
     async [Symbol.asyncDispose](): Promise<void> {
         await Promise.all([...this.iterators.values()].map(it => it.return?.()));
+        this.iterators.clear();
+    }
+
+    async *[Symbol.asyncIterator](): AsyncGenerator<Map<K, IteratorResult<V>>> {
+        try {
+            while (this.continue) {
+                yield this.race();
+            }
+        } finally {
+            await this[Symbol.asyncDispose]();
+        }
     }
 }

@@ -28,9 +28,7 @@ export class PullNode<T> implements Node<T> {
     async* create(): AsyncIterable<T> {
         await using racer = new AsyncIteratorRacer<string, any>([['inputs', combineLatest(this.dependencies)[Symbol.asyncIterator]()]]);
 
-        while (racer.continue) {
-            const resolved = await racer.race();
-
+        for await (const resolved of racer) {
             if (resolved.has('inputs')) {
                 const newInputs = resolved.get('inputs')!.value;
                 if (!equal(this.inputs, newInputs)) {
