@@ -32,7 +32,7 @@ export async function* combineLatest(iterables: AsyncIterable<any>[]): AsyncIter
                 }
             }
 
-            await signal;
+            await Promise.all([signal, Promise.resolve()]);
             // This must be done before yielding otherwise we can miss a sync update
             ({promise: signal, resolve: signalResolve} = Promise.withResolvers<void>());
 

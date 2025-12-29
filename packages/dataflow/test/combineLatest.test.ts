@@ -57,8 +57,18 @@ describe("combineLatest", () => {
 
         assertThat(result, equals([
             [1, 'a', true],
-            [2, 'a', true],
             [2, 'a', false]
+        ]));
+    });
+
+    test("works with N sources", async () => {
+        const result = await toPromiseArray(
+            combineLatest([values(1, 2), values('a'), values(true, false), values('2', '1')])
+        );
+
+        assertThat(result, equals([
+            [1, 'a', true, '2'],
+            [2, 'a', false, '1']
         ]));
     });
 
