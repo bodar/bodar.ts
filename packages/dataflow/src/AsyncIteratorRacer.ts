@@ -18,35 +18,6 @@ export class AsyncIteratorRacer<K, V> {
         return this;
     }
 
-    /** Get and remove a single resolved result by key */
-    pop(key: K): V | undefined {
-        try {
-            return this.resolved.get(key)?.value;
-        } finally {
-            this.resolved.delete(key);
-        }
-    }
-
-    // delete(key: K): boolean {
-    //     this.pending.delete(key);
-    //     this.resolved.delete(key);
-    //     return this.iterators.delete(key);
-    // }
-    //
-    // has(key: K): boolean {
-    //     return this.iterators.has(key);
-    // }
-    //
-    // get(key: K): AsyncIterator<V> | undefined {
-    //     return this.iterators.get(key);
-    // }
-    //
-    // keys(): IterableIterator<K> {
-    //     return this.iterators.keys();
-    // }
-
-    // Racing methods
-
     /** Start .next() for all iterators not currently pending or resolved */
     pull(): void {
         for (const [key, iterator] of this.iterators) {
@@ -79,8 +50,6 @@ export class AsyncIteratorRacer<K, V> {
         return this.take();
     }
 
-
-    // State checks
     get continue(): boolean {
         return this.iterators.size > 0;
     }
