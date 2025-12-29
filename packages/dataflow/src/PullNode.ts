@@ -7,6 +7,7 @@ import {type BackpressureStrategy, SharedAsyncIterable} from "./SharedAsyncItera
 import type {ThrottleStrategy} from "./Throttle.ts";
 import {type Node, type Version} from "./Node.ts";
 import {toAsyncIterable} from "./toAsyncIterable.ts";
+import {AsyncIteratorRacer} from "./AsyncIteratorRacer.ts";
 
 /** Node implementation that uses combineLatest to merge dependency streams and memoizes results */
 export class PullNode<T> implements Node<T> {
@@ -25,47 +26,25 @@ export class PullNode<T> implements Node<T> {
     }
 
     async* create(): AsyncIterable<T> {
-        const iterators = new Map<string, AsyncIterator<any>>();
-        const pending = new Map<string, Promise<void>>();
-        const resolved = new Map<string, any>();
-        let {promise: signal, resolve: signalResolve} = Promise.withResolvers<void>();
+            await using racer = new AsyncIteratorRacer<string, any>([['inputs', combineLatest(this.dependencies)[Symbol.asyncIterator]()]]);
 
-        iterators.set('inputs', combineLatest(this.dependencies)[Symbol.asyncIterator]());
+        while (racer.continue) {
+            const resolved = await racer.race();
 
-        try {
-            while (true) {
-                for (const [name, iterator] of iterators) {
-                    if (!pending.has(name) && !resolved.has(name)) {
-                        pending.set(name, iterator.next().then(result => {
-                            pending.delete(name);
-                            result.done ? iterators.delete(name) : resolved.set(name, result.value);
-                            signalResolve();
-                        }));
-                    }
+            const newInputs = resolved.get('inputs')?.value;
+            if (newInputs) {
+                if (!equal(this.inputs, newInputs)) {
+                    await invalidate(this.value);
+                    this.value = this.fun(...newInputs.map((v: Version<any>) => v.value));
+                    this.inputs = newInputs.slice();
                 }
-
-                await Promise.all([signal, Promise.resolve()]);
-                ({promise: signal, resolve: signalResolve} = Promise.withResolvers<void>());
-
-                if (resolved.has('inputs')) {
-                    const newInputs = resolved.get('inputs');
-                    resolved.delete('inputs');
-                    if (!equal(this.inputs, newInputs)) {
-                        await invalidate(this.value);
-                        this.value = this.fun(...newInputs.map((v: Version<any>) => v.value));
-                        this.inputs = newInputs.slice();
-                    }
-                    iterators.set('values', toAsyncIterable<T>(this.value)[Symbol.asyncIterator]());
-                } else if (resolved.has('values')) {
-                    yield resolved.get('values');
-                    resolved.delete('values');
-                    await this.throttle();
-                } else if (pending.size === 0) {
-                    break;
-                }
+                racer.set('values', toAsyncIterable<T>(this.value)[Symbol.asyncIterator]());
             }
-        } finally {
-            await Promise.all([...iterators.values()].map((iterator) => iterator.return?.()));
+            const values = resolved.get('values')?.value;
+            if (values) {
+                yield values;
+                await this.throttle();
+            }
         }
     }
 }

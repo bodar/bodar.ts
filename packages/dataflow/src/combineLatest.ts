@@ -15,9 +15,7 @@ export async function* combineLatest(iterables: AsyncIterable<any>[]): AsyncIter
     results.length = 0;
 
     while (racer.continue) {
-        await racer.race();
-
-        const resolved = racer.take();
+        const resolved = await racer.race();
         for (const [index, result] of resolved) {
             if (!result.done) currentValues[index] = result.value;
         }

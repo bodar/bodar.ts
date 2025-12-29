@@ -292,20 +292,20 @@ describe("graph", () => {
             });
 
             const iterator = generator[Symbol.asyncIterator]();
-            expect(await iterator.next()).toEqual({done: false, value: {value: 0, version: 0}});
-            expect(await iterator.next()).toEqual({done: false, value: {value: 1, version: 1}});
-            expect(await iterator.next()).toEqual({done: false, value: {value: 2, version: 2}});
+            expect(await iterator.next()).toEqual({done: false, value: {value: 1, version: 0}});
+            expect(await iterator.next()).toEqual({done: false, value: {value: 2, version: 1}});
+            expect(await iterator.next()).toEqual({done: false, value: {value: 3, version: 2}});
             expect(disposed).toEqual(0);
             source.value = 10;
             expect(disposed).toEqual(0);
             // Ideally this would be 30 here but because the pull is eager, each iterator locks
             // in the next value before the input can bubble up (it's a race condition)
             // If the result was async the source could beat it
-            expect(await iterator.next()).toEqual({done: false, value: {value: 3, version: 3}});
+            expect(await iterator.next()).toEqual({done: false, value: {value: 4, version: 3}});
             expect(disposed).toEqual(1);
-            expect(await iterator.next()).toEqual({done: false, value: {value: 40, version: 4}});
+            expect(await iterator.next()).toEqual({done: false, value: {value: 50, version: 4}});
             expect(disposed).toEqual(1);
-            expect(await iterator.next()).toEqual({done: false, value: {value: 50, version: 5}});
+            expect(await iterator.next()).toEqual({done: false, value: {value: 60, version: 5}});
             expect(disposed).toEqual(1);
         });
     });

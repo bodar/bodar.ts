@@ -19,9 +19,9 @@ export class AsyncIteratorRacer<K, V> {
     }
 
     /** Get and remove a single resolved result by key */
-    pop(key: K): IteratorResult<V> | undefined {
+    pop(key: K): V | undefined {
         try {
-            return this.resolved.get(key);
+            return this.resolved.get(key)?.value;
         } finally {
             this.resolved.delete(key);
         }
@@ -66,17 +66,19 @@ export class AsyncIteratorRacer<K, V> {
         this.signal = Promise.withResolvers();
     }
 
-    async race(): Promise<void> {
-        this.pull();
-        await this.wait();
-    }
-
     /** Get and clear all resolved results */
     take(): Map<K, IteratorResult<V>> {
         const result = this.resolved;
         this.resolved = new Map();
         return result;
     }
+
+    async race(): Promise<Map<K, IteratorResult<V>>> {
+        this.pull();
+        await this.wait();
+        return this.take();
+    }
+
 
     // State checks
     get continue(): boolean {
