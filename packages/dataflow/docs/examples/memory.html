@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Performance Monitor - Dataflow Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="memory.css">
+</head>
+<body>
+
+<div class="site-header">
+    <h1>Dataflow</h1>
+    <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="GitHub" src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
+</div>
+
+<nav class="docs-nav">
+    <a href="../index.html">Quick Start</a>
+    <a href="../setup.html">Setup</a>
+    <a href="../reactivity.html">Reactivity</a>
+    <a href="../inputs.html">Inputs</a>
+    <a href="../islands.html">Islands</a>
+    <a href="./" class="active">Examples</a>
+</nav>
+
+<h1>Performance Monitor</h1>
+
+<div class="intro">
+    <p>This example demonstrates <strong>real-time data visualization</strong> using Observable Plot with Dataflow's reactive generators.</p>
+
+    <p>Key features shown:</p>
+    <ul>
+        <li>Using <code>now</code> generator to trigger frame-by-frame updates</li>
+        <li>Using <code>width</code> for responsive chart sizing</li>
+        <li>Accumulating time-series data with <code>mutable</code></li>
+        <li>Multiple Observable Plot charts with different scales</li>
+        <li>FPS calculation from frame timing</li>
+    </ul>
+
+    <div class="note">
+        <strong>Note:</strong> Memory API (<code>performance.memory</code>) is only available in Chromium browsers. FPS works in all browsers.
+    </div>
+
+    <p><a href="https://github.com/bodar/bodar.ts/blob/master/packages/dataflow/docs/examples/memory.html">View source on GitHub</a></p>
+</div>
+
+<div class="memory-app">
+    <h2>Heap & FPS Over Time</h2>
+
+    <script type="module" is="reactive">
+        import {display, mutable, view, now, width} from "@bodar/dataflow/runtime.ts";
+        import * as Plot from "@observablehq/plot";
+
+        const gcAvailable = typeof gc === 'function';
+
+        const samples = mutable([]);
+        const timing = {lastTime: performance.now()};
+
+        const addSample = (sample, max) => {
+            samples.update(arr => {
+                arr.push(sample);
+                return arr.length > max ? arr.slice(-max) : arr;
+            });
+        };
+    </script>
+
+    <script type="module" is="reactive">
+        const forceGC = view(<input type="checkbox" id="force-gc" checked={gcAvailable} disabled={!gcAvailable}/>);
+    </script>
+    <label for="force-gc" class="gc-control">
+        <script type="module" is="reactive">
+            `Force GC ${gcAvailable ? '' : '(unavailable)'}`
+        </script>
+    </label>
+
+    <script type="module" is="reactive">
+        {
+            const maxSamples = Math.max(100, width - 100);
+            const currentTime = now;
+            if (forceGC && gcAvailable) gc();
+            const used = performance.memory?.usedJSHeapSize || 0;
+            const total = performance.memory?.totalJSHeapSize || 0;
+            const delta = currentTime - timing.lastTime;
+            const fps = delta > 0 ? 1000 / delta : 0;
+            timing.lastTime = currentTime;
+            addSample({used, total, fps}, maxSamples);
+        }
+    </script>
+
+    <script type="module" is="reactive">
+        {
+            const maxSamples = Math.max(100, width - 100);
+            const latest = samples[samples.length - 1];
+            if (latest) {
+                display(<div class="stats">
+                    <span>Samples: {samples.length}/{maxSamples}</span>
+                    <span>Used: {(latest.used / 1024 / 1024).toFixed(2)} MB</span>
+                    <span>Allocated: {(latest.total / 1024 / 1024).toFixed(2)} MB</span>
+                    <span>FPS: {latest.fps.toFixed(0)}</span>
+                </div>);
+            } else {
+                display(<div class="stats">Waiting for data...</div>);
+            }
+        }
+    </script>
+
+    <script type="module" is="reactive">
+        {
+            if (samples.length > 1) {
+                // Transform data for faceting
+                const data = samples.flatMap((d, i) => [
+                    {i, metric: "Memory", value: d.used / 1024 / 1024, series: "Used"},
+                    {i, metric: "Memory", value: d.total / 1024 / 1024, series: "Allocated"},
+                    {i, metric: "FPS", value: d.fps, series: "FPS"}
+                ]);
+
+                const chart = Plot.plot({
+                    width: width,
+                    height: width / 2,
+                    y: {grid: true},
+                    x: {label: null},
+                    fy: {label: null, domain: ["Memory", "FPS"]},
+                    color: {
+                        domain: ["Used", "Allocated", "FPS"],
+                        range: ["#3b82f6", "#f59e0b", "#10b981"]
+                    },
+                    marks: [
+                        Plot.ruleY([0]),
+                        Plot.areaY(data, {x: "i", y: "value", fy: "metric", fill: "series", fillOpacity: 0.2}),
+                        Plot.lineY(data, {x: "i", y: "value", fy: "metric", stroke: "series", strokeWidth: 2}),
+                        Plot.tip(data, Plot.pointerX({x: "i", y: "value", fy: "metric", title: d => `${d.series}: ${d.value.toFixed(d.metric === "FPS" ? 0 : 2)}${d.metric === "Memory" ? " MB" : ""}`}))
+                    ],
+                    facet: {data, y: "metric"}
+                });
+
+                display(<div class="chart-container">{chart}</div>);
+            } else {
+                display(<div class="chart-container placeholder">Collecting initial samples...</div>);
+            }
+        }
+    </script>
+</div>
+
+</body>
+</html>
