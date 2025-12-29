@@ -201,6 +201,26 @@ describe("combineLatest", () => {
             expect(sourceA.disposed).toBe(true);
             expect(sourceB.disposed).toBe(true);
         });
+
+        test("if a source throws, error propagates and we still clean up", async () => {
+            const sourceA = observableSource(1, 2);
+            async function* throwing() {
+                yield 'a';
+                throw new Error("source error");
+            }
+
+            let caught: Error | undefined;
+            try {
+                for await (const _ of combineLatest([sourceA, throwing()])) {
+                    // keep iterating
+                }
+            } catch (e) {
+                caught = e as Error;
+            }
+
+            expect(caught?.message).toBe("source error");
+            expect(sourceA.disposed).toBe(true);
+        });
     })
 
 

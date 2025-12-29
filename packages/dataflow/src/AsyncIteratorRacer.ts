@@ -27,6 +27,10 @@ export class AsyncIteratorRacer<K, V> {
                     this.pending.delete(key);
                     result.done ? this.iterators.delete(key) : this.resolved.set(key, result);
                     this.signal.resolve();
+                }, error => {
+                    this.pending.delete(key);
+                    this.iterators.delete(key);
+                    this.signal.reject(error);
                 }));
             }
         }
