@@ -11,8 +11,5 @@
     "@typescript/native-preview": "^7.0.0-dev.20251215.1",
     "asserttt": "^1.0.1",
     "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "@observablehq/inputs": "^0.12.0"
   }
 }
