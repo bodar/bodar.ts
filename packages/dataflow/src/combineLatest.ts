@@ -10,14 +10,13 @@ export async function* combineLatest(iterables: AsyncIterable<any>[]): AsyncIter
     await using racer = new AsyncIteratorRacer<number, any>(iterators);
 
     const results = await Promise.all(iterators.map(([, iterator]) => iterator.next()));
-    const currentValues = results.map(r => r.value);
-    yield currentValues.slice();
-    results.length = 0;
+    const values = results.map(r => r.value);
+    yield values.slice();
 
     for await (const resolved of racer) {
         for (const [index, result] of resolved) {
-            if (!result.done) currentValues[index] = result.value;
+            if (!result.done) values[index] = result.value;
         }
-        if (resolved.values().some(result => !result.done)) yield currentValues.slice();
+        if (resolved.values().some(result => !result.done)) yield values.slice();
     }
 }
