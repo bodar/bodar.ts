@@ -12,16 +12,15 @@ import {AsyncIteratorRacer} from "./AsyncIteratorRacer.ts";
 /** Node implementation that uses combineLatest to merge dependency streams and memoizes results */
 export class PullNode<T> implements Node<T> {
     public value: T | undefined;
-    // private inputs?: any[];
-    private shared?: SharedAsyncIterable<T>;
+    private shared: SharedAsyncIterable<T>;
 
     constructor(public key: string, public dependencies: PullNode<any>[], public fun: Function,
                 private backpressure: BackpressureStrategy,
                 private throttle: ThrottleStrategy) {
+        this.shared = new SharedAsyncIterable<T>({[Symbol.asyncIterator]:() => this.create()}, this.backpressure);
     }
 
     [Symbol.asyncIterator](): AsyncIterator<T> {
-        if (!this.shared) this.shared = new SharedAsyncIterable<T>({[Symbol.asyncIterator]:() => this.create()}, this.backpressure)
         return this.shared[Symbol.asyncIterator]();
     }
 
