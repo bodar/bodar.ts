@@ -47,7 +47,7 @@
     top-down document order.</p>
 
 <script type="module" is="reactive">
-    import {display, view, input, event, mutable, observe, now, width} from '@bodar/dataflow/runtime.ts';
+    import {display, view, input, event, mutable, observe, now, width, raw} from '@bodar/dataflow/runtime.ts';
 </script>
 
 <h2 id="reactive-scope">Reactive Scope</h2>
@@ -119,21 +119,22 @@
 <p>This is equivalent to the promise-based approach in the previous section, but often reads more clearly for sequential
     async operations.</p>
 
-<h3>For Await...Of</h3>
+<h3 id="for-await-of">For Await...Of</h3>
 
 <p>Top-level <code>for await...of</code> loops are also supported for iterating over async iterables:</p>
 
 <div class="example">
     <script type="module" is="reactive" data-echo>
-        const slow_source = [async function* () {
-            for (let i = 0; i < 10; i++) {
-                yield i;
+        const slow_source = raw(async function* () {
+            let count = 0;
+            while (true) {
+                yield count++;
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
-        }];
+        });
     </script>
     <script type="module" is="reactive" data-echo>
-        for await (const i of slow_source[0]()) {
+        for await (const i of slow_source()) {
             display(i);
         }
     </script>
@@ -387,6 +388,40 @@
 <p>Within the defining code block, <code>count</code> is a <code>Mutable</code> object and <code>.value</code> can be
     read and written. In other code blocks, <code>count</code> yields the current value (not the Mutable object). To
     modify a mutable from another block, expose functions like <code>increment</code> and <code>reset</code> above.</p>
+
+<h2 id="raw">Raw</h2>
+
+<p>Dataflow automatically processes certain values when they flow between reactive blocks - promises are awaited,
+    generators are iterated, and their yielded values trigger re-evaluation. Sometimes you want to pass these values
+    through <em>without</em> this automatic processing. The <code>raw</code> function marks a value to be passed as-is:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const generatorFn = raw(function* () {
+            yield 1;
+            yield 2;
+            yield 3;
+        });
+    </script>
+    <script type="module" is="reactive" data-echo>
+        // generatorFn is the function itself, not an iterated value
+        const values = [...generatorFn()];
+        `Values: ${values.join(', ')}`
+    </script>
+</div>
+
+<p>This is particularly useful when you want to:</p>
+<ul>
+    <li>Pass a generator function to be called and iterated manually (as in the <a href="#for-await-of">for await...of</a> example above)</li>
+    <li>Store a promise without awaiting it</li>
+    <li>Pass async iterables to be consumed with explicit iteration</li>
+</ul>
+
+<div class="note">
+    <strong>Note:</strong> Without <code>raw</code>, a generator assigned to a top-level variable would be automatically
+    iterated by Dataflow, with each yielded value triggering dependent blocks to re-run. With <code>raw</code>, you get
+    the generator function itself.
+</div>
 
 <script type="module">
     import hljs from 'highlight.js/lib/core.js';

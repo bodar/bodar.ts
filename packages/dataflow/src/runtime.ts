@@ -16,6 +16,7 @@ export {event} from './api/event.ts';
 export {observe} from './api/observe.ts';
 export {mutable} from './api/mutable.ts';
 export {now} from './api/now.ts';
+export {raw} from './api/raw.ts';
 
 export {BaseGraph} from './BaseGraph.ts'
 export {Idle} from './Idle.ts'
