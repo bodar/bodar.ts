@@ -52,20 +52,6 @@ describe("graph", () => {
         assertThat(await valuesOf(nodeB), equals([2]));
     });
 
-    test.skip("functions are only called once unless their input change", async () => {
-        const graph = new Graph();
-        let count = 0;
-        const {node} = graph.define(function node() {
-            count++;
-            return 1;
-        });
-        assertThat(count, is(0));
-        assertThat(await valuesOf(node), equals([1]));
-        assertThat(count, is(1));
-        assertThat(await valuesOf(node), equals([1]));
-        assertThat(count, is(1));
-    });
-
     test("if a dependency returns the same value multiple times in a row, it will still cause the function to execute", async () => {
         const graph = new Graph();
         graph.define(function* datasource() {

@@ -69,7 +69,7 @@ export class BaseGraph {
     /** Starts consuming all sink nodes */
     run(): void {
         this.sinks().forEach(async node => {
-            for await (const {value} of node) void (value);
+            for await (const value of node) void (value);
         });
     }
 }
