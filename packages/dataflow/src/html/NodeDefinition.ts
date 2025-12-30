@@ -3,6 +3,7 @@ import {parseScript, processJSX, toScript} from "../javascript/script-parsing.ts
 import {findUnresolvedReferences} from "../javascript/findUnresolvedReferences.ts";
 import {findTopLevelVariableDeclarations} from "../javascript/findTopLevelVariableDeclarations.ts";
 import {isSingleStatement, isSingleExpression} from "../javascript/isSingleExpression.ts";
+import {hasTopLevelAwait} from "../javascript/findTopLevelAwaits.ts";
 import {type IdGenerator, SimpleHashGenerator} from "../IdGenerator.ts";
 
 export interface SerializeOptions {
@@ -21,6 +22,7 @@ export class NodeDefinition {
                 private _imports: Imports,
                 private _singleExpression: boolean,
                 private _singleStatement: boolean,
+                private _hasTopLevelAwait: boolean,
                 private _body: string
     ) {
     }
@@ -34,10 +36,11 @@ export class NodeDefinition {
             const imports = processImports(program);
             const singleExpression = isSingleExpression(program);
             const singleStatement = isSingleStatement(program);
+            const topLevelAwait = hasTopLevelAwait(program);
             const newJavascript = toScript(program);
-            return new NodeDefinition(key, inputs, [...outputs, ...imports.locals()], imports, singleExpression, singleStatement, newJavascript);
+            return new NodeDefinition(key, inputs, [...outputs, ...imports.locals()], imports, singleExpression, singleStatement, topLevelAwait, newJavascript);
         } catch (error: any) {
-            return (new NodeDefinition(key, [], [], Imports.empty, true, false, JSON.stringify(error.message)));
+            return (new NodeDefinition(key, [], [], Imports.empty, true, false, false, JSON.stringify(error.message)));
         }
     }
 
@@ -75,7 +78,7 @@ export class NodeDefinition {
     }
 
     isAsync(options?: SerializeOptions): boolean {
-        return !this.getImports(options).isEmpty();
+        return !this.getImports(options).isEmpty() || this._hasTopLevelAwait;
     }
 
     toString(options?: SerializeOptions): string {

@@ -101,6 +101,44 @@
     </script>
 </div>
 
+<h2>Top-Level Await</h2>
+
+<p>You can use <code>await</code> directly at the top level of a reactive script without wrapping it in an async
+    function. This makes working with async APIs more natural:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const response = await fetch('https://api.github.com/repos/octocat/Hello-World');
+        const repo = await response.json();
+    </script>
+    <script type="module" is="reactive" data-echo>
+        `${repo.name}: ${repo.description}`
+    </script>
+</div>
+
+<p>This is equivalent to the promise-based approach in the previous section, but often reads more clearly for sequential
+    async operations.</p>
+
+<h3>For Await...Of</h3>
+
+<p>Top-level <code>for await...of</code> loops are also supported for iterating over async iterables:</p>
+
+<div class="example">
+    <script type="module" is="reactive" data-echo>
+        const slow_source = [async function* () {
+            for (let i = 0; i < 10; i++) {
+                yield i;
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }];
+    </script>
+    <script type="module" is="reactive" data-echo>
+        for await (const i of slow_source[0]()) {
+            display(i);
+        }
+    </script>
+</div>
+
 <h2>Generators</h2>
 
 <p>Values that change over time - such as interactive inputs, animation parameters, or streaming data - can be

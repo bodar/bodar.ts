@@ -119,4 +119,66 @@ for (let i = 0; i < 5; ++i) {alert(i);}
 {if (typeof gc === 'function') gc();}
 }`);
     });
+
+    test("detects top-level await expression", async () => {
+        // language=JavaScript
+        const definition = NodeDefinition.parse(`const response = await fetch(url);`, '1234');
+        expect(definition.isAsync()).toBe(true);
+        // language=JavaScript
+        expect(definition.toString()).toBe(`"1234",["fetch","url"],["response"],async(fetch,url) => {
+const response = await fetch(url);
+return {response};
+}`);
+    });
+
+    test("detects multiple top-level await expressions", async () => {
+        // language=JavaScript
+        const definition = NodeDefinition.parse(`
+            const response = await fetch(url);
+            const data = await response.json();
+        `, '1234');
+        expect(definition.isAsync()).toBe(true);
+        // language=JavaScript
+        expect(definition.toString()).toBe(`"1234",["fetch","url"],["response","data"],async(fetch,url) => {
+const response = await fetch(url);const data = await response.json();
+return {response,data};
+}`);
+    });
+
+    test("detects for await...of loop", async () => {
+        // language=JavaScript
+        const definition = NodeDefinition.parse(`
+            const values = [];
+            for await (const value of asyncIterable) values.push(value);
+        `, '1234');
+        expect(definition.isAsync()).toBe(true);
+        // language=JavaScript
+        expect(definition.toString()).toBe(`"1234",["asyncIterable"],["values"],async(asyncIterable) => {
+const values = [];for await (const value of asyncIterable) values.push(value);
+return {values};
+}`);
+    });
+
+    test("await inside nested arrow function does NOT make block async", async () => {
+        // language=JavaScript
+        const definition = NodeDefinition.parse(`
+            const fn = async () => await fetch(url);
+        `, '1234');
+        expect(definition.isAsync()).toBe(false);
+        // language=JavaScript
+        expect(definition.toString()).toBe(`"1234",["fetch","url"],["fn"],(fetch,url) => {
+const fn = async () => await fetch(url);
+return {fn};
+}`);
+    });
+
+    test("await inside class method does NOT make block async", async () => {
+        // language=JavaScript
+        const definition = NodeDefinition.parse(`
+            class Fetcher {
+                async fetch() { return await getData(); }
+            }
+        `, '1234');
+        expect(definition.isAsync()).toBe(false);
+    });
 });
