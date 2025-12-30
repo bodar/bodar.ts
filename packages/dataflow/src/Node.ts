@@ -10,7 +10,7 @@ export interface Version<T> {
 }
 
 /** Reactive node that yields versioned values as dependencies change */
-export interface Node<T> extends AsyncIterable<Version<T>> {
+export interface Node<T> extends AsyncIterable<T> {
     key: string;
     dependencies: Node<T>[];
     fun: Function;
