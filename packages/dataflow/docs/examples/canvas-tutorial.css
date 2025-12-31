@@ -121,7 +121,7 @@ a:hover {
 
 .control-row input[type="range"] {
     flex: 1;
-    min-width: 50px;
+    min-width: 80px;
 }
 
 .control-row input[type="color"] {
@@ -210,8 +210,8 @@ a:hover {
 /* Local controls grid */
 .controls-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem 1.5rem;
 }
 
 /* Input styling */
