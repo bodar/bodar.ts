@@ -750,7 +750,7 @@
 <!-- rect (path) Section -->
 <section class="element-section">
     <h2>rect(x, y, width, height)</h2>
-    <p>Adds a rectangle to the current path (unlike <code>fillRect</code> which draws immediately). Useful for combining shapes in one path.</p>
+    <p>Adds a rectangle to the current path (unlike <code>fillRect</code> which draws immediately). Add multiple rectangles to one path, then fill/stroke them all together.</p>
 
     <div class="canvas-preview">
         <script type="module" is="reactive">
@@ -764,8 +764,9 @@
 
             // Draw multiple rects in one path
             ctx.beginPath();
-            ctx.rect(rectPathX, rectPathY, rectPathW, rectPathH);
-            ctx.rect(rectPathX + rectPathW + 20, rectPathY, rectPathW, rectPathH);
+            for (let i = 0; i < rectPathCount; i++) {
+                ctx.rect(rectPathX + i * (rectPathW + 15), rectPathY, rectPathW, rectPathH);
+            }
 
             ctx.fillStyle = fillStyle;
             ctx.strokeStyle = strokeStyle;
@@ -777,6 +778,12 @@
     </script>
 
     <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive"><label>count {rectPathCount}</label></script>
+            <script type="module" is="reactive">
+                const rectPathCount = view(<input type="range" min="1" max="4" value="1"/>);
+            </script>
+        </div>
         <div class="control-row">
             <script type="module" is="reactive"><label>x {rectPathX}</label></script>
             <script type="module" is="reactive">
@@ -792,7 +799,7 @@
         <div class="control-row">
             <script type="module" is="reactive"><label>width {rectPathW}</label></script>
             <script type="module" is="reactive">
-                const rectPathW = view(<input type="range" min="20" max="150" value="80"/>);
+                const rectPathW = view(<input type="range" min="20" max="100" value="60"/>);
             </script>
         </div>
         <div class="control-row">
