@@ -113,9 +113,10 @@ a:hover {
 }
 
 .control-row label {
-    min-width: 50px;
+    min-width: 80px;
     font-size: 0.75rem;
     color: #475569;
+    font-variant-numeric: tabular-nums;
 }
 
 .control-row input[type="range"] {
