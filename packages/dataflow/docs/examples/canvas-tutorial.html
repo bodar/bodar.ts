@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Canvas 2D Tutorial - Dataflow Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="canvas-tutorial.css">
+</head>
+<body>
+
+<div class="site-header">
+    <h1>Dataflow</h1>
+    <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="GitHub" src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
+</div>
+
+<nav class="docs-nav">
+    <a href="../index.html">Quick Start</a>
+    <a href="../setup.html">Setup</a>
+    <a href="../reactivity.html">Reactivity</a>
+    <a href="../inputs.html">Inputs</a>
+    <a href="../islands.html">Islands</a>
+    <a href="./" class="active">Examples</a>
+</nav>
+
+<!-- Single import for the whole page -->
+<script type="module" is="reactive">
+    import {view, display} from "@bodar/dataflow/runtime.ts";
+</script>
+
+<h1>Interactive Canvas 2D Tutorial</h1>
+
+<div class="intro">
+    <p>Explore Canvas 2D drawing interactively! Adjust the <strong>global controls</strong> to change canvas size, colors, and line properties - all examples update simultaneously.</p>
+    <p><a href="https://github.com/bodar/bodar.ts/blob/master/packages/dataflow/docs/examples/canvas-tutorial.html">View source on GitHub</a></p>
+</div>
+
+<div class="tutorial-layout">
+<!-- Global Controls - Left Column -->
+<aside class="global-controls">
+    <h2>Global Controls</h2>
+    <div class="control-group">
+        <h3>Canvas Size</h3>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>width {canvasWidth}</label></script>
+            <script type="module" is="reactive">
+                const canvasWidth = view(<input type="range" min="200" max="600" value="400"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>height {canvasHeight}</label></script>
+            <script type="module" is="reactive">
+                const canvasHeight = view(<input type="range" min="100" max="300" value="150"/>);
+            </script>
+        </div>
+    </div>
+    <div class="control-group">
+        <h3>Colors</h3>
+        <div class="control-row">
+            <label>fillStyle</label>
+            <script type="module" is="reactive">
+                const fillStyle = view(<input type="color" value="#3b82f6"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <label>strokeStyle</label>
+            <script type="module" is="reactive">
+                const strokeStyle = view(<input type="color" value="#1e40af"/>);
+            </script>
+        </div>
+    </div>
+    <div class="control-group">
+        <h3>Line</h3>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>lineWidth {lineWidth}</label></script>
+            <script type="module" is="reactive">
+                const lineWidth = view(<input type="range" min="1" max="20" value="2"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>alpha {globalAlpha}</label></script>
+            <script type="module" is="reactive">
+                const globalAlpha = view(<input type="range" min="0" max="1" step="0.1" value="1"/>);
+            </script>
+        </div>
+    </div>
+</aside>
+
+<!-- Main Content - Right Column -->
+<main class="main-content">
+
+<!-- fillRect Section -->
+<section class="element-section">
+    <h2>fillRect(x, y, width, height)</h2>
+    <p>Draws a filled rectangle. Position starts at (<code>x</code>, <code>y</code>) with specified <code>width</code> and <code>height</code>.</p>
+
+    <div class="canvas-preview">
+        <script type="module" is="reactive">
+            const fillRectCanvas = display(<canvas width={canvasWidth} height={canvasHeight}></canvas>);
+        </script>
+    </div>
+    <script type="module" is="reactive">
+        {
+            const ctx = fillRectCanvas.getContext("2d");
+            ctx.clearRect(0, 0, fillRectCanvas.width, fillRectCanvas.height);
+            ctx.fillStyle = fillStyle;
+            ctx.globalAlpha = globalAlpha;
+            ctx.fillRect(fillRectX, fillRectY, fillRectW, fillRectH);
+        }
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive"><label>x {fillRectX}</label></script>
+            <script type="module" is="reactive">
+                const fillRectX = view(<input type="range" min="0" max="300" value="50"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>y {fillRectY}</label></script>
+            <script type="module" is="reactive">
+                const fillRectY = view(<input type="range" min="0" max="200" value="25"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>width {fillRectW}</label></script>
+            <script type="module" is="reactive">
+                const fillRectW = view(<input type="range" min="10" max="300" value="100"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>height {fillRectH}</label></script>
+            <script type="module" is="reactive">
+                const fillRectH = view(<input type="range" min="10" max="200" value="80"/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+<!-- strokeRect Section -->
+<section class="element-section">
+    <h2>strokeRect(x, y, width, height)</h2>
+    <p>Draws a rectangle outline (stroke only, no fill). Uses <code>strokeStyle</code> and <code>lineWidth</code>.</p>
+
+    <div class="canvas-preview">
+        <script type="module" is="reactive">
+            const strokeRectCanvas = display(<canvas width={canvasWidth} height={canvasHeight}></canvas>);
+        </script>
+    </div>
+    <script type="module" is="reactive">
+        {
+            const ctx = strokeRectCanvas.getContext("2d");
+            ctx.clearRect(0, 0, strokeRectCanvas.width, strokeRectCanvas.height);
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = lineWidth;
+            ctx.globalAlpha = globalAlpha;
+            ctx.strokeRect(strokeRectX, strokeRectY, strokeRectW, strokeRectH);
+        }
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive"><label>x {strokeRectX}</label></script>
+            <script type="module" is="reactive">
+                const strokeRectX = view(<input type="range" min="0" max="300" value="50"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>y {strokeRectY}</label></script>
+            <script type="module" is="reactive">
+                const strokeRectY = view(<input type="range" min="0" max="200" value="25"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>width {strokeRectW}</label></script>
+            <script type="module" is="reactive">
+                const strokeRectW = view(<input type="range" min="10" max="300" value="100"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>height {strokeRectH}</label></script>
+            <script type="module" is="reactive">
+                const strokeRectH = view(<input type="range" min="10" max="200" value="80"/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+<!-- clearRect Section -->
+<section class="element-section">
+    <h2>clearRect(x, y, width, height)</h2>
+    <p>Clears pixels in a rectangle to transparent. Here we first fill the canvas, then use <code>clearRect</code> to create a "hole".</p>
+
+    <div class="canvas-preview">
+        <script type="module" is="reactive">
+            const clearRectCanvas = display(<canvas width={canvasWidth} height={canvasHeight}></canvas>);
+        </script>
+    </div>
+    <script type="module" is="reactive">
+        {
+            const ctx = clearRectCanvas.getContext("2d");
+            ctx.clearRect(0, 0, clearRectCanvas.width, clearRectCanvas.height);
+            // Fill the whole canvas first
+            ctx.fillStyle = fillStyle;
+            ctx.globalAlpha = globalAlpha;
+            ctx.fillRect(0, 0, clearRectCanvas.width, clearRectCanvas.height);
+            // Then clear a portion
+            ctx.clearRect(clearRectX, clearRectY, clearRectW, clearRectH);
+        }
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive"><label>x {clearRectX}</label></script>
+            <script type="module" is="reactive">
+                const clearRectX = view(<input type="range" min="0" max="300" value="100"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>y {clearRectY}</label></script>
+            <script type="module" is="reactive">
+                const clearRectY = view(<input type="range" min="0" max="200" value="30"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>width {clearRectW}</label></script>
+            <script type="module" is="reactive">
+                const clearRectW = view(<input type="range" min="10" max="200" value="80"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>height {clearRectH}</label></script>
+            <script type="module" is="reactive">
+                const clearRectH = view(<input type="range" min="10" max="150" value="60"/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+<!-- Paths: moveTo, lineTo Section -->
+<section class="element-section">
+    <h2>Paths: moveTo, lineTo</h2>
+    <p>Build paths with <code>beginPath()</code>, <code>moveTo(x, y)</code>, and <code>lineTo(x, y)</code>. Render with <code>stroke()</code> or <code>fill()</code>. Use <code>closePath()</code> to connect back to start.</p>
+
+    <div class="canvas-preview">
+        <script type="module" is="reactive">
+            const pathCanvas = display(<canvas width={canvasWidth} height={canvasHeight}></canvas>);
+        </script>
+    </div>
+    <script type="module" is="reactive">
+        {
+            const ctx = pathCanvas.getContext("2d");
+            ctx.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
+
+            ctx.beginPath();
+            ctx.moveTo(pathStartX, pathStartY);
+            ctx.lineTo(pathMidX, pathMidY);
+            ctx.lineTo(pathEndX, pathEndY);
+
+            if (pathClose) ctx.closePath();
+
+            ctx.fillStyle = fillStyle;
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = lineWidth;
+            ctx.globalAlpha = globalAlpha;
+
+            if (pathClose) ctx.fill();
+            ctx.stroke();
+        }
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive"><label>start x {pathStartX}</label></script>
+            <script type="module" is="reactive">
+                const pathStartX = view(<input type="range" min="0" max="400" value="50"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>start y {pathStartY}</label></script>
+            <script type="module" is="reactive">
+                const pathStartY = view(<input type="range" min="0" max="200" value="120"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>mid x {pathMidX}</label></script>
+            <script type="module" is="reactive">
+                const pathMidX = view(<input type="range" min="0" max="400" value="200"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>mid y {pathMidY}</label></script>
+            <script type="module" is="reactive">
+                const pathMidY = view(<input type="range" min="0" max="200" value="20"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>end x {pathEndX}</label></script>
+            <script type="module" is="reactive">
+                const pathEndX = view(<input type="range" min="0" max="400" value="350"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>end y {pathEndY}</label></script>
+            <script type="module" is="reactive">
+                const pathEndY = view(<input type="range" min="0" max="200" value="120"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <label>closePath</label>
+            <script type="module" is="reactive">
+                const pathClose = view(<input type="checkbox" checked/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+<!-- quadraticCurveTo Section -->
+<section class="element-section">
+    <h2>quadraticCurveTo(cpx, cpy, x, y)</h2>
+    <p>Adds a quadratic Bezier curve with one control point. The curve is pulled toward the control point (shown in orange).</p>
+
+    <div class="canvas-preview">
+        <script type="module" is="reactive">
+            const quadCanvas = display(<canvas width={canvasWidth} height={canvasHeight}></canvas>);
+        </script>
+    </div>
+    <script type="module" is="reactive">
+        {
+            const ctx = quadCanvas.getContext("2d");
+            ctx.clearRect(0, 0, quadCanvas.width, quadCanvas.height);
+
+            // Draw guide lines
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = "#ddd";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(quadStartX, quadStartY);
+            ctx.lineTo(quadCtrlX, quadCtrlY);
+            ctx.lineTo(quadEndX, quadEndY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw control point
+            ctx.fillStyle = "#f59e0b";
+            ctx.beginPath();
+            ctx.arc(quadCtrlX, quadCtrlY, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw endpoints
+            ctx.fillStyle = "#888";
+            ctx.beginPath();
+            ctx.arc(quadStartX, quadStartY, 4, 0, Math.PI * 2);
+            ctx.arc(quadEndX, quadEndY, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw the curve
+            ctx.beginPath();
+            ctx.moveTo(quadStartX, quadStartY);
+            ctx.quadraticCurveTo(quadCtrlX, quadCtrlY, quadEndX, quadEndY);
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = lineWidth;
+            ctx.globalAlpha = globalAlpha;
+            ctx.stroke();
+        }
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive"><label>start x {quadStartX}</label></script>
+            <script type="module" is="reactive">
+                const quadStartX = view(<input type="range" min="0" max="400" value="50"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>start y {quadStartY}</label></script>
+            <script type="module" is="reactive">
+                const quadStartY = view(<input type="range" min="0" max="200" value="120"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #f59e0b">ctrl x {quadCtrlX}</label></script>
+            <script type="module" is="reactive">
+                const quadCtrlX = view(<input type="range" min="0" max="400" value="200"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #f59e0b">ctrl y {quadCtrlY}</label></script>
+            <script type="module" is="reactive">
+                const quadCtrlY = view(<input type="range" min="0" max="200" value="10"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>end x {quadEndX}</label></script>
+            <script type="module" is="reactive">
+                const quadEndX = view(<input type="range" min="0" max="400" value="350"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>end y {quadEndY}</label></script>
+            <script type="module" is="reactive">
+                const quadEndY = view(<input type="range" min="0" max="200" value="120"/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+<!-- bezierCurveTo Section -->
+<section class="element-section">
+    <h2>bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y)</h2>
+    <p>Adds a cubic Bezier curve with two control points. The curve starts toward cp1 (orange) and ends coming from cp2 (pink).</p>
+
+    <div class="canvas-preview">
+        <script type="module" is="reactive">
+            const bezierCanvas = display(<canvas width={canvasWidth} height={canvasHeight}></canvas>);
+        </script>
+    </div>
+    <script type="module" is="reactive">
+        {
+            const ctx = bezierCanvas.getContext("2d");
+            ctx.clearRect(0, 0, bezierCanvas.width, bezierCanvas.height);
+
+            // Draw guide lines
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = "#ddd";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(bezierStartX, bezierStartY);
+            ctx.lineTo(bezierCtrl1X, bezierCtrl1Y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(bezierEndX, bezierEndY);
+            ctx.lineTo(bezierCtrl2X, bezierCtrl2Y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw control points
+            ctx.fillStyle = "#f59e0b";
+            ctx.beginPath();
+            ctx.arc(bezierCtrl1X, bezierCtrl1Y, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#ec4899";
+            ctx.beginPath();
+            ctx.arc(bezierCtrl2X, bezierCtrl2Y, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw endpoints
+            ctx.fillStyle = "#888";
+            ctx.beginPath();
+            ctx.arc(bezierStartX, bezierStartY, 4, 0, Math.PI * 2);
+            ctx.arc(bezierEndX, bezierEndY, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw the curve
+            ctx.beginPath();
+            ctx.moveTo(bezierStartX, bezierStartY);
+            ctx.bezierCurveTo(bezierCtrl1X, bezierCtrl1Y, bezierCtrl2X, bezierCtrl2Y, bezierEndX, bezierEndY);
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = lineWidth;
+            ctx.globalAlpha = globalAlpha;
+            ctx.stroke();
+        }
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #f59e0b">cp1 x {bezierCtrl1X}</label></script>
+            <script type="module" is="reactive">
+                const bezierCtrl1X = view(<input type="range" min="0" max="400" value="50"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #f59e0b">cp1 y {bezierCtrl1Y}</label></script>
+            <script type="module" is="reactive">
+                const bezierCtrl1Y = view(<input type="range" min="0" max="200" value="10"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #ec4899">cp2 x {bezierCtrl2X}</label></script>
+            <script type="module" is="reactive">
+                const bezierCtrl2X = view(<input type="range" min="0" max="400" value="350"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #ec4899">cp2 y {bezierCtrl2Y}</label></script>
+            <script type="module" is="reactive">
+                const bezierCtrl2Y = view(<input type="range" min="0" max="200" value="10"/>);
+            </script>
+        </div>
+    </div>
+    <script type="module" is="reactive">
+        const bezierStartX = 50;
+        const bezierStartY = 120;
+        const bezierEndX = 350;
+        const bezierEndY = 120;
+    </script>
+</section>
+
+<!-- arc Section -->
+<section class="element-section">
+    <h2>arc(x, y, radius, startAngle, endAngle, ccw)</h2>
+    <p>Adds a circular arc to the path. Angles are in radians (displayed in degrees here). Toggle counterclockwise direction.</p>
+
+    <div class="canvas-preview">
+        <script type="module" is="reactive">
+            const arcCanvas = display(<canvas width={canvasWidth} height={canvasHeight}></canvas>);
+        </script>
+    </div>
+    <script type="module" is="reactive">
+        {
+            const ctx = arcCanvas.getContext("2d");
+            ctx.clearRect(0, 0, arcCanvas.width, arcCanvas.height);
+
+            // Draw center point
+            ctx.fillStyle = "#888";
+            ctx.beginPath();
+            ctx.arc(arcX, arcY, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw the arc
+            ctx.beginPath();
+            ctx.arc(arcX, arcY, arcRadius, arcStart * Math.PI / 180, arcEnd * Math.PI / 180, arcCCW);
+
+            ctx.fillStyle = fillStyle;
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = lineWidth;
+            ctx.globalAlpha = globalAlpha;
+
+            if (arcFill) {
+                ctx.lineTo(arcX, arcY);
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.stroke();
+        }
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive"><label>x {arcX}</label></script>
+            <script type="module" is="reactive">
+                const arcX = view(<input type="range" min="50" max="350" value="200"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>y {arcY}</label></script>
+            <script type="module" is="reactive">
+                const arcY = view(<input type="range" min="30" max="120" value="75"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>radius {arcRadius}</label></script>
+            <script type="module" is="reactive">
+                const arcRadius = view(<input type="range" min="10" max="100" value="50"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>start {arcStart}°</label></script>
+            <script type="module" is="reactive">
+                const arcStart = view(<input type="range" min="0" max="360" value="0"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>end {arcEnd}°</label></script>
+            <script type="module" is="reactive">
+                const arcEnd = view(<input type="range" min="0" max="360" value="270"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <label>ccw</label>
+            <script type="module" is="reactive">
+                const arcCCW = view(<input type="checkbox"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <label>fill pie</label>
+            <script type="module" is="reactive">
+                const arcFill = view(<input type="checkbox" checked/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+<!-- arcTo Section -->
+<section class="element-section">
+    <h2>arcTo(x1, y1, x2, y2, radius)</h2>
+    <p>Creates a rounded corner. The arc connects from the current point, tangent to the lines formed by (current→p1) and (p1→p2).</p>
+
+    <div class="canvas-preview">
+        <script type="module" is="reactive">
+            const arcToCanvas = display(<canvas width={canvasWidth} height={canvasHeight}></canvas>);
+        </script>
+    </div>
+    <script type="module" is="reactive">
+        {
+            const ctx = arcToCanvas.getContext("2d");
+            ctx.clearRect(0, 0, arcToCanvas.width, arcToCanvas.height);
+
+            // Draw guide lines
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = "#ddd";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(arcToStartX, arcToStartY);
+            ctx.lineTo(arcToX1, arcToY1);
+            ctx.lineTo(arcToX2, arcToY2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw control points
+            ctx.fillStyle = "#f59e0b";
+            ctx.beginPath();
+            ctx.arc(arcToX1, arcToY1, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#ec4899";
+            ctx.beginPath();
+            ctx.arc(arcToX2, arcToY2, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw start point
+            ctx.fillStyle = "#888";
+            ctx.beginPath();
+            ctx.arc(arcToStartX, arcToStartY, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw the arcTo path
+            ctx.beginPath();
+            ctx.moveTo(arcToStartX, arcToStartY);
+            ctx.arcTo(arcToX1, arcToY1, arcToX2, arcToY2, arcToRadius);
+            ctx.lineTo(arcToX2, arcToY2);
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = lineWidth;
+            ctx.globalAlpha = globalAlpha;
+            ctx.stroke();
+        }
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive"><label>start x {arcToStartX}</label></script>
+            <script type="module" is="reactive">
+                const arcToStartX = view(<input type="range" min="0" max="400" value="50"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>start y {arcToStartY}</label></script>
+            <script type="module" is="reactive">
+                const arcToStartY = view(<input type="range" min="0" max="200" value="50"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #f59e0b">x1 {arcToX1}</label></script>
+            <script type="module" is="reactive">
+                const arcToX1 = view(<input type="range" min="0" max="400" value="50"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #f59e0b">y1 {arcToY1}</label></script>
+            <script type="module" is="reactive">
+                const arcToY1 = view(<input type="range" min="0" max="200" value="120"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #ec4899">x2 {arcToX2}</label></script>
+            <script type="module" is="reactive">
+                const arcToX2 = view(<input type="range" min="0" max="400" value="300"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #ec4899">y2 {arcToY2}</label></script>
+            <script type="module" is="reactive">
+                const arcToY2 = view(<input type="range" min="0" max="200" value="120"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>radius {arcToRadius}</label></script>
+            <script type="module" is="reactive">
+                const arcToRadius = view(<input type="range" min="5" max="100" value="40"/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+<!-- ellipse Section -->
+<section class="element-section">
+    <h2>ellipse(x, y, rx, ry, rotation, start, end)</h2>
+    <p>Adds an elliptical arc. Specify center, x/y radii, rotation angle, and start/end angles.</p>
+
+    <div class="canvas-preview">
+        <script type="module" is="reactive">
+            const ellipseCanvas = display(<canvas width={canvasWidth} height={canvasHeight}></canvas>);
+        </script>
+    </div>
+    <script type="module" is="reactive">
+        {
+            const ctx = ellipseCanvas.getContext("2d");
+            ctx.clearRect(0, 0, ellipseCanvas.width, ellipseCanvas.height);
+
+            // Draw center point
+            ctx.fillStyle = "#888";
+            ctx.beginPath();
+            ctx.arc(ellipseX, ellipseY, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw the ellipse
+            ctx.beginPath();
+            ctx.ellipse(ellipseX, ellipseY, ellipseRx, ellipseRy, ellipseRotation * Math.PI / 180, 0, Math.PI * 2);
+            ctx.fillStyle = fillStyle;
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = lineWidth;
+            ctx.globalAlpha = globalAlpha;
+            ctx.fill();
+            ctx.stroke();
+        }
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive"><label>x {ellipseX}</label></script>
+            <script type="module" is="reactive">
+                const ellipseX = view(<input type="range" min="50" max="350" value="200"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>y {ellipseY}</label></script>
+            <script type="module" is="reactive">
+                const ellipseY = view(<input type="range" min="30" max="120" value="75"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>rx {ellipseRx}</label></script>
+            <script type="module" is="reactive">
+                const ellipseRx = view(<input type="range" min="10" max="150" value="80"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>ry {ellipseRy}</label></script>
+            <script type="module" is="reactive">
+                const ellipseRy = view(<input type="range" min="10" max="100" value="40"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>rotation {ellipseRotation}°</label></script>
+            <script type="module" is="reactive">
+                const ellipseRotation = view(<input type="range" min="0" max="180" value="0"/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+<!-- rect (path) Section -->
+<section class="element-section">
+    <h2>rect(x, y, width, height)</h2>
+    <p>Adds a rectangle to the current path (unlike <code>fillRect</code> which draws immediately). Useful for combining shapes in one path.</p>
+
+    <div class="canvas-preview">
+        <script type="module" is="reactive">
+            const rectPathCanvas = display(<canvas width={canvasWidth} height={canvasHeight}></canvas>);
+        </script>
+    </div>
+    <script type="module" is="reactive">
+        {
+            const ctx = rectPathCanvas.getContext("2d");
+            ctx.clearRect(0, 0, rectPathCanvas.width, rectPathCanvas.height);
+
+            // Draw multiple rects in one path
+            ctx.beginPath();
+            ctx.rect(rectPathX, rectPathY, rectPathW, rectPathH);
+            ctx.rect(rectPathX + rectPathW + 20, rectPathY, rectPathW, rectPathH);
+
+            ctx.fillStyle = fillStyle;
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = lineWidth;
+            ctx.globalAlpha = globalAlpha;
+            ctx.fill();
+            ctx.stroke();
+        }
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive"><label>x {rectPathX}</label></script>
+            <script type="module" is="reactive">
+                const rectPathX = view(<input type="range" min="0" max="200" value="30"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>y {rectPathY}</label></script>
+            <script type="module" is="reactive">
+                const rectPathY = view(<input type="range" min="0" max="100" value="25"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>width {rectPathW}</label></script>
+            <script type="module" is="reactive">
+                const rectPathW = view(<input type="range" min="20" max="150" value="80"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>height {rectPathH}</label></script>
+            <script type="module" is="reactive">
+                const rectPathH = view(<input type="range" min="20" max="120" value="80"/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+<!-- roundRect Section -->
+<section class="element-section">
+    <h2>roundRect(x, y, width, height, radii)</h2>
+    <p>Adds a rounded rectangle to the path. The <code>radii</code> parameter controls corner rounding.</p>
+
+    <div class="canvas-preview">
+        <script type="module" is="reactive">
+            const roundRectCanvas = display(<canvas width={canvasWidth} height={canvasHeight}></canvas>);
+        </script>
+    </div>
+    <script type="module" is="reactive">
+        {
+            const ctx = roundRectCanvas.getContext("2d");
+            ctx.clearRect(0, 0, roundRectCanvas.width, roundRectCanvas.height);
+
+            ctx.beginPath();
+            ctx.roundRect(roundRectX, roundRectY, roundRectW, roundRectH, roundRectRadius);
+
+            ctx.fillStyle = fillStyle;
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = lineWidth;
+            ctx.globalAlpha = globalAlpha;
+            ctx.fill();
+            ctx.stroke();
+        }
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive"><label>x {roundRectX}</label></script>
+            <script type="module" is="reactive">
+                const roundRectX = view(<input type="range" min="0" max="200" value="50"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>y {roundRectY}</label></script>
+            <script type="module" is="reactive">
+                const roundRectY = view(<input type="range" min="0" max="100" value="20"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>width {roundRectW}</label></script>
+            <script type="module" is="reactive">
+                const roundRectW = view(<input type="range" min="50" max="300" value="200"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>height {roundRectH}</label></script>
+            <script type="module" is="reactive">
+                const roundRectH = view(<input type="range" min="30" max="150" value="100"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>radius {roundRectRadius}</label></script>
+            <script type="module" is="reactive">
+                const roundRectRadius = view(<input type="range" min="0" max="50" value="20"/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+<!-- Text Section -->
+<section class="element-section">
+    <h2>fillText / strokeText</h2>
+    <p>Draw text with <code>fillText(text, x, y)</code> or <code>strokeText(text, x, y)</code>. Style with <code>font</code>, <code>textAlign</code>, <code>textBaseline</code>. Crosshairs show the anchor point.</p>
+
+    <div class="canvas-preview">
+        <script type="module" is="reactive">
+            const textCanvas = display(<canvas width={canvasWidth} height={canvasHeight}></canvas>);
+        </script>
+    </div>
+    <script type="module" is="reactive">
+        {
+            const ctx = textCanvas.getContext("2d");
+            ctx.clearRect(0, 0, textCanvas.width, textCanvas.height);
+
+            // Draw crosshairs at text position
+            ctx.strokeStyle = "#ddd";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(textX, 0);
+            ctx.lineTo(textX, textCanvas.height);
+            ctx.moveTo(0, textY);
+            ctx.lineTo(textCanvas.width, textY);
+            ctx.stroke();
+
+            // Configure text
+            ctx.font = `${textFontSize}px ${textFontFamily}`;
+            ctx.textAlign = textAlign;
+            ctx.textBaseline = textBaseline;
+            ctx.globalAlpha = globalAlpha;
+
+            // Draw text
+            ctx.fillStyle = fillStyle;
+            ctx.fillText(textContent, textX, textY);
+
+            if (textShowStroke) {
+                ctx.strokeStyle = strokeStyle;
+                ctx.lineWidth = lineWidth;
+                ctx.strokeText(textContent, textX, textY);
+            }
+        }
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row" style="grid-column: 1 / -1">
+            <label>text</label>
+            <script type="module" is="reactive">
+                const textContent = view(<input type="text" value="Hello Canvas!" style="flex: 1"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>x {textX}</label></script>
+            <script type="module" is="reactive">
+                const textX = view(<input type="range" min="0" max="400" value="200"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>y {textY}</label></script>
+            <script type="module" is="reactive">
+                const textY = view(<input type="range" min="0" max="200" value="80"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>size {textFontSize}px</label></script>
+            <script type="module" is="reactive">
+                const textFontSize = view(<input type="range" min="12" max="72" value="32"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <label>font</label>
+            <script type="module" is="reactive">
+                const textFontFamily = view(<select>
+                    <option value="sans-serif">sans-serif</option>
+                    <option value="serif">serif</option>
+                    <option value="monospace">monospace</option>
+                </select>);
+            </script>
+        </div>
+        <div class="control-row">
+            <label>align</label>
+            <script type="module" is="reactive">
+                const textAlign = view(<select>
+                    <option value="start">start</option>
+                    <option value="end">end</option>
+                    <option value="left">left</option>
+                    <option value="center">center</option>
+                    <option value="right">right</option>
+                </select>);
+            </script>
+        </div>
+        <div class="control-row">
+            <label>baseline</label>
+            <script type="module" is="reactive">
+                const textBaseline = view(<select>
+                    <option value="top">top</option>
+                    <option value="hanging">hanging</option>
+                    <option value="middle">middle</option>
+                    <option value="alphabetic">alphabetic</option>
+                    <option value="ideographic">ideographic</option>
+                    <option value="bottom">bottom</option>
+                </select>);
+            </script>
+        </div>
+        <div class="control-row">
+            <label>stroke</label>
+            <script type="module" is="reactive">
+                const textShowStroke = view(<input type="checkbox"/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+</main>
+</div>
+
+</body>
+</html>
