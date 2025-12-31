@@ -386,21 +386,26 @@
 <section class="element-section">
     <h2>&lt;path&gt;</h2>
     <p>The most powerful SVG element — draws complex shapes using the <code>d</code> attribute with path commands.</p>
-    <p class="format-note"><strong>Common commands:</strong> <code>M</code> move to, <code>L</code> line to, <code>H</code> horizontal, <code>V</code> vertical, <code>C</code> cubic bezier, <code>Q</code> quadratic bezier, <code>A</code> arc, <code>Z</code> close path. Lowercase = relative coordinates.</p>
+    <p class="format-note"><strong>Commands:</strong> <code>M</code> move to, <code>L</code> line to, <code>H</code> horizontal, <code>V</code> vertical, <code>C</code> cubic bezier, <code>S</code> smooth cubic, <code>Q</code> quadratic bezier, <code>T</code> smooth quadratic, <code>A</code> arc, <code>Z</code> close path. Lowercase = relative coordinates.</p>
+</section>
+
+<!-- Path: Lines -->
+<section class="element-section">
+    <h3>Path: Lines (L, H, V)</h3>
+    <p><code>L x,y</code> draws a line to absolute coordinates. <code>H x</code> horizontal line, <code>V y</code> vertical line.</p>
 
     <script type="module" is="reactive">
-        const pathD = `M ${pathStartX},${pathStartY} Q ${pathControlX},${pathControlY} ${pathEndX},${pathEndY}`;
+        const linePath = `M ${lineStartX},${lineStartY} L ${lineMidX},${lineMidY} H ${lineHX} V ${lineVY}`;
     </script>
-    <script type="module" is="reactive" id="svg-path">
+    <script type="module" is="reactive">
         <div class="svg-preview">
             <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
-                <circle cx={pathStartX} cy={pathStartY} r="4" fill="#888" opacity="0.5"/>
-                <circle cx={pathControlX} cy={pathControlY} r="4" fill="#f59e0b" opacity="0.7"/>
-                <circle cx={pathEndX} cy={pathEndY} r="4" fill="#888" opacity="0.5"/>
-                <line x1={pathStartX} y1={pathStartY} x2={pathControlX} y2={pathControlY} stroke="#ddd" strokeWidth="1"/>
-                <line x1={pathControlX} y1={pathControlY} x2={pathEndX} y2={pathEndY} stroke="#ddd" strokeWidth="1"/>
+                <circle cx={lineStartX} cy={lineStartY} r="4" fill="#888" opacity="0.5"/>
+                <circle cx={lineMidX} cy={lineMidY} r="4" fill="#888" opacity="0.5"/>
+                <circle cx={lineHX} cy={lineMidY} r="4" fill="#10b981" opacity="0.7"/>
+                <circle cx={lineHX} cy={lineVY} r="4" fill="#8b5cf6" opacity="0.7"/>
                 <path
-                    d={pathD}
+                    d={linePath}
                     fill="none"
                     stroke={globalStroke}
                     strokeWidth={globalStrokeWidth}
@@ -414,43 +419,553 @@
         <div class="control-row" style="grid-column: 1 / -1">
             <label>d</label>
             <script type="module" is="reactive">
-                <code style="flex: 1; font-size: 0.85em">{pathD}</code>
+                <code style="flex: 1; font-size: 0.85em">{linePath}</code>
             </script>
         </div>
         <div class="control-row">
-            <script type="module" is="reactive"><label>start x {pathStartX}</label></script>
+            <script type="module" is="reactive"><label>M x {lineStartX}</label></script>
             <script type="module" is="reactive">
-                const pathStartX = view(<input type="range" min="0" max="200" value="20"/>);
+                const lineStartX = view(<input type="range" min="0" max="200" value="20"/>);
             </script>
         </div>
         <div class="control-row">
-            <script type="module" is="reactive"><label>start y {pathStartY}</label></script>
+            <script type="module" is="reactive"><label>M y {lineStartY}</label></script>
             <script type="module" is="reactive">
-                const pathStartY = view(<input type="range" min="0" max="100" value="80"/>);
+                const lineStartY = view(<input type="range" min="0" max="100" value="20"/>);
             </script>
         </div>
         <div class="control-row">
-            <script type="module" is="reactive"><label>control x {pathControlX}</label></script>
+            <script type="module" is="reactive"><label>L x {lineMidX}</label></script>
             <script type="module" is="reactive">
-                const pathControlX = view(<input type="range" min="0" max="200" value="100"/>);
+                const lineMidX = view(<input type="range" min="0" max="200" value="100"/>);
             </script>
         </div>
         <div class="control-row">
-            <script type="module" is="reactive"><label>control y {pathControlY}</label></script>
+            <script type="module" is="reactive"><label>L y {lineMidY}</label></script>
             <script type="module" is="reactive">
-                const pathControlY = view(<input type="range" min="0" max="100" value="10"/>);
+                const lineMidY = view(<input type="range" min="0" max="100" value="50"/>);
             </script>
         </div>
         <div class="control-row">
-            <script type="module" is="reactive"><label>end x {pathEndX}</label></script>
+            <script type="module" is="reactive"><label style="color: #10b981">H {lineHX}</label></script>
             <script type="module" is="reactive">
-                const pathEndX = view(<input type="range" min="0" max="200" value="180"/>);
+                const lineHX = view(<input type="range" min="0" max="200" value="160"/>);
             </script>
         </div>
         <div class="control-row">
-            <script type="module" is="reactive"><label>end y {pathEndY}</label></script>
+            <script type="module" is="reactive"><label style="color: #8b5cf6">V {lineVY}</label></script>
             <script type="module" is="reactive">
-                const pathEndY = view(<input type="range" min="0" max="100" value="80"/>);
+                const lineVY = view(<input type="range" min="0" max="100" value="80"/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+<!-- Path: Quadratic Bezier -->
+<section class="element-section">
+    <h3>Path: Quadratic Bezier (Q)</h3>
+    <p><code>Q cx,cy x,y</code> draws a curve with one control point. The curve is pulled toward the control point.</p>
+
+    <script type="module" is="reactive">
+        const quadPath = `M ${quadStartX},${quadStartY} Q ${quadControlX},${quadControlY} ${quadEndX},${quadEndY}`;
+    </script>
+    <script type="module" is="reactive">
+        <div class="svg-preview">
+            <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
+                <circle cx={quadStartX} cy={quadStartY} r="4" fill="#888" opacity="0.5"/>
+                <circle cx={quadControlX} cy={quadControlY} r="4" fill="#f59e0b" opacity="0.7"/>
+                <circle cx={quadEndX} cy={quadEndY} r="4" fill="#888" opacity="0.5"/>
+                <line x1={quadStartX} y1={quadStartY} x2={quadControlX} y2={quadControlY} stroke="#ddd" strokeWidth="1"/>
+                <line x1={quadControlX} y1={quadControlY} x2={quadEndX} y2={quadEndY} stroke="#ddd" strokeWidth="1"/>
+                <path
+                    d={quadPath}
+                    fill="none"
+                    stroke={globalStroke}
+                    strokeWidth={globalStrokeWidth}
+                    opacity={globalOpacity}
+                />
+            </svg>
+        </div>
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row" style="grid-column: 1 / -1">
+            <label>d</label>
+            <script type="module" is="reactive">
+                <code style="flex: 1; font-size: 0.85em">{quadPath}</code>
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>start x {quadStartX}</label></script>
+            <script type="module" is="reactive">
+                const quadStartX = view(<input type="range" min="0" max="200" value="20"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>start y {quadStartY}</label></script>
+            <script type="module" is="reactive">
+                const quadStartY = view(<input type="range" min="0" max="100" value="80"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #f59e0b">ctrl x {quadControlX}</label></script>
+            <script type="module" is="reactive">
+                const quadControlX = view(<input type="range" min="0" max="200" value="100"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #f59e0b">ctrl y {quadControlY}</label></script>
+            <script type="module" is="reactive">
+                const quadControlY = view(<input type="range" min="0" max="100" value="10"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>end x {quadEndX}</label></script>
+            <script type="module" is="reactive">
+                const quadEndX = view(<input type="range" min="0" max="200" value="180"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>end y {quadEndY}</label></script>
+            <script type="module" is="reactive">
+                const quadEndY = view(<input type="range" min="0" max="100" value="80"/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+<!-- Path: Smooth Quadratic -->
+<section class="element-section">
+    <h3>Path: Smooth Quadratic (T)</h3>
+    <p><code>T x,y</code> continues a quadratic curve by reflecting the previous control point. Chain multiple T commands for smooth waves.</p>
+
+    <script type="module" is="reactive">
+        const smoothQuadPath = `M ${tStartX},${tStartY} Q ${tCtrl1X},${tCtrl1Y} ${tMid1X},${tMid1Y} T ${tMid2X},${tMid2Y} T ${tEndX},${tEndY}`;
+        const reflectedCtrl1X = 2 * tMid1X - tCtrl1X;
+        const reflectedCtrl1Y = 2 * tMid1Y - tCtrl1Y;
+        const reflectedCtrl2X = 2 * tMid2X - reflectedCtrl1X;
+        const reflectedCtrl2Y = 2 * tMid2Y - reflectedCtrl1Y;
+    </script>
+    <script type="module" is="reactive">
+        <div class="svg-preview">
+            <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
+                <circle cx={tStartX} cy={tStartY} r="4" fill="#888" opacity="0.5"/>
+                <circle cx={tCtrl1X} cy={tCtrl1Y} r="4" fill="#f59e0b" opacity="0.7"/>
+                <circle cx={tMid1X} cy={tMid1Y} r="4" fill="#888" opacity="0.5"/>
+                <circle cx={reflectedCtrl1X} cy={reflectedCtrl1Y} r="4" fill="#f59e0b" opacity="0.3"/>
+                <circle cx={tMid2X} cy={tMid2Y} r="4" fill="#888" opacity="0.5"/>
+                <circle cx={reflectedCtrl2X} cy={reflectedCtrl2Y} r="4" fill="#f59e0b" opacity="0.3"/>
+                <circle cx={tEndX} cy={tEndY} r="4" fill="#888" opacity="0.5"/>
+                <line x1={tStartX} y1={tStartY} x2={tCtrl1X} y2={tCtrl1Y} stroke="#ddd" strokeWidth="1"/>
+                <line x1={tCtrl1X} y1={tCtrl1Y} x2={tMid1X} y2={tMid1Y} stroke="#ddd" strokeWidth="1"/>
+                <line x1={tMid1X} y1={tMid1Y} x2={reflectedCtrl1X} y2={reflectedCtrl1Y} stroke="#ddd" strokeWidth="1" strokeDasharray="3"/>
+                <line x1={tMid2X} y1={tMid2Y} x2={reflectedCtrl2X} y2={reflectedCtrl2Y} stroke="#ddd" strokeWidth="1" strokeDasharray="3"/>
+                <path
+                    d={smoothQuadPath}
+                    fill="none"
+                    stroke={globalStroke}
+                    strokeWidth={globalStrokeWidth}
+                    opacity={globalOpacity}
+                />
+            </svg>
+        </div>
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row" style="grid-column: 1 / -1">
+            <label>d</label>
+            <script type="module" is="reactive">
+                <code style="flex: 1; font-size: 0.85em">{smoothQuadPath}</code>
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #f59e0b">Q ctrl x {tCtrl1X}</label></script>
+            <script type="module" is="reactive">
+                const tCtrl1X = view(<input type="range" min="0" max="200" value="40"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #f59e0b">Q ctrl y {tCtrl1Y}</label></script>
+            <script type="module" is="reactive">
+                const tCtrl1Y = view(<input type="range" min="0" max="100" value="10"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>T1 x {tMid2X}</label></script>
+            <script type="module" is="reactive">
+                const tMid2X = view(<input type="range" min="0" max="200" value="120"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>T1 y {tMid2Y}</label></script>
+            <script type="module" is="reactive">
+                const tMid2Y = view(<input type="range" min="0" max="100" value="50"/>);
+            </script>
+        </div>
+    </div>
+    <script type="module" is="reactive">
+        const tStartX = 10;
+        const tStartY = 50;
+        const tMid1X = 60;
+        const tMid1Y = 50;
+        const tEndX = 190;
+        const tEndY = 50;
+    </script>
+</section>
+
+<!-- Path: Cubic Bezier -->
+<section class="element-section">
+    <h3>Path: Cubic Bezier (C)</h3>
+    <p><code>C c1x,c1y c2x,c2y x,y</code> draws a curve with two control points. The curve starts toward c1 and ends coming from c2.</p>
+
+    <script type="module" is="reactive">
+        const cubicPath = `M ${cubicStartX},${cubicStartY} C ${cubicCtrl1X},${cubicCtrl1Y} ${cubicCtrl2X},${cubicCtrl2Y} ${cubicEndX},${cubicEndY}`;
+    </script>
+    <script type="module" is="reactive">
+        <div class="svg-preview">
+            <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
+                <circle cx={cubicStartX} cy={cubicStartY} r="4" fill="#888" opacity="0.5"/>
+                <circle cx={cubicCtrl1X} cy={cubicCtrl1Y} r="4" fill="#f59e0b" opacity="0.7"/>
+                <circle cx={cubicCtrl2X} cy={cubicCtrl2Y} r="4" fill="#ec4899" opacity="0.7"/>
+                <circle cx={cubicEndX} cy={cubicEndY} r="4" fill="#888" opacity="0.5"/>
+                <line x1={cubicStartX} y1={cubicStartY} x2={cubicCtrl1X} y2={cubicCtrl1Y} stroke="#ddd" strokeWidth="1"/>
+                <line x1={cubicEndX} y1={cubicEndY} x2={cubicCtrl2X} y2={cubicCtrl2Y} stroke="#ddd" strokeWidth="1"/>
+                <path
+                    d={cubicPath}
+                    fill="none"
+                    stroke={globalStroke}
+                    strokeWidth={globalStrokeWidth}
+                    opacity={globalOpacity}
+                />
+            </svg>
+        </div>
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row" style="grid-column: 1 / -1">
+            <label>d</label>
+            <script type="module" is="reactive">
+                <code style="flex: 1; font-size: 0.85em">{cubicPath}</code>
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #f59e0b">ctrl1 x {cubicCtrl1X}</label></script>
+            <script type="module" is="reactive">
+                const cubicCtrl1X = view(<input type="range" min="0" max="200" value="20"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #f59e0b">ctrl1 y {cubicCtrl1Y}</label></script>
+            <script type="module" is="reactive">
+                const cubicCtrl1Y = view(<input type="range" min="0" max="100" value="10"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #ec4899">ctrl2 x {cubicCtrl2X}</label></script>
+            <script type="module" is="reactive">
+                const cubicCtrl2X = view(<input type="range" min="0" max="200" value="180"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #ec4899">ctrl2 y {cubicCtrl2Y}</label></script>
+            <script type="module" is="reactive">
+                const cubicCtrl2Y = view(<input type="range" min="0" max="100" value="10"/>);
+            </script>
+        </div>
+    </div>
+    <script type="module" is="reactive">
+        const cubicStartX = 20;
+        const cubicStartY = 80;
+        const cubicEndX = 180;
+        const cubicEndY = 80;
+    </script>
+</section>
+
+<!-- Path: Smooth Cubic -->
+<section class="element-section">
+    <h3>Path: Smooth Cubic (S)</h3>
+    <p><code>S c2x,c2y x,y</code> continues a cubic curve by reflecting the previous c2 as the new c1. Creates smooth connections.</p>
+
+    <script type="module" is="reactive">
+        const smoothCubicPath = `M ${sStartX},${sStartY} C ${sCtrl1X},${sCtrl1Y} ${sCtrl2X},${sCtrl2Y} ${sMidX},${sMidY} S ${sCtrl3X},${sCtrl3Y} ${sEndX},${sEndY}`;
+        const reflectedCtrlX = 2 * sMidX - sCtrl2X;
+        const reflectedCtrlY = 2 * sMidY - sCtrl2Y;
+    </script>
+    <script type="module" is="reactive">
+        <div class="svg-preview">
+            <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
+                <circle cx={sStartX} cy={sStartY} r="4" fill="#888" opacity="0.5"/>
+                <circle cx={sCtrl1X} cy={sCtrl1Y} r="4" fill="#f59e0b" opacity="0.7"/>
+                <circle cx={sCtrl2X} cy={sCtrl2Y} r="4" fill="#ec4899" opacity="0.7"/>
+                <circle cx={sMidX} cy={sMidY} r="4" fill="#888" opacity="0.5"/>
+                <circle cx={reflectedCtrlX} cy={reflectedCtrlY} r="4" fill="#f59e0b" opacity="0.3"/>
+                <circle cx={sCtrl3X} cy={sCtrl3Y} r="4" fill="#ec4899" opacity="0.7"/>
+                <circle cx={sEndX} cy={sEndY} r="4" fill="#888" opacity="0.5"/>
+                <line x1={sStartX} y1={sStartY} x2={sCtrl1X} y2={sCtrl1Y} stroke="#ddd" strokeWidth="1"/>
+                <line x1={sMidX} y1={sMidY} x2={sCtrl2X} y2={sCtrl2Y} stroke="#ddd" strokeWidth="1"/>
+                <line x1={sMidX} y1={sMidY} x2={reflectedCtrlX} y2={reflectedCtrlY} stroke="#ddd" strokeWidth="1" strokeDasharray="3"/>
+                <line x1={sEndX} y1={sEndY} x2={sCtrl3X} y2={sCtrl3Y} stroke="#ddd" strokeWidth="1"/>
+                <path
+                    d={smoothCubicPath}
+                    fill="none"
+                    stroke={globalStroke}
+                    strokeWidth={globalStrokeWidth}
+                    opacity={globalOpacity}
+                />
+            </svg>
+        </div>
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row" style="grid-column: 1 / -1">
+            <label>d</label>
+            <script type="module" is="reactive">
+                <code style="flex: 1; font-size: 0.85em">{smoothCubicPath}</code>
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #ec4899">C ctrl2 x {sCtrl2X}</label></script>
+            <script type="module" is="reactive">
+                const sCtrl2X = view(<input type="range" min="0" max="200" value="80"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #ec4899">C ctrl2 y {sCtrl2Y}</label></script>
+            <script type="module" is="reactive">
+                const sCtrl2Y = view(<input type="range" min="0" max="100" value="10"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #ec4899">S ctrl x {sCtrl3X}</label></script>
+            <script type="module" is="reactive">
+                const sCtrl3X = view(<input type="range" min="0" max="200" value="180"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label style="color: #ec4899">S ctrl y {sCtrl3Y}</label></script>
+            <script type="module" is="reactive">
+                const sCtrl3Y = view(<input type="range" min="0" max="100" value="90"/>);
+            </script>
+        </div>
+    </div>
+    <script type="module" is="reactive">
+        const sStartX = 10;
+        const sStartY = 50;
+        const sCtrl1X = 30;
+        const sCtrl1Y = 90;
+        const sMidX = 100;
+        const sMidY = 50;
+        const sEndX = 190;
+        const sEndY = 50;
+    </script>
+</section>
+
+<!-- Path: Arc -->
+<section class="element-section">
+    <h3>Path: Arc (A)</h3>
+    <p><code>A rx ry rotation large-arc sweep x,y</code> draws an elliptical arc. The flags select which of 4 possible arcs to draw.</p>
+
+    <script type="module" is="reactive">
+        const arcPath = `M ${arcStartX},${arcStartY} A ${arcRx} ${arcRy} ${arcRotation} ${arcLargeArc} ${arcSweep} ${arcEndX},${arcEndY}`;
+    </script>
+    <script type="module" is="reactive">
+        <div class="svg-preview">
+            <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
+                <circle cx={arcStartX} cy={arcStartY} r="4" fill="#888" opacity="0.5"/>
+                <circle cx={arcEndX} cy={arcEndY} r="4" fill="#888" opacity="0.5"/>
+                <path
+                    d={arcPath}
+                    fill="none"
+                    stroke={globalStroke}
+                    strokeWidth={globalStrokeWidth}
+                    opacity={globalOpacity}
+                />
+            </svg>
+        </div>
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row" style="grid-column: 1 / -1">
+            <label>d</label>
+            <script type="module" is="reactive">
+                <code style="flex: 1; font-size: 0.85em">{arcPath}</code>
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>rx {arcRx}</label></script>
+            <script type="module" is="reactive">
+                const arcRx = view(<input type="range" min="10" max="100" value="50"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>ry {arcRy}</label></script>
+            <script type="module" is="reactive">
+                const arcRy = view(<input type="range" min="10" max="100" value="30"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>rotation {arcRotation}°</label></script>
+            <script type="module" is="reactive">
+                const arcRotation = view(<input type="range" min="0" max="360" value="0"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>end x {arcEndX}</label></script>
+            <script type="module" is="reactive">
+                const arcEndX = view(<input type="range" min="0" max="200" value="160"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <label>large-arc</label>
+            <script type="module" is="reactive">
+                const arcLargeArc = view(<select>
+                    <option value="0">0 (small)</option>
+                    <option value="1">1 (large)</option>
+                </select>);
+            </script>
+        </div>
+        <div class="control-row">
+            <label>sweep</label>
+            <script type="module" is="reactive">
+                const arcSweep = view(<select>
+                    <option value="0">0 (ccw)</option>
+                    <option value="1">1 (cw)</option>
+                </select>);
+            </script>
+        </div>
+    </div>
+    <script type="module" is="reactive">
+        const arcStartX = 40;
+        const arcStartY = 50;
+        const arcEndY = 50;
+    </script>
+</section>
+
+<!-- Path: Close Path -->
+<section class="element-section">
+    <h3>Path: Close Path (Z)</h3>
+    <p><code>Z</code> closes the path by drawing a straight line back to the starting point. Creates closed shapes for filling.</p>
+
+    <script type="module" is="reactive">
+        const closedPath = `M ${closeStartX},${closeStartY} L ${closeMidX},${closeMidY} L ${closeEndX},${closeEndY}${closeZ ? ' Z' : ''}`;
+    </script>
+    <script type="module" is="reactive">
+        <div class="svg-preview">
+            <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
+                <path
+                    d={closedPath}
+                    fill={closeZ ? globalFill : 'none'}
+                    stroke={globalStroke}
+                    strokeWidth={globalStrokeWidth}
+                    opacity={globalOpacity}
+                />
+            </svg>
+        </div>
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row" style="grid-column: 1 / -1">
+            <label>d</label>
+            <script type="module" is="reactive">
+                <code style="flex: 1; font-size: 0.85em">{closedPath}</code>
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>start x {closeStartX}</label></script>
+            <script type="module" is="reactive">
+                const closeStartX = view(<input type="range" min="0" max="200" value="100"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>start y {closeStartY}</label></script>
+            <script type="module" is="reactive">
+                const closeStartY = view(<input type="range" min="0" max="100" value="10"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>mid x {closeMidX}</label></script>
+            <script type="module" is="reactive">
+                const closeMidX = view(<input type="range" min="0" max="200" value="40"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>mid y {closeMidY}</label></script>
+            <script type="module" is="reactive">
+                const closeMidY = view(<input type="range" min="0" max="100" value="80"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>end x {closeEndX}</label></script>
+            <script type="module" is="reactive">
+                const closeEndX = view(<input type="range" min="0" max="200" value="160"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>end y {closeEndY}</label></script>
+            <script type="module" is="reactive">
+                const closeEndY = view(<input type="range" min="0" max="100" value="80"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <label>close path</label>
+            <script type="module" is="reactive">
+                const closeZ = view(<input type="checkbox" checked/>);
+            </script>
+        </div>
+    </div>
+</section>
+
+<!-- textPath Section -->
+<section class="element-section">
+    <h2>&lt;textPath&gt;</h2>
+    <p>Text that flows along a <code>&lt;path&gt;</code>. The <code>startOffset</code> controls where text begins on the path.</p>
+
+    <script type="module" is="reactive">
+        <div class="svg-preview">
+            <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
+                <defs>
+                    <path id="textCurve" d={`M 10,${curveY} Q 100,${curveY - curveHeight} 190,${curveY}`} fill="none"/>
+                </defs>
+                <path d={`M 10,${curveY} Q 100,${curveY - curveHeight} 190,${curveY}`}
+                      fill="none" stroke="#ddd" strokeWidth="1"/>
+                <text fill={globalFill} fontSize={textSize} opacity={globalOpacity}>
+                    <textPath href="#textCurve" startOffset={`${textOffset}%`}>
+                        {textContent}
+                    </textPath>
+                </text>
+            </svg>
+        </div>
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive"><label>startOffset {textOffset}%</label></script>
+            <script type="module" is="reactive">
+                const textOffset = view(<input type="range" min="0" max="100" value="0"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>fontSize {textSize}</label></script>
+            <script type="module" is="reactive">
+                const textSize = view(<input type="range" min="8" max="24" value="14"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>curve {curveHeight}</label></script>
+            <script type="module" is="reactive">
+                const curveHeight = view(<input type="range" min="0" max="60" value="30"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>y {curveY}</label></script>
+            <script type="module" is="reactive">
+                const curveY = view(<input type="range" min="20" max="80" value="60"/>);
+            </script>
+        </div>
+        <div class="control-row" style="grid-column: 1 / -1">
+            <label>text</label>
+            <script type="module" is="reactive">
+                const textContent = view(<input type="text" value="Text flows along a path!" style="flex: 1"/>);
             </script>
         </div>
     </div>
@@ -513,62 +1028,6 @@
             <script type="module" is="reactive"><label>scaleY {scaleY}</label></script>
             <script type="module" is="reactive">
                 const scaleY = view(<input type="range" min="0.1" max="2" step="0.1" value="1"/>);
-            </script>
-        </div>
-    </div>
-</section>
-
-<!-- textPath Section -->
-<section class="element-section">
-    <h2>&lt;textPath&gt;</h2>
-    <p>Text that flows along a <code>&lt;path&gt;</code>. The <code>startOffset</code> controls where text begins on the path.</p>
-
-    <script type="module" is="reactive">
-        <div class="svg-preview">
-            <svg viewBox={`${viewBoxMinX} ${viewBoxMinY} ${viewBoxWidth} ${viewBoxHeight}`}>
-                <defs>
-                    <path id="textCurve" d={`M 10,${curveY} Q 100,${curveY - curveHeight} 190,${curveY}`} fill="none"/>
-                </defs>
-                <path d={`M 10,${curveY} Q 100,${curveY - curveHeight} 190,${curveY}`}
-                      fill="none" stroke="#ddd" strokeWidth="1"/>
-                <text fill={globalFill} fontSize={textSize} opacity={globalOpacity}>
-                    <textPath href="#textCurve" startOffset={`${textOffset}%`}>
-                        {textContent}
-                    </textPath>
-                </text>
-            </svg>
-        </div>
-    </script>
-
-    <div class="controls-grid">
-        <div class="control-row">
-            <script type="module" is="reactive"><label>startOffset {textOffset}%</label></script>
-            <script type="module" is="reactive">
-                const textOffset = view(<input type="range" min="0" max="100" value="0"/>);
-            </script>
-        </div>
-        <div class="control-row">
-            <script type="module" is="reactive"><label>fontSize {textSize}</label></script>
-            <script type="module" is="reactive">
-                const textSize = view(<input type="range" min="8" max="24" value="14"/>);
-            </script>
-        </div>
-        <div class="control-row">
-            <script type="module" is="reactive"><label>curve {curveHeight}</label></script>
-            <script type="module" is="reactive">
-                const curveHeight = view(<input type="range" min="0" max="60" value="30"/>);
-            </script>
-        </div>
-        <div class="control-row">
-            <script type="module" is="reactive"><label>y {curveY}</label></script>
-            <script type="module" is="reactive">
-                const curveY = view(<input type="range" min="20" max="80" value="60"/>);
-            </script>
-        </div>
-        <div class="control-row" style="grid-column: 1 / -1">
-            <label>text</label>
-            <script type="module" is="reactive">
-                const textContent = view(<input type="text" value="Text flows along a path!" style="flex: 1"/>);
             </script>
         </div>
     </div>
