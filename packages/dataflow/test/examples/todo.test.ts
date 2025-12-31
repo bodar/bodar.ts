@@ -10,12 +10,12 @@ import type {Idle} from "../../src/Idle.ts";
 import type {BaseGraph} from "../../src/BaseGraph.ts";
 
 
-async function renderHTML(html: string, global: any = globalThis): Promise<{
+export async function renderHTML(html: string, global: any = globalThis): Promise<{
     browser: (Window & typeof globalThis),
     idle: Idle,
     graph: BaseGraph
 }> {
-    const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
+    const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), idle: true});
     const reactive = transformer.transform(html);
     const browser = parseHTML(reactive);
 

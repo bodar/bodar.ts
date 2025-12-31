@@ -29,6 +29,7 @@ export interface HTMLTransformerDependencies {
     importMap?: ImportMap;
     selectors?: Partial<HTMLTransformerSelectors>;
     idGenerator?: IdGenerator;
+    idle?: boolean;
 }
 
 /** Default CSS selectors for head, reactive scripts, and body/islands */
@@ -41,6 +42,7 @@ export const DefaultSelectors: HTMLTransformerSelectors = {
 /** Transforms HTML by processing reactive scripts and injecting runtime code */
 export class HTMLTransformer {
     private idGenerator: IdGenerator;
+    public idle: boolean;
 
     constructor(private deps: HTMLTransformerDependencies) {
         const selectors = {...DefaultSelectors, ...(deps.selectors ?? {})} as HTMLTransformerSelectors;
@@ -49,6 +51,7 @@ export class HTMLTransformer {
         this.deps.rewriter.on(selectors.script, new ScriptTransformer(this));
         this.deps.rewriter.on(selectors.end, new EndTransformer(this, bundler));
         this.idGenerator = this.deps.idGenerator ?? new CountingIdGenerator();
+        this.idle = !!this.deps.idle;
     }
 
     transform(input: Response | Blob | Bun.BufferSource): Response;

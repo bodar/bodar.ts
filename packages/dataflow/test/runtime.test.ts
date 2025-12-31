@@ -16,4 +16,9 @@ describe("runtime", async () => {
         const r = runtime();
         expect(typeof r.throttle).toBe("function");
     });
+
+    test.only("can turn on idle detection", async () => {
+        const r = runtime(globalThis, true);
+        expect(typeof r.idle).toBe("object");
+    });
 });

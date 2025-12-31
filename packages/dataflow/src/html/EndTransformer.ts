@@ -28,17 +28,17 @@ export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementCont
                 return (d.hasWidth() ? `_runtime_.graph.define("width_${d.key}",[],[],() => Width.for("${d.key}", _runtime_));` : '')
                     + `_runtime_.graph.define(${d.toString(options)});`;
             }).join('\n');
-            const javascript = await this.bundler.transform(scriptTemplate(registrations));
+            const javascript = await this.bundler.transform(scriptTemplate(registrations, this.controller.idle));
             end.before(`<script type="module" is="reactive-runtime">${javascript}</script>`, {html: true})
         }
     }
 }
 
-export function scriptTemplate(registrations: string):string {
+export function scriptTemplate(registrations: string, idle: boolean = false):string {
     // language=javascript
     return `import {Display, View, Width, JSX2DOM, runtime} from "@bodar/dataflow/runtime.ts";
 
-    const _runtime_ = runtime(globalThis);
+    const _runtime_ = runtime(globalThis, ${idle});
     _runtime_.graph.define("jsx", [], [], () => new JSX2DOM(globalThis));
     ${registrations}
     _runtime_.graph.run();`;

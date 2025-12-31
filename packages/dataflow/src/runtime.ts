@@ -28,18 +28,21 @@ export {chain} from "@bodar/yadic/chain.ts";
 export interface RuntimeExports {
     throttle: ThrottleStrategy;
     backpressure: BackpressureStrategy;
-    idle: Idle;
     graph: BaseGraph;
+    idle?: Idle;
 }
 
 /** Creates a runtime with lazy-initialized dependencies */
-export function runtime<G = object>(global: G = globalThis as G): RuntimeExports & G {
-    return chain(LazyMap.create()
+export function runtime<G = object>(global: G = globalThis as G, idle: boolean = false): RuntimeExports & G {
+    const base = idle ?
+        LazyMap.create()
+            .set('idle', () => new Idle(Throttle.auto()))
+            .set('throttle', ({idle}) => idle.strategy) :
+        LazyMap.create()
+            .set('throttle', () => Throttle.auto())
+
+    return chain(base
         .set('backpressure', () => Backpressure.fastest)
-        .set('idle', () => new Idle(Throttle.auto()))
-        .set('throttle', ({idle}: {idle: Idle}) => idle.strategy)
-        .set('graph', ({throttle, backpressure}: {
-            throttle: ThrottleStrategy,
-            backpressure: BackpressureStrategy
-        }) => new BaseGraph(backpressure, throttle, global)), global as any);
+        .set('graph', ({throttle, backpressure}: { throttle: ThrottleStrategy, backpressure: BackpressureStrategy }) =>
+            new BaseGraph(backpressure, throttle, global)), global as any);
 }
