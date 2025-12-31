@@ -1,7 +1,7 @@
 import {Imports, processImports} from "../javascript/Imports.ts";
 import {parseScript, processJSX, toScript} from "../javascript/script-parsing.ts";
 import {findUnresolvedReferences} from "../javascript/findUnresolvedReferences.ts";
-import {findTopLevelVariableDeclarations} from "../javascript/findTopLevelVariableDeclarations.ts";
+import {findTopLevelDeclarations} from "../javascript/findTopLevelDeclarations.ts";
 import {isSingleStatement, isSingleExpression} from "../javascript/isSingleExpression.ts";
 import {hasTopLevelAwait} from "../javascript/findTopLevelAwaits.ts";
 import {type IdGenerator, SimpleHashGenerator} from "../IdGenerator.ts";
@@ -32,7 +32,7 @@ export class NodeDefinition {
         try {
             const program = processJSX(parseScript(javascript));
             const inputs = findUnresolvedReferences(program);
-            const outputs = findTopLevelVariableDeclarations(program);
+            const outputs = findTopLevelDeclarations(program);
             const imports = processImports(program);
             const singleExpression = isSingleExpression(program);
             const singleStatement = isSingleStatement(program);

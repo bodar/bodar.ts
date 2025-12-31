@@ -181,4 +181,26 @@ return {fn};
         `, '1234');
         expect(definition.isAsync()).toBe(false);
     });
+
+    test("detects function declaration as output", async () => {
+        // language=JavaScript
+        const definition = NodeDefinition.parse(`function greet(name) { return 'Hello ' + name; }`, '1234');
+        expect(definition.outputs).toEqual(['greet']);
+        // language=JavaScript
+        expect(definition.toString()).toBe(`"1234",[],["greet"],() => {
+function greet(name) {return 'Hello ' + name;}
+return {greet};
+}`);
+    });
+
+    test("detects class declaration as output", async () => {
+        // language=JavaScript
+        const definition = NodeDefinition.parse(`class Greeter { greet(name) { return 'Hello ' + name; } }`, '1234');
+        expect(definition.outputs).toEqual(['Greeter']);
+        // language=JavaScript
+        expect(definition.toString()).toBe(`"1234",[],["Greeter"],() => {
+class Greeter {greet(name) {return 'Hello ' + name;}}
+return {Greeter};
+}`);
+    });
 });
