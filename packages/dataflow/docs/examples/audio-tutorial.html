@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Web Audio Tutorial - Dataflow Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="audio-tutorial.css">
+</head>
+<body>
+
+<div class="site-header">
+    <h1>Dataflow</h1>
+    <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="GitHub" src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
+</div>
+
+<nav class="docs-nav">
+    <a href="../index.html">Quick Start</a>
+    <a href="../setup.html">Setup</a>
+    <a href="../reactivity.html">Reactivity</a>
+    <a href="../inputs.html">Inputs</a>
+    <a href="../islands.html">Islands</a>
+    <a href="./" class="active">Examples</a>
+</nav>
+
+<!-- Single import for the whole page -->
+<script type="module" is="reactive">
+    import {view, display, mutable} from "@bodar/dataflow/runtime.ts";
+</script>
+
+<!-- Shared AudioContext -->
+<script type="module">
+    let audioCtx = null;
+    window.getAudioContext = () => {
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        return audioCtx;
+    };
+
+    window.drawWaveform = (analyser, canvas, color = '#2563eb') => {
+        const ctx = canvas.getContext('2d');
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        const draw = () => {
+            if (!canvas.isConnected) return;
+            analyser.getByteTimeDomainData(dataArray);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            const sliceWidth = canvas.width / bufferLength;
+            let x = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                const v = dataArray[i] / 128.0;
+                const y = v * canvas.height / 2;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+                x += sliceWidth;
+            }
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+            requestAnimationFrame(draw);
+        };
+        draw();
+    };
+
+    window.drawSpectrum = (analyser, canvas) => {
+        const ctx = canvas.getContext('2d');
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        const draw = () => {
+            if (!canvas.isConnected) return;
+            analyser.getByteFrequencyData(dataArray);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const barWidth = canvas.width / bufferLength * 2.5;
+            let x = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                const barHeight = (dataArray[i] / 255) * canvas.height;
+                ctx.fillStyle = `hsl(${210 + (dataArray[i] / 255) * 40}, 70%, 45%)`;
+                ctx.fillRect(x, canvas.height - barHeight, barWidth - 1, barHeight);
+                x += barWidth;
+                if (x > canvas.width) break;
+            }
+            requestAnimationFrame(draw);
+        };
+        draw();
+    };
+</script>
+
+<h1>Interactive Web Audio Tutorial</h1>
+
+<div class="intro">
+    <p>Explore the Web Audio API interactively! Each section demonstrates a different audio node. Press <strong>Play</strong> to hear the sound and see real-time waveform visualizations. Multiple sections can play simultaneously.</p>
+    <p><a href="https://github.com/bodar/bodar.ts/blob/master/packages/dataflow/docs/examples/audio-tutorial.html">View source on GitHub</a></p>
+</div>
+
+<div class="tutorial-layout">
+<aside class="global-controls">
+    <h2>Global Controls</h2>
+    <div class="control-group">
+        <h3>Master</h3>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>volume {masterVolume}%</label></script>
+            <script type="module" is="reactive">
+                const masterVolume = view(<input id="master-volume" type="range" min="0" max="100" value="50"/>);
+            </script>
+        </div>
+    </div>
+</aside>
+
+<main class="main-content">
+
+<!-- Section 1: OscillatorNode -->
+<section class="element-section">
+    <h2>OscillatorNode</h2>
+    <p>The fundamental sound source. Choose a waveform <code>type</code>, set the <code>frequency</code> in Hz, and fine-tune with <code>detune</code> in cents.</p>
+
+    <div class="audio-preview">
+        <script type="module" is="reactive">
+            const oscCanvas = display(<canvas width="600" height="100"></canvas>);
+        </script>
+    </div>
+
+    <script type="module" is="reactive">
+        const oscPlaying = view(<input type="checkbox" id="osc-play" class="play-toggle"/>);
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive">
+                display(<label for="osc-play" class={oscPlaying ? 'play-button playing' : 'play-button'}>
+                    {oscPlaying ? 'Stop' : 'Play'}
+                </label>);
+            </script>
+        </div>
+        <div class="control-row">
+            <label>type</label>
+            <script type="module" is="reactive">
+                const oscType = view(<select>
+                    <option value="sine">sine</option>
+                    <option value="square">square</option>
+                    <option value="sawtooth">sawtooth</option>
+                    <option value="triangle">triangle</option>
+                </select>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>freq {oscFreq} Hz</label></script>
+            <script type="module" is="reactive">
+                const oscFreq = view(<input type="range" min="20" max="2000" value="440"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>detune {oscDetune} cents</label></script>
+            <script type="module" is="reactive">
+                const oscDetune = view(<input type="range" min="-100" max="100" value="0"/>);
+            </script>
+        </div>
+    </div>
+
+    <script type="module" is="reactive">
+        {
+            const isPlaying = oscPlaying;
+            const freq = Number(oscFreq);
+            const detune = Number(oscDetune);
+            const type = String(oscType);
+            const vol = Number(masterVolume) / 100;
+
+            if (isPlaying) {
+                if (!window.oscNode) {
+                    const ctx = getAudioContext();
+                    window.oscNode = ctx.createOscillator();
+                    window.oscGainNode = ctx.createGain();
+                    window.oscAnalyserNode = ctx.createAnalyser();
+                    window.oscAnalyserNode.fftSize = 2048;
+                    window.oscNode.connect(window.oscGainNode);
+                    window.oscGainNode.connect(window.oscAnalyserNode);
+                    window.oscAnalyserNode.connect(ctx.destination);
+                    window.oscNode.start();
+                    drawWaveform(window.oscAnalyserNode, oscCanvas);
+                }
+                window.oscNode.type = type;
+                window.oscNode.frequency.value = freq;
+                window.oscNode.detune.value = detune;
+                window.oscGainNode.gain.value = vol;
+            } else {
+                if (window.oscNode) {
+                    window.oscNode.stop();
+                    window.oscNode = null;
+                }
+            }
+        }
+    </script>
+</section>
+
+<!-- Section 2: GainNode -->
+<section class="element-section">
+    <h2>GainNode</h2>
+    <p>Controls amplitude (volume). The <code>gain</code> value multiplies the signal: 0 = silence, 1 = full volume.</p>
+
+    <div class="audio-preview">
+        <script type="module" is="reactive">
+            const gainCanvas = display(<canvas width="600" height="100"></canvas>);
+        </script>
+    </div>
+
+    <script type="module" is="reactive">
+        const gainPlaying = view(<input type="checkbox" id="gain-play" class="play-toggle"/>);
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive">
+                display(<label for="gain-play" class={gainPlaying ? 'play-button playing' : 'play-button'}>
+                    {gainPlaying ? 'Stop' : 'Play'}
+                </label>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>gain {gainValue}%</label></script>
+            <script type="module" is="reactive">
+                const gainValue = view(<input type="range" min="0" max="100" value="50"/>);
+            </script>
+        </div>
+    </div>
+
+    <script type="module" is="reactive">
+        {
+            const isPlaying = gainPlaying;
+            const gain = Number(gainValue) / 100;
+            const vol = Number(masterVolume) / 100;
+
+            if (isPlaying) {
+                if (!window.gainOsc) {
+                    const ctx = getAudioContext();
+                    window.gainOsc = ctx.createOscillator();
+                    window.gainOsc.frequency.value = 440;
+                    window.gainGainNode = ctx.createGain();
+                    window.gainMasterNode = ctx.createGain();
+                    window.gainAnalyser = ctx.createAnalyser();
+                    window.gainAnalyser.fftSize = 2048;
+                    window.gainOsc.connect(window.gainGainNode);
+                    window.gainGainNode.connect(window.gainMasterNode);
+                    window.gainMasterNode.connect(window.gainAnalyser);
+                    window.gainAnalyser.connect(ctx.destination);
+                    window.gainOsc.start();
+                    drawWaveform(window.gainAnalyser, gainCanvas);
+                }
+                window.gainGainNode.gain.value = gain;
+                window.gainMasterNode.gain.value = vol;
+            } else {
+                if (window.gainOsc) {
+                    window.gainOsc.stop();
+                    window.gainOsc = null;
+                }
+            }
+        }
+    </script>
+</section>
+
+<!-- Section 3: BiquadFilterNode -->
+<section class="element-section">
+    <h2>BiquadFilterNode</h2>
+    <p>Shape the tone with various filter types. <code>frequency</code> sets the cutoff, <code>Q</code> controls resonance.</p>
+
+    <div class="audio-preview">
+        <script type="module" is="reactive">
+            const filterCanvas = display(<canvas width="600" height="100"></canvas>);
+        </script>
+    </div>
+
+    <script type="module" is="reactive">
+        const filterPlaying = view(<input type="checkbox" id="filter-play" class="play-toggle"/>);
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive">
+                display(<label for="filter-play" class={filterPlaying ? 'play-button playing' : 'play-button'}>
+                    {filterPlaying ? 'Stop' : 'Play'}
+                </label>);
+            </script>
+        </div>
+        <div class="control-row">
+            <label>type</label>
+            <script type="module" is="reactive">
+                const filterType = view(<select>
+                    <option value="lowpass">lowpass</option>
+                    <option value="highpass">highpass</option>
+                    <option value="bandpass">bandpass</option>
+                    <option value="notch">notch</option>
+                    <option value="lowshelf">lowshelf</option>
+                    <option value="highshelf">highshelf</option>
+                    <option value="peaking">peaking</option>
+                    <option value="allpass">allpass</option>
+                </select>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>freq {filterFreq} Hz</label></script>
+            <script type="module" is="reactive">
+                const filterFreq = view(<input type="range" min="20" max="20000" value="1000"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>Q {filterQ}</label></script>
+            <script type="module" is="reactive">
+                const filterQ = view(<input type="range" min="1" max="200" value="10"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>gain {filterGain} dB</label></script>
+            <script type="module" is="reactive">
+                const filterGain = view(<input type="range" min="-40" max="40" value="0"/>);
+            </script>
+        </div>
+    </div>
+
+    <p class="format-note">Note: <code>gain</code> only affects lowshelf, highshelf, and peaking filters. The allpass filter affects phase only (not directly audible).</p>
+
+    <script type="module" is="reactive">
+        {
+            const isPlaying = filterPlaying;
+            const type = String(filterType);
+            const freq = Number(filterFreq);
+            const q = Number(filterQ) / 10;
+            const gainDb = Number(filterGain);
+            const vol = Number(masterVolume) / 100;
+
+            if (isPlaying) {
+                if (!window.filterOsc) {
+                    const ctx = getAudioContext();
+                    window.filterOsc = ctx.createOscillator();
+                    window.filterOsc.type = 'sawtooth';
+                    window.filterOsc.frequency.value = 110;
+                    window.filterNode = ctx.createBiquadFilter();
+                    window.filterGainNode = ctx.createGain();
+                    window.filterAnalyser = ctx.createAnalyser();
+                    window.filterAnalyser.fftSize = 2048;
+                    window.filterOsc.connect(window.filterNode);
+                    window.filterNode.connect(window.filterGainNode);
+                    window.filterGainNode.connect(window.filterAnalyser);
+                    window.filterAnalyser.connect(ctx.destination);
+                    window.filterOsc.start();
+                    drawSpectrum(window.filterAnalyser, filterCanvas);
+                }
+                window.filterNode.type = type;
+                window.filterNode.frequency.value = freq;
+                window.filterNode.Q.value = q;
+                window.filterNode.gain.value = gainDb;
+                window.filterGainNode.gain.value = vol;
+            } else {
+                if (window.filterOsc) {
+                    window.filterOsc.stop();
+                    window.filterOsc = null;
+                }
+            }
+        }
+    </script>
+</section>
+
+<!-- Section 4: DelayNode -->
+<section class="element-section">
+    <h2>DelayNode</h2>
+    <p>Create echo effects. <code>delayTime</code> sets the delay. <code>feedback</code> creates repeating echoes.</p>
+
+    <div class="audio-preview">
+        <script type="module" is="reactive">
+            const delayCanvas = display(<canvas width="600" height="100"></canvas>);
+        </script>
+    </div>
+
+    <script type="module" is="reactive">
+        const delayPlaying = view(<input type="checkbox" id="delay-play" class="play-toggle"/>);
+    </script>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive">
+                display(<label for="delay-play" class={delayPlaying ? 'play-button playing' : 'play-button'}>
+                    {delayPlaying ? 'Stop' : 'Play'}
+                </label>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>delay {delayTime}ms</label></script>
+            <script type="module" is="reactive">
+                const delayTime = view(<input type="range" min="0" max="1000" value="300"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>feedback {delayFeedback}%</label></script>
+            <script type="module" is="reactive">
+                const delayFeedback = view(<input type="range" min="0" max="90" value="50"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>dry/wet {delayWet}%</label></script>
+            <script type="module" is="reactive">
+                const delayWet = view(<input type="range" min="0" max="100" value="50"/>);
+            </script>
+        </div>
+    </div>
+
+    <script type="module" is="reactive">
+        {
+            const isPlaying = delayPlaying;
+            const time = Number(delayTime) / 1000;
+            const feedback = Number(delayFeedback) / 100;
+            const wet = Number(delayWet) / 100;
+            const vol = Number(masterVolume) / 100;
+
+            if (isPlaying) {
+                if (!window.delayOsc) {
+                    const ctx = getAudioContext();
+                    window.delayOsc = ctx.createOscillator();
+                    window.delayOsc.frequency.value = 440;
+                    window.delayNode = ctx.createDelay(2);
+                    window.delayFeedbackNode = ctx.createGain();
+                    window.delayDryNode = ctx.createGain();
+                    window.delayWetNode = ctx.createGain();
+                    window.delayMasterNode = ctx.createGain();
+                    window.delayAnalyser = ctx.createAnalyser();
+                    window.delayAnalyser.fftSize = 2048;
+                    window.delayOsc.connect(window.delayDryNode);
+                    window.delayDryNode.connect(window.delayMasterNode);
+                    window.delayOsc.connect(window.delayNode);
+                    window.delayNode.connect(window.delayFeedbackNode);
+                    window.delayFeedbackNode.connect(window.delayNode);
+                    window.delayNode.connect(window.delayWetNode);
+                    window.delayWetNode.connect(window.delayMasterNode);
+                    window.delayMasterNode.connect(window.delayAnalyser);
+                    window.delayAnalyser.connect(ctx.destination);
+                    window.delayOsc.start();
+                    drawWaveform(window.delayAnalyser, delayCanvas, '#16a34a');
+                }
+                window.delayNode.delayTime.value = time;
+                window.delayFeedbackNode.gain.value = feedback;
+                window.delayDryNode.gain.value = 1 - wet;
+                window.delayWetNode.gain.value = wet;
+                window.delayMasterNode.gain.value = vol;
+            } else {
+                if (window.delayOsc) {
+                    window.delayOsc.stop();
+                    window.delayOsc = null;
+                }
+            }
+        }
+    </script>
+</section>
+
+<!-- Section 5: ADSR Envelope -->
+<section class="element-section">
+    <h2>ADSR Envelope</h2>
+    <p>Shape how sound evolves over time. <code>Attack</code> is the rise time, <code>Decay</code> drops to <code>Sustain</code> level, and <code>Release</code> fades out.</p>
+
+    <div class="audio-preview">
+        <script type="module" is="reactive">
+            const adsrCanvas = display(<canvas width="600" height="100"></canvas>);
+        </script>
+    </div>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <script type="module" is="reactive">
+                display(<button class="play-button" onclick={() => {
+                    const ctx = getAudioContext();
+                    const attack = Number(adsrAttack) / 1000;
+                    const decay = Number(adsrDecay) / 1000;
+                    const sustain = Number(adsrSustain) / 100;
+                    const release = Number(adsrRelease) / 1000;
+                    const vol = Number(masterVolume) / 100;
+
+                    const osc = ctx.createOscillator();
+                    osc.frequency.value = 440;
+                    const gain = ctx.createGain();
+                    gain.gain.value = 0;
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    const now = ctx.currentTime;
+                    gain.gain.linearRampToValueAtTime(vol, now + attack);
+                    gain.gain.linearRampToValueAtTime(sustain * vol, now + attack + decay);
+                    gain.gain.setValueAtTime(sustain * vol, now + attack + decay + 0.5);
+                    gain.gain.linearRampToValueAtTime(0, now + attack + decay + 0.5 + release);
+                    osc.start(now);
+                    osc.stop(now + attack + decay + 0.5 + release + 0.1);
+                }}>Trigger</button>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>attack {adsrAttack}ms</label></script>
+            <script type="module" is="reactive">
+                const adsrAttack = view(<input type="range" min="0" max="2000" value="100"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>decay {adsrDecay}ms</label></script>
+            <script type="module" is="reactive">
+                const adsrDecay = view(<input type="range" min="0" max="2000" value="200"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>sustain {adsrSustain}%</label></script>
+            <script type="module" is="reactive">
+                const adsrSustain = view(<input type="range" min="0" max="100" value="70"/>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>release {adsrRelease}ms</label></script>
+            <script type="module" is="reactive">
+                const adsrRelease = view(<input type="range" min="0" max="2000" value="300"/>);
+            </script>
+        </div>
+    </div>
+
+    <!-- Draw ADSR curve -->
+    <script type="module" is="reactive">
+        {
+            const attack = Number(adsrAttack) / 1000;
+            const decay = Number(adsrDecay) / 1000;
+            const sustain = Number(adsrSustain) / 100;
+            const release = Number(adsrRelease) / 1000;
+
+            const canvas = adsrCanvas;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            const total = attack + decay + 0.5 + release;
+            const scale = w / total;
+
+            ctx.strokeStyle = '#d97706';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, h);
+            ctx.lineTo(attack * scale, h * 0.1);
+            ctx.lineTo((attack + decay) * scale, h * (1 - sustain * 0.9));
+            ctx.lineTo((attack + decay + 0.5) * scale, h * (1 - sustain * 0.9));
+            ctx.lineTo(w, h);
+            ctx.stroke();
+
+            ctx.fillStyle = '#475569';
+            ctx.font = '11px system-ui';
+            ctx.fillText('A', attack * scale / 2, h - 5);
+            ctx.fillText('D', (attack + decay / 2) * scale, h - 5);
+            ctx.fillText('S', (attack + decay + 0.25) * scale, h - 5);
+            ctx.fillText('R', (attack + decay + 0.5 + release / 2) * scale, h - 5);
+        }
+    </script>
+</section>
+
+<!-- Section 6: Mini Synth -->
+<section class="element-section">
+    <h2>Mini Synth</h2>
+    <p>Everything together! Use keyboard keys <strong>A S D F G H J K</strong> to play notes, or click the keys below.</p>
+
+    <div class="audio-preview">
+        <script type="module" is="reactive">
+            const synthCanvas = display(<canvas id="synth-canvas" width="600" height="100"></canvas>);
+        </script>
+    </div>
+
+    <div class="keyboard">
+        <div class="key" data-key="a"><span class="note">C4</span><span class="hotkey">A</span></div>
+        <div class="key" data-key="s"><span class="note">D4</span><span class="hotkey">S</span></div>
+        <div class="key" data-key="d"><span class="note">E4</span><span class="hotkey">D</span></div>
+        <div class="key" data-key="f"><span class="note">F4</span><span class="hotkey">F</span></div>
+        <div class="key" data-key="g"><span class="note">G4</span><span class="hotkey">G</span></div>
+        <div class="key" data-key="h"><span class="note">A4</span><span class="hotkey">H</span></div>
+        <div class="key" data-key="j"><span class="note">B4</span><span class="hotkey">J</span></div>
+        <div class="key" data-key="k"><span class="note">C5</span><span class="hotkey">K</span></div>
+    </div>
+
+    <div class="controls-grid">
+        <div class="control-row">
+            <label>waveform</label>
+            <script type="module" is="reactive">
+                const synthWaveform = view(<select id="synth-waveform">
+                    <option value="sawtooth">sawtooth</option>
+                    <option value="square">square</option>
+                    <option value="triangle">triangle</option>
+                    <option value="sine">sine</option>
+                </select>);
+            </script>
+        </div>
+        <div class="control-row">
+            <script type="module" is="reactive"><label>cutoff {synthCutoff} Hz</label></script>
+            <script type="module" is="reactive">
+                const synthCutoff = view(<input id="synth-cutoff" type="range" min="100" max="5000" value="2000"/>);
+            </script>
+        </div>
+    </div>
+
+    <!-- Synth setup and keyboard handling -->
+    <script type="module">
+        const synthNotes = {
+            'a': 261.63, 's': 293.66, 'd': 329.63, 'f': 349.23,
+            'g': 392.00, 'h': 440.00, 'j': 493.88, 'k': 523.25
+        };
+        const activeNotes = new Map();
+
+        // Create master nodes
+        const ctx = new AudioContext();
+        const synthMaster = ctx.createGain();
+        const synthAnalyser = ctx.createAnalyser();
+        synthAnalyser.fftSize = 2048;
+        synthMaster.connect(synthAnalyser);
+        synthAnalyser.connect(ctx.destination);
+
+        // Start visualization
+        setTimeout(() => {
+            const canvas = document.querySelector('#synth-canvas');
+            if (canvas) drawWaveform(synthAnalyser, canvas, '#db2777');
+        }, 100);
+
+        window.synthMaster = synthMaster;
+        window.synthCtx = ctx;
+
+        const playNote = (key) => {
+            if (activeNotes.has(key)) return;
+            const freq = synthNotes[key];
+            if (!freq) return;
+
+            if (ctx.state === 'suspended') ctx.resume();
+
+            const waveform = document.querySelector('#synth-waveform')?.value || 'sawtooth';
+            const cutoff = Number(document.querySelector('#synth-cutoff')?.value || 2000);
+            const vol = Number(document.querySelector('#master-volume')?.value || 50) / 100;
+
+            const osc = ctx.createOscillator();
+            osc.type = waveform;
+            osc.frequency.value = freq;
+
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = cutoff;
+
+            const gain = ctx.createGain();
+            gain.gain.value = 0;
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(synthMaster);
+            synthMaster.gain.value = vol;
+
+            gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.02);
+            osc.start();
+            activeNotes.set(key, {osc, gain});
+
+            document.querySelector(`.key[data-key="${key}"]`)?.classList.add('active');
+        };
+
+        const stopNote = (key) => {
+            const note = activeNotes.get(key);
+            if (!note) return;
+            note.gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1);
+            note.osc.stop(ctx.currentTime + 0.15);
+            activeNotes.delete(key);
+            document.querySelector(`.key[data-key="${key}"]`)?.classList.remove('active');
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.repeat) return;
+            playNote(e.key.toLowerCase());
+        });
+        document.addEventListener('keyup', (e) => stopNote(e.key.toLowerCase()));
+
+        document.querySelectorAll('.key').forEach(el => {
+            const key = el.dataset.key;
+            el.addEventListener('mousedown', () => playNote(key));
+            el.addEventListener('mouseup', () => stopNote(key));
+            el.addEventListener('mouseleave', () => stopNote(key));
+        });
+    </script>
+</section>
+
+</main>
+</div>
+
+</body>
+</html>
