@@ -203,4 +203,23 @@ class Greeter {greet(name) {return 'Hello ' + name;}}
 return {Greeter};
 }`);
     });
+
+    test("explicit display with multiple statements should not wrap in implicit display", async () => {
+        // language=JavaScript
+        const definition = NodeDefinition.parse(`
+            if (state !== 'closed') {
+                display(<div>Controls</div>)
+            }
+            display(<dl><dt>Status</dt></dl>);
+        `, '1234');
+
+        expect(definition.hasExplicitDisplay()).toBe(true);
+        expect(definition.hasImplicitDisplay()).toBe(false);
+        // Should NOT wrap body in return display(...) - that would produce invalid JS
+        // language=JavaScript
+        expect(definition.toString()).toBe(`"1234",["state","display","jsx"],[],(state,display,jsx) => {
+const display = Display.for("1234", _runtime_);
+if (state !== 'closed') {display(jsx.createElement("div", null, ["Controls"]));}display(jsx.createElement("dl", null, [jsx.createElement("dt", null, ["Status"])]));
+}`);
+    });
 });

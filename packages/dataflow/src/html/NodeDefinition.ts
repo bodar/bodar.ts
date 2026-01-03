@@ -126,7 +126,7 @@ export class NodeDefinition {
             this.hasImplicitDisplay() || this.hasExplicitDisplay() || this.hasExplicitView() ? `const display = Display.for(${JSON.stringify(this._key)}, _runtime_);` : undefined,
             this.hasExplicitView() ? `const view = View.for(display);` : undefined,
             this.hasWidthInput() ? `const width = width_${this._key};` : undefined,
-            outputs.length ? `${this._body}\nreturn {${outputs.join(',')}};` : this._singleStatement ? this._body : `return display(${this._body.replace(/;$/, '')})`
+            outputs.length ? `${this._body}\nreturn {${outputs.join(',')}};` : this._singleStatement || this.hasExplicitDisplay() || this.hasExplicitView() ? this._body : `return display(${this._body.replace(/;$/, '')})`
         ].filter(l => l).join('\n');
     }
 
