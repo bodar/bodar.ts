@@ -2,7 +2,7 @@ import {Imports, processImports} from "../javascript/Imports.ts";
 import {parseScript, processJSX, toScript} from "../javascript/script-parsing.ts";
 import {findUnresolvedReferences} from "../javascript/findUnresolvedReferences.ts";
 import {findTopLevelDeclarations} from "../javascript/findTopLevelDeclarations.ts";
-import {isSingleStatement, isSingleExpression} from "../javascript/isSingleExpression.ts";
+import {isSingleExpression} from "../javascript/isSingleExpression.ts";
 import {hasTopLevelAwait} from "../javascript/findTopLevelAwaits.ts";
 import {type IdGenerator, SimpleHashGenerator} from "../IdGenerator.ts";
 
@@ -21,7 +21,6 @@ export class NodeDefinition {
                 private _outputs: string[],
                 private _imports: Imports,
                 private _singleExpression: boolean,
-                private _singleStatement: boolean,
                 private _hasTopLevelAwait: boolean,
                 private _body: string
     ) {
@@ -35,12 +34,11 @@ export class NodeDefinition {
             const outputs = findTopLevelDeclarations(program);
             const imports = processImports(program);
             const singleExpression = isSingleExpression(program);
-            const singleStatement = isSingleStatement(program);
             const topLevelAwait = hasTopLevelAwait(program);
             const newJavascript = toScript(program);
-            return new NodeDefinition(key, inputs, [...outputs, ...imports.locals()], imports, singleExpression, singleStatement, topLevelAwait, newJavascript);
+            return new NodeDefinition(key, inputs, [...outputs, ...imports.locals()], imports, singleExpression, topLevelAwait, newJavascript);
         } catch (error: any) {
-            return (new NodeDefinition(key, [], [], Imports.empty, true, false, false, JSON.stringify(error.message)));
+            return (new NodeDefinition(key, [], [], Imports.empty, true, false, JSON.stringify(error.message)));
         }
     }
 
@@ -126,7 +124,7 @@ export class NodeDefinition {
             this.hasImplicitDisplay() || this.hasExplicitDisplay() || this.hasExplicitView() ? `const display = Display.for(${JSON.stringify(this._key)}, _runtime_);` : undefined,
             this.hasExplicitView() ? `const view = View.for(display);` : undefined,
             this.hasWidthInput() ? `const width = width_${this._key};` : undefined,
-            outputs.length ? `${this._body}\nreturn {${outputs.join(',')}};` : this._singleStatement || this.hasExplicitDisplay() || this.hasExplicitView() ? this._body : `return display(${this._body.replace(/;$/, '')})`
+            outputs.length ? `${this._body}\nreturn {${outputs.join(',')}};` : this._singleExpression && !this.hasExplicitDisplay() && !this.hasExplicitView() ? `return display(${this._body.replace(/;$/, '')})` : this._body
         ].filter(l => l).join('\n');
     }
 

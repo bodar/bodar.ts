@@ -222,4 +222,22 @@ const display = Display.for("1234", _runtime_);
 if (state !== 'closed') {display(jsx.createElement("div", null, ["Controls"]));}display(jsx.createElement("dl", null, [jsx.createElement("dt", null, ["Status"])]));
 }`);
     });
+
+    test("multiple statements without display should not wrap in implicit display", async () => {
+        // language=JavaScript
+        const definition = NodeDefinition.parse(`
+            if (condition) {
+                console.log('yes')
+            }
+            console.log('done');
+        `, '1234');
+
+        expect(definition.hasExplicitDisplay()).toBe(false);
+        expect(definition.hasImplicitDisplay()).toBe(false);
+        // Should NOT wrap body in return display(...) - that would produce invalid JS
+        // language=JavaScript
+        expect(definition.toString()).toBe(`"1234",["condition","console"],[],(condition,console) => {
+if (condition) {console.log('yes');}console.log('done');
+}`);
+    });
 });
