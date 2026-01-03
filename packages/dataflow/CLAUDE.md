@@ -82,7 +82,7 @@ Start the test server at http://localhost:3000/ with `./run demo`.
 
 ## File Structure
 
-- `src/` - Core transform-time classes (BaseGraph, PullNode, combineLast, SharedAsyncIterable)
+- `src/` - Core transform-time classes (BaseGraph, PullNode, combineLatest, SharedAsyncIterable)
 - `src/api/` - Runtime APIs (view, mutable, display, etc.)
 - `src/html/` - HTML transformation and node processing
 - `docs/` - Documentation (read if in doubt)
