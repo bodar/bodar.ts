@@ -74,6 +74,17 @@ Think of dataflows as separate layers rather than one big app with many UI compo
 
 This avoids unnecessary UI components with redundant state management.
 
+## Writing Examples and Tutorials
+
+Examples should demonstrate that reactive code is lightweight and sympathetic to the underlying concept.
+
+- **Minimal code** - only what's needed to illustrate the concept or tutorial
+- **Lean into reactivity** - let the reactive model do the work. If you're writing lots of imperative code, step back and rethink.
+- **No `requestAnimationFrame`** - the graph is already throttled to animation frames. A generator yielding in a loop or a block depending on `now` will naturally run at animation speed.
+- **Be sympathetic to the subject** - We want the example to demonstrate the subject, so allow the subject to shine through
+
+The goal is to show how little code is needed when you embrace the reactive dataflow approach.
+
 ## Building and Testing
 
 Run commands from the mono repo root (not inside `packages/dataflow`).
