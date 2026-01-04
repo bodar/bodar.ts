@@ -9,6 +9,8 @@ import {HTMLTransformer} from "../html/HTMLTransformer.ts";
 import {chain} from "@bodar/yadic/chain.ts";
 import {NodeDefinition} from "../html/NodeDefinition.ts";
 
+const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+
 export async function renderAndExecute(htmlParser: (html: string) => (Window & typeof globalThis), html: string, global: any = globalThis): Promise<{
     browser: (Window & typeof globalThis),
     idle: Idle,
@@ -21,7 +23,7 @@ export async function renderAndExecute(htmlParser: (html: string) => (Window & t
 
     const module = browser.document.querySelector('script[type=module][is=reactive-runtime]')!;
     const definition = NodeDefinition.parse(module.textContent);
-    const fun = new Function(...definition.inputs, `return (${definition.fun()})(${definition.inputs.join(',')});`);
+    const fun = new AsyncFunction(...definition.inputs, definition.body());
     const {_runtime_} = await fun(...definition.inputs.map(i => {
         if (i === 'globalThis') return g;
         return Reflect.get(g, i);

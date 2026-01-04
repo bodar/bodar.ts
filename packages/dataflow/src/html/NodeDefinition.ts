@@ -87,7 +87,7 @@ export class NodeDefinition {
 
     fun(options?: SerializeOptions): string {
         const inputs = this.getInputs(options);
-        return `${this.isAsync(options) ? 'async' : ''}(${inputs.join(',')}) => {\n${this.getBody(options)}\n}`;
+        return `${this.isAsync(options) ? 'async' : ''}(${inputs.join(',')}) => {\n${this.body(options)}\n}`;
     }
 
     private getInputs(options?: SerializeOptions): string[] {
@@ -116,7 +116,7 @@ export class NodeDefinition {
         return imports;
     }
 
-    private getBody(options?: SerializeOptions): string {
+    body(options?: SerializeOptions): string {
         const imports = this.getImports(options);
         const outputs = this.getOutputs(options);
         return [
