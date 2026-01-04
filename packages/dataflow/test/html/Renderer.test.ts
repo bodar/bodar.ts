@@ -9,9 +9,9 @@ import {chain} from "@bodar/yadic/chain.ts";
 
 describe("Renderer", () => {
     async function render(fun: (doc: Document, display: (v: any) => any) => any, initialSlot: string = ''): Promise<Element> {
-        const globals = parseHTML(`<slot name="output">${initialSlot}</slot>`);
+        const globals = parseHTML(`<body><slot name="output">${initialSlot}</slot></body>`);
         const throttle = Throttle.auto();
-        const display = Display.for('output', chain({throttle}, globals));
+        const display = Display.for('output', chain({throttle, reactiveRoot: globals.document.documentElement}, globals));
 
         // Execute the function which should call display() to render values
         fun(globals.document, display);

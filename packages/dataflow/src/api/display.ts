@@ -25,6 +25,7 @@ export interface DisplayContract {
 /** Dependencies required by Display */
 export interface DisplayDependencies extends SlotRendererDependencies {
     throttle: ThrottleStrategy;
+    reactiveRoot: HTMLElement;
 }
 
 /** Collects values and renders them to a named slot with throttling */
@@ -48,7 +49,7 @@ export class Display {
         try {
             const updates = this.pop();
             if (updates.length > 0) {
-                const slot = this.deps.document.querySelector<HTMLSlotElement>(`slot[name="${this.key}"]`);
+                const slot = this.deps.reactiveRoot.querySelector<HTMLSlotElement>(`slot[name="${this.key}"]`);
                 if (slot) {
                     new SlotRenderer(this.deps).render(slot, updates);
                 }

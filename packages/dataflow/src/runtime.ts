@@ -32,9 +32,14 @@ export interface RuntimeExports {
     idle?: Idle;
 }
 
+export type RuntimeConfig = Partial<{
+    scriptId: string;
+    idle: boolean;
+}>
+
 /** Creates a runtime with lazy-initialized dependencies */
-export function runtime<G = object>(global: G = globalThis as G, idle: boolean = false): RuntimeExports & G {
-    const base = idle ?
+export function runtime(config: RuntimeConfig = {}, global: typeof globalThis  = globalThis): RuntimeExports & typeof globalThis {
+    const base = config.idle ?
         LazyMap.create()
             .set('idle', () => new Idle(Throttle.auto()))
             .set('throttle', ({idle}) => idle.strategy) :
@@ -42,7 +47,8 @@ export function runtime<G = object>(global: G = globalThis as G, idle: boolean =
             .set('throttle', () => Throttle.auto())
 
     return chain(base
+        .set('reactiveRoot', () => config.scriptId ? global.document.getElementById(config.scriptId)?.parentElement! : global.document.documentElement!)
         .set('backpressure', () => Backpressure.fastest)
         .set('graph', ({throttle, backpressure}: { throttle: ThrottleStrategy, backpressure: BackpressureStrategy }) =>
-            new BaseGraph(backpressure, throttle, global)), global as any);
+            new BaseGraph(backpressure, throttle, global)), global);
 }

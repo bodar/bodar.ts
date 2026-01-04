@@ -11,12 +11,10 @@ describe("display", () => {
 })
 
 describe("Display", () => {
-
-
     test("display connects to the DOM and flushes when Throttle settles", async () => {
-        const browser = parseHTML('<slot name="key"></slot>');
+        const browser = parseHTML('<body><slot name="key"></slot></body>');
         const throttle = Throttle.auto();
-        const display = Display.for('key', chain({throttle}, browser))
+        const display = Display.for('key', chain({throttle, reactiveRoot: browser.document.documentElement}, browser))
 
         expect(display('Hello')).toEqual('Hello');
         expect(display('Dan')).toEqual('Dan');
@@ -28,15 +26,5 @@ describe("Display", () => {
         expect(slot.innerHTML).toEqual('');
         await throttle();
         expect(slot.innerHTML).toEqual('HelloDan');
-    });
-
-    test("different display instances share the same state", async () => {
-        // const display1 = Display.for('key')
-        // const hello = display1('Hello');
-        // expect(hello).toEqual('Hello');
-        //
-        // const display2 = Display.for('key')
-        // display2('Dan');
-        // expect(display2.values).toEqual(['Hello', 'Dan']);
     });
 })

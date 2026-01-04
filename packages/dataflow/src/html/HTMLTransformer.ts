@@ -41,7 +41,7 @@ export const DefaultSelectors: HTMLTransformerSelectors = {
 
 /** Transforms HTML by processing reactive scripts and injecting runtime code */
 export class HTMLTransformer {
-    private idGenerator: IdGenerator;
+    public idGenerator: IdGenerator;
     public idle: boolean;
 
     constructor(private deps: HTMLTransformerDependencies) {

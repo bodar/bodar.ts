@@ -2,6 +2,7 @@ import {topologicalSort} from "./TopologicalSort.ts";
 import {NodeDefinition, type SerializeOptions} from "./NodeDefinition.ts";
 import {HTMLTransformer} from "./HTMLTransformer.ts";
 import type {Bundler} from "../bundling/Bundler.ts";
+import type {RuntimeConfig} from "../runtime.ts";
 
 export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
     constructor(private controller: HTMLTransformer, private bundler: Bundler) {
@@ -14,7 +15,7 @@ export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementCont
 
     async endTag(end: HTMLRewriterTypes.EndTag) {
         const definitions = this.controller.popDefinitions();
-        if(definitions.length > 0) {
+        if (definitions.length > 0) {
             const sorted = topologicalSort(definitions);
 
             // Check if any definition imports display/view from runtime
@@ -28,18 +29,18 @@ export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementCont
                 return (d.hasWidth() ? `_runtime_.graph.define("width_${d.key}",[],[],() => Width.for("${d.key}", _runtime_));` : '')
                     + `_runtime_.graph.define(${d.toString(options)});`;
             }).join('\n');
-            const javascript = await this.bundler.transform(scriptTemplate(registrations, this.controller.idle));
-            end.before(`<script type="module" is="reactive-runtime">${javascript}</script>`, {html: true})
+            const scriptId = this.controller.idGenerator.generate(registrations);
+            const javascript = await this.bundler.transform(scriptTemplate({scriptId, idle: this.controller.idle}, registrations));
+            end.before(`<script type="module" is="reactive-runtime" id="${scriptId}">${javascript}</script>`, {html: true})
         }
     }
 }
 
-export function scriptTemplate(registrations: string, idle: boolean = false):string {
+export function scriptTemplate(config: RuntimeConfig, registrations: string): string {
     // language=javascript
     return `import {Display, View, Width, JSX2DOM, runtime} from "@bodar/dataflow/runtime.ts";
-
-    const _runtime_ = runtime(globalThis, ${idle});
-    _runtime_.graph.define("jsx", [], [], () => new JSX2DOM(globalThis));
-    ${registrations}
-    _runtime_.graph.run();`;
+const _runtime_ = runtime(${JSON.stringify(config)}, globalThis);
+_runtime_.graph.define("jsx", [], [], () => new JSX2DOM(globalThis));
+${registrations}
+_runtime_.graph.run();`;
 }
