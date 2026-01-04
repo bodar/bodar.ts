@@ -1,6 +1,6 @@
 import {describe, expect, test} from "bun:test";
-import {Idle} from "../src/Idle.ts";
-import {Throttle} from "../src/Throttle.ts";
+import {Idle} from "../../src/testing/Idle.ts";
+import {Throttle} from "../../src/Throttle.ts";
 
 describe("Idle", () => {
     test("can detect when Throttle has not been called for a while", async () => {

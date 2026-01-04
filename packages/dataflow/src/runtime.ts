@@ -4,7 +4,7 @@
 import {LazyMap} from "@bodar/yadic/LazyMap.ts";
 import {chain} from "@bodar/yadic/chain.ts";
 import {Throttle, type ThrottleStrategy} from "./Throttle.ts";
-import {Idle} from "./Idle.ts";
+import {Idle} from "./testing/Idle.ts";
 import {BaseGraph} from "./BaseGraph.ts";
 import {Backpressure, type BackpressureStrategy} from "./SharedAsyncIterable.ts";
 
@@ -19,7 +19,7 @@ export {now} from './api/now.ts';
 export {raw} from './api/raw.ts';
 
 export {BaseGraph} from './BaseGraph.ts'
-export {Idle} from './Idle.ts'
+export {Idle} from './testing/Idle.ts'
 export {Throttle} from './Throttle.ts'
 export {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
 export {chain} from "@bodar/yadic/chain.ts";

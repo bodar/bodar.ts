@@ -3,8 +3,11 @@ import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import html from "../../docs/examples/comments.html" with {type: "text"}
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
-import {renderHTML} from "./todo.test.ts";
+import {curry} from "@bodar/totallylazy/functions/curry.ts";
+import {parseHTML} from "linkedom";
+import {renderAndExecute} from "../../src/testing/renderAndExecute.ts";
 
+const renderHTML = curry(renderAndExecute)(parseHTML)
 
 describe("comments", async () => {
     test("can render the 2 built in comments", async () => {

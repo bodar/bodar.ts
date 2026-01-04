@@ -87,6 +87,12 @@ export function chain<T extends object[]>(...objects: T): Chain<T> {
                 } catch (_e) {
                 }
             }
+        },
+        has(_target: {}, prop: string | symbol): boolean {
+            for (const obj of objects) {
+                if (Reflect.has(obj, prop)) return true;
+            }
+            return false;
         }
     }) as Chain<T>
 }

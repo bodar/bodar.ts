@@ -1,34 +1,14 @@
 import {describe, test} from "bun:test";
 import {parseHTML} from "linkedom";
-import {HTMLTransformer} from "../../src/html/HTMLTransformer.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
-import {NodeDefinition} from "../../src/html/NodeDefinition.ts";
 import html from "../../docs/examples/todo.html" with {type: "text"}
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
-import type {Idle} from "../../src/Idle.ts";
-import type {BaseGraph} from "../../src/BaseGraph.ts";
+import {curry} from "@bodar/totallylazy/functions/curry.ts";
+import {renderAndExecute} from "../../src/testing/renderAndExecute.ts";
 
 
-export async function renderHTML(html: string, global: any = globalThis): Promise<{
-    browser: (Window & typeof globalThis),
-    idle: Idle,
-    graph: BaseGraph
-}> {
-    const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), idle: true});
-    const reactive = transformer.transform(html);
-    const browser = parseHTML(reactive);
-
-    const module = browser.document.querySelector('script[type=module][is=reactive-runtime]')!;
-    const definition = NodeDefinition.parse(module.textContent);
-    const fun = new Function(...definition.inputs, `return (${definition.fun()})(${definition.inputs.join(',')});`);
-    const {_runtime_} = await fun(...definition.inputs.map(i => {
-        if (i === 'globalThis') return browser;
-        return Reflect.get(browser, i) || Reflect.get(global, i);
-    }));
-    await new Promise(resolve => setTimeout(resolve, 0));
-    return {browser, idle: _runtime_.idle, graph: _runtime_.graph};
-}
+const renderHTML = curry(renderAndExecute)(parseHTML)
 
 describe("todo", async () => {
     test("can render the 3 built in todos", async () => {

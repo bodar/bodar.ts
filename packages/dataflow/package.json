@@ -25,7 +25,9 @@
     "./Node.ts": "./src/Node.ts",
     "./PullNode.ts": "./src/PullNode.ts",
     "./runtime.ts": "./src/runtime.ts",
-    "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts"
+    "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts",
+    "./testing/Idle.ts": "./src/testing/Idle.ts",
+    "./testing/renderAndExecute.ts": "./src/testing/renderAndExecute.ts"
   },
   "files": [
     "src",

@@ -1,4 +1,9 @@
-import type {ThrottleStrategy} from "./Throttle.ts";
+/**
+ * Class that allows one to detect when reactive rendering is idle
+ * @module
+ */
+
+import type {ThrottleStrategy} from "../Throttle.ts";
 
 export class Idle {
     private id: number = 0;
