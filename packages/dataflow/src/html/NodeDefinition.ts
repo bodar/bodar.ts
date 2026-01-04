@@ -85,6 +85,11 @@ export class NodeDefinition {
         return `${JSON.stringify(this.key)},${JSON.stringify(inputs)},${JSON.stringify(outputs)},${this.fun(options)}`;
     }
 
+    toFunction(options?: SerializeOptions): Function {
+        if (this.isAsync(options)) return new AsyncFunction(...this.inputs, this.body(options));
+        return new Function(...this.inputs, this.body(options));
+    }
+
     fun(options?: SerializeOptions): string {
         const inputs = this.getInputs(options);
         return `${this.isAsync(options) ? 'async' : ''}(${inputs.join(',')}) => {\n${this.body(options)}\n}`;
@@ -107,8 +112,6 @@ export class NodeDefinition {
     }
 
     private getImports(options?: SerializeOptions): Imports {
-        if (!options?.stripDisplay && !options?.stripView) return this._imports;
-
         const imports = this._imports.clone();
         if (options?.stripDisplay) imports.removeSpecifier(this.Runtime, 'display');
         if (options?.stripView) imports.removeSpecifier(this.Runtime, 'view');
@@ -157,3 +160,5 @@ export class NodeDefinition {
     }
 }
 
+const AsyncFunction = Object.getPrototypeOf(async function () {
+}).constructor;
