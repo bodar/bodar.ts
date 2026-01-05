@@ -8,13 +8,13 @@ import type {ThrottleStrategy} from "../Throttle.ts";
 export type SupportedValue = Node | string | number;
 
 /** Placeholder function - should be rewritten by the transformer */
-export function display<T extends SupportedValue>(_value: T): T {
+export function display<T extends SupportedValue>(..._values: T[]): T[] {
     throw new Error('display() is a placeholder - it should have been rewritten by the transformer. Did you import it from @bodar/dataflow/runtime.ts?');
 }
 
 /** Contract for display function with value collection */
 export interface DisplayContract {
-    <T extends SupportedValue>(value: T): T;
+    (...values: SupportedValue[]): SupportedValue[];
 
     key: string;
     values: SupportedValue[];
@@ -36,23 +36,21 @@ export class Display {
     constructor(private deps: DisplayDependencies, public key: string) {
     }
 
-    call(value: any): any {
-        this.values.push(value);
+    call(...values: SupportedValue[]): SupportedValue[] {
+        this.values.push(...values);
         if (!this.pending) {
             this.pending = true;
             this.deps.throttle().then(() => this.flush());
         }
-        return value;
+        return values;
     }
 
     flush(): void {
         try {
             const updates = this.pop();
-            if (updates.length > 0) {
-                const slot = this.deps.reactiveRoot.querySelector<HTMLSlotElement>(`slot[name="${this.key}"]`);
-                if (slot) {
-                    new SlotRenderer(this.deps).render(slot, updates);
-                }
+            const slot = this.deps.reactiveRoot.querySelector<HTMLSlotElement>(`slot[name="${this.key}"]`);
+            if (slot) {
+                new SlotRenderer(this.deps).render(slot, updates);
             }
         } finally {
             this.pending = false;
@@ -73,6 +71,6 @@ export class Display {
 
     static for(key: string, deps: DisplayDependencies): DisplayContract {
         const display = new Display(deps, key);
-        return Object.assign((value: any) => display.call(value), display);
+        return Object.assign((...values: SupportedValue[]) => display.call(...values), display);
     }
 }

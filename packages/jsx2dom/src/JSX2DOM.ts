@@ -2,9 +2,9 @@
  * Super light weight JSX to Native DOM
  */
 import './types.d.ts';
-import { attributeToProperty } from './attribute-mapping.ts';
-import { SVG_ELEMENTS } from './svg-elements.ts';
-import { svgPresentationToKebab } from './svg-presentation-mapping.ts';
+import {attributeToProperty} from './attribute-mapping.ts';
+import {SVG_ELEMENTS} from './svg-elements.ts';
+import {svgPresentationToKebab} from './svg-presentation-mapping.ts';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 

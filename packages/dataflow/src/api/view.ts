@@ -19,7 +19,7 @@ export interface ViewContract {
 export class View {
     static for(display: DisplayContract): ViewContract {
         return (value: HTMLElement) => {
-            return input(display(value as SupportedInputs));
+            return input(display(value as SupportedInputs)[0] as SupportedInputs);
         };
     }
 }

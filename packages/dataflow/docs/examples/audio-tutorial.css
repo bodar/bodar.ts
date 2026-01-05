@@ -68,152 +68,46 @@ a:hover {
     margin-bottom: 0.75rem;
 }
 
-/* Two column layout */
-.tutorial-layout {
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    gap: 2rem;
-}
-
-/* Global controls - left column */
-.global-controls {
-    position: sticky;
-    top: 1rem;
-    align-self: start;
-}
-
-.global-controls h2 {
-    margin: 0 0 1rem 0;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #334155;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.control-group {
-    margin-bottom: 1.5rem;
-}
-
-.control-group h3 {
-    margin: 0 0 0.5rem 0;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-/* Control row */
-.control-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.4rem;
-}
-
-.control-row label {
-    min-width: 80px;
-    font-size: 0.75rem;
-    color: #475569;
-    font-variant-numeric: tabular-nums;
-}
-
-.control-row input[type="range"] {
-    flex: 1;
-    min-width: 80px;
-}
-
-.control-row input[type="color"] {
-    width: 32px;
-    height: 24px;
-    padding: 2px;
-    border: 1px solid #cbd5e1;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.control-row .value {
-    min-width: 28px;
-    font-size: 0.7rem;
-    color: #64748b;
-    text-align: right;
-    font-family: ui-monospace, monospace;
-}
-
-/* Main content - right column */
-.main-content {
-    min-width: 0;
-}
-
-/* Element sections */
-.element-section {
-    margin-bottom: 2rem;
+/* Audio Context container */
+.audio-context {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
     padding: 1.5rem;
-    background: #fafafa;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
+    margin-bottom: 2rem;
 }
 
-.element-section h2 {
+.audio-context-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.audio-context-header h2 {
     margin: 0 0 0.5rem 0;
     font-size: 1.25rem;
     color: #1e293b;
 }
 
-.element-section h3 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.1rem;
-    color: #334155;
-}
-
-.element-section > p {
-    margin: 0 0 1rem 0;
-    color: #475569;
-    font-size: 0.95rem;
-}
-
-.element-section code {
-    font-family: ui-monospace, monospace;
-    background: #e2e8f0;
-    padding: 0.15rem 0.4rem;
-    border-radius: 3px;
-    font-size: 0.85em;
-}
-
-.format-note {
+.context-info {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
     font-size: 0.85rem;
+}
+
+.context-info dt {
     color: #64748b;
-    background: #f1f5f9;
-    padding: 0.5rem 0.75rem;
-    border-radius: 4px;
-    border-left: 3px solid #94a3b8;
+    font-weight: 500;
 }
 
-/* Audio preview container - light theme for visualizations */
-.audio-preview {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    padding: 1rem;
-    margin: 1rem 0;
-    overflow: hidden;
-}
-
-.audio-preview canvas {
-    display: block;
-    width: 100%;
-    height: 100px;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-}
-
-/* Hidden checkbox for toggle state */
-.play-toggle {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
+.context-info dd {
+    margin: 0;
+    color: #334155;
+    font-family: ui-monospace, monospace;
 }
 
 /* Play/Stop button */
@@ -221,19 +115,16 @@ a:hover {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
     min-width: 80px;
     padding: 0.65rem 1.5rem;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #ffffff !important;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
     background: #4269d0;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     transition: background 0.15s;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    letter-spacing: 0.02em;
 }
 
 .play-button:hover {
@@ -248,64 +139,182 @@ a:hover {
     background: #b91c1c;
 }
 
-/* Keyboard visual for mini synth */
-.keyboard {
-    display: flex;
-    gap: 2px;
-    margin: 1rem 0;
-}
-
-.keyboard .key {
-    width: 40px;
-    height: 120px;
-    background: white;
-    border: 1px solid #cbd5e1;
-    border-radius: 0 0 4px 4px;
+/* Node stack - vertical layout */
+.node-stack {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
     align-items: center;
-    padding-bottom: 8px;
-    font-size: 0.7rem;
-    color: #64748b;
-    cursor: pointer;
-    transition: background 0.1s;
+    gap: 0;
 }
 
-.keyboard .key:hover {
-    background: #f1f5f9;
+/* Node connector line */
+.node-connector {
+    width: 2px;
+    height: 20px;
+    background: #cbd5e1;
+    position: relative;
 }
 
-.keyboard .key.active {
-    background: #3b82f6;
-    color: white;
+.node-connector::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #cbd5e1;
 }
 
-.keyboard .key .note {
+/* Audio node blocks */
+.audio-node {
+    width: 100%;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Node type color coding */
+.audio-node.oscillator {
+    border-left: 3px solid #3b82f6;
+}
+
+.audio-node.biquadfilter {
+    border-left: 3px solid #f59e0b;
+}
+
+.audio-node.gain {
+    border-left: 3px solid #10b981;
+}
+
+.audio-node.delay {
+    border-left: 3px solid #ec4899;
+}
+
+.audio-node.analyser {
+    border-left: 3px solid #8b5cf6;
+}
+
+.audio-node.destination {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
+
+/* Node header */
+.node-header {
+    padding: 0.75rem 1rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.node-header h3 {
+    margin: 0;
+    font-size: 0.95rem;
     font-weight: 600;
-    font-size: 0.8rem;
+    color: #334155;
 }
 
-.keyboard .key .hotkey {
-    font-size: 0.65rem;
-    opacity: 0.7;
+/* Node body */
+.node-body {
+    padding: 1rem;
 }
 
-/* Local controls grid */
-.controls-grid {
+.node-description {
+    font-size: 0.9rem;
+    color: #475569;
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+}
+
+.node-description code {
+    font-family: ui-monospace, monospace;
+    background: #e2e8f0;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.85em;
+}
+
+/* Node controls */
+.node-controls {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 0.75rem 1.5rem;
+}
+
+.control-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.control-row label {
+    min-width: 75px;
+    font-size: 0.8rem;
+    color: #475569;
+    font-weight: 500;
+}
+
+.control-row input[type="range"] {
+    flex: 1;
+    min-width: 80px;
+}
+
+.control-row select {
+    flex: 1;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    background: white;
+}
+
+.control-row .value {
+    min-width: 60px;
+    font-size: 0.75rem;
+    color: #64748b;
+    text-align: right;
+    font-family: ui-monospace, monospace;
+}
+
+/* Node visualization */
+.node-visualization {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.visualization-canvas {
+    display: block;
+    width: 100%;
+    height: 80px;
+    background: #0f172a;
+    border-radius: 4px;
+}
+
+/* Node info (for destination) */
+.node-info {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.node-info dt {
+    color: #64748b;
+    font-weight: 500;
+}
+
+.node-info dd {
+    margin: 0;
+    color: #334155;
+    font-family: ui-monospace, monospace;
 }
 
 /* Input styling */
 input, select {
     font-family: inherit;
     font-size: inherit;
-    border: 1px solid #cbd5e1;
-    border-radius: 4px;
-    padding: 0.3em 0.5em;
-    background-color: #fff;
 }
 
 input:focus, select:focus {
@@ -316,26 +325,25 @@ input:focus, select:focus {
 
 /* Responsive */
 @media (max-width: 700px) {
-    .tutorial-layout {
+    .audio-context-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .context-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .node-controls {
         grid-template-columns: 1fr;
     }
 
-    .global-controls {
-        position: relative;
-        top: 0;
-        padding: 1rem;
-        background: #f8fafc;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
-        margin-bottom: 1.5rem;
+    .control-row {
+        flex-wrap: wrap;
     }
 
-    .control-group {
-        margin-bottom: 1rem;
-    }
-
-    .keyboard .key {
-        width: 32px;
-        height: 100px;
+    .control-row label {
+        min-width: 100%;
     }
 }
