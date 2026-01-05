@@ -31,8 +31,19 @@
 
 <!-- Single import for page -->
 <script type="module" is="reactive">
-    import {display, event, observe, view} from "@bodar/dataflow/runtime.ts";
-    import {waveform} from "./audio-builder.ts";
+    import {display, event, view} from "@bodar/dataflow/runtime.ts";
+</script>
+
+<!-- Waveform generator - yields time-domain data from analyser -->
+<script type="module" is="reactive">
+    function* waveform(analyser) {
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        while (true) {
+            analyser.getByteTimeDomainData(dataArray);
+            yield dataArray;
+        }
+    }
 </script>
 
 <!-- AudioContext setup -->

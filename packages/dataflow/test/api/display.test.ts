@@ -16,8 +16,8 @@ describe("Display", () => {
         const throttle = Throttle.auto();
         const display = Display.for('key', chain({throttle, reactiveRoot: browser.document.documentElement}, browser))
 
-        expect(display('Hello')).toEqual(['Hello']);
-        expect(display('Dan')).toEqual(['Dan']);
+        expect(display('Hello')).toEqual('Hello');
+        expect(display('Dan')).toEqual('Dan');
 
         expect(display.key).toEqual('key');
         expect(display.values).toEqual(['Hello', 'Dan']);
