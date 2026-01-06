@@ -43,13 +43,13 @@ describe("todo", async () => {
         const {browser, idle} = await renderHTML(html as any);
 
         assertThat(Array.from(browser.document.querySelectorAll<HTMLInputElement>('.todo-item input[type=checkbox]'))
-            .filter(i => i.getAttribute('checked') === 'true').length, is(1));
+            .filter(i => i.hasAttribute('checked')).length, is(1));
 
         browser.document.querySelector<HTMLInputElement>('.todo-item:nth-child(2) input[type=checkbox]')!.click();
 
         await idle.fired();
         assertThat(Array.from(browser.document.querySelectorAll<HTMLInputElement>('.todo-item input[type=checkbox]'))
-            .filter(i => i.getAttribute('checked') === 'true').length, is(2));
+            .filter(i => i.hasAttribute('checked')).length, is(2));
     });
 
     test("can edit a todo", async () => {
