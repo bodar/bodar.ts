@@ -1,55 +1,55 @@
 // =============================================================================
-// Attribute to Property Mapping (inlined to keep this an ambient declaration file)
+// Property to Attribute Mapping (transforms DOM property names to HTML attribute names)
 // =============================================================================
 
-/** Maps HTML attribute names to DOM property names */
-type AttributeToProperty = {
-    'class': 'className';
-    'for': 'htmlFor';
-    'readonly': 'readOnly';
-    'maxlength': 'maxLength';
-    'minlength': 'minLength';
-    'tabindex': 'tabIndex';
-    'colspan': 'colSpan';
-    'rowspan': 'rowSpan';
-    'datetime': 'dateTime';
-    'enctype': 'encType';
-    'formaction': 'formAction';
-    'formmethod': 'formMethod';
-    'formtarget': 'formTarget';
-    'formnovalidate': 'formNoValidate';
-    'contenteditable': 'contentEditable';
-    'accesskey': 'accessKey';
-    'autocomplete': 'autoComplete';
-    'autofocus': 'autoFocus';
-    'autoplay': 'autoPlay';
-    'cellpadding': 'cellPadding';
-    'cellspacing': 'cellSpacing';
-    'charset': 'charSet';
-    'classname': 'className';
-    'crossorigin': 'crossOrigin';
-    'defaultchecked': 'defaultChecked';
-    'defaultvalue': 'defaultValue';
-    'frameborder': 'frameBorder';
-    'hreflang': 'hrefLang';
-    'htmlfor': 'htmlFor';
-    'httpequiv': 'httpEquiv';
-    'inputmode': 'inputMode';
-    'novalidate': 'noValidate';
-    'srcset': 'srcSet';
-    'srclang': 'srcLang';
-    'srcdoc': 'srcDoc';
-    'usemap': 'useMap';
+/** Maps DOM property names to HTML attribute names */
+type PropertyToAttribute = {
+    'className': 'class';
+    'htmlFor': 'for';
+    'readOnly': 'readonly';
+    'maxLength': 'maxlength';
+    'minLength': 'minlength';
+    'tabIndex': 'tabindex';
+    'colSpan': 'colspan';
+    'rowSpan': 'rowspan';
+    'dateTime': 'datetime';
+    'encType': 'enctype';
+    'formAction': 'formaction';
+    'formMethod': 'formmethod';
+    'formTarget': 'formtarget';
+    'formNoValidate': 'formnovalidate';
+    'contentEditable': 'contenteditable';
+    'accessKey': 'accesskey';
+    'autoComplete': 'autocomplete';
+    'autoFocus': 'autofocus';
+    'autoPlay': 'autoplay';
+    'cellPadding': 'cellpadding';
+    'cellSpacing': 'cellspacing';
+    'charSet': 'charset';
+    'crossOrigin': 'crossorigin';
+    'defaultChecked': 'defaultchecked';
+    'defaultValue': 'defaultvalue';
+    'frameBorder': 'frameborder';
+    'hrefLang': 'hreflang';
+    'httpEquiv': 'http-equiv';
+    'inputMode': 'inputmode';
+    'noValidate': 'novalidate';
+    'srcSet': 'srcset';
+    'srcLang': 'srclang';
+    'srcDoc': 'srcdoc';
+    'useMap': 'usemap';
 };
 
 // =============================================================================
 // Type Utilities
 // =============================================================================
 
-/** Remap property names using a mapping object, extracting types from DOM element */
-type Remap<T, M extends Record<string, string>> = {
-    [K in keyof M as M[K] extends keyof T ? K : never]?:
-        M[K] extends keyof T ? T[M[K]] : never
+/** Transform property names to attribute names using the PropertyToAttribute mapping */
+type TransformToAttribute<T> = {
+    [K in keyof T as K extends keyof PropertyToAttribute
+        ? PropertyToAttribute[K]
+        : K
+    ]?: T[K]
 };
 
 /** Pick all properties starting with a prefix */
@@ -121,11 +121,18 @@ type TableCellExclusions = 'cellIndex';
 // HTML Element Attributes (derived from HTMLElement)
 // =============================================================================
 
+/** Data attribute support */
+type DataAttributes = { [K in `data-${string}`]?: string | number | boolean };
+
+/** ARIA attribute support */
+type AriaAttributes = { [K in `aria-${string}`]?: string | number | boolean };
+
 type ElementProps<T extends HTMLElement, E extends string = never> =
-    & Partial<Omit<NonMethods<NonConstants<T>>, BaseExclusions | E | keyof AttributeToProperty>>
-    & Remap<T, AttributeToProperty>
+    & TransformToAttribute<Partial<Omit<NonMethods<NonConstants<T>>, BaseExclusions | E>>>
     & Partial<PickStartingWith<T, 'on'>>
-    & { style?: Partial<CSSStyleDeclaration> | string };
+    & { style?: Partial<CSSStyleDeclaration> | string }
+    & DataAttributes
+    & AriaAttributes;
 
 // =============================================================================
 // HTML Element-Specific Interfaces
@@ -216,39 +223,17 @@ type SvgBaseExclusions =
     | 'dataset' | 'style' | 'part' | 'attributeStyleMap';
 
 // =============================================================================
-// SVG Presentation Attributes
+// SVG Presentation Attributes (kebab-case only)
 // =============================================================================
 
-/** camelCase presentation attributes with corrected types for SVG */
-interface SvgPresentationCamel {
-    fill?: string;
-    fillOpacity?: string | number;
-    fillRule?: string;
-    stroke?: string;
-    strokeWidth?: string | number;
-    strokeLinecap?: string;
-    strokeLinejoin?: string;
-    strokeDasharray?: string;
-    strokeDashoffset?: string | number;
-    strokeMiterlimit?: string | number;
-    strokeOpacity?: string | number;
-    opacity?: string | number;
-    clipPath?: string;
-    clipRule?: string;
-    mask?: string;
-    filter?: string;
-    transform?: string;
-    transformOrigin?: string;
-    visibility?: string;
-    display?: string;
-    overflow?: string;
-    cursor?: string;
-}
-
-/** kebab-case presentation attributes */
-interface SvgPresentationKebab {
+/** SVG presentation attributes - kebab-case only for consistency with HTML attributes */
+interface SvgPresentationAttributes {
+    // Fill
+    'fill'?: string;
     'fill-opacity'?: string | number;
     'fill-rule'?: string;
+    // Stroke
+    'stroke'?: string;
     'stroke-width'?: string | number;
     'stroke-linecap'?: string;
     'stroke-linejoin'?: string;
@@ -256,9 +241,18 @@ interface SvgPresentationKebab {
     'stroke-dashoffset'?: string | number;
     'stroke-miterlimit'?: string | number;
     'stroke-opacity'?: string | number;
+    // General
+    'opacity'?: string | number;
     'clip-path'?: string;
     'clip-rule'?: string;
+    'mask'?: string;
+    'filter'?: string;
+    'transform'?: string;
     'transform-origin'?: string;
+    'visibility'?: string;
+    'display'?: string;
+    'overflow'?: string;
+    'cursor'?: string;
     // Text presentation
     'dominant-baseline'?: string;
     'text-anchor'?: string;
@@ -285,9 +279,6 @@ interface SvgPresentationKebab {
     'marker-mid'?: string;
     'marker-end'?: string;
 }
-
-/** Combined presentation attributes (both camelCase and kebab-case) */
-type SvgPresentationAttributes = SvgPresentationCamel & SvgPresentationKebab;
 
 // =============================================================================
 // SVG Core Attributes (not in DOM but needed for JSX)

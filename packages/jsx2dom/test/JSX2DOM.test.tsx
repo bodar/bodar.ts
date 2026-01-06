@@ -63,29 +63,6 @@ describe("JSX2DOM", () => {
         expect(count).toEqual(1);
     });
 
-    // Linkedom does not implement checked properties in HTMLInputElement
-    it.skip("can set a boolean HTML attributes", async () => {
-        const html = parseHTML('...'); // creates html, head, body
-        const jsx = new JSX2DOM(html)
-        html.document.body.appendChild(<form><input checked={true}/><input checked={false}/></form>);
-        expect(html.document.body.innerHTML).toEqual('<form><input checked/><input/></form>');
-    });
-
-    it("maps 'class' attribute to className property", async () => {
-        const html = parseHTML('...');
-        const jsx = new JSX2DOM(html);
-        const div = <div class="test-class"/>;
-        expect(div.className).toEqual('test-class');
-    });
-
-    // Linkedom doesn't implement htmlFor, but it will just fall back to setAttribute
-    it("maps 'for' attribute to htmlFor property on labels", async () => {
-        const html = parseHTML('...');
-        const jsx = new JSX2DOM(html);
-        html.document.body.appendChild(<label for="input-id">Label</label>);
-        expect(html.document.body.innerHTML).toEqual('<label for="input-id">Label</label>');
-    });
-
     it("handles style as a string", async () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);
@@ -99,12 +76,189 @@ describe("JSX2DOM", () => {
         html.document.body.appendChild(<div style={{ color: 'blue', fontSize: '16px' }}>Styled</div>);
         expect(html.document.body.innerHTML).toEqual('<div style="color:blue;font-size:16px">Styled</div>')
     });
+});
 
-    it("maps tabindex attribute to tabIndex property", async () => {
+describe("JSX2DOM HTML Attributes", () => {
+    it("uses setAttribute for all attributes (isEqualNode compatible)", async () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);
-        const div = <div tabindex={5}>Focusable</div>;
-        expect((div as HTMLElement).tabIndex).toEqual(5);
+        const div1 = <div class="test" id="foo" tabindex={5}/>;
+        const div2 = html.document.createElement('div');
+        div2.setAttribute('class', 'test');
+        div2.setAttribute('id', 'foo');
+        div2.setAttribute('tabindex', '5');
+        expect(div1.isEqualNode(div2)).toBe(true);
+    });
+
+    it("sets 'class' attribute directly", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<div class="test-class"/>);
+        expect(html.document.body.innerHTML).toEqual('<div class="test-class"></div>');
+    });
+
+    it("sets 'for' attribute on labels", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<label for="input-id">Label</label>);
+        expect(html.document.body.innerHTML).toEqual('<label for="input-id">Label</label>');
+    });
+
+    it("sets 'tabindex' attribute (lowercase)", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<div tabindex={5}/>);
+        expect(html.document.body.innerHTML).toEqual('<div tabindex="5"></div>');
+    });
+
+    it("sets 'colspan' attribute on table cells", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<td colspan={2}>Cell</td>);
+        expect(html.document.body.innerHTML).toEqual('<td colspan="2">Cell</td>');
+    });
+
+    it("sets 'rowspan' attribute on table cells", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<td rowspan={3}>Cell</td>);
+        expect(html.document.body.innerHTML).toEqual('<td rowspan="3">Cell</td>');
+    });
+
+    it("sets 'maxlength' attribute on inputs", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<input maxlength={100}/>);
+        expect(html.document.body.innerHTML).toEqual('<input maxlength="100">');
+    });
+
+    it("supports data-* attributes", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<div data-testid="my-element" data-value={42}/>);
+        expect(html.document.body.innerHTML).toContain('data-testid="my-element"');
+        expect(html.document.body.innerHTML).toContain('data-value="42"');
+    });
+
+    it("supports aria-* attributes", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<button aria-label="Close" aria-hidden={false}/>);
+        expect(html.document.body.innerHTML).toContain('aria-label="Close"');
+        expect(html.document.body.innerHTML).toContain('aria-hidden="false"');
+    });
+});
+
+describe("JSX2DOM Boolean Attributes", () => {
+    it("sets boolean attribute when true", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<input checked={true}/>);
+        expect(html.document.body.innerHTML).toEqual('<input checked>');
+    });
+
+    it("omits boolean attribute when false", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<input checked={false}/>);
+        expect(html.document.body.innerHTML).toEqual('<input>');
+    });
+
+    it("handles disabled attribute", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<button disabled={true}>Click</button>);
+        expect(html.document.body.innerHTML).toEqual('<button disabled>Click</button>');
+    });
+
+    it("handles required attribute", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<input required={true}/>);
+        expect(html.document.body.innerHTML).toEqual('<input required>');
+    });
+
+    it("handles hidden attribute", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<div hidden={true}>Hidden</div>);
+        expect(html.document.body.innerHTML).toEqual('<div hidden>Hidden</div>');
+    });
+
+    it("handles readonly attribute", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<input readonly={true}/>);
+        expect(html.document.body.innerHTML).toEqual('<input readonly>');
+    });
+
+    it("handles multiple attribute on select", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<select multiple={true}/>);
+        expect(html.document.body.innerHTML).toEqual('<select multiple></select>');
+    });
+
+    it("handles open attribute on details", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<details open={true}><summary>Title</summary></details>);
+        expect(html.document.body.innerHTML).toContain('<details open>');
+    });
+
+    it("handles multiple boolean attributes together", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<input type="checkbox" checked={true} disabled={true} required={false}/>);
+        const output = html.document.body.innerHTML;
+        expect(output).toContain('checked');
+        expect(output).toContain('disabled');
+        expect(output).not.toContain('required');
+    });
+});
+
+describe("JSX2DOM isEqualNode Compatibility", () => {
+    it("produces equal nodes for same attributes", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+
+        const jsx1 = <div class="test" id="foo" tabindex={5}/>;
+        const jsx2 = <div class="test" id="foo" tabindex={5}/>;
+
+        expect(jsx1.isEqualNode(jsx2)).toBe(true);
+    });
+
+    it("produces nodes equal to manually created ones", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+
+        const jsxDiv = <div class="test" id="myid"/>;
+
+        const manualDiv = html.document.createElement('div');
+        manualDiv.setAttribute('class', 'test');
+        manualDiv.setAttribute('id', 'myid');
+
+        expect(jsxDiv.isEqualNode(manualDiv)).toBe(true);
+    });
+
+    it("detects differences in attributes", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+
+        const div1 = <div class="foo"/>;
+        const div2 = <div class="bar"/>;
+
+        expect(div1.isEqualNode(div2)).toBe(false);
+    });
+
+    it("detects differences in styles", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+
+        const div1 = <div style={{ color: 'blue' }}/>;
+        const div2 = <div style={{ color: 'red' }}/>;
+
+        expect(div1.isEqualNode(div2)).toBe(false);
     });
 });
 
@@ -130,18 +284,12 @@ describe("JSX2DOM SVG Support", () => {
         expect(html.document.body.innerHTML).toEqual('<path stroke-linecap="round" stroke-width="2" d="M0 0" />');
     });
 
-    it("converts camelCase presentation attributes to kebab-case", async () => {
+    it("handles SVG text elements with kebab-case attributes", async () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);
-        html.document.body.appendChild(<path d="M0 0" strokeWidth={3} strokeLinecap="square"/>);
-        expect(html.document.body.innerHTML).toEqual('<path stroke-linecap="square" stroke-width="3" d="M0 0" />');
-    });
-
-    it("handles SVG text elements", async () => {
-        const html = parseHTML('...');
-        const jsx = new JSX2DOM(html);
-        html.document.body.appendChild(<text x={10} y={20} font-size={14}>Hello</text>);
-        expect(html.document.body.innerHTML).toEqual('<text font-size="14" y="20" x="10">Hello</text>');
+        html.document.body.appendChild(<text x={10} y={20} font-size={14} text-anchor="middle">Hello</text>);
+        expect(html.document.body.innerHTML).toContain('font-size="14"');
+        expect(html.document.body.innerHTML).toContain('text-anchor="middle"');
     });
 
     it("handles gradient elements", async () => {
@@ -163,5 +311,13 @@ describe("JSX2DOM SVG Support", () => {
         const jsx = new JSX2DOM(html);
         html.document.body.appendChild(<svg viewBox="0 0 100 100"><circle cx={50} cy={50} r={40}/></svg>);
         expect(html.document.body.innerHTML).toEqual('<svg viewBox="0 0 100 100"><circle r="40" cy="50" cx="50" /></svg>');
+    });
+
+    it("handles fill-opacity and stroke-opacity", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<rect fill-opacity={0.5} stroke-opacity={0.8}/>);
+        expect(html.document.body.innerHTML).toContain('fill-opacity="0.5"');
+        expect(html.document.body.innerHTML).toContain('stroke-opacity="0.8"');
     });
 });

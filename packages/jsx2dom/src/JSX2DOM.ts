@@ -2,9 +2,8 @@
  * Super light weight JSX to Native DOM
  */
 import './types.d.ts';
-import {attributeToProperty} from './attribute-mapping.ts';
+import {BOOLEAN_ATTRIBUTES} from './boolean-attributes.ts';
 import {SVG_ELEMENTS} from './svg-elements.ts';
-import {svgPresentationToKebab} from './svg-presentation-mapping.ts';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
@@ -71,25 +70,17 @@ export class JSX2DOM {
                 continue;
             }
 
-            // SVG: always use setAttribute (properties are read-only animated types)
-            if (isSVG && node instanceof SVGElement) {
-                // Convert camelCase to kebab-case for presentation attributes
-                const attrName = svgPresentationToKebab[key] ?? key;
-                node.setAttribute(attrName, String(value));
+            // Boolean attribute handling (HTML only)
+            if (!isSVG && BOOLEAN_ATTRIBUTES.has(key)) {
+                if (value === true && node instanceof HTMLElement) {
+                    node.setAttribute(key, '');
+                }
+                // If false, don't set the attribute at all
                 continue;
             }
 
-            // HTML: Map attribute names to DOM property names
-            const propertyName = (attributeToProperty as Record<string, string>)[key] ?? key;
-
-            // Try to set as property first, fall back to setAttribute
-            if (propertyName in node) {
-                try {
-                    Reflect.set(node, propertyName, value);
-                } catch {
-                    if (node instanceof HTMLElement) node.setAttribute(key, String(value));
-                }
-            } else if (node instanceof HTMLElement) {
+            // All other attributes: use setAttribute directly
+            if (node instanceof HTMLElement || node instanceof SVGElement) {
                 node.setAttribute(key, String(value));
             }
         }
