@@ -5,7 +5,7 @@ import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import {observableSource} from "./api/observe.test.ts";
-import {mutable} from "../src/api/mutable.ts";
+import {Mutable, mutable} from "../src/api/mutable.ts";
 
 describe("graph", () => {
     test("if the function has a name use that as the key", async () => {
@@ -162,6 +162,37 @@ describe("graph", () => {
         const {c} = graph.define('c', (a: number) => a + 3);
         const {d} = graph.define('d', (a: number) => a + 4);
         assertThat(graph.dependents(a), equals([b, c, d]));
+    });
+
+    test.only("bug", async () => {
+        const graph = new Graph();
+        const oscillator_type = mutable('sine');
+        graph.define('oscillator_type', () => oscillator_type);
+        graph.define('oscillator', (oscillator_type: string) => {
+            console.log('New oscillator with type', oscillator_type);
+            return `oscillator(${oscillator_type})`;
+        });
+        let oscillator_frequency: Mutable<number>;
+        graph.define('oscillator_frequency', (oscillator: string) => {
+            console.log('New oscillator_frequency', oscillator, oscillator.length);
+            return oscillator_frequency = mutable(oscillator.length * 440);
+        });
+        const {oscillator_frequency_span} = graph.define('oscillator_frequency_span', (oscillator_frequency: number) => {
+            console.log('New oscillator_frequency span', oscillator_frequency);
+            return `${oscillator_frequency} Hz`;
+        });
+        const iterator = oscillator_frequency_span[Symbol.asyncIterator]();
+        expect(await iterator.next()).toEqual({value: '7040 Hz', done: false});
+        oscillator_frequency!.value++;
+        expect(await iterator.next()).toEqual({value: '7041 Hz', done: false});
+        oscillator_type.value = 'square'
+        expect(await iterator.next()).toEqual({value: '7920 Hz', done: false});
+        oscillator_frequency!.value++;
+        expect(await iterator.next()).toEqual({value: '7921 Hz', done: false});
+        oscillator_type.value = 'sawtooth'
+        expect(await iterator.next()).toEqual({value: '8800 Hz', done: false});
+        oscillator_frequency!.value++;
+        expect(await iterator.next()).toEqual({value: '8801 Hz', done: false});
     });
 
     describe("invalidation", () => {

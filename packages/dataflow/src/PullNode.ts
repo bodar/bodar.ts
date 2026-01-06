@@ -30,12 +30,15 @@ export class PullNode<T> implements Node<T> {
         for await (const resolved of racer) {
             if (resolved.has('inputs')) {
                 const newInputs = resolved.get('inputs')!.value;
+                console.log(`PullNode(${this.key}) - new inputs resolved`, newInputs);
                 await invalidate(this.value);
                 this.value = this.fun(...newInputs);
                 racer.set('values', toAsyncIterable<T>(this.value)[Symbol.asyncIterator]());
             }
             if (resolved.has('values')) {
-                yield resolved.get('values')!.value;
+                const v = resolved.get('values')!.value;
+                console.log(`PullNode(${this.key}) - values resolved`, v)
+                yield v;
                 await this.throttle();
             }
         }
@@ -53,8 +56,10 @@ async function invalidate(value: any): Promise<void> {
         if (value instanceof AbortController) {
             value.abort();
         } else if (typeof value[Symbol.dispose] === 'function') {
+            console.log('invalidate object with Symbol.dispose', value);
             value[Symbol.dispose]();
         } else if (typeof value[Symbol.asyncDispose] === 'function') {
+            console.log('invalidate object with Symbol.asyncDispose', value);
             await value[Symbol.asyncDispose]();
         }
     } catch (e) {
