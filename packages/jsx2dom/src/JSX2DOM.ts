@@ -3,21 +3,22 @@
  */
 import './types.d.ts';
 import {BOOLEAN_ATTRIBUTES} from './boolean-attributes.ts';
-import {SVG_ELEMENTS} from './svg-elements.ts';
+import {isSVG} from './svg-elements.ts';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 /** JSX attributes - can be strings, booleans, numbers, functions, or style objects */
-export type Attributes = { [key: string]: unknown } | null;
+export type Attributes = { [key: string]: unknown };
 /** Supported nested JSX content */
 export type Content = string | number | Node | Content[];
+
+export type SupportedNode = DocumentFragment | SupportedElement;
+export type SupportedElement = HTMLElement | SVGElement;
 
 /** Explicit Dependencies for JSX2DOM, allows it to work with linkedom and yadic */
 export interface JSX2DOMDependencies {
     document: Document,
     Node: typeof Node,
-    HTMLElement: typeof HTMLElement,
-    SVGElement: typeof SVGElement
 }
 
 /** JSX2DOM class, works with native DOM or linkedom */
@@ -26,67 +27,48 @@ export class JSX2DOM {
     }
 
     createElement(name: null, attributes: null, ...contents: Content[]): DocumentFragment;
-    createElement(name: string, attributes: Attributes, ...contents: Content[]): HTMLElement | SVGElement;
-    createElement(name: string | null, attributes: Attributes, ...contents: Content[]): Node {
+    createElement(name: string, attributes: Attributes | null, ...contents: Content[]): HTMLElement | SVGElement;
+    createElement(name: string | null, attributes: Attributes | null, ...contents: Content[]): Node {
         const {document} = this.deps;
-        const isSVG = name !== null && SVG_ELEMENTS.has(name);
-
-        const node = name === null
-            ? document.createDocumentFragment()
-            : isSVG
+        if (name === null) {
+            return this.addContent(document.createDocumentFragment(), contents);
+        } else {
+            const element: SupportedElement = isSVG(name)
                 ? document.createElementNS(SVG_NAMESPACE, name)
                 : document.createElement(name);
 
-        this.addAttributes(node, attributes, isSVG);
-        this.addContent(node, contents);
-        return node;
+            if (attributes) this.addAttributes(element, attributes);
+            return this.addContent(element, contents);
+        }
     }
 
-    private addAttributes(node: Node, attributes: Attributes, isSVG: boolean = false) {
-        const {HTMLElement, SVGElement} = this.deps;
-        if (attributes === null) return;
-
+    private addAttributes(element: SupportedElement, attributes: Attributes) {
         for (const [key, value] of Object.entries(attributes)) {
             if (value === undefined || value === null) continue;
 
-            // Event handlers
             if (key.startsWith('on') && typeof value === 'function') {
-                node.addEventListener(key.substring(2), value as EventListener);
-                continue;
-            }
-
-            // Style support (object or string) - works for both HTML and SVG
-            if (key === 'style' && (node instanceof HTMLElement || node instanceof SVGElement)) {
+                element.addEventListener(key.substring(2), value as EventListener);
+            } else if (key === 'style') {
                 if (typeof value === 'object') {
-                    const style = (node as HTMLElement | SVGElement).style as unknown as Record<string, string>;
-                    for (const [prop, val] of Object.entries(value as object)) {
+                    for (const [prop, val] of Object.entries(value)) {
                         if (val !== undefined && val !== null) {
-                            style[prop] = String(val);
+                            Reflect.set(element.style, prop, String(val));
                         }
                     }
                 } else if (typeof value === 'string') {
-                    (node as HTMLElement | SVGElement).style.cssText = value;
+                    element.style.cssText = value;
                 }
-                continue;
-            }
-
-            // Boolean attribute handling (HTML only)
-            if (!isSVG && BOOLEAN_ATTRIBUTES.has(key)) {
-                if (value === true && node instanceof HTMLElement) {
-                    node.setAttribute(key, '');
+            } else if (!isSVG(element) && BOOLEAN_ATTRIBUTES.has(key)) {
+                if (value === true) {
+                    element.setAttribute(key, '');
                 }
-                // If false, don't set the attribute at all
-                continue;
-            }
-
-            // All other attributes: use setAttribute directly
-            if (node instanceof HTMLElement || node instanceof SVGElement) {
-                node.setAttribute(key, String(value));
+            } else {
+                element.setAttribute(key, String(value));
             }
         }
     }
 
-    private addContent(node: Node, contents: Content[]) {
+    private addContent(node: SupportedNode, contents: Content[]) {
         const {document, Node} = this.deps;
         for (const content of contents) {
             if (Array.isArray(content)) {
@@ -95,5 +77,6 @@ export class JSX2DOM {
                 node.appendChild(content instanceof Node ? content : document.createTextNode(String(content)));
             }
         }
+        return node;
     }
 }

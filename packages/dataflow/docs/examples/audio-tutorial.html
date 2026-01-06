@@ -97,7 +97,7 @@
                         <label>Frequency</label>
                         <script type="module" is="reactive">
                             const oscillator_frequency = view(<input type="range" min="20" max="2000" step="1"
-                                   data-key={crypto.randomUUID()}
+                                   data-key={Math.random()}
                                    value={oscillator.frequency.value}
                                    oninput={ev => oscillator.frequency.value = ev.target.value}/>);
                         </script>
@@ -109,7 +109,7 @@
                         <label>Detune</label>
                         <script type="module" is="reactive">
                             const oscillator_detune = view(<input type="range" min="-100" max="100" step="1"
-                                   data-key={crypto.randomUUID()}
+                                   data-key={Math.random()}
                                    value={oscillator.detune.value}
                                    oninput={ev => oscillator.detune.value = ev.target.value}/>);
                         </script>
@@ -158,7 +158,7 @@
                         <label>Frequency</label>
                         <script type="module" is="reactive">
                             const filter_frequency = view(<input type="range" min="20" max="20000" step="1"
-                                   data-key={crypto.randomUUID()}
+                                   data-key={Math.random()}
                                    value={filter.frequency.value}
                                    oninput={ev => filter.frequency.value = ev.target.value}/>);
                         </script>
@@ -170,7 +170,7 @@
                         <label>Q</label>
                         <script type="module" is="reactive">
                             const filter_q = view(<input type="range" min="0.1" max="20" step="0.1"
-                                   data-key={crypto.randomUUID()}
+                                   data-key={Math.random()}
                                    value={filter.Q.value}
                                    oninput={ev => filter.Q.value = ev.target.value}/>);
                         </script>
@@ -182,7 +182,7 @@
                         <label>Gain</label>
                         <script type="module" is="reactive">
                             const filter_gain = view(<input type="range" min="-40" max="40" step="1"
-                                   data-key={crypto.randomUUID()}
+                                   data-key={Math.random()}
                                    value={filter.gain.value}
                                    oninput={ev => filter.gain.value = ev.target.value}/>);
                         </script>

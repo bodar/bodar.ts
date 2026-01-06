@@ -164,6 +164,13 @@ describe("JSX2DOM Boolean Attributes", () => {
         expect(html.document.body.innerHTML).toEqual('<input>');
     });
 
+    it("can set an attribute without a value", async () => {
+        const html = parseHTML('...');
+        const jsx = new JSX2DOM(html);
+        html.document.body.appendChild(<input checked/>);
+        expect(html.document.body.innerHTML).toEqual('<input checked>');
+    });
+
     it("handles disabled attribute", async () => {
         const html = parseHTML('...');
         const jsx = new JSX2DOM(html);

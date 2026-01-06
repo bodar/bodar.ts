@@ -1,3 +1,5 @@
+import type {SupportedElement} from "./JSX2DOM.ts";
+
 /**
  * Set of SVG element names for runtime detection.
  * Used to determine when to use createElementNS with SVG namespace.
@@ -22,3 +24,7 @@ export const SVG_ELEMENTS = new Set([
     // Animation
     'animate', 'animateMotion', 'animateTransform', 'mpath', 'set',
 ]);
+
+export function isSVG(tag: string | SupportedElement) {
+    return SVG_ELEMENTS.has(typeof tag === 'string' ? tag : tag.tagName);
+}
