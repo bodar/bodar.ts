@@ -1,6 +1,7 @@
 import {describe, expect, it} from "bun:test";
 import {parseHTML} from "linkedom";
-import {JSX2DOM} from "../src/JSX2DOM.ts";
+import {autoKeyEvents, JSX2DOM} from "../src/JSX2DOM.ts";
+import {chain} from "@bodar/yadic/chain.ts";
 
 describe("JSX2DOM", () => {
     it("enables JSX and Linkedom to work together without global pollution", async () => {
@@ -61,6 +62,17 @@ describe("JSX2DOM", () => {
         expect(count).toEqual(0);
         html.document.body.click();
         expect(count).toEqual(1);
+    });
+
+    it("autoKeyEvents adds data-key to elements with event handlers", async () => {
+        const html = parseHTML('<html><head></head><body></body></html>');
+        const jsx = new JSX2DOM(chain({onEventListener: autoKeyEvents()}, html));
+        const div1 = <div onclick={() => {}}/>;
+        const div2 = <div onmouseover={() => {}}/>;
+        const div3 = <div class="no-events"/>;
+        expect(div1.getAttribute('data-key')).toBe('0');
+        expect(div2.getAttribute('data-key')).toBe('1');
+        expect(div3.getAttribute('data-key')).toBeNull();
     });
 
     it("handles style as a string", async () => {

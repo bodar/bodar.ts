@@ -21,7 +21,7 @@ export {raw} from './api/raw.ts';
 export {BaseGraph} from './BaseGraph.ts'
 export {Idle} from './testing/Idle.ts'
 export {Throttle} from './Throttle.ts'
-export {JSX2DOM} from "@bodar/jsx2dom/JSX2DOM.ts";
+export {JSX2DOM, autoKeyEvents} from "@bodar/jsx2dom/JSX2DOM.ts";
 export {chain} from "@bodar/yadic/chain.ts";
 
 /** Dependencies and services provided by the runtime */

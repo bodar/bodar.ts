@@ -38,9 +38,9 @@ export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementCont
 
 export function scriptTemplate(config: RuntimeConfig, registrations: string): string {
     // language=javascript
-    return `import {Display, View, Width, JSX2DOM, runtime} from "@bodar/dataflow/runtime.ts";
+    return `import {Display, View, Width, JSX2DOM, autoKeyEvents, runtime, chain} from "@bodar/dataflow/runtime.ts";
 const _runtime_ = runtime(${JSON.stringify(config)}, globalThis);
-_runtime_.graph.define("jsx", [], [], () => new JSX2DOM(globalThis));
+_runtime_.graph.define("jsx", [], [], () => new JSX2DOM(chain({onEventListener: autoKeyEvents()}, globalThis)));
 ${registrations}
 _runtime_.graph.run();`;
 }

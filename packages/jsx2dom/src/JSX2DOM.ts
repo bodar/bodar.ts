@@ -19,6 +19,14 @@ export type SupportedElement = HTMLElement | SVGElement;
 export interface JSX2DOMDependencies {
     document: Document,
     Node: typeof Node,
+    /** Called when an event listener is added to an element */
+    onEventListener?: (element: SupportedElement, eventName: string, listener: EventListener) => void,
+}
+
+/** Creates an onEventListener that adds unique data-key attributes for isEqualNode compatibility */
+export function autoKeyEvents(): (element: SupportedElement) => void {
+    let keyCounter = 0;
+    return (element) => element.setAttribute('data-key', String(keyCounter++));
 }
 
 /** JSX2DOM class, works with native DOM or linkedom */
@@ -47,7 +55,9 @@ export class JSX2DOM {
             if (value === undefined || value === null) continue;
 
             if (key.startsWith('on') && typeof value === 'function') {
-                element.addEventListener(key.substring(2), value as EventListener);
+                const eventName = key.substring(2);
+                element.addEventListener(eventName, value as EventListener);
+                this.deps.onEventListener?.(element, eventName, value as EventListener);
             } else if (key === 'style') {
                 if (typeof value === 'object') {
                     for (const [prop, val] of Object.entries(value)) {
