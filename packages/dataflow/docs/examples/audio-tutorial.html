@@ -61,8 +61,8 @@
         </div>
         <script type="module" is="reactive">
             state === 'running'
-                ? <button class="play-button playing" onclick={() => context.suspend()}>Suspend</button>
-                : <button class="play-button" onclick={() => context.resume()}>Resume</button>
+                ? <button class="play-button playing" onclick={() => context.suspend()}>Stop</button>
+                : <button class="play-button" onclick={() => context.resume()}>Play</button>
         </script>
     </div>
 
