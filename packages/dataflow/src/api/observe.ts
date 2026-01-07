@@ -25,7 +25,7 @@ export function observe<T>(init: (notify: (t: T | undefined) => any) => any, val
         }
     }
 
-    // Make generator interruptible even if already awaiting
+    // Make generator interruptible even when awaiting
     const instance = generator();
     const originalReturn = instance.return;
     Reflect.set(instance, 'return', function (returnValue?: any): Promise<IteratorResult<T>> {

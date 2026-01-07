@@ -2,6 +2,7 @@ import {describe, test} from "bun:test";
 import {Mutable} from "../../src/api/mutable.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
+import {toPromiseArray} from "@bodar/totallylazy/collections/Array.ts";
 
 describe("Mutable", () => {
     test("initial value", () => {
@@ -34,9 +35,9 @@ describe("Mutable", () => {
         const iter = mut[Symbol.asyncIterator]();
 
         assertThat((await iter.next()).value, equals(0));
-        mut.value =  1;
+        mut.value = 1;
         assertThat((await iter.next()).value, equals(1));
-        mut.value =  2;
+        mut.value = 2;
         assertThat((await iter.next()).value, equals(2));
     });
 
@@ -51,6 +52,14 @@ describe("Mutable", () => {
         mut.value = 3;
 
         assertThat((await iter.next()).value, equals(3));
+    });
+
+    test("can terminate", async () => {
+        const mut = new Mutable<number | undefined>(0);
+        setTimeout(() => mut.value = 1, 10);
+        setTimeout(() => mut.value = 2, 20);
+        setTimeout(() => mut.value = undefined, 30); // terminates
+        assertThat(await toPromiseArray(mut), equals([0, 1, 2]))
     });
 });
 

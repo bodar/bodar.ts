@@ -55,8 +55,7 @@ function invalidate(value: any): void {
         } else if (typeof value[Symbol.dispose] === 'function') {
             value[Symbol.dispose]();
         } else if (typeof value[Symbol.asyncDispose] === 'function') {
-            console.log('Calling asyncDispose');
-            value[Symbol.asyncDispose](); // Don't await - may hang if is not interruptible
+            value[Symbol.asyncDispose](); // Don't await - may hang if not interruptible
         }
     } catch (e) {
         console.error('Error during invalidate:', e);

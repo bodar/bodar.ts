@@ -42,4 +42,12 @@ describe("observe", () => {
 
         expect(source.disposed).toBe(true);
     });
+
+    test("return() completes even when awaiting a promise that will never resolve", async () => {
+        let disposed = false;
+        const source = observe<number>(() => () => disposed = true);
+        source.next(); // Start awaiting but don't await it
+        await source.return(undefined as any);
+        expect(disposed).toBe(true);
+    });
 });

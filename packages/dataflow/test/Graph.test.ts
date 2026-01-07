@@ -13,7 +13,7 @@ describe("graph", () => {
         const {constant} = graph.define(function constant() {
             return 1;
         });
-        assertThat(await valuesOf(constant), equals([1]));
+        assertThat(await toPromiseArray(constant), equals([1]));
     });
 
     test("otherwise calculate the hash of the function source", async () => {
@@ -21,7 +21,7 @@ describe("graph", () => {
         const {rmbt6f} = graph.define(function () {
             return 1;
         });
-        assertThat(await valuesOf(rmbt6f), equals([1]));
+        assertThat(await toPromiseArray(rmbt6f), equals([1]));
     });
 
     test("can provide a key explicitly", async () => {
@@ -29,27 +29,27 @@ describe("graph", () => {
         const {fun} = graph.define('fun', function () {
             return 1;
         });
-        assertThat(await valuesOf(fun), equals([1]));
+        assertThat(await toPromiseArray(fun), equals([1]));
     });
 
     test("can create a node from a function that returns a value, if it has no inputs it only ever have 1 result", async () => {
         const graph = new Graph();
         const {node} = graph.define('node', () => 1);
-        assertThat(await valuesOf(node), equals([1]));
+        assertThat(await toPromiseArray(node), equals([1]));
     });
 
     test("Can iterate multiple times and it still returns the same state", async () => {
         const graph = new Graph();
         const {node} = graph.define('node', () => 1);
-        assertThat(await valuesOf(node), equals([1]));
-        assertThat(await valuesOf(node), equals([1]));
+        assertThat(await toPromiseArray(node), equals([1]));
+        assertThat(await toPromiseArray(node), equals([1]));
     });
 
     test("nodes can depend on other nodes", async () => {
         const graph = new Graph();
         graph.define("nodeA", () => 1);
         const {nodeB} = graph.define('nodeB', (nodeA: number) => nodeA * 2);
-        assertThat(await valuesOf(nodeB), equals([2]));
+        assertThat(await toPromiseArray(nodeB), equals([2]));
     });
 
     test("if a dependency returns the same value multiple times in a row, it will still cause the function to execute", async () => {
@@ -60,7 +60,7 @@ describe("graph", () => {
         let sum = 0;
         const {node} = graph.define('node', (datasource: number) => sum += datasource);
         assertThat(sum, is(0));
-        assertThat(await valuesOf(node), equals([1, 3, 6]));
+        assertThat(await toPromiseArray(node), equals([1, 3, 6]));
     });
 
     test("if a function returns an generator then the node will yield the values not the generator", async () => {
@@ -68,7 +68,7 @@ describe("graph", () => {
         const {test} = graph.define(function* test() {
             yield* [1, 2, 3];
         });
-        const result = await valuesOf(test);
+        const result = await toPromiseArray(test);
         assertThat(result, equals([1, 2, 3]));
     });
 
@@ -81,7 +81,7 @@ describe("graph", () => {
                 }
             }
         });
-        assertThat(await valuesOf(test), equals([1, 2, 3]));
+        assertThat(await toPromiseArray(test), equals([1, 2, 3]));
     });
 
     test("if a function returns a promise then the node will yield the value of the promise", async () => {
@@ -90,7 +90,7 @@ describe("graph", () => {
         const {test} = graph.define(function test(promise: number) {
             return promise * 3;
         });
-        assertThat(await valuesOf(test), equals([6]));
+        assertThat(await toPromiseArray(test), equals([6]));
     });
 
     test("can compose generators with constants", async () => {
@@ -102,15 +102,15 @@ describe("graph", () => {
         const {combined} = graph.define(function combined(constant: number, generator: number) {
             return constant * generator
         });
-        assertThat(await valuesOf(combined), equals([10, 20, 30]));
+        assertThat(await toPromiseArray(combined), equals([10, 20, 30]));
     });
 
     test("if a function returns multiple things then it will create multiple nodes", async () => {
         const graph = new Graph();
         const {fun, a, b} = graph.define('fun', () => ({a: 1, b: 2}));
-        assertThat(await valuesOf(fun), equals([{a: 1, b: 2}]));
-        assertThat(await valuesOf(a), equals([1]));
-        assertThat(await valuesOf(b), equals([2]));
+        assertThat(await toPromiseArray(fun), equals([{a: 1, b: 2}]));
+        assertThat(await toPromiseArray(a), equals([1]));
+        assertThat(await toPromiseArray(b), equals([2]));
     });
 
     test("generators still work when there are multiple objects returned", async () => {
@@ -120,7 +120,7 @@ describe("graph", () => {
                 yield* [1, 2, 3];
             }
         }));
-        assertThat(await valuesOf(b), equals([1, 2, 3]));
+        assertThat(await toPromiseArray(b), equals([1, 2, 3]));
     });
 
     test("can detect the sink nodes of the graph", async () => {
@@ -202,7 +202,7 @@ describe("graph", () => {
                 controllers.push(controller);
                 return controller;
             });
-            await valuesOf(node);
+            await toPromiseArray(node);
             expect(controllers.length).toBe(2);
             expect(controllers[0].signal.aborted).toBe(true);
             expect(controllers[1].signal.aborted).toBe(false);
@@ -220,7 +220,7 @@ describe("graph", () => {
                     disposals.push(datasource);
                 }
             }));
-            await valuesOf(node);
+            await toPromiseArray(node);
             expect(disposals).toEqual([1]);
         });
 
@@ -237,7 +237,7 @@ describe("graph", () => {
                     disposals.push(datasource);
                 }
             }));
-            await valuesOf(node);
+            await toPromiseArray(node);
             expect(disposals).toEqual([1]);
         });
     });
@@ -249,7 +249,7 @@ describe("graph", () => {
             graph.define('source', () => source);
             const {node} = graph.define('node', (source: number) => source * 2);
 
-            assertThat(await valuesOf(node), equals([2, 4]));
+            assertThat(await toPromiseArray(node), equals([2, 4]));
             expect(source.disposed).toBe(true);
         });
 
@@ -317,9 +317,23 @@ describe("graph", () => {
             expect(await iterator.next()).toEqual({done: false, value: 60});
             expect(disposed).toEqual(1);
         });
+
+        test("invalidating an async generator that is awaiting a promise that will never resolve does not hang", async () => {
+            const graph = new Graph();
+            const trigger = mutable<number | undefined>(1);
+            graph.define('trigger', () => trigger);
+            const {source} = graph.define(async function* source(trigger: number) {
+                if (trigger === 1) yield 1;
+                if (trigger === 2) await new Promise(() => {}); // never resolves
+            });
+
+            // Queue up mutations: 1 -> 2 -> 1 -> undefined
+            setTimeout(() => trigger.value = 2, 10);       // creates stuck generator
+            setTimeout(() => trigger.value = 1, 20);       // invalidates stuck, yields 1 again
+            setTimeout(() => trigger.value = undefined, 30); // terminates
+
+            assertThat(await toPromiseArray(source), equals([1, 1]));
+        });
     });
 })
 
-async function valuesOf<T>(iterable: AsyncIterable<T>): Promise<T[]> {
-    return await toPromiseArray(iterable);
-}
