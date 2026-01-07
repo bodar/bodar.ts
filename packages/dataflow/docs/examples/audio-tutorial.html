@@ -10,7 +10,8 @@
 
 <div class="site-header">
     <h1>Dataflow</h1>
-    <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="GitHub" src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
+    <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="GitHub"
+                                                                                   src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
 </div>
 
 <nav class="docs-nav">
@@ -25,30 +26,21 @@
 <h1>Interactive Web Audio Tutorial</h1>
 
 <div class="intro">
-    <p>Explore the Web Audio API interactively! This example demonstrates a connected audio graph with real-time visualization. Press <strong>Play</strong> to start the audio context and hear sound flow through the nodes.</p>
-    <p><a href="https://github.com/bodar/bodar.ts/blob/master/packages/dataflow/docs/examples/audio-tutorial.html">View source on GitHub</a></p>
+    <p>Explore the Web Audio API interactively! This example demonstrates a connected audio graph with real-time
+        visualization. Press <strong>Play</strong> to start the audio context and hear sound flow through the nodes.</p>
+    <p><a href="https://github.com/bodar/bodar.ts/blob/master/packages/dataflow/docs/examples/audio-tutorial.html">View
+        source on GitHub</a></p>
 </div>
 
 <!-- Single import for page -->
 <script type="module" is="reactive">
-    import {display, event, view} from "@bodar/dataflow/runtime.ts";
-</script>
-
-<!-- Waveform generator - yields time-domain data from analyser -->
-<script type="module" is="reactive">
-    function* waveform(analyser) {
-        const bufferLength = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-        while (true) {
-            analyser.getByteTimeDomainData(dataArray);
-            yield dataArray;
-        }
-    }
+    import {display, event, view, input} from "@bodar/dataflow/runtime.ts";
 </script>
 
 <!-- AudioContext setup -->
 <script type="module" is="reactive">
     const context = new AudioContext();
+    context.suspend();
     const state = event(context, 'statechange', () => context.state, context.state);
 </script>
 
@@ -62,13 +54,15 @@
                     <dd>{state}</dd>
                     <dt>Sample Rate</dt>
                     <dd>{context.sampleRate} Hz</dd>
+                    <dt>Output Latency</dt>
+                    <dd>{(context.outputLatency * 1000).toFixed(1)} ms</dd>
                 </dl>
             </script>
         </div>
         <script type="module" is="reactive">
             state === 'running'
-                ? <button class="play-button playing" onclick={() => context.suspend()}>Stop</button>
-                : <button class="play-button" onclick={() => context.resume()}>Play</button>
+                ? <button class="play-button playing" onclick={() => context.suspend()}>Suspend</button>
+                : <button class="play-button" onclick={() => context.resume()}>Resume</button>
         </script>
     </div>
 
@@ -80,7 +74,8 @@
                 <h3>OscillatorNode</h3>
             </div>
             <div class="node-body">
-                <p class="node-description">The fundamental sound source. Choose a waveform <code>type</code>, set the <code>frequency</code> in Hz, and fine-tune with <code>detune</code> in cents.</p>
+                <p class="node-description">The fundamental sound source. Choose a waveform <code>type</code>, set the
+                    <code>frequency</code> in Hz, and fine-tune with <code>detune</code> in cents.</p>
                 <div class="node-controls">
                     <div class="control-row">
                         <label for="oscillator_type">Type</label>
@@ -96,22 +91,24 @@
                     <div class="control-row">
                         <label for="oscillator_frequency">Frequency</label>
                         <script type="module" is="reactive">
-                            const oscillator_frequency = view(<input id="oscillator_frequency" type="range" min="20" max="2000" step="1"
-                                   data-key={crypto.randomUUID()}
-                                   value={oscillator.frequency.value}
-                                   oninput={ev => oscillator.frequency.value = ev.target.value}/>);
+                            const oscillator_frequency = view(<input id="oscillator_frequency" type="range" min="20"
+                                                                     max="2000" step="1"
+                                                                     data-key={crypto.randomUUID()}
+                                                                     value={oscillator.frequency.value}
+                                                                     oninput={ev => oscillator.frequency.value = ev.target.value}/>);
                         </script>
                         <script type="module" is="reactive">
-                            <span id="oscillator_frequency_span" class="value">{Math.round(oscillator_frequency)} Hz</span>
+                            <span id="oscillator_frequency_span"
+                                  class="value">{Math.round(oscillator_frequency)} Hz</span>
                         </script>
                     </div>
                     <div class="control-row">
                         <label>Detune</label>
                         <script type="module" is="reactive">
                             const oscillator_detune = view(<input type="range" min="-100" max="100" step="1"
-                                   data-key={crypto.randomUUID()}
-                                   value={oscillator.detune.value}
-                                   oninput={ev => oscillator.detune.value = ev.target.value}/>);
+                                                                  data-key={crypto.randomUUID()}
+                                                                  value={oscillator.detune.value}
+                                                                  oninput={ev => oscillator.detune.value = ev.target.value}/>);
                         </script>
                         <script type="module" is="reactive">
                             <span class="value">{Math.round(oscillator_detune)} cents</span>
@@ -126,7 +123,7 @@
             const oscillator = new OscillatorNode(context, {type: oscillator_type});
             Reflect.set(oscillator, Symbol.dispose, () => oscillator.disconnect());
             oscillator.connect(filter);
-            oscillator.start();
+            if (state === 'running') oscillator.start();
         </script>
 
         <div class="node-connector"></div>
@@ -137,7 +134,8 @@
                 <h3>BiquadFilterNode</h3>
             </div>
             <div class="node-body">
-                <p class="node-description">Shape the tone with various filter types. <code>frequency</code> sets the cutoff, <code>Q</code> controls resonance. <code>gain</code> only affects lowshelf, highshelf, and peaking filters.</p>
+                <p class="node-description">Shape the tone with various filter types. <code>frequency</code> sets the
+                    cutoff, <code>Q</code> controls resonance, and <code>gain</code> boosts or cuts frequencies.</p>
                 <div class="node-controls">
                     <div class="control-row">
                         <label>Type</label>
@@ -158,38 +156,44 @@
                         <label>Frequency</label>
                         <script type="module" is="reactive">
                             const filter_frequency = view(<input type="range" min="20" max="20000" step="1"
-                                   data-key={crypto.randomUUID()}
-                                   value={filter.frequency.value}
-                                   oninput={ev => filter.frequency.value = ev.target.value}/>);
+                                                                 data-key={crypto.randomUUID()}
+                                                                 value={filter.frequency.value}
+                                                                 oninput={ev => filter.frequency.value = ev.target.value}/>);
                         </script>
                         <script type="module" is="reactive">
                             <span class="value">{Math.round(filter_frequency)} Hz</span>
                         </script>
                     </div>
-                    <div class="control-row">
+                    <div class="control-row" id="filter-q">
                         <label>Q</label>
                         <script type="module" is="reactive">
-                            const filter_q = view(<input type="range" min="0.1" max="20" step="0.1"
-                                   data-key={crypto.randomUUID()}
-                                   value={filter.Q.value}
-                                   oninput={ev => filter.Q.value = ev.target.value}/>);
+                            const q = view(<input type="range" min="0.1" max="20" step="0.1"
+                                                  data-key={crypto.randomUUID()}
+                                                  value={filter.Q.value}
+                                                  oninput={ev => filter.Q.value = ev.target.value}/>);
                         </script>
                         <script type="module" is="reactive">
-                            <span class="value">{Number(filter_q).toFixed(1)}</span>
+                            <span class="value">{Number(q).toFixed(1)}</span>
                         </script>
                     </div>
-                    <div class="control-row">
+                    <script type="module" is="reactive">
+                        document.getElementById('filter-q').hidden = ['lowshelf', 'highshelf'].includes(filter_type);
+                    </script>
+                    <div class="control-row" id="filter-gain">
                         <label>Gain</label>
                         <script type="module" is="reactive">
-                            const filter_gain = view(<input type="range" min="-40" max="40" step="1"
-                                   data-key={crypto.randomUUID()}
-                                   value={filter.gain.value}
-                                   oninput={ev => filter.gain.value = ev.target.value}/>);
+                            const g = view(<input type="range" min="-40" max="40" step="1"
+                                                  data-key={crypto.randomUUID()}
+                                                  value={filter.gain.value}
+                                                  oninput={ev => filter.gain.value = ev.target.value}/>);
                         </script>
                         <script type="module" is="reactive">
-                            <span class="value">{Math.round(filter_gain)} dB</span>
+                            <span class="value">{Math.round(g)} dB</span>
                         </script>
                     </div>
+                    <script type="module" is="reactive">
+                        document.getElementById('filter-gain').hidden = !['lowshelf', 'highshelf', 'peaking'].includes(filter_type);
+                    </script>
                 </div>
             </div>
         </div>
@@ -198,7 +202,118 @@
         <script type="module" is="reactive">
             const filter = new BiquadFilterNode(context, {type: filter_type});
             Reflect.set(filter, Symbol.dispose, () => filter.disconnect());
-            filter.connect(gain);
+            filter.connect(panner);
+        </script>
+
+        <div class="node-connector"></div>
+
+        <!-- StereoPannerNode -->
+        <div class="audio-node stereopanner">
+            <div class="node-header">
+                <h3>StereoPannerNode</h3>
+            </div>
+            <div class="node-body">
+                <p class="node-description">Position the sound in the stereo field. <code>pan</code> ranges from -1
+                    (full left) to 1 (full right).</p>
+                <div class="node-controls">
+                    <div class="control-row">
+                        <label>Pan</label>
+                        <script type="module" is="reactive">
+                            const pan_value = view(<input type="range" min="-1" max="1" step="0.01"
+                                                          value={panner.pan.value}
+                                                          oninput={ev => panner.pan.value = ev.target.value}/>);
+                        </script>
+                        <script type="module" is="reactive">
+                            <span
+                                class="value">{pan_value < 0 ? `L ${Math.abs(pan_value * 100).toFixed(0)}%` : pan_value > 0 ? `R ${(pan_value * 100).toFixed(0)}%` : 'Center'}</span>
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- StereoPannerNode creation -->
+        <script type="module" is="reactive">
+            const panner = new StereoPannerNode(context);
+            Reflect.set(panner, Symbol.dispose, () => panner.disconnect());
+            panner.connect(compressor);
+        </script>
+
+        <div class="node-connector"></div>
+
+        <!-- DynamicsCompressorNode -->
+        <div class="audio-node compressor">
+            <div class="node-header">
+                <h3>DynamicsCompressorNode</h3>
+            </div>
+            <div class="node-body">
+                <p class="node-description">Reduces loud sounds and boosts quiet ones. <code>threshold</code> sets where
+                    compression begins, <code>ratio</code> controls intensity.</p>
+                <div class="node-controls">
+                    <div class="control-row">
+                        <label>Threshold</label>
+                        <script type="module" is="reactive">
+                            const comp_threshold = view(<input type="range" min="-100" max="0" step="1"
+                                                               value={compressor.threshold.value}
+                                                               oninput={ev => compressor.threshold.value = ev.target.value}/>);
+                        </script>
+                        <script type="module" is="reactive">
+                            <span class="value">{Math.round(comp_threshold)} dB</span>
+                        </script>
+                    </div>
+                    <div class="control-row">
+                        <label>Knee</label>
+                        <script type="module" is="reactive">
+                            const comp_knee = view(<input type="range" min="0" max="40" step="1"
+                                                          value={compressor.knee.value}
+                                                          oninput={ev => compressor.knee.value = ev.target.value}/>);
+                        </script>
+                        <script type="module" is="reactive">
+                            <span class="value">{Math.round(comp_knee)} dB</span>
+                        </script>
+                    </div>
+                    <div class="control-row">
+                        <label>Ratio</label>
+                        <script type="module" is="reactive">
+                            const comp_ratio = view(<input type="range" min="1" max="20" step="0.1"
+                                                           value={compressor.ratio.value}
+                                                           oninput={ev => compressor.ratio.value = ev.target.value}/>);
+                        </script>
+                        <script type="module" is="reactive">
+                            <span class="value">{Number(comp_ratio).toFixed(1)}:1</span>
+                        </script>
+                    </div>
+                    <div class="control-row">
+                        <label>Attack</label>
+                        <script type="module" is="reactive">
+                            const comp_attack = view(<input type="range" min="0" max="1" step="0.001"
+                                                            value={compressor.attack.value}
+                                                            oninput={ev => compressor.attack.value = ev.target.value}/>);
+                        </script>
+                        <script type="module" is="reactive">
+                            <span class="value">{(comp_attack * 1000).toFixed(0)} ms</span>
+                        </script>
+                    </div>
+                    <div class="control-row">
+                        <label>Release</label>
+                        <script type="module" is="reactive">
+                            const comp_release = view(<input type="range" min="0" max="1" step="0.01"
+                                                             value={compressor.release.value}
+                                                             oninput={ev => compressor.release.value = ev.target.value}/>);
+                        </script>
+                        <script type="module" is="reactive">
+                            <span class="value">{(comp_release * 1000).toFixed(0)} ms</span>
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DynamicsCompressorNode creation -->
+        <script type="module" is="reactive">
+            const compressor = new DynamicsCompressorNode(context);
+            Reflect.set(compressor, Symbol.dispose, () => compressor.disconnect());
+            compressor.connect(gain);
         </script>
 
         <div class="node-connector"></div>
@@ -209,14 +324,15 @@
                 <h3>GainNode</h3>
             </div>
             <div class="node-body">
-                <p class="node-description">Controls amplitude (volume). The <code>gain</code> value multiplies the signal: 0 = silence, 1 = full volume.</p>
+                <p class="node-description">Controls amplitude (volume). The <code>gain</code> value multiplies the
+                    signal: 0 = silence, 1 = full volume.</p>
                 <div class="node-controls">
                     <div class="control-row">
                         <label>Gain</label>
                         <script type="module" is="reactive">
                             const gain_value = view(<input type="range" min="0" max="1" step="0.01"
-                                   value={gain.gain.value}
-                                   oninput={ev => gain.gain.value = ev.target.value}/>);
+                                                           value={gain.gain.value}
+                                                           oninput={ev => gain.gain.value = ev.target.value}/>);
                         </script>
                         <script type="module" is="reactive">
                             <span class="value">{(gain_value * 100).toFixed(0)}%</span>
@@ -231,39 +347,7 @@
             const gain = new GainNode(context);
             gain.gain.value = 0.3;
             Reflect.set(gain, Symbol.dispose, () => gain.disconnect());
-            gain.connect(delay);
-        </script>
-
-        <div class="node-connector"></div>
-
-        <!-- DelayNode -->
-        <div class="audio-node delay">
-            <div class="node-header">
-                <h3>DelayNode</h3>
-            </div>
-            <div class="node-body">
-                <p class="node-description">Create echo effects. <code>delayTime</code> sets the delay in seconds.</p>
-                <div class="node-controls">
-                    <div class="control-row">
-                        <label>Delay Time</label>
-                        <script type="module" is="reactive">
-                            const delay_time = view(<input type="range" min="0" max="1" step="0.01"
-                                   value={delay.delayTime.value}
-                                   oninput={ev => delay.delayTime.value = ev.target.value}/>);
-                        </script>
-                        <script type="module" is="reactive">
-                            <span class="value">{(delay_time * 1000).toFixed(0)} ms</span>
-                        </script>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- DelayNode creation -->
-        <script type="module" is="reactive">
-            const delay = new DelayNode(context, {maxDelayTime: 2});
-            Reflect.set(delay, Symbol.dispose, () => delay.disconnect());
-            delay.connect(analyser);
+            gain.connect(analyser);
         </script>
 
         <div class="node-connector"></div>
@@ -274,10 +358,12 @@
                 <h3>AnalyserNode</h3>
             </div>
             <div class="node-body">
-                <p class="node-description">Provides real-time frequency and time-domain analysis data for visualization. The waveform below shows the audio signal.</p>
+                <p class="node-description">Provides real-time frequency and time-domain analysis data for
+                    visualization. The waveform below shows the audio signal.</p>
                 <div class="node-visualization">
                     <script type="module" is="reactive">
-                        const waveformCanvas = display(<canvas class="visualization-canvas" width="560" height="80"></canvas>);
+                        const waveformCanvas = display(<canvas class="visualization-canvas" width={width}
+                                                               height={Math.round(width / 6)}></canvas>);
                     </script>
                 </div>
             </div>
@@ -290,28 +376,34 @@
             analyser.connect(destination);
         </script>
 
-        <!-- Waveform generator -->
+        <!-- Waveform generator - yields time-domain data from analyser -->
         <script type="module" is="reactive">
-            const data = waveform(analyser);
+            function* waveform() {
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                while (state === 'running') {
+                    analyser.getByteTimeDomainData(dataArray);
+                    yield dataArray;
+                }
+            }
         </script>
 
         <!-- Waveform rendering -->
         <script type="module" is="reactive">
             {
-                const samples = data;
                 const ctx = waveformCanvas.getContext('2d');
                 const w = waveformCanvas.width;
                 const h = waveformCanvas.height;
 
-                ctx.fillStyle = '#0f172a';
+                ctx.fillStyle = '#f8fafc';
                 ctx.fillRect(0, 0, w, h);
                 ctx.lineWidth = 2;
-                ctx.strokeStyle = '#8b5cf6';
+                ctx.strokeStyle = '#4269d0';
                 ctx.beginPath();
 
-                const sliceWidth = w / samples.length;
-                for (let i = 0; i < samples.length; i++) {
-                    const v = samples[i] / 128.0;
+                const sliceWidth = w / waveform.length;
+                for (let i = 0; i < waveform.length; i++) {
+                    const v = waveform[i] / 128.0;
                     const y = v * h / 2;
                     if (i === 0) ctx.moveTo(0, y);
                     else ctx.lineTo(i * sliceWidth, y);
