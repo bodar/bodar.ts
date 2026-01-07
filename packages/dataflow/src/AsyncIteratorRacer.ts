@@ -16,24 +16,8 @@ export class AsyncIteratorRacer<K, V> {
     }
 
     set(key: K, iterator: AsyncIterator<V>): this {
-        if (this.iterators.has(key)) {
-            console.log('Racer.set called but old iterator found for key', key);
-            const oldIterator = this.iterators.get(key);
-            if (oldIterator!.return) {
-                console.log('Racer.set old iterator has return method, calling it');
-                oldIterator!.return?.({value: 'manual abort', done: true});
-            }
-            if (Reflect.has(oldIterator!, Symbol.dispose)) {
-                console.log('Racer.set old iterator has Symbol.dispose, calling it');
-                Reflect.get(oldIterator!, Symbol.dispose)();
-            }
-            if (Reflect.has(oldIterator!, Symbol.asyncDispose)) {
-                console.log('Racer.set old iterator has Symbol.asyncDispose. Calling it');
-                Reflect.get(oldIterator!, Symbol.asyncDispose)();
-            }
-        }
-        if (this.pending.has(key)) console.log('Racer.set called but pending found for key', key);
-        if (this.resolved.has(key)) console.log('Racer.set called but resolved found for key', key);
+        if (this.pending.has(key)) this.pending.delete(key);
+        if (this.resolved.has(key)) this.resolved.delete(key);
         this.iterators.set(key, iterator);
         return this;
     }
@@ -42,10 +26,12 @@ export class AsyncIteratorRacer<K, V> {
         for (const [key, iterator] of this.iterators) {
             if (!this.pending.has(key) && !this.resolved.has(key)) {
                 this.pending.set(key, iterator.next().then(result => {
+                    if (this.iterators.get(key) !== iterator) return;
                     this.pending.delete(key);
                     result.done ? this.iterators.delete(key) : this.resolved.set(key, result);
                     this.signal.resolve();
                 }, error => {
+                    if (this.iterators.get(key) !== iterator) return;
                     this.pending.delete(key);
                     this.iterators.delete(key);
                     this.signal.reject(error);

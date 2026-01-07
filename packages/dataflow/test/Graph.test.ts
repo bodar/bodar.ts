@@ -164,23 +164,17 @@ describe("graph", () => {
         assertThat(graph.dependents(a), equals([b, c, d]));
     });
 
-    test.only("bug", async () => {
+    test("when a dependency returns a mutable, and the parent dependency changes, the old mutable is disposed and a new one is created", async () => {
         const graph = new Graph();
         const oscillator_type = mutable('sine');
         graph.define('oscillator_type', () => oscillator_type);
-        graph.define('oscillator', (oscillator_type: string) => {
-            console.log('New oscillator with type', oscillator_type);
-            return `oscillator(${oscillator_type})`;
-        });
+        graph.define('oscillator', (oscillator_type: string) =>
+            `oscillator(${oscillator_type})`);
         let oscillator_frequency: Mutable<number>;
-        graph.define('oscillator_frequency', (oscillator: string) => {
-            console.log('New oscillator_frequency', oscillator, oscillator.length);
-            return oscillator_frequency = mutable(oscillator.length * 440);
-        });
-        const {oscillator_frequency_span} = graph.define('oscillator_frequency_span', (oscillator_frequency: number) => {
-            console.log('New oscillator_frequency span', oscillator_frequency);
-            return `${oscillator_frequency} Hz`;
-        });
+        graph.define('oscillator_frequency', (oscillator: string) =>
+            oscillator_frequency = mutable(oscillator.length * 440));
+        const {oscillator_frequency_span} = graph.define('oscillator_frequency_span', (oscillator_frequency: number) =>
+            `${oscillator_frequency} Hz`);
         const iterator = oscillator_frequency_span[Symbol.asyncIterator]();
         expect(await iterator.next()).toEqual({value: '7040 Hz', done: false});
         oscillator_frequency!.value++;
@@ -203,7 +197,7 @@ describe("graph", () => {
             });
             const controllers: AbortController[] = [];
             const {node} = graph.define('node', (datasource: number) => {
-                void(datasource);
+                void (datasource);
                 const controller = new AbortController();
                 controllers.push(controller);
                 return controller;
@@ -314,14 +308,13 @@ describe("graph", () => {
             expect(disposed).toEqual(0);
             source.value = 10;
             expect(disposed).toEqual(0);
-            // Ideally this would be 30 here but because the pull is eager, each iterator locks
-            // in the next value before the input can bubble up (it's a race condition)
-            // If the result was async the source could beat it
-            expect(await iterator.next()).toEqual({done: false, value: 3});
-            expect(disposed).toEqual(1);
+            // The old iterator's pending result is discarded when the new input arrives.
+            // The count++ already happened (count went from 3 to 4), so new generator starts with count=4.
             expect(await iterator.next()).toEqual({done: false, value: 40});
             expect(disposed).toEqual(1);
             expect(await iterator.next()).toEqual({done: false, value: 50});
+            expect(disposed).toEqual(1);
+            expect(await iterator.next()).toEqual({done: false, value: 60});
             expect(disposed).toEqual(1);
         });
     });
