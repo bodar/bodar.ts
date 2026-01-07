@@ -291,34 +291,34 @@
         </script>
 
         <!-- Waveform generator -->
-<!--        <script type="module" is="reactive">-->
-<!--            const data = waveform(analyser);-->
-<!--        </script>-->
+        <script type="module" is="reactive">
+            const data = waveform(analyser);
+        </script>
 
-<!--        &lt;!&ndash; Waveform rendering &ndash;&gt;-->
-<!--        <script type="module" is="reactive">-->
-<!--            {-->
-<!--                const samples = data;-->
-<!--                const ctx = waveformCanvas.getContext('2d');-->
-<!--                const w = waveformCanvas.width;-->
-<!--                const h = waveformCanvas.height;-->
+        <!-- Waveform rendering -->
+        <script type="module" is="reactive">
+            {
+                const samples = data;
+                const ctx = waveformCanvas.getContext('2d');
+                const w = waveformCanvas.width;
+                const h = waveformCanvas.height;
 
-<!--                ctx.fillStyle = '#0f172a';-->
-<!--                ctx.fillRect(0, 0, w, h);-->
-<!--                ctx.lineWidth = 2;-->
-<!--                ctx.strokeStyle = '#8b5cf6';-->
-<!--                ctx.beginPath();-->
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(0, 0, w, h);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#8b5cf6';
+                ctx.beginPath();
 
-<!--                const sliceWidth = w / samples.length;-->
-<!--                for (let i = 0; i < samples.length; i++) {-->
-<!--                    const v = samples[i] / 128.0;-->
-<!--                    const y = v * h / 2;-->
-<!--                    if (i === 0) ctx.moveTo(0, y);-->
-<!--                    else ctx.lineTo(i * sliceWidth, y);-->
-<!--                }-->
-<!--                ctx.stroke();-->
-<!--            }-->
-<!--        </script>-->
+                const sliceWidth = w / samples.length;
+                for (let i = 0; i < samples.length; i++) {
+                    const v = samples[i] / 128.0;
+                    const y = v * h / 2;
+                    if (i === 0) ctx.moveTo(0, y);
+                    else ctx.lineTo(i * sliceWidth, y);
+                }
+                ctx.stroke();
+            }
+        </script>
 
         <div class="node-connector"></div>
 
