@@ -3,22 +3,36 @@
  * */
 
 /** Converts a callback into an AsyncIterator that terminates on undefined */
-export async function* observe<T>(init: (notify: (t: T | undefined) => any) => any, value?: T, terminate: (t: T | undefined) => boolean = t => t === undefined): AsyncGenerator<T> {
-    let {promise, resolve} = Promise.withResolvers<T>();
-    // Must close over the resolve variable to see it change
-    const dispose = init((v => resolve(value = v)));
+export function observe<T>(init: (notify: (t: T | undefined) => any) => any, value?: T, terminate: (t: T | undefined) => boolean = t => t === undefined): AsyncGenerator<T> {
+    let signal = Promise.withResolvers<T>()
 
-    try {
-        if (value !== undefined) yield value;
+    async function* generator(): AsyncGenerator<T> {
+        // Must close over the signal variable to see it change
+        const dispose = init((v => signal.resolve(value = v)));
 
-        while (true) {
-            await promise;
-            // Must create new promise before yielding otherwise we miss any synchronous notifications
-            ({promise, resolve} = Promise.withResolvers<T>());
-            if (terminate(value)) break;
-            yield value!;
+        try {
+            if (value !== undefined) yield value;
+
+            while (true) {
+                await signal.promise;
+                // Must create new promise before yielding otherwise we miss any synchronous notifications
+                signal = Promise.withResolvers<T>();
+                if (terminate(value)) break;
+                yield value!;
+            }
+        } finally {
+            if (typeof dispose === 'function' && dispose.length === 0) await dispose();
         }
-    } finally {
-        if (typeof dispose === 'function' && dispose.length === 0) dispose();
     }
+
+    // Make generator interruptible even if already awaiting
+    const instance = generator();
+    const originalReturn = instance.return;
+    Reflect.set(instance, 'return', function (returnValue?: any): Promise<IteratorResult<T>> {
+        terminate = () => true;
+        signal.resolve?.(undefined);
+        return originalReturn.call(instance, returnValue);
+    });
+
+    return instance;
 }
