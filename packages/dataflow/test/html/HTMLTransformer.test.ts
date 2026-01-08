@@ -141,4 +141,50 @@ const a = 1;
 return {a};
 });`)}</script></body>`);
     });
+
+    test('supports custom type transformers', async () => {
+        const transformer = new HTMLTransformer({
+            rewriter: new HTMLRewriter(),
+            typeTransformers: {
+                'sql': (content, attributes, key) => `const ${key}_result = executeSql(\`${content}\`);`
+            }
+        });
+        const result = transformer.transform('<body><script type="sql" is="reactive" id="query">SELECT * FROM users</script></body>');
+        // Transformer converts SQL to JS, which then gets parsed for inputs/outputs
+        expect(result).toContain('_runtime_.graph.define("query",["executeSql"],["query_result"]');
+        expect(result).toContain('const query_result = executeSql(`SELECT * FROM users`);');
+    });
+
+    test('type transformer receives attributes and key', async () => {
+        let receivedContent: string | undefined;
+        let receivedAttributes: Map<string, string> | undefined;
+        let receivedKey: string | undefined;
+
+        const transformer = new HTMLTransformer({
+            rewriter: new HTMLRewriter(),
+            typeTransformers: {
+                'custom': (content, attributes, key) => {
+                    receivedContent = content;
+                    receivedAttributes = attributes;
+                    receivedKey = key;
+                    return 'const x = 1;';
+                }
+            }
+        });
+        transformer.transform('<body><script type="custom" is="reactive" id="mykey" data-foo="bar">some content</script></body>');
+
+        expect(receivedContent).toBe('some content');
+        expect(receivedKey).toBe('mykey');
+        expect(receivedAttributes?.get('type')).toBe('custom');
+        expect(receivedAttributes?.get('data-foo')).toBe('bar');
+    });
+
+    test('unregistered types pass through as JavaScript', async () => {
+        const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
+        const result = transformer.transform('<body><script type="unknown" is="reactive">const a = 1;</script></body>');
+        expect(result).toBe(`<body><script type="module" is="reactive-runtime" id="dmyfzn_1">${scriptTemplate({scriptId: 'dmyfzn_1', idle: false},`_runtime_.graph.define("vge10p_0",[],["a"],() => {
+const a = 1;
+return {a};
+});`)}</script></body>`);
+    });
 });

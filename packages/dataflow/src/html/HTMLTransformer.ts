@@ -22,6 +22,9 @@ export interface HTMLTransformerSelectors {
     end: string;
 }
 
+/** Function that transforms script content before parsing */
+export type TypeTransformer = (content: string, attributes: Map<string, string>, key: string) => string;
+
 /** Dependencies required by HTMLTransformer */
 export interface HTMLTransformerDependencies {
     rewriter: HTMLRewriter;
@@ -30,6 +33,7 @@ export interface HTMLTransformerDependencies {
     selectors?: Partial<HTMLTransformerSelectors>;
     idGenerator?: IdGenerator;
     idle?: boolean;
+    typeTransformers?: Record<string, TypeTransformer>;
 }
 
 /** Default CSS selectors for head, reactive scripts, and body/islands */
@@ -43,6 +47,7 @@ export const DefaultSelectors: HTMLTransformerSelectors = {
 export class HTMLTransformer {
     public idGenerator: IdGenerator;
     public idle: boolean;
+    private typeTransformers: Record<string, TypeTransformer>;
 
     constructor(private deps: HTMLTransformerDependencies) {
         const selectors = {...DefaultSelectors, ...(deps.selectors ?? {})} as HTMLTransformerSelectors;
@@ -52,6 +57,7 @@ export class HTMLTransformer {
         this.deps.rewriter.on(selectors.end, new EndTransformer(this, bundler));
         this.idGenerator = this.deps.idGenerator ?? new CountingIdGenerator();
         this.idle = !!this.deps.idle;
+        this.typeTransformers = this.deps.typeTransformers ?? {};
     }
 
     transform(input: Response | Blob | Bun.BufferSource): Response;
@@ -68,8 +74,11 @@ export class HTMLTransformer {
     }
 
     addScript(javascript: string, attributes: Map<string, string>): NodeDefinition {
-        const key = attributes.get('id') ?? this.idGenerator.generate(javascript)
-        const definition = NodeDefinition.parse(javascript, key);
+        const key = attributes.get('id') ?? this.idGenerator.generate(javascript);
+        const type = attributes.get('type') ?? 'module';
+        const transformer = this.typeTransformers[type];
+        const transformed = transformer ? transformer(javascript, attributes, key) : javascript;
+        const definition = NodeDefinition.parse(transformed, key);
         this.definitions[this.definitions.length - 1].push(definition);
         return definition;
     }
