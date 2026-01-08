@@ -4,7 +4,6 @@ import {findUnresolvedReferences} from "../javascript/findUnresolvedReferences.t
 import {findTopLevelDeclarations} from "../javascript/findTopLevelDeclarations.ts";
 import {isSingleExpression} from "../javascript/isSingleExpression.ts";
 import {hasTopLevelAwait} from "../javascript/findTopLevelAwaits.ts";
-import {type IdGenerator, SimpleHashGenerator} from "../IdGenerator.ts";
 
 export interface SerializeOptions {
     stripDisplay?: boolean;
@@ -26,8 +25,7 @@ export class NodeDefinition {
     ) {
     }
 
-    static parse(javascript: string, id?: string, idGenerator: IdGenerator = SimpleHashGenerator): NodeDefinition {
-        const key = id || idGenerator.generate(javascript);
+    static parse(javascript: string, key: string): NodeDefinition {
         try {
             const program = processJSX(parseScript(javascript));
             const inputs = findUnresolvedReferences(program);
@@ -65,14 +63,6 @@ export class NodeDefinition {
         const specifierStrings = entries.map(([, imp]) => imp.specifier);
         const importStrings = entries.map(([source]) => `import('${source}')`);
         return `const [${specifierStrings.join(', ')}] = await Promise.all([${importStrings.join(', ')}]);`;
-    }
-
-    isSingleExpression(): boolean {
-        return this._singleExpression;
-    }
-
-    isLambda(): boolean {
-        return this.isSingleExpression() && this.outputs.length === 0 && this.imports.isEmpty();
     }
 
     isAsync(options?: SerializeOptions): boolean {

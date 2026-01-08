@@ -20,12 +20,9 @@ export async function renderAndExecute(htmlParser: (html: string) => (Window & t
     const g = chain(browser, global)
 
     const module = browser.document.querySelector('script[type=module][is=reactive-runtime]')!;
-    const definition = NodeDefinition.parse(module.textContent);
+    const definition = NodeDefinition.parse(module.textContent, '');
     const fun = definition.toFunction();
-    const {_runtime_} = await fun(...definition.inputs.map(i => {
-        if (i === 'globalThis') return g;
-        return Reflect.get(g, i);
-    }));
+    const {_runtime_} = await fun(...definition.inputs.map(i => i === 'globalThis' ? g : Reflect.get(g, i)));
     await new Promise(resolve => setTimeout(resolve, 0));
     return {browser, idle: _runtime_.idle, graph: _runtime_.graph};
 }

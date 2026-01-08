@@ -67,8 +67,9 @@ export class HTMLTransformer {
         this.definitions.push([]);
     }
 
-    addScript(javascript: string, id?: string): NodeDefinition {
-        const definition = NodeDefinition.parse(javascript, id, this.idGenerator);
+    addScript(javascript: string, attributes: Map<string, string>): NodeDefinition {
+        const key = attributes.get('id') ?? this.idGenerator.generate(javascript)
+        const definition = NodeDefinition.parse(javascript, key);
         this.definitions[this.definitions.length - 1].push(definition);
         return definition;
     }
