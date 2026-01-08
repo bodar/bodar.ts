@@ -18,6 +18,7 @@
     "./api/view.ts": "./src/api/view.ts",
     "./api/width.ts": "./src/api/width.ts",
     "./BaseGraph.ts": "./src/BaseGraph.ts",
+    "./bundling/BunBundler.ts": "./src/bundling/BunBundler.ts",
     "./bundling/bundle.ts": "./src/bundling/bundle.ts",
     "./Graph.ts": "./src/Graph.ts",
     "./html/HTMLTransformer.ts": "./src/html/HTMLTransformer.ts",

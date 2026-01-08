@@ -1,3 +1,4 @@
+/** @module */
 import type {Bundler} from "./Bundler.ts";
 import {bundleText} from "./bundle.ts";
 
