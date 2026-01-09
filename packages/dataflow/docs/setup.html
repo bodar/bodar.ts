@@ -5,6 +5,7 @@
     <title>Setup - Dataflow</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="setup.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/intellij-light.min.css">
     <script type="importmap">
         {
@@ -32,74 +33,150 @@
 
 <h1>Setup</h1>
 
-<p>Dataflow transforms HTML containing <code>is="reactive"</code> scripts into interactive pages. The transformation can happen at build time or runtime.</p>
+<p>Dataflow transforms HTML containing <code>is="reactive"</code> scripts into interactive pages. Configure your setup by selecting your runtime, module strategy, and transformation location.</p>
 
-<h2>Installation</h2>
+<!-- Import runtime APIs -->
+<script type="module" is="reactive">
+    import {display, view, mutable} from '@bodar/dataflow/runtime.ts';
+</script>
 
-<div class="example">
-    <pre><code class="language-bash">npx jsr add @bodar/dataflow
+<!-- Step 1: Runtime Selection -->
+<section class="setup-section">
+    <h2>1. Runtime Environment</h2>
+    <p>Where will you run the transformation?</p>
 
-bunx jsr add @bodar/dataflow
+    <script type="module" is="reactive">
+        const runtime = mutable('node');
 
-deno add jsr:@bodar/dataflow
+        const runtimes = [
+            {id: 'node', name: 'Node.js', logo: 'nodedotjs'},
+            {id: 'bun', name: 'Bun', logo: 'bun'},
+            {id: 'deno', name: 'Deno', logo: 'deno'},
+            {id: 'browser', name: 'Browser', logo: 'googlechrome'}
+        ];
 
-pnpm i jsr:@bodar/dataflow
+        display(<div class="selector-grid">
+            {runtimes.map(rt =>
+                <label class="selector-card">
+                    <input type="radio" name="runtime" value={rt.id}
+                           onchange={() => runtime.value = rt.id}/>
+                    <div class="card-content">
+                        <img src={`https://cdn.simpleicons.org/${rt.logo}`} alt={rt.name} class="runtime-logo"/>
+                        <span class="card-label">{rt.name}</span>
+                    </div>
+                </label>
+            )}
+        </div>);
+    </script>
+</section>
 
-yarn add jsr:@bodar/dataflow</code></pre>
-</div>
+<!-- Step 2: Module Strategy Selection -->
+<section class="setup-section">
+    <h2>2. Module Strategy</h2>
+    <p>How should imports be resolved?</p>
 
-<p>For browsers, use an import map with the pre-minified runtime. See <a href="#service-worker">Service Worker</a> below.</p>
+    <script type="module" is="reactive">
+        const strategy = mutable('importmap');
 
-<h2 id="choosing-your-approach">Choosing Your Approach</h2>
+        const strategies = [
+            {id: 'bundler', name: 'Bundler', desc: 'Bundle and minify reactive imports with BunBundler', requiresBun: true},
+            {id: 'importmap', name: 'Import Map', desc: 'Use pre-minified runtime via import map (~11KB gzipped)'},
+            {id: 'byo', name: 'Bring Your Own', desc: 'You manage your own import map or bundling'}
+        ];
 
-<p>Each deployment option has different trade-offs:</p>
+        display(<div class="selector-list">
+            {strategies.map(s => {
+                const disabled = s.requiresBun && runtime !== 'bun';
+                return <label class={`selector-option ${disabled ? 'disabled' : ''}`}>
+                    <input type="radio" name="strategy" value={s.id}
+                           disabled={disabled}
+                           onchange={() => strategy.value = s.id}/>
+                    <div class="option-content">
+                        <strong>{s.name}</strong>
+                        <span class="option-desc">{s.desc}</span>
+                        {disabled ? <span class="option-requires">Requires Bun runtime</span> : ''}
+                    </div>
+                </label>;
+            })}
+        </div>);
+    </script>
+</section>
 
-<table>
-    <thead>
-    <tr>
-        <th>Approach</th>
-        <th>Best For</th>
-        <th>Considerations</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td><a href="#build-time">Build Time</a></td>
-        <td>Static sites</td>
-        <td>Requires build step; can use bundler or import map</td>
-    </tr>
-    <tr>
-        <td><a href="#bun-serve">Bun.serve</a></td>
-        <td>Full-stack TypeScript apps</td>
-        <td>Can use bundler or import map</td>
-    </tr>
-    <tr>
-        <td><a href="#cloudflare-workers">Cloudflare Workers</a></td>
-        <td>Any backend language, edge deployment</td>
-        <td>Import map only (no bundler)</td>
-    </tr>
-    <tr>
-        <td><a href="#service-worker">Service Worker</a></td>
-        <td>No build or server available</td>
-        <td>Larger runtime; doesn't transform initial page load</td>
-    </tr>
-    </tbody>
-</table>
+<!-- Step 3: Transformation Location -->
+<section class="setup-section">
+    <h2>3. Transformation Location</h2>
+    <p>When should HTML be transformed?</p>
 
-<div class="note">
-    <strong>Islands and Bundling:</strong> When using <a href="islands.html">reactive islands</a>, prefer import maps over bundling. With a bundler, each island gets its own copy of the runtime. With an import map, all islands share the same pre-minified runtime (<script type="module" is="reactive">`${runtime.compressed} (${runtime.uncompressed} uncompressed)`</script>).
-</div>
+    <script type="module" is="reactive">
+        const location = mutable('build');
 
-<h2 id="build-time">Build Time</h2>
+        const locations = [
+            {id: 'build', name: 'Build Time', desc: 'Static site generation or build pipelines'},
+            {id: 'server', name: 'Server', desc: 'Transform on each request (Bun.serve, Node, etc.)'},
+            {id: 'edge', name: 'Edge', desc: 'Cloudflare Workers or other edge runtimes', disabledWhen: () => strategy === 'bundler', requiresMsg: 'Requires Import Map or BYO'},
+            {id: 'browser', name: 'Browser', desc: 'Service Worker for progressive enhancement', disabledWhen: () => runtime !== 'browser', requiresMsg: 'Requires Browser runtime'}
+        ];
 
-<p>For static site generation or build pipelines, use <code>HTMLTransformer</code> directly:</p>
+        display(<div class="selector-list">
+            {locations.map(loc => {
+                const disabled = loc.disabledWhen?.() ?? false;
+                return <label class={`selector-option ${disabled ? 'disabled' : ''}`}>
+                    <input type="radio" name="location" value={loc.id}
+                           disabled={disabled}
+                           onchange={() => location.value = loc.id}/>
+                    <div class="option-content">
+                        <strong>{loc.name}</strong>
+                        <span class="option-desc">{loc.desc}</span>
+                        {disabled ? <span class="option-requires">{loc.requiresMsg}</span> : ''}
+                    </div>
+                </label>;
+            })}
+        </div>);
+    </script>
+</section>
 
-<h3>With Bundler</h3>
+<!-- Installation -->
+<section class="setup-section">
+    <h2>Installation</h2>
 
-<p>Use <code>BunBundler</code> to bundle and minify reactive imports:</p>
+    <script type="module" is="reactive">
+        const installCommands = {
+            node: 'npx jsr add @bodar/dataflow',
+            bun: 'bunx jsr add @bodar/dataflow',
+            deno: 'deno add jsr:@bodar/dataflow',
+            browser: '# No server-side installation needed for browser-only setup'
+        };
 
-<div class="example">
-    <pre><code class="language-javascript">import {HTMLTransformer} from '@bodar/dataflow';
+        const installCode = installCommands[runtime];
+
+        display(<div class="code-block">
+            <div class="code-header">
+                <span class="code-lang">bash</span>
+                <button class="copy-btn" type="button" onclick={(e) => {
+                    navigator.clipboard.writeText(installCode);
+                    e.target.textContent = 'Copied!';
+                    setTimeout(() => e.target.textContent = 'Copy', 2000);
+                }}>Copy</button>
+            </div>
+            <pre><code class="language-bash">{installCode}</code></pre>
+        </div>);
+    </script>
+
+    <script type="module" is="reactive">
+        <p hidden={runtime === 'browser'}>For browsers, use an import map with the pre-minified runtime (see code example below).</p>
+    </script>
+</section>
+
+<!-- Code Example -->
+<section class="setup-section">
+    <h2>Code Example</h2>
+
+    <script type="module" is="reactive">
+        // Code templates based on configuration
+        const getCode = () => {
+            // Build time with bundler (Bun only)
+            if (location === 'build' && strategy === 'bundler') {
+                return `import {HTMLTransformer} from '@bodar/dataflow';
 import {BunBundler} from '@bodar/dataflow/bundling/BunBundler.ts';
 
 const transformer = new HTMLTransformer({
@@ -107,15 +184,12 @@ const transformer = new HTMLTransformer({
     bundler: new BunBundler()
 });
 
-const output = transformer.transform(htmlString);</code></pre>
-</div>
+const output = await transformer.transform(htmlString);`;
+            }
 
-<h3>With Import Map</h3>
-
-<p>For pages using <a href="islands.html">reactive islands</a>, use an import map to share the runtime across islands:</p>
-
-<div class="example">
-    <pre><code class="language-javascript">import {HTMLTransformer} from '@bodar/dataflow';
+            // Build time with import map
+            if (location === 'build' && strategy === 'importmap') {
+                return `import {HTMLTransformer} from '@bodar/dataflow';
 
 const importMap = {
     imports: {
@@ -128,23 +202,24 @@ const transformer = new HTMLTransformer({
     importMap
 });
 
-const output = transformer.transform(htmlString);</code></pre>
-</div>
+const output = await transformer.transform(htmlString);`;
+            }
 
-<div class="note">
-    <strong>Note:</strong> <code>HTMLTransformer</code> is stateful and should be created fresh for each transformation.
-</div>
+            // Build time with BYO
+            if (location === 'build' && strategy === 'byo') {
+                return `import {HTMLTransformer} from '@bodar/dataflow';
 
-<h2>Runtime with ReactiveHandler</h2>
+// No bundler or importMap - you manage modules yourself
+const transformer = new HTMLTransformer({
+    rewriter: new HTMLRewriter()
+});
 
-<p>For fetch-compatible systems, use <code>ReactiveHandler</code> middleware to automatically transform HTML responses. It handles the plumbing of checking content-type and status, and creates a fresh transformer per request.</p>
+const output = await transformer.transform(htmlString);`;
+            }
 
-<h3 id="bun-serve">Bun.serve</h3>
-
-<p>With Bun, you can use <code>BunBundler</code> to bundle and minify imports at runtime:</p>
-
-<div class="example">
-    <pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
+            // Server with bundler (Bun only)
+            if (location === 'server' && strategy === 'bundler') {
+                return `import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
 import {HTMLTransformer} from '@bodar/dataflow';
 import {BunBundler} from '@bodar/dataflow/bundling/BunBundler.ts';
 
@@ -156,17 +231,27 @@ const transformer = () => new HTMLTransformer({
 Bun.serve({
     fetch: ReactiveHandler(transformer, async (request) => {
         // Your existing handler logic
-        return new Response('&lt;html&gt;...&lt;/html&gt;', {
+        return new Response('<html>...</html>', {
             headers: {'content-type': 'text/html'}
         });
     })
-});</code></pre>
-</div>
+});`;
+            }
 
-<p>For pages using <a href="islands.html">reactive islands</a>, use an import map instead to share the runtime:</p>
+            // Server with import map
+            if (location === 'server' && strategy === 'importmap') {
+                const serverCode = runtime === 'bun'
+                    ? `Bun.serve({
+    fetch: ReactiveHandler(transformer, async (request) => {
+        return new Response('<html>...</html>', {
+            headers: {'content-type': 'text/html'}
+        });
+    })
+});`
+                    : `// Use with your HTTP framework
+const handler = ReactiveHandler(transformer, yourRequestHandler);`;
 
-<div class="example">
-    <pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
+                return `import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
 import {HTMLTransformer} from '@bodar/dataflow';
 
 const importMap = {
@@ -180,21 +265,27 @@ const transformer = () => new HTMLTransformer({
     importMap
 });
 
-Bun.serve({
-    fetch: ReactiveHandler(transformer, async (request) => {
-        return new Response('&lt;html&gt;...&lt;/html&gt;', {
-            headers: {'content-type': 'text/html'}
-        });
-    })
-});</code></pre>
-</div>
+${serverCode}`;
+            }
 
-<h3 id="cloudflare-workers">Cloudflare Workers</h3>
+            // Server with BYO
+            if (location === 'server' && strategy === 'byo') {
+                return `import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
+import {HTMLTransformer} from '@bodar/dataflow';
 
-<p>Cloudflare Workers run at the edge and work with any backend - your HTML can come from any language or framework. Use an import map pointing to the pre-minified runtime:</p>
+// No bundler or importMap - you manage modules yourself
+const transformer = () => new HTMLTransformer({
+    rewriter: new HTMLRewriter()
+});
 
-<div class="example">
-    <pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
+// Use with your HTTP framework
+const handler = ReactiveHandler(transformer, yourRequestHandler);`;
+            }
+
+            // Edge (import map or BYO only)
+            if (location === 'edge') {
+                if (strategy === 'importmap') {
+                    return `import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
 import {HTMLTransformer} from '@bodar/dataflow';
 
 const importMap = {
@@ -210,15 +301,26 @@ const transformer = () => new HTMLTransformer({
 
 export default {
     fetch: ReactiveHandler(transformer, fetch)
-};</code></pre>
-</div>
+};`;
+                } else {
+                    return `import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
+import {HTMLTransformer} from '@bodar/dataflow';
 
-<h3 id="service-worker">Service Worker</h3>
+// No bundler or importMap - you manage modules yourself
+const transformer = () => new HTMLTransformer({
+    rewriter: new HTMLRewriter()
+});
 
-<p>Transform HTML client-side for progressive enhancement and offline-first applications:</p>
+export default {
+    fetch: ReactiveHandler(transformer, fetch)
+};`;
+                }
+            }
 
-<div class="example">
-    <pre><code class="language-javascript">import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
+            // Browser (Service Worker)
+            if (location === 'browser') {
+                if (strategy === 'importmap') {
+                    return `import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
 import {HTMLTransformer} from '@bodar/dataflow';
 
 const importMap = {
@@ -236,39 +338,90 @@ const handler = ReactiveHandler(transformer, fetch);
 
 self.addEventListener('fetch', (event) => {
     event.respondWith(handler(event.request));
-});</code></pre>
-</div>
+});`;
+                } else {
+                    return `import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
+import {HTMLTransformer} from '@bodar/dataflow';
 
-<div class="note">
-    <strong>Considerations:</strong>
-    <ul>
-        <li>Service workers only transform pages <em>after</em> initial registration - the first page load won't be transformed unless you force a reload</li>
-        <li>The service worker bundle is larger because it includes the HTML transformer and JavaScript parser (Acorn)</li>
-        <li>Point the import map to your own bundled runtime rather than the CDN if you're already bundling the transformer</li>
-    </ul>
-</div>
+// No bundler or importMap - you manage modules yourself
+const transformer = () => new HTMLTransformer({
+    rewriter: new HTMLRewriter(),
+});
 
+const handler = ReactiveHandler(transformer, fetch);
+
+self.addEventListener('fetch', (event) => {
+    event.respondWith(handler(event.request));
+});`;
+                }
+            }
+
+            return '// Select options above to see the code example';
+        };
+
+        const code = getCode();
+
+        display(<div class="code-block">
+            <div class="code-header">
+                <span class="code-lang">javascript</span>
+                <button class="copy-btn" type="button" onclick={(e) => {
+                    navigator.clipboard.writeText(code);
+                    e.target.textContent = 'Copied!';
+                    setTimeout(() => e.target.textContent = 'Copy', 2000);
+                }}>Copy</button>
+            </div>
+            <pre><code class="language-javascript">{code}</code></pre>
+        </div>);
+    </script>
+</section>
+
+<!-- Notes based on selection -->
 <script type="module" is="reactive">
-    const runtime = fetch('https://dataflow.bodar.com/runtime.js')
-        .then(async r => {
-            const compressed = r.headers.get('content-length');
-            const uncompressed = (await r.text()).length;
-            return {
-                compressed: `${Math.round(compressed / 1024)}KB`,
-                uncompressed: `${Math.round(uncompressed / 1024)}KB`
-            };
-        });
+    <div class="note" hidden={strategy !== 'importmap'}>
+        <strong>Islands and Import Maps:</strong> When using <a href="islands.html">reactive islands</a>, import maps are preferred. All islands share the same pre-minified runtime (~11KB gzipped) rather than each island bundling its own copy.
+    </div>
 </script>
 
+<script type="module" is="reactive">
+    <div class="note" hidden={location !== 'browser'}>
+        <strong>Service Worker Considerations:</strong>
+        <ul>
+            <li>Service workers only transform pages <em>after</em> initial registration - the first page load won't be transformed unless you force a reload</li>
+            <li>The service worker bundle is larger because it includes the HTML transformer and JavaScript parser (Acorn)</li>
+        </ul>
+    </div>
+</script>
+
+<script type="module" is="reactive">
+    <div class="note" hidden={strategy !== 'byo'}>
+        <strong>Bring Your Own:</strong> This option is useful if you already have an import map in your HTML, or you're doing server-side rendering with tools like HTMX where you want to manage the import map in your template. Simply don't pass <code>bundler</code> or <code>importMap</code> to the transformer.
+    </div>
+</script>
+
+<script type="module" is="reactive">
+    <div class="note" hidden={!(strategy === 'bundler' && runtime === 'bun')}>
+        <strong>Note:</strong> <code>HTMLTransformer</code> is stateful and should be created fresh for each transformation. When using <code>ReactiveHandler</code>, pass a factory function that creates a new transformer.
+    </div>
+</script>
+
+<!-- Syntax highlighting -->
 <script type="module">
     import hljs from 'highlight.js/lib/core.js';
     import javascript from 'highlight.js/lib/languages/javascript';
     import bash from 'highlight.js/lib/languages/bash';
-    import xml from 'highlight.js/lib/languages/xml';
 
     hljs.registerLanguage('javascript', javascript);
     hljs.registerLanguage('bash', bash);
-    hljs.registerLanguage('xml', xml);
+
+    // Re-highlight when content changes
+    const observer = new MutationObserver(() => {
+        document.querySelectorAll('pre code:not(.hljs)').forEach(el => {
+            hljs.highlightElement(el);
+        });
+    });
+    observer.observe(document.body, {childList: true, subtree: true});
+
+    // Initial highlight
     hljs.highlightAll();
 </script>
 
