@@ -1,7 +1,7 @@
 /**
  * @module
  *
- * PostgreSQL database records interface using Bun's SQL client with type-safe query building.
+ * SQLite database records interface using Bun's SQLite with type-safe query building.
  */
 
 import type {Transducer} from "@bodar/totallylazy/transducers/Transducer.ts";
@@ -11,28 +11,29 @@ import {sql} from "../template/Sql.ts";
 import type {Records} from "../Records.ts";
 
 /**
- * A SQL client interface that can execute queries with parameters.
- * Compatible with Bun's SQL client.
+ * A minimal SQLite database interface compatible with Bun's SQLite Database.
  */
-export interface SQLClient {
-    (query: string, params: unknown[]): Promise<any> | AsyncIterable<any>;
+export interface SQLiteDatabase {
+    query(sql: string): {
+        all(...params: unknown[]): unknown[];
+    };
 }
 
 /**
- * PostgresRecords is a class that provides methods for interacting with a PostgreSQL database using Bun's SQL client.
+ * SQLiteRecords provides async methods for interacting with a SQLite database using Bun's SQLite.
  */
-export class PostgresRecords implements Records {
+export class SQLiteRecords implements Records {
     /**
-     * Creates a new instance of PostgresRecords.
+     * Creates a new instance of SQLiteRecords.
      *
-     * @param client - The SQL client instance (e.g., Bun's SQL client).
+     * @param db - The SQLite database instance (e.g., Bun's Database from bun:sqlite).
      */
-    constructor(private client: SQLClient) {
+    constructor(private db: SQLiteDatabase) {
     }
 
     /**
      * Retrieves data from the database based on the provided definition and transducers.
-     * 
+     *
      * @param definition - The definition of the data to retrieve.
      * @param transducers - Optional transducers to apply to the data.
      * @returns A promise that resolves to an iterable of the retrieved data.
@@ -45,13 +46,13 @@ export class PostgresRecords implements Records {
     async get<A, B, C, D, E, F>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>, c: Transducer<B, C> & Supported<B>, d: Transducer<C, D> & Supported<C>, e: Transducer<D, E> & Supported<D>, f: Transducer<E, F> & Supported<E>): Promise<Iterable<F>>;
     async get<A>(definition: Definition<A>, ...transducers: readonly Supported<A>[]): Promise<Iterable<A>> {
         const queryOptions = statement(sql(toSelect(definition, ...transducers)));
-        const result = await this.client(queryOptions.text, queryOptions.args);
-        return result;
+        const result = this.db.query(queryOptions.text).all(...queryOptions.args);
+        return result as A[];
     }
 
     /**
      * Executes a query on the database.
-     * 
+     *
      * @param definition - The definition of the query to execute.
      * @param transducers - Optional transducers to apply to the query results.
      * @returns An async iterable of the query results.
@@ -62,8 +63,11 @@ export class PostgresRecords implements Records {
     query<A, B, C, D>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>, c: Transducer<B, C> & Supported<B>, d: Transducer<C, D> & Supported<C>): AsyncIterable<D>;
     query<A, B, C, D, E>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>, c: Transducer<B, C> & Supported<B>, d: Transducer<C, D> & Supported<C>, e: Transducer<D, E> & Supported<D>): AsyncIterable<E>;
     query<A, B, C, D, E, F>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>, c: Transducer<B, C> & Supported<B>, d: Transducer<C, D> & Supported<C>, e: Transducer<D, E> & Supported<D>, f: Transducer<E, F> & Supported<E>): AsyncIterable<F>;
-    query<A>(definition: Definition<A>, ...transducers: readonly Supported<A>[]): AsyncIterable<A> {
+    async *query<A>(definition: Definition<A>, ...transducers: readonly Supported<A>[]): AsyncIterable<A> {
         const queryOptions = statement(sql(toSelect(definition, ...transducers)));
-        return this.client(queryOptions.text, queryOptions.args) as any;
+        const results = this.db.query(queryOptions.text).all(...queryOptions.args) as A[];
+        for (const row of results) {
+            yield row;
+        }
     }
 }
