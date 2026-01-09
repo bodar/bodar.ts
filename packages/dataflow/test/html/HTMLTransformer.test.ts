@@ -146,7 +146,7 @@ return {a};
         const transformer = new HTMLTransformer({
             rewriter: new HTMLRewriter(),
             typeTransformers: {
-                'sql': (content, attributes, key) => `const ${key}_result = executeSql(\`${content}\`);`
+                'sql': (content, _attributes, key) => `const ${key}_result = executeSql(\`${content}\`);`
             }
         });
         const result = transformer.transform('<body><script type="sql" is="reactive" id="query">SELECT * FROM users</script></body>');
