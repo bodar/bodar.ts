@@ -6,7 +6,7 @@
  */
 
 import {Sql} from "../template/Sql.ts";
-import {statement} from "./statement.ts";
+import {statement} from "../statement/numberedPlaceholder.ts";
 
 async function hashSHA256(value: string): Promise<string> {
     const hasher = new Bun.CryptoHasher("sha256");

@@ -1,42 +1,48 @@
 /**
  * @module
  *
- * SQLite database records interface using Bun's SQLite with type-safe query building.
+ * DuckDB database records interface using @duckdb/node-api with type-safe query building.
  */
 
 import type {Transducer} from "@bodar/totallylazy/transducers/Transducer.ts";
 import {type Definition, toSelect, type Supported} from "../builder/builders.ts";
-import {statement} from "../statement/ordinalPlaceholder.ts";
+import {statement} from "../statement/numberedPlaceholder.ts";
 import {sql} from "../template/Sql.ts";
 import type {Records} from "../Records.ts";
+import type {DuckDBResultReader, DuckDBValue} from "@duckdb/node-api";
 
 /**
- * A minimal SQLite database interface compatible with Bun's SQLite Database.
+ * A DuckDB connection interface compatible with @duckdb/node-api.
+ * Users can provide any object matching this interface.
  */
-export interface SQLiteDatabase {
-    query(sql: string): {
-        all(...params: unknown[]): unknown[];
-    };
+export interface DuckDBConnection {
+    runAndReadAll(sql: string, params?: DuckDBValue[]): Promise<DuckDBResultReader>;
 }
 
 /**
- * SQLiteRecords provides async methods for interacting with a SQLite database using Bun's SQLite.
+ * Converts array-of-arrays result to array-of-objects using column names.
  */
-export class SQLiteRecords implements Records {
+function toObjects<A>(result: DuckDBResultReader): A[] {
+    const columns = result.columnNames();
+    return result.getRows().map(row =>
+        Object.fromEntries(columns.map((col, i) => [col, row[i]])) as A
+    );
+}
+
+/**
+ * DuckDBRecords provides methods for interacting with a DuckDB database using @duckdb/node-api.
+ */
+export class DuckDBRecords implements Records {
     /**
-     * Creates a new instance of SQLiteRecords.
+     * Creates a new instance of DuckDBRecords.
      *
-     * @param db - The SQLite database instance (e.g., Bun's Database from bun:sqlite).
+     * @param connection - The DuckDB connection instance from @duckdb/node-api.
      */
-    constructor(private db: SQLiteDatabase) {
+    constructor(private connection: DuckDBConnection) {
     }
 
     /**
      * Retrieves data from the database based on the provided definition and transducers.
-     *
-     * @param definition - The definition of the data to retrieve.
-     * @param transducers - Optional transducers to apply to the data.
-     * @returns A promise that resolves to an iterable of the retrieved data.
      */
     async get<A>(definition: Definition<A>): Promise<Iterable<A>>;
     async get<A, B>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>): Promise<Iterable<B>>;
@@ -46,16 +52,13 @@ export class SQLiteRecords implements Records {
     async get<A, B, C, D, E, F>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>, c: Transducer<B, C> & Supported<B>, d: Transducer<C, D> & Supported<C>, e: Transducer<D, E> & Supported<D>, f: Transducer<E, F> & Supported<E>): Promise<Iterable<F>>;
     async get<A>(definition: Definition<A>, ...transducers: readonly Supported<A>[]): Promise<Iterable<A>> {
         const queryOptions = statement(sql(toSelect(definition, ...transducers)));
-        const result = this.db.query(queryOptions.text).all(...queryOptions.args);
-        return result as A[];
+        const result = await this.connection.runAndReadAll(queryOptions.text, queryOptions.args as DuckDBValue[]);
+        return toObjects<A>(result);
     }
 
     /**
      * Executes a query on the database.
-     *
-     * @param definition - The definition of the query to execute.
-     * @param transducers - Optional transducers to apply to the query results.
-     * @returns An async iterable of the query results.
+     * Returns results as an async iterable.
      */
     query<A>(definition: Definition<A>): AsyncIterable<A>;
     query<A, B>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>): AsyncIterable<B>;
@@ -63,11 +66,14 @@ export class SQLiteRecords implements Records {
     query<A, B, C, D>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>, c: Transducer<B, C> & Supported<B>, d: Transducer<C, D> & Supported<C>): AsyncIterable<D>;
     query<A, B, C, D, E>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>, c: Transducer<B, C> & Supported<B>, d: Transducer<C, D> & Supported<C>, e: Transducer<D, E> & Supported<D>): AsyncIterable<E>;
     query<A, B, C, D, E, F>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>, c: Transducer<B, C> & Supported<B>, d: Transducer<C, D> & Supported<C>, e: Transducer<D, E> & Supported<D>, f: Transducer<E, F> & Supported<E>): AsyncIterable<F>;
-    async *query<A>(definition: Definition<A>, ...transducers: readonly Supported<A>[]): AsyncIterable<A> {
+    query<A>(definition: Definition<A>, ...transducers: readonly Supported<A>[]): AsyncIterable<A> {
+        const self = this;
         const queryOptions = statement(sql(toSelect(definition, ...transducers)));
-        const results = this.db.query(queryOptions.text).all(...queryOptions.args) as A[];
-        for (const row of results) {
-            yield row;
-        }
+        return {
+            async *[Symbol.asyncIterator]() {
+                const result = await self.connection.runAndReadAll(queryOptions.text, queryOptions.args as DuckDBValue[]);
+                yield* toObjects<A>(result);
+            }
+        };
     }
 }

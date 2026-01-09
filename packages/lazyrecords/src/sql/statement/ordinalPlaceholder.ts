@@ -1,7 +1,8 @@
 /**
  * @module
  *
- * Converts SQL template expressions into SQLite parameterized statements with ? placeholders.
+ * Converts SQL template expressions into parameterized statements with ordinal placeholders (?).
+ * Used by SQLite and MySQL which use this placeholder style.
  */
 
 import {Sql} from "../template/Sql.ts";
@@ -17,7 +18,7 @@ function generatePlaceholders(sql: Sql) {
     });
 }
 
-/** Converts SQL template into a SQLite parameterized statement with ? placeholders. */
+/** Converts SQL template into a parameterized statement with ? placeholders. */
 export function statement(sql: Sql): { text: string; args: unknown[] } {
     return {
         text: generatePlaceholders(sql),

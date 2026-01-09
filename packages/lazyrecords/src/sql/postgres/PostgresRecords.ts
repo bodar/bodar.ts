@@ -6,7 +6,7 @@
 
 import type {Transducer} from "@bodar/totallylazy/transducers/Transducer.ts";
 import {type Definition, toSelect, type Supported} from "../builder/builders.ts";
-import {statement} from "./statement.ts";
+import {statement} from "../statement/numberedPlaceholder.ts";
 import {sql} from "../template/Sql.ts";
 import type {Records} from "../Records.ts";
 

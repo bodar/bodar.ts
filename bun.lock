@@ -39,6 +39,7 @@
       "version": "0.0.0",
       "dependencies": {
         "@bodar/totallylazy": "workspace:totallylazy",
+        "@duckdb/node-api": "^1.4.3-r.3",
       },
       "devDependencies": {
         "bun-types": "1.2.3",
@@ -66,6 +67,20 @@
     "@bodar/totallylazy": ["@bodar/totallylazy@workspace:packages/totallylazy"],
 
     "@bodar/yadic": ["@bodar/yadic@workspace:packages/yadic"],
+
+    "@duckdb/node-api": ["@duckdb/node-api@1.4.3-r.3", "", { "dependencies": { "@duckdb/node-bindings": "1.4.3-r.3" } }, "sha512-lPHpmYRMoFJkTCZmp76sETTNPly7lT3eJfV69vqsZE3wur+OY9VW/BflMQ41mP1vSucGqw4rY6XCSmMACE7bwQ=="],
+
+    "@duckdb/node-bindings": ["@duckdb/node-bindings@1.4.3-r.3", "", { "optionalDependencies": { "@duckdb/node-bindings-darwin-arm64": "1.4.3-r.3", "@duckdb/node-bindings-darwin-x64": "1.4.3-r.3", "@duckdb/node-bindings-linux-arm64": "1.4.3-r.3", "@duckdb/node-bindings-linux-x64": "1.4.3-r.3", "@duckdb/node-bindings-win32-x64": "1.4.3-r.3" } }, "sha512-QrkUgZw4Xwn5lNbvUHXcF3F5OvVexf9uQyJnxrLTzs9P93Be0UB+b4hr1EZwf1OMMocchN9iG1R839aVIfSJBg=="],
+
+    "@duckdb/node-bindings-darwin-arm64": ["@duckdb/node-bindings-darwin-arm64@1.4.3-r.3", "", { "os": "darwin", "cpu": "arm64" }, "sha512-iyVZbanRsZKSoK1BHqC61+PExyFUjJ7Ftz+BVN6xsWvB3tfkBBwEcZ5K/cCkHuCqmT7IcUwwDoc89Naz7Tze/A=="],
+
+    "@duckdb/node-bindings-darwin-x64": ["@duckdb/node-bindings-darwin-x64@1.4.3-r.3", "", { "os": "darwin", "cpu": "x64" }, "sha512-exWYLzYLlKqsTp92iBR8SEcaMJpOWbUjaTmNN48TYCjDzLXPW2r4G2xhbFA67KuxnBJcrGvwNOOFcBje2AhfHg=="],
+
+    "@duckdb/node-bindings-linux-arm64": ["@duckdb/node-bindings-linux-arm64@1.4.3-r.3", "", { "os": "linux", "cpu": "arm64" }, "sha512-Jx3SS6Hy2l3TuHUZ9iJ/b2ZnajfFV7AB1TMEh2gE1mmytoVkqjiMvVRj7487u4pxEANj9ELYXspdspC4/wyOaA=="],
+
+    "@duckdb/node-bindings-linux-x64": ["@duckdb/node-bindings-linux-x64@1.4.3-r.3", "", { "os": "linux", "cpu": "x64" }, "sha512-1ISlvsyQheiJlr8tdtVJ0cfCsjBB2leQZL82KJHFKx4Q5gj4yWRYi4tfaPup9zk5rY0xXSuVuhBxKPkTX1UZqg=="],
+
+    "@duckdb/node-bindings-win32-x64": ["@duckdb/node-bindings-win32-x64@1.4.3-r.3", "", { "os": "win32", "cpu": "x64" }, "sha512-DQBGxcIZ6yatHrcxIevejKsyj1cobu6BwXU17YuxCSA/BxdfEl7QnhBzwEpDJUDj6gUbLbBqsEvwY+K/NWAwEg=="],
 
     "@observablehq/inputs": ["@observablehq/inputs@0.12.0", "", { "dependencies": { "htl": "^0.3.1", "isoformat": "^0.2.0" } }, "sha512-1ln7+PYe31cMx00K9awVbiCscQM0THnXRJ/AEzd+FfTA25Gu3KRWknAGECxU49QzHyKqiXpLl5LCg3XtYm70eQ=="],
 

@@ -1,5 +1,5 @@
 import {describe, it} from "bun:test";
-import {statement} from "@bodar/lazyrecords/sql/postgres/statement.ts";
+import {statement} from "@bodar/lazyrecords/sql/statement/numberedPlaceholder.ts";
 import {id} from "@bodar/lazyrecords/sql/template/Identifier.ts";
 import {SQL} from "@bodar/lazyrecords/sql/template/Sql.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
