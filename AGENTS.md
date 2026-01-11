@@ -34,6 +34,8 @@
    - Check `./run` and `bootstrap.sh` for already available commands
    - Examples: `./run test`, `./run wrangler deploy`
 
+6. Exports in package.json are automatically created if you run `./run exports`
 
+7. Often you will just want to run the full build which will typecheck, test, generate docs and exports with `./run`
 
-After every response check if you have violated any rules and tell me then correct if needed
+8. If asked to create a git work tree, they live inside `../bodar.ts-worktrees/`
