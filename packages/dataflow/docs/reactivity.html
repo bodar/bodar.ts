@@ -293,7 +293,7 @@
                 const id = setTimeout(() => resolve({query, length, delay}), delay);
                 signal.addEventListener('abort', () => {
                     clearTimeout(id);
-                    resolve({aborted: true, query});
+                    display(`Aborted "${query}"`);
                 }, {once: true});
             })
         };
@@ -304,8 +304,7 @@
         const results = search(query, controller.signal);
     </script>
     <script type="module" is="reactive" data-echo>
-        results.aborted ? `Aborted: "${results.query}"` :
-            `Found ${results.length} results for "${results.query}" (${results.delay}ms)`
+        `Found ${results.length} results for "${results.query}" (${results.delay}ms)`
     </script>
 </div>
 

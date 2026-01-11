@@ -208,6 +208,45 @@ describe("graph", () => {
             expect(controllers[1].signal.aborted).toBe(false);
         });
 
+        test("AbortController abort signal fires when inputs change during pending promise", async () => {
+            const graph = new Graph();
+            const query = mutable('a');
+            graph.define('query', () => query);
+
+            const abortedQueries: string[] = [];
+
+            // Simulates the search function from reactivity.html
+            const {results} = graph.define('results', (query: string) => {
+                const controller = new AbortController();
+                new Promise<{query: string, aborted: boolean}>((resolve) => {
+                    const id = setTimeout(() => resolve({query, aborted: false}), 100);
+                    controller.signal.addEventListener('abort', () => {
+                        clearTimeout(id);
+                        abortedQueries.push(query);  // Track aborted queries
+                        resolve({query, aborted: true});
+                    });
+                });
+                // Return controller so it gets invalidated
+                return controller;
+            });
+
+            const iterator = results[Symbol.asyncIterator]();
+
+            // Get first result
+            const first = await iterator.next();
+            expect(first.value).toBeInstanceOf(AbortController);
+
+            // Change query - should abort the pending operation
+            query.value = 'ap';
+
+            // Get second result
+            const second = await iterator.next();
+            expect(second.value).toBeInstanceOf(AbortController);
+
+            // Verify first was aborted
+            expect(abortedQueries).toContain('a');
+        });
+
         test("Symbol.dispose is called when new inputs arrive", async () => {
             const graph = new Graph();
             graph.define(function* datasource() {
