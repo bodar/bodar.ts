@@ -33,7 +33,7 @@
 
 <h1>Setup</h1>
 
-<p>Dataflow transforms HTML containing <code>is="reactive"</code> scripts into interactive pages. Configure your setup by selecting your runtime, module strategy, and transformation location.</p>
+<p>Dataflow transforms HTML containing <code>is="reactive"</code> scripts into interactive pages. Configure your setup by selecting your runtime and module strategy.</p>
 
 <!-- Import runtime APIs -->
 <script type="module" is="reactive">
@@ -46,12 +46,13 @@
     <p>Where will you run the transformation?</p>
 
     <script type="module" is="reactive">
-        const runtime = mutable('node');
+        const runtime = mutable('bun');
 
         const runtimes = [
-            {id: 'node', name: 'Node.js', logo: 'nodedotjs'},
             {id: 'bun', name: 'Bun', logo: 'bun'},
+            {id: 'node', name: 'Node.js', logo: 'nodedotjs'},
             {id: 'deno', name: 'Deno', logo: 'deno'},
+            {id: 'cloudflare', name: 'Cloudflare', logo: 'cloudflare'},
             {id: 'browser', name: 'Browser', logo: 'googlechrome'}
         ];
 
@@ -79,16 +80,16 @@
         const strategy = mutable('importmap');
 
         const strategies = [
-            {id: 'bundler', name: 'Bundler', desc: 'Bundle and minify reactive imports with BunBundler', requiresBun: true},
-            {id: 'importmap', name: 'Import Map', desc: 'Use pre-minified runtime via import map (~11KB gzipped)'},
+            {id: 'importmap', name: 'Import Map', desc: 'Use pre-minified runtime via import map (~11KB gzipped)', checked: true},
+            {id: 'bundler', name: 'Bundler', desc: 'Bundle and minify reactive imports with BunBundler', bunOnly: true},
             {id: 'byo', name: 'Bring Your Own', desc: 'You manage your own import map or bundling'}
         ];
 
         display(<div class="selector-list">
             {strategies.map(s => {
-                const disabled = s.requiresBun && runtime !== 'bun';
+                const disabled = s.bunOnly && runtime !== 'bun';
                 return <label class={`selector-option ${disabled ? 'disabled' : ''}`}>
-                    <input type="radio" name="strategy" value={s.id}
+                    <input type="radio" name="strategy" value={s.id} checked={s.checked}
                            disabled={disabled}
                            onchange={() => strategy.value = s.id}/>
                     <div class="option-content">
@@ -102,48 +103,16 @@
     </script>
 </section>
 
-<!-- Step 3: Transformation Location -->
-<section class="setup-section">
-    <h2>3. Transformation Location</h2>
-    <p>When should HTML be transformed?</p>
-
-    <script type="module" is="reactive">
-        const location = mutable('build');
-
-        const locations = [
-            {id: 'build', name: 'Build Time', desc: 'Static site generation or build pipelines'},
-            {id: 'server', name: 'Server', desc: 'Transform on each request (Bun.serve, Node, etc.)'},
-            {id: 'edge', name: 'Edge', desc: 'Cloudflare Workers or other edge runtimes', disabledWhen: () => strategy === 'bundler', requiresMsg: 'Requires Import Map or BYO'},
-            {id: 'browser', name: 'Browser', desc: 'Service Worker for progressive enhancement', disabledWhen: () => runtime !== 'browser', requiresMsg: 'Requires Browser runtime'}
-        ];
-
-        display(<div class="selector-list">
-            {locations.map(loc => {
-                const disabled = loc.disabledWhen?.() ?? false;
-                return <label class={`selector-option ${disabled ? 'disabled' : ''}`}>
-                    <input type="radio" name="location" value={loc.id}
-                           disabled={disabled}
-                           onchange={() => location.value = loc.id}/>
-                    <div class="option-content">
-                        <strong>{loc.name}</strong>
-                        <span class="option-desc">{loc.desc}</span>
-                        {disabled ? <span class="option-requires">{loc.requiresMsg}</span> : ''}
-                    </div>
-                </label>;
-            })}
-        </div>);
-    </script>
-</section>
-
 <!-- Installation -->
 <section class="setup-section">
     <h2>Installation</h2>
 
     <script type="module" is="reactive">
         const installCommands = {
-            node: 'npx jsr add @bodar/dataflow',
             bun: 'bunx jsr add @bodar/dataflow',
+            node: 'npx jsr add @bodar/dataflow',
             deno: 'deno add jsr:@bodar/dataflow',
+            cloudflare: 'npx jsr add @bodar/dataflow',
             browser: '# No server-side installation needed for browser-only setup'
         };
 
@@ -161,10 +130,6 @@
             <pre><code class="language-bash">{installCode}</code></pre>
         </div>);
     </script>
-
-    <script type="module" is="reactive">
-        <p hidden={runtime === 'browser'}>For browsers, use an import map with the pre-minified runtime (see code example below).</p>
-    </script>
 </section>
 
 <!-- Code Example -->
@@ -172,191 +137,62 @@
     <h2>Code Example</h2>
 
     <script type="module" is="reactive">
-        // Code templates based on configuration
         const getCode = () => {
-            // Build time with bundler (Bun only)
-            if (location === 'build' && strategy === 'bundler') {
-                return `import {HTMLTransformer} from '@bodar/dataflow';
-import {BunBundler} from '@bodar/dataflow/bundling/BunBundler.ts';
+            const lines = [];
 
-const transformer = new HTMLTransformer({
-    rewriter: new HTMLRewriter(),
-    bundler: new BunBundler()
-});
-
-const output = await transformer.transform(htmlString);`;
+            // Imports
+            lines.push(`import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';`);
+            lines.push(`import {HTMLTransformer} from '@bodar/dataflow';`);
+            if (strategy === 'bundler') {
+                lines.push(`import {BunBundler} from '@bodar/dataflow/bundling/BunBundler.ts';`);
             }
 
-            // Build time with import map
-            if (location === 'build' && strategy === 'importmap') {
-                return `import {HTMLTransformer} from '@bodar/dataflow';
-
-const importMap = {
-    imports: {
-        '@bodar/dataflow/runtime.ts': 'https://dataflow.bodar.com/runtime.js'
-    }
-};
-
-const transformer = new HTMLTransformer({
-    rewriter: new HTMLRewriter(),
-    importMap
-});
-
-const output = await transformer.transform(htmlString);`;
+            // Import map config
+            if (strategy === 'importmap') {
+                lines.push('');
+                lines.push(`const importMap = {`);
+                lines.push(`    imports: {`);
+                lines.push(`        '@bodar/dataflow/runtime.ts': 'https://dataflow.bodar.com/runtime.js'`);
+                lines.push(`    }`);
+                lines.push(`};`);
             }
 
-            // Build time with BYO
-            if (location === 'build' && strategy === 'byo') {
-                return `import {HTMLTransformer} from '@bodar/dataflow';
+            // Transformer options
+            const options = ['rewriter: new HTMLRewriter()'];
+            if (strategy === 'bundler') options.push('bundler: new BunBundler()');
+            if (strategy === 'importmap') options.push('importMap');
 
-// No bundler or importMap - you manage modules yourself
-const transformer = new HTMLTransformer({
-    rewriter: new HTMLRewriter()
-});
+            lines.push('');
+            lines.push(`const transformer = () => new HTMLTransformer({`);
+            lines.push(`    ${options.join(',\n    ')}`);
+            lines.push(`});`);
 
-const output = await transformer.transform(htmlString);`;
+            // Handler based on runtime
+            lines.push('');
+            if (runtime === 'bun') {
+                lines.push(`Bun.serve({`);
+                lines.push(`    fetch: ReactiveHandler(transformer, async (request) => {`);
+                lines.push(`        return new Response('<html>...</html>', {`);
+                lines.push(`            headers: {'content-type': 'text/html'}`);
+                lines.push(`        });`);
+                lines.push(`    })`);
+                lines.push(`});`);
+            } else if (runtime === 'cloudflare') {
+                lines.push(`export default {`);
+                lines.push(`    fetch: ReactiveHandler(transformer, fetch)`);
+                lines.push(`};`);
+            } else if (runtime === 'browser') {
+                lines.push(`const handler = ReactiveHandler(transformer, fetch);`);
+                lines.push('');
+                lines.push(`self.addEventListener('fetch', (event) => {`);
+                lines.push(`    event.respondWith(handler(event.request));`);
+                lines.push(`});`);
+            } else {
+                // Node.js, Deno
+                lines.push(`const handler = ReactiveHandler(transformer, yourRequestHandler);`);
             }
 
-            // Server with bundler (Bun only)
-            if (location === 'server' && strategy === 'bundler') {
-                return `import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
-import {HTMLTransformer} from '@bodar/dataflow';
-import {BunBundler} from '@bodar/dataflow/bundling/BunBundler.ts';
-
-const transformer = () => new HTMLTransformer({
-    rewriter: new HTMLRewriter(),
-    bundler: new BunBundler()
-});
-
-Bun.serve({
-    fetch: ReactiveHandler(transformer, async (request) => {
-        // Your existing handler logic
-        return new Response('<html>...</html>', {
-            headers: {'content-type': 'text/html'}
-        });
-    })
-});`;
-            }
-
-            // Server with import map
-            if (location === 'server' && strategy === 'importmap') {
-                const serverCode = runtime === 'bun'
-                    ? `Bun.serve({
-    fetch: ReactiveHandler(transformer, async (request) => {
-        return new Response('<html>...</html>', {
-            headers: {'content-type': 'text/html'}
-        });
-    })
-});`
-                    : `// Use with your HTTP framework
-const handler = ReactiveHandler(transformer, yourRequestHandler);`;
-
-                return `import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
-import {HTMLTransformer} from '@bodar/dataflow';
-
-const importMap = {
-    imports: {
-        '@bodar/dataflow/runtime.ts': 'https://dataflow.bodar.com/runtime.js'
-    }
-};
-
-const transformer = () => new HTMLTransformer({
-    rewriter: new HTMLRewriter(),
-    importMap
-});
-
-${serverCode}`;
-            }
-
-            // Server with BYO
-            if (location === 'server' && strategy === 'byo') {
-                return `import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
-import {HTMLTransformer} from '@bodar/dataflow';
-
-// No bundler or importMap - you manage modules yourself
-const transformer = () => new HTMLTransformer({
-    rewriter: new HTMLRewriter()
-});
-
-// Use with your HTTP framework
-const handler = ReactiveHandler(transformer, yourRequestHandler);`;
-            }
-
-            // Edge (import map or BYO only)
-            if (location === 'edge') {
-                if (strategy === 'importmap') {
-                    return `import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
-import {HTMLTransformer} from '@bodar/dataflow';
-
-const importMap = {
-    imports: {
-        '@bodar/dataflow/runtime.ts': 'https://dataflow.bodar.com/runtime.js'
-    }
-};
-
-const transformer = () => new HTMLTransformer({
-    rewriter: new HTMLRewriter(),
-    importMap
-});
-
-export default {
-    fetch: ReactiveHandler(transformer, fetch)
-};`;
-                } else {
-                    return `import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
-import {HTMLTransformer} from '@bodar/dataflow';
-
-// No bundler or importMap - you manage modules yourself
-const transformer = () => new HTMLTransformer({
-    rewriter: new HTMLRewriter()
-});
-
-export default {
-    fetch: ReactiveHandler(transformer, fetch)
-};`;
-                }
-            }
-
-            // Browser (Service Worker)
-            if (location === 'browser') {
-                if (strategy === 'importmap') {
-                    return `import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
-import {HTMLTransformer} from '@bodar/dataflow';
-
-const importMap = {
-    imports: {
-        '@bodar/dataflow/runtime.ts': 'https://dataflow.bodar.com/runtime.js'
-    }
-};
-
-const transformer = () => new HTMLTransformer({
-    rewriter: new HTMLRewriter(),
-    importMap
-});
-
-const handler = ReactiveHandler(transformer, fetch);
-
-self.addEventListener('fetch', (event) => {
-    event.respondWith(handler(event.request));
-});`;
-                } else {
-                    return `import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';
-import {HTMLTransformer} from '@bodar/dataflow';
-
-// No bundler or importMap - you manage modules yourself
-const transformer = () => new HTMLTransformer({
-    rewriter: new HTMLRewriter(),
-});
-
-const handler = ReactiveHandler(transformer, fetch);
-
-self.addEventListener('fetch', (event) => {
-    event.respondWith(handler(event.request));
-});`;
-                }
-            }
-
-            return '// Select options above to see the code example';
+            return lines.join('\n');
         };
 
         const code = getCode();
@@ -383,7 +219,7 @@ self.addEventListener('fetch', (event) => {
 </script>
 
 <script type="module" is="reactive">
-    <div class="note" hidden={location !== 'browser'}>
+    <div class="note" hidden={runtime !== 'browser'}>
         <strong>Service Worker Considerations:</strong>
         <ul>
             <li>Service workers only transform pages <em>after</em> initial registration - the first page load won't be transformed unless you force a reload</li>
