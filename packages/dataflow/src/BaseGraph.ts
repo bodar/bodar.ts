@@ -6,11 +6,13 @@ import {type Node} from "./Node.ts";
 import {node, PullNode} from "./PullNode.ts";
 import {Backpressure, type BackpressureStrategy} from "./SharedAsyncIterable.ts";
 import {Throttle, type ThrottleStrategy} from "./Throttle.ts";
+import {Invalidator} from "./Invalidator.ts";
 
 /** A Graph with no function parsing or automatic logic */
 export class BaseGraph {
     constructor(private backpressure: BackpressureStrategy = Backpressure.fastest,
                 private throttle: ThrottleStrategy = Throttle.auto(),
+                private invalidator: Invalidator = new Invalidator(),
                 private globals: any = globalThis) {
     }
 
@@ -34,13 +36,13 @@ export class BaseGraph {
         // Auto-register missing dependencies from globals (lazy lookup)
         for (const input of inputs) {
             if (!this.nodes.has(input)) {
-                const globalNode = node(input, [], () => Reflect.get(this.globals, input), this.backpressure, this.throttle);
+                const globalNode = node(input, [], () => Reflect.get(this.globals, input), this.backpressure, this.throttle, this.invalidator);
                 this.nodes.set(input, globalNode);
             }
         }
 
         const dependencies = inputs.map(input => this.nodes.get(input)!);
-        const newNode = node(key, dependencies, fun, this.backpressure, this.throttle);
+        const newNode = node(key, dependencies, fun, this.backpressure, this.throttle, this.invalidator);
         this.nodes.set(key, newNode);
         return newNode
     }

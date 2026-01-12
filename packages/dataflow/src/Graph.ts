@@ -7,6 +7,7 @@ import {Backpressure, type BackpressureStrategy} from "./SharedAsyncIterable.ts"
 import {lazy} from "@bodar/totallylazy/functions/lazy.ts";
 import {Throttle, type ThrottleStrategy} from "./Throttle.ts";
 import {BaseGraph} from "./BaseGraph.ts";
+import {Invalidator} from "./Invalidator.ts";
 import {parseFunction} from "./javascript/parseFunction.ts";
 import {getOutputs} from "./javascript/outputs.ts";
 import {getInputs} from "./javascript/inputs.ts";
@@ -16,8 +17,9 @@ import {type IdGenerator, SimpleHashGenerator} from "./IdGenerator.ts";
 export class Graph extends BaseGraph {
     constructor(backpressure: BackpressureStrategy = Backpressure.fastest,
                 throttle: ThrottleStrategy = Throttle.auto(),
+                invalidator: Invalidator = new Invalidator(),
                 private idGenerator: IdGenerator = SimpleHashGenerator) {
-        super(backpressure, throttle);
+        super(backpressure, throttle, invalidator);
     }
 
     /** Creates nodes from a function, parsing inputs/outputs to build the dependency graph */

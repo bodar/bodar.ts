@@ -7,6 +7,7 @@ import {Throttle, type ThrottleStrategy} from "./Throttle.ts";
 import {Idle} from "./testing/Idle.ts";
 import {BaseGraph} from "./BaseGraph.ts";
 import {Backpressure, type BackpressureStrategy} from "./SharedAsyncIterable.ts";
+import {Invalidator} from "./Invalidator.ts";
 
 export {display, Display} from './api/display.ts';
 export {view, View} from './api/view.ts';
@@ -21,6 +22,7 @@ export {raw} from './api/raw.ts';
 export {BaseGraph} from './BaseGraph.ts'
 export {Idle} from './testing/Idle.ts'
 export {Throttle} from './Throttle.ts'
+export {Invalidator} from './Invalidator.ts'
 export {JSX2DOM, autoKeyEvents} from "@bodar/jsx2dom/JSX2DOM.ts";
 export {chain} from "@bodar/yadic/chain.ts";
 
@@ -28,6 +30,7 @@ export {chain} from "@bodar/yadic/chain.ts";
 export interface RuntimeExports {
     throttle: ThrottleStrategy;
     backpressure: BackpressureStrategy;
+    invalidator: Invalidator;
     graph: BaseGraph;
     idle?: Idle;
 }
@@ -49,6 +52,7 @@ export function runtime(config: RuntimeConfig = {}, global: typeof globalThis  =
     return chain(base
         .set('reactiveRoot', () => config.scriptId ? global.document.getElementById(config.scriptId)?.parentElement! : global.document.documentElement!)
         .set('backpressure', () => Backpressure.fastest)
-        .set('graph', ({throttle, backpressure}: { throttle: ThrottleStrategy, backpressure: BackpressureStrategy }) =>
-            new BaseGraph(backpressure, throttle, global)), global);
+        .set('invalidator', () => new Invalidator())
+        .set('graph', ({throttle, backpressure, invalidator}: { throttle: ThrottleStrategy, backpressure: BackpressureStrategy, invalidator: Invalidator }) =>
+            new BaseGraph(backpressure, throttle, invalidator, global)), global);
 }

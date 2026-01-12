@@ -6,6 +6,9 @@ import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import {observableSource} from "./api/observe.test.ts";
 import {Mutable, mutable} from "../src/api/mutable.ts";
+import {Invalidator} from "../src/Invalidator.ts";
+import {Backpressure} from "../src/SharedAsyncIterable.ts";
+import {Throttle} from "../src/Throttle.ts";
 
 describe("graph", () => {
     test("if the function has a name use that as the key", async () => {
@@ -278,6 +281,27 @@ describe("graph", () => {
             }));
             await toPromiseArray(node);
             expect(disposals).toEqual([1]);
+        });
+
+        test("custom invalidation rules are applied when new inputs arrive", async () => {
+            const invalidator = new Invalidator();
+            const disconnected: string[] = [];
+            invalidator.add(
+                value => typeof value?.disconnect === 'function',
+                value => disconnected.push(value.name)
+            );
+
+            const graph = new Graph(Backpressure.fastest, Throttle.auto(), invalidator);
+            graph.define(function* datasource() {
+                yield* ['sine', 'square'];
+            });
+            const {node} = graph.define('node', (datasource: string) => ({
+                name: datasource,
+                disconnect() {}
+            }));
+
+            await toPromiseArray(node);
+            expect(disconnected).toEqual(['sine']);
         });
     });
 

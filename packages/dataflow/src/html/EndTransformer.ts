@@ -41,6 +41,7 @@ export function scriptTemplate(config: RuntimeConfig, registrations: string): st
     return `import {Display, View, Width, JSX2DOM, autoKeyEvents, runtime, chain} from "@bodar/dataflow/runtime.ts";
 const _runtime_ = runtime(${JSON.stringify(config)}, globalThis);
 _runtime_.graph.define("jsx", [], [], () => new JSX2DOM(chain({onEventListener: autoKeyEvents()}, globalThis)));
+_runtime_.graph.define("invalidator", [], [], () => _runtime_.invalidator);
 ${registrations}
 _runtime_.graph.run();`;
 }

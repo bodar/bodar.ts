@@ -37,6 +37,11 @@
     import {display, event, view, input} from "@bodar/dataflow/runtime.ts";
 </script>
 
+<!-- Register AudioNode cleanup rule -->
+<script type="module" is="reactive">
+    {invalidator.add(value => value instanceof AudioNode, value => value.disconnect());}
+</script>
+
 <!-- AudioContext setup -->
 <script type="module" is="reactive">
     const context = new AudioContext();
@@ -119,7 +124,6 @@
         <!-- OscillatorNode creation -->
         <script type="module" is="reactive">
             const oscillator = new OscillatorNode(context, {type: oscillator_type});
-            Reflect.set(oscillator, Symbol.dispose, () => oscillator.disconnect());
             oscillator.connect(filter);
             if (state === 'running') oscillator.start();
         </script>
@@ -196,7 +200,6 @@
         <!-- BiquadFilterNode creation -->
         <script type="module" is="reactive">
             const filter = new BiquadFilterNode(context, {type: filter_type});
-            Reflect.set(filter, Symbol.dispose, () => filter.disconnect());
             filter.connect(panner);
         </script>
 
@@ -230,7 +233,6 @@
         <!-- StereoPannerNode creation -->
         <script type="module" is="reactive">
             const panner = new StereoPannerNode(context);
-            Reflect.set(panner, Symbol.dispose, () => panner.disconnect());
             panner.connect(compressor);
         </script>
 
@@ -307,7 +309,6 @@
         <!-- DynamicsCompressorNode creation -->
         <script type="module" is="reactive">
             const compressor = new DynamicsCompressorNode(context);
-            Reflect.set(compressor, Symbol.dispose, () => compressor.disconnect());
             compressor.connect(gain);
         </script>
 
@@ -341,7 +342,6 @@
         <script type="module" is="reactive">
             const gain = new GainNode(context);
             gain.gain.value = 0.3;
-            Reflect.set(gain, Symbol.dispose, () => gain.disconnect());
             gain.connect(analyser);
         </script>
 
@@ -367,7 +367,6 @@
         <!-- AnalyserNode creation -->
         <script type="module" is="reactive">
             const analyser = new AnalyserNode(context, {fftSize: 2048});
-            Reflect.set(analyser, Symbol.dispose, () => analyser.disconnect());
             analyser.connect(destination);
         </script>
 

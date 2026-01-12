@@ -23,6 +23,7 @@
     "./Graph.ts": "./src/Graph.ts",
     "./html/HTMLTransformer.ts": "./src/html/HTMLTransformer.ts",
     "./http/ReactiveHandler.ts": "./src/http/ReactiveHandler.ts",
+    "./Invalidator.ts": "./src/Invalidator.ts",
     "./Node.ts": "./src/Node.ts",
     "./PullNode.ts": "./src/PullNode.ts",
     "./runtime.ts": "./src/runtime.ts",
