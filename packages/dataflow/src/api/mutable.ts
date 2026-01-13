@@ -1,4 +1,4 @@
-import {observe} from "./observe.ts";
+import {events} from "./events.ts";
 
 /** A Mutable value that is AsyncIterable and an fires a 'change' event */
 export class Mutable<T> extends EventTarget implements AsyncIterable<T> {
@@ -21,11 +21,7 @@ export class Mutable<T> extends EventTarget implements AsyncIterable<T> {
     }
 
     [Symbol.asyncIterator](): AsyncIterator<T> {
-        return observe(notify => {
-            const handler = () => notify(this.value);
-            this.addEventListener('change', handler);
-            return () => this.removeEventListener('change', handler);
-        }, this._value);
+        return events(this, 'change', () => this._value, this._value);
     }
 }
 

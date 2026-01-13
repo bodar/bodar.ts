@@ -12,7 +12,7 @@ import {Display} from './api/display.ts';
 import {View} from './api/view.ts';
 import {Width} from './api/width.ts';
 import {input} from './api/input.ts';
-import {event} from './api/event.ts';
+import {events} from './api/events.ts';
 import {observe} from './api/observe.ts';
 import {mutable} from './api/mutable.ts';
 import {now} from './api/now.ts';
@@ -23,7 +23,7 @@ export {display, Display} from './api/display.ts';
 export {view, View} from './api/view.ts';
 export {width, Width} from './api/width.ts';
 export {input} from './api/input.ts';
-export {event} from './api/event.ts';
+export {events} from './api/events.ts';
 export {observe} from './api/observe.ts';
 export {mutable} from './api/mutable.ts';
 export {now} from './api/now.ts';
@@ -56,7 +56,7 @@ function createImplicitImports(global: typeof globalThis, invalidator: Invalidat
         .set('invalidator', () => invalidator)
         .set('jsx', () => new JSX2DOM(chain({onEventListener: autoKeyEvents()}, global)))
         .set('observe', () => observe)
-        .set('event', () => event)
+        .set('events', () => events)
         .set('input', () => input)
         .set('mutable', () => mutable)
         .set('now', () => now)

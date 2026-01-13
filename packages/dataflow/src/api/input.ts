@@ -3,14 +3,14 @@
  */
 
 
-import {event} from "./event.ts";
+import {events} from "./events.ts";
 
 /** Input elements supported by the input function */
 export type SupportedInputs = HTMLInputElement | HTMLSelectElement;
 
 /** Creates an AsyncIterator that yields input element values on change */
 export function input<E extends SupportedInputs, R>(element: E, eventType: string = eventOf(element), value: (i: E) => R = valueOf): AsyncIterator<R> {
-    return event(element, eventType, () => value(element), value(element));
+    return events(element, eventType, () => value(element), value(element));
 }
 
 function valueOf(element: any): any {

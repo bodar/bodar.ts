@@ -244,7 +244,7 @@
 
 <div class="example">
     <script type="module" is="reactive" data-echo>
-        const windowWidth = event(window, "resize", () => window.innerWidth, window.innerWidth);
+        const windowWidth = events(window, "resize", () => window.innerWidth, window.innerWidth);
     </script>
     <script type="module" is="reactive" data-echo>
         `Window width: ${windowWidth}px`
@@ -345,8 +345,8 @@
             document.addEventListener("pointermove", handler);
             return () => document.removeEventListener("pointermove", handler);
         }, [0, 0]);
-        // NB: This can be also be defined with event function as a one-liner
-        // const pointer = event(document, 'pointermove', ev => [ev.clientX, ev.clientY], [0, 0])
+        // NB: This can be also be defined with events function as a one-liner
+        // const pointer = events(document, 'pointermove', ev => [ev.clientX, ev.clientY], [0, 0])
     </script>
     <script type="module" is="reactive" data-echo>
         <>Pointer: [{pointer.map(Math.round).join(", ")}]</>

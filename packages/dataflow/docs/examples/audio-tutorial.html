@@ -41,7 +41,7 @@
 <script type="module" is="reactive">
     const context = new AudioContext();
     context.suspend();
-    const state = event(context, 'statechange', () => context.state, context.state);
+    const state = events(context, 'statechange', () => context.state, context.state);
 </script>
 
 <section class="audio-context">
