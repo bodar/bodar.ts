@@ -32,11 +32,6 @@
         source on GitHub</a></p>
 </div>
 
-<!-- Single import for page -->
-<script type="module" is="reactive">
-    import {display, event, view, input} from "@bodar/dataflow/runtime.ts";
-</script>
-
 <!-- Register AudioNode cleanup rule -->
 <script type="module" is="reactive">
     {invalidator.add(value => value instanceof AudioNode, value => value.disconnect());}

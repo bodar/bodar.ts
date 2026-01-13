@@ -51,7 +51,6 @@
 
 <pre><code class="language-html">&lt;div is="reactive-island"&gt;
     &lt;script type="module" is="reactive"&gt;
-        import {mutable} from '@bodar/dataflow/runtime.ts';
         const count = mutable(0);
         const increment = () =&gt; count.value++;
         const decrement = () =&gt; count.value--;
@@ -73,7 +72,6 @@
     <div class="card" is="reactive-island">
         <h3>Island A</h3>
         <script type="module" is="reactive">
-            import {mutable} from '@bodar/dataflow/runtime.ts';
             const count = mutable(0);
             const increment = () => count.value++;
             const decrement = () => count.value--;
@@ -90,7 +88,6 @@
     <div class="card" is="reactive-island">
         <h3>Island B</h3>
         <script type="module" is="reactive">
-            import {mutable} from '@bodar/dataflow/runtime.ts';
             const count = mutable(100);
             const increment = () => count.value++;
             const decrement = () => count.value--;
@@ -107,7 +104,6 @@
     <div class="card" is="reactive-island">
         <h3>Island C</h3>
         <script type="module" is="reactive">
-            import {mutable} from '@bodar/dataflow/runtime.ts';
             const count = mutable(1000);
             const increment = () => count.value++;
             const decrement = () => count.value--;
@@ -133,7 +129,6 @@
 <pre><code class="language-html">&lt;!-- Server returns this HTML fragment --&gt;
 &lt;div is="reactive-island" hx-swap-oob="true" id="widget"&gt;
     &lt;script type="module" is="reactive"&gt;
-        import {view} from '@bodar/dataflow/runtime.ts';
         const value = view(&lt;input type="range" min="0" max="100"/&gt;);
     &lt;/script&gt;
     &lt;script type="module" is="reactive"&gt;

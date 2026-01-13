@@ -82,7 +82,7 @@
 </div>
 
 
-<p>For explicit control, import the <code>display</code> function. You can call it multiple times:</p>
+<p>For explicit control, use the <code>display</code> function. You can call it multiple times:</p>
 
 <div class="example">
     <script type="module" is="reactive" data-echo="html">
@@ -94,18 +94,9 @@
 
 <h2>Imports</h2>
 
-<p>All top-level declarations (including imports) are shared within the same <a href="reactivity.html#reactive-scope">reactive scope</a>. By default, the whole page is a single scope, so the imported <code>display</code> function is available to all other reactive scripts (document order does not matter). For isolated scopes, see <a href="islands.html">Reactive Islands</a>.</p>
+<p>All top-level declarations (including imports) are shared within the same <a href="reactivity.html#reactive-scope">reactive scope</a>. By default, the whole page is a single scope. For isolated scopes, see <a href="islands.html">Reactive Islands</a>.</p>
 
-<div class="example">
-    <script type="module" is="reactive" data-echo="html">
-        import {display, view, input, now} from '@bodar/dataflow/runtime.ts';
-    </script>
-</div>
-
-<div class="note">
-    <strong>Note:</strong> Unlike Observable you do need to import <code>display</code>, <code>view</code>,
-    <code>input</code> etc at least once if you want to use them.
-</div>
+<p>Common APIs like <code>display</code>, <code>view</code>, <code>input</code>, <code>mutable</code>, <code>now</code>, etc. are implicitly available - no import needed. Just use them directly in any reactive script.</p>
 
 <div class="note">
     <strong>Note:</strong> All the examples from now on will not show the enclosing reactive script tag

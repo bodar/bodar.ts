@@ -5,12 +5,6 @@ import {findTopLevelDeclarations} from "../javascript/findTopLevelDeclarations.t
 import {isSingleExpression} from "../javascript/isSingleExpression.ts";
 import {hasTopLevelAwait} from "../javascript/findTopLevelAwaits.ts";
 
-export interface SerializeOptions {
-    stripDisplay?: boolean;
-    stripView?: boolean;
-    stripWidth?: boolean;
-}
-
 /** A definition of a Node but still in raw text format */
 export class NodeDefinition {
     private readonly Runtime = '@bodar/dataflow/runtime.ts';
@@ -65,57 +59,54 @@ export class NodeDefinition {
         return `const [${specifierStrings.join(', ')}] = await Promise.all([${importStrings.join(', ')}]);`;
     }
 
-    isAsync(options?: SerializeOptions): boolean {
-        return !this.getImports(options).isEmpty() || this._hasTopLevelAwait;
+    isAsync(): boolean {
+        return !this.getImports().isEmpty() || this._hasTopLevelAwait;
     }
 
-    toString(options?: SerializeOptions): string {
-        const inputs = this.getInputs(options);
-        const outputs = this.getOutputs(options);
-        return `${JSON.stringify(this.key)},${JSON.stringify(inputs)},${JSON.stringify(outputs)},${this.fun(options)}`;
+    toString(): string {
+        const inputs = this.getInputs();
+        const outputs = this.getOutputs();
+        return `${JSON.stringify(this.key)},${JSON.stringify(inputs)},${JSON.stringify(outputs)},${this.fun()}`;
     }
 
-    toFunction(options?: SerializeOptions): Function {
-        if (this.isAsync(options)) return new AsyncFunction(...this.inputs, this.body(options));
-        return new Function(...this.inputs, this.body(options));
+    toFunction(): Function {
+        if (this.isAsync()) return new AsyncFunction(...this.inputs, this.body());
+        return new Function(...this.inputs, this.body());
     }
 
-    fun(options?: SerializeOptions): string {
-        const inputs = this.getInputs(options);
-        return `${this.isAsync(options) ? 'async' : ''}(${inputs.join(',')}) => {\n${this.body(options)}\n}`;
+    fun(): string {
+        const inputs = this.getInputs();
+        return `${this.isAsync() ? 'async' : ''}(${inputs.join(',')}) => {\n${this.body()}\n}`;
     }
 
-    private getInputs(options?: SerializeOptions): string[] {
+    private getInputs(): string[] {
         let inputs = this._inputs;
-        if (options?.stripDisplay) inputs = inputs.filter(i => i !== 'display');
-        if (options?.stripView) inputs = inputs.filter(i => i !== 'view');
-        if (options?.stripWidth) inputs = inputs.map(i => i === 'width' ? `width_${this.key}` : i);
+        // Strip display/view - accessed via _runtime_.Display/_runtime_.View
+        inputs = inputs.filter(i => i !== 'display' && i !== 'view');
+        // Map width to the per-node width stream
+        inputs = inputs.map(i => i === 'width' ? `width_${this.key}` : i);
         return inputs;
     }
 
-    private getOutputs(options?: SerializeOptions): string[] {
-        let outputs = this._outputs;
-        if (options?.stripDisplay) outputs = outputs.filter(o => o !== 'display');
-        if (options?.stripView) outputs = outputs.filter(o => o !== 'view');
-        if (options?.stripWidth) outputs = outputs.filter(o => o !== 'width');
-        return outputs;
+    private getOutputs(): string[] {
+        return this._outputs.filter(o => o !== 'display' && o !== 'view' && o !== 'width');
     }
 
-    private getImports(options?: SerializeOptions): Imports {
+    private getImports(): Imports {
         const imports = this._imports.clone();
-        if (options?.stripDisplay) imports.removeSpecifier(this.Runtime, 'display');
-        if (options?.stripView) imports.removeSpecifier(this.Runtime, 'view');
-        if (options?.stripWidth) imports.removeSpecifier(this.Runtime, 'width');
+        imports.removeSpecifier(this.Runtime, 'display');
+        imports.removeSpecifier(this.Runtime, 'view');
+        imports.removeSpecifier(this.Runtime, 'width');
         return imports;
     }
 
-    body(options?: SerializeOptions): string {
-        const imports = this.getImports(options);
-        const outputs = this.getOutputs(options);
+    body(): string {
+        const imports = this.getImports();
+        const outputs = this.getOutputs();
         return [
             this.importsExpressions(imports),
-            this.hasImplicitDisplay() || this.hasExplicitDisplay() || this.hasExplicitView() ? `const display = Display.for(${JSON.stringify(this._key)}, _runtime_);` : undefined,
-            this.hasExplicitView() ? `const view = View.for(display);` : undefined,
+            this.hasImplicitDisplay() || this.hasExplicitDisplay() || this.hasExplicitView() ? `const display = _runtime_.Display.for(${JSON.stringify(this._key)}, _runtime_);` : undefined,
+            this.hasExplicitView() ? `const view = _runtime_.View.for(display);` : undefined,
             this.hasWidthInput() ? `const width = width_${this._key};` : undefined,
             outputs.length ? `${this._body}\nreturn {${outputs.join(',')}};` : this._singleExpression && !this.hasExplicitDisplay() && !this.hasExplicitView() ? `return display(${this._body.replace(/;$/, '')})` : this._body
         ].filter(l => l).join('\n');

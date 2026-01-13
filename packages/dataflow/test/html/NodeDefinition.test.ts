@@ -11,20 +11,11 @@ describe("NodeDefinition", () => {
 
         expect(definition.hasExplicitDisplay()).toBe(true);
 
-        // Without strip options, display remains in inputs/outputs/imports
-        // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["jsx"],["input","display"],async(jsx) => {
-const [{display}] = await Promise.all([import('@bodar/dataflow/runtime.ts')]);
-const display = Display.for("1234", _runtime_);
-const input = display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
-return {input,display};
-}`)
-
-        // With strip options (as EndTransformer would pass), display is stripped
+        // display is always stripped from outputs and imports (accessed via _runtime_.Display)
         // Becomes synchronous because the only import (runtime.ts) is stripped
         // language=JavaScript
-        expect(definition.toString({stripDisplay: true})).toBe(`"1234",["jsx"],["input"],(jsx) => {
-const display = Display.for("1234", _runtime_);
+        expect(definition.toString()).toBe(`"1234",["jsx"],["input"],(jsx) => {
+const display = _runtime_.Display.for("1234", _runtime_);
 const input = display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input};
 }`)
@@ -39,12 +30,12 @@ return {input};
 
         expect(definition.hasExplicitView()).toBe(true);
 
-        // With strip options (as EndTransformer would pass), view is stripped
+        // view is always stripped from outputs and imports (accessed via _runtime_.View)
         // Becomes synchronous because the only import (runtime.ts) is stripped
         // language=JavaScript
-        expect(definition.toString({stripView: true})).toBe(`"1234",["jsx"],["input"],(jsx) => {
-const display = Display.for("1234", _runtime_);
-const view = View.for(display);
+        expect(definition.toString()).toBe(`"1234",["jsx"],["input"],(jsx) => {
+const display = _runtime_.Display.for("1234", _runtime_);
+const view = _runtime_.View.for(display);
 const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input};
 }`)
@@ -58,11 +49,11 @@ return {input};
 
         expect(definition.hasExplicitView()).toBe(true); // detected as input
 
-        // With strip options, view is removed from inputs
+        // view is always stripped from inputs (accessed via _runtime_.View)
         // language=JavaScript
-        expect(definition.toString({stripView: true})).toBe(`"1234",["jsx"],["input"],(jsx) => {
-const display = Display.for("1234", _runtime_);
-const view = View.for(display);
+        expect(definition.toString()).toBe(`"1234",["jsx"],["input"],(jsx) => {
+const display = _runtime_.Display.for("1234", _runtime_);
+const view = _runtime_.View.for(display);
 const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input};
 }`)
@@ -73,10 +64,10 @@ return {input};
         const definition = NodeDefinition.parse(`<input name="name" type="text" value="Dan"/>`, '1234');
         expect(definition.hasImplicitDisplay()).toBe(true);
         expect(definition.hasDisplay()).toBe(true);
-        // Implicit display still injects Display.for() and wraps in display()
+        // Implicit display still injects _runtime_.Display.for() and wraps in display()
         // language=JavaScript
         expect(definition.toString()).toBe(`"1234",["jsx"],[],(jsx) => {
-const display = Display.for("1234", _runtime_);
+const display = _runtime_.Display.for("1234", _runtime_);
 return display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}))
 }`);
     });
@@ -217,8 +208,8 @@ return {Greeter};
         expect(definition.hasImplicitDisplay()).toBe(false);
         // Should NOT wrap body in return display(...) - that would produce invalid JS
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["state","display","jsx"],[],(state,display,jsx) => {
-const display = Display.for("1234", _runtime_);
+        expect(definition.toString()).toBe(`"1234",["state","jsx"],[],(state,jsx) => {
+const display = _runtime_.Display.for("1234", _runtime_);
 if (state !== 'closed') {display(jsx.createElement("div", null, ["Controls"]));}display(jsx.createElement("dl", null, [jsx.createElement("dt", null, ["Status"])]));
 }`);
     });

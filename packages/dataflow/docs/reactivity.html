@@ -46,10 +46,6 @@
     blocks run in topological order determined by variable references (a.k.a. <em>dataflow</em>), rather than in
     top-down document order.</p>
 
-<script type="module" is="reactive">
-    import {display, view, input, event, mutable, observe, now, width, raw} from '@bodar/dataflow/runtime.ts';
-</script>
-
 <h2 id="reactive-scope">Reactive Scope</h2>
 
 <p>All top-level variables declared in reactive scripts are shared within the same <strong>reactive scope</strong>. By
@@ -364,9 +360,7 @@
     <code>setState</code> in React - use it when you need state changes to flow back up the dependency graph:</p>
 
 <div class="note">
-    <strong>Note:</strong> In Observable Framework, <code>Mutable</code> is implicitly available. In Dataflow, you must
-    import <code>mutable</code> from the runtime (like all other functions). Dataflow also adds an
-    <code>update(fn)</code> method for functional updates, e.g. <code>list.update(arr => [...arr, item])</code>.
+    <strong>Note:</strong> Dataflow adds an <code>update(fn)</code> method for functional updates, e.g. <code>list.update(arr => [...arr, item])</code>.
 </div>
 
 <div class="example">
