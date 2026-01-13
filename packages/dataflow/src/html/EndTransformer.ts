@@ -18,20 +18,33 @@ export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementCont
         if (definitions.length > 0) {
             const sorted = topologicalSort(definitions);
 
-            const registrations = sorted.map((d: NodeDefinition) => {
-                return (d.hasWidth() ? `_runtime_.graph.define("width_${d.key}",[],[],() => _runtime_.Width.for("${d.key}", _runtime_));` : '')
+            const imports = new Set<string>(['runtime']);
+            for (const d of sorted) {
+                for (const imp of d.getUsedDirectImports()) imports.add(imp);
+                if (d.hasDisplay()) imports.add('Display');
+                if (d.hasExplicitView()) imports.add('View');
+                if (d.hasWidth()) imports.add('Width');
+                if (d.hasJsx()) imports.add('JSX2DOM').add('autoKeyEvents').add('chain');
+            }
+
+            const jsxNodeDef = imports.has('JSX2DOM')
+                ? `_runtime_.graph.define("jsx",[],[],() => new JSX2DOM(chain({onEventListener: autoKeyEvents()}, globalThis)));`
+                : '';
+
+            const registrations = jsxNodeDef + sorted.map((d: NodeDefinition) => {
+                return (d.hasWidth() ? `_runtime_.graph.define("width_${d.key}",[],[],() => Width.for("${d.key}", _runtime_));` : '')
                     + `_runtime_.graph.define(${d.toString()});`;
             }).join('\n');
             const scriptId = this.controller.idGenerator.generate(registrations);
-            const javascript = await this.bundler.transform(scriptTemplate({scriptId, idle: this.controller.idle}, registrations));
+            const javascript = await this.bundler.transform(scriptTemplate({scriptId, idle: this.controller.idle}, imports, registrations));
             end.before(`<script type="module" is="reactive-runtime" id="${scriptId}">${javascript}</script>`, {html: true})
         }
     }
 }
 
-export function scriptTemplate(config: RuntimeConfig, registrations: string): string {
+export function scriptTemplate(config: RuntimeConfig, imports: Set<string>, registrations: string): string {
     // language=javascript
-    return `import {runtime} from "@bodar/dataflow/runtime.ts";
+    return `import {${([...imports].join(','))}} from "@bodar/dataflow/runtime.ts";
 const _runtime_ = runtime(${JSON.stringify(config)}, globalThis);
 ${registrations}
 _runtime_.graph.run();`;

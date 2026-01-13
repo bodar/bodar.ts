@@ -5,10 +5,10 @@ import {findTopLevelDeclarations} from "../javascript/findTopLevelDeclarations.t
 import {isSingleExpression} from "../javascript/isSingleExpression.ts";
 import {hasTopLevelAwait} from "../javascript/findTopLevelAwaits.ts";
 
+export const IMPLICIT_IMPORTS = new Set(['observe', 'events', 'input', 'mutable', 'now', 'raw']);
+
 /** A definition of a Node but still in raw text format */
 export class NodeDefinition {
-    private readonly Runtime = '@bodar/dataflow/runtime.ts';
-
     constructor(private _key: string,
                 private _inputs: string[],
                 private _outputs: string[],
@@ -81,9 +81,8 @@ export class NodeDefinition {
 
     private getInputs(): string[] {
         let inputs = this._inputs;
-        // Strip display/view - accessed via _runtime_.Display/_runtime_.View
         inputs = inputs.filter(i => i !== 'display' && i !== 'view');
-        // Map width to the per-node width stream
+        inputs = inputs.filter(i => !IMPLICIT_IMPORTS.has(i));
         inputs = inputs.map(i => i === 'width' ? `width_${this.key}` : i);
         return inputs;
     }
@@ -93,11 +92,7 @@ export class NodeDefinition {
     }
 
     private getImports(): Imports {
-        const imports = this._imports.clone();
-        imports.removeSpecifier(this.Runtime, 'display');
-        imports.removeSpecifier(this.Runtime, 'view');
-        imports.removeSpecifier(this.Runtime, 'width');
-        return imports;
+        return this._imports;
     }
 
     body(): string {
@@ -105,9 +100,9 @@ export class NodeDefinition {
         const outputs = this.getOutputs();
         return [
             this.importsExpressions(imports),
-            this.hasImplicitDisplay() || this.hasExplicitDisplay() || this.hasExplicitView() ? `const display = _runtime_.Display.for(${JSON.stringify(this._key)}, _runtime_);` : undefined,
-            this.hasExplicitView() ? `const view = _runtime_.View.for(display);` : undefined,
-            this.hasWidthInput() ? `const width = width_${this._key};` : undefined,
+            this.hasDisplay() ? `const display = Display.for(${JSON.stringify(this._key)}, _runtime_);` : undefined,
+            this.hasExplicitView() ? `const view = View.for(display);` : undefined,
+            this.hasWidth() ? `const width = width_${this._key};` : undefined,
             outputs.length ? `${this._body}\nreturn {${outputs.join(',')}};` : this._singleExpression && !this.hasExplicitDisplay() && !this.hasExplicitView() ? `return display(${this._body.replace(/;$/, '')})` : this._body
         ].filter(l => l).join('\n');
     }
@@ -117,27 +112,28 @@ export class NodeDefinition {
     }
 
     hasExplicitDisplay(): boolean {
-        return this._imports.get(this.Runtime)?.locals.includes('display') || this._inputs.some(v => v === 'display');
+        return this._inputs.includes('display');
     }
 
     hasExplicitView(): boolean {
-        return this._imports.get(this.Runtime)?.locals.includes('view') || this._inputs.some(v => v === 'view');
+        return this._inputs.includes('view');
     }
 
     hasWidth(): boolean {
-        return this.hasWidthImport() || this.hasWidthInput();
-    }
-
-    hasWidthInput(): boolean {
-        return this._inputs.some(v => v === 'width');
-    }
-
-    hasWidthImport(): boolean {
-        return !!this._imports.get(this.Runtime)?.locals.includes('width');
+        return this._inputs.includes('width');
     }
 
     hasDisplay(): boolean {
         return this.hasImplicitDisplay() || this.hasExplicitDisplay() || this.hasExplicitView();
+    }
+
+    hasJsx(): boolean {
+        return this._inputs.includes('jsx');
+    }
+
+    /** Returns direct implicit imports used by this node (for tree-shaking imports) */
+    getUsedDirectImports(): string[] {
+        return this._inputs.filter((i) => IMPLICIT_IMPORTS.has(i));
     }
 }
 

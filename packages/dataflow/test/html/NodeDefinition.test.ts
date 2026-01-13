@@ -2,58 +2,38 @@ import {describe, expect, test} from "bun:test";
 import {NodeDefinition} from "../../src/html/NodeDefinition.ts";
 
 describe("NodeDefinition", () => {
-    test("detects explicit display function from runtime import", async () => {
+    test("detects display as unresolved reference (input)", async () => {
         // language=JavaScript
         const definition = NodeDefinition.parse(`
-            import {display} from "@bodar/dataflow/runtime.ts";
             const input = display(<input name="name" type="text" value="Dan"/>);
         `, '1234');
 
         expect(definition.hasExplicitDisplay()).toBe(true);
 
-        // display is always stripped from outputs and imports (accessed via _runtime_.Display)
-        // Becomes synchronous because the only import (runtime.ts) is stripped
+        // display is detected as input and wired via Display.for()
+        // jsx is a regular input provided by the jsx graph node
         // language=JavaScript
         expect(definition.toString()).toBe(`"1234",["jsx"],["input"],(jsx) => {
-const display = _runtime_.Display.for("1234", _runtime_);
+const display = Display.for("1234", _runtime_);
 const input = display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input};
 }`)
     });
 
-    test("detects explicit view function from runtime import", async () => {
+    test("detects view as unresolved reference (input)", async () => {
         // language=JavaScript
         const definition = NodeDefinition.parse(`
-            import {view} from "@bodar/dataflow/runtime.ts";
             const input = view(<input name="name" type="text" value="Dan"/>);
         `, '1234');
 
         expect(definition.hasExplicitView()).toBe(true);
 
-        // view is always stripped from outputs and imports (accessed via _runtime_.View)
-        // Becomes synchronous because the only import (runtime.ts) is stripped
+        // view is detected as input and wired via View.for()
+        // jsx is a regular input provided by the jsx graph node
         // language=JavaScript
         expect(definition.toString()).toBe(`"1234",["jsx"],["input"],(jsx) => {
-const display = _runtime_.Display.for("1234", _runtime_);
-const view = _runtime_.View.for(display);
-const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
-return {input};
-}`)
-    });
-
-    test("detects view as unresolved reference (input parameter)", async () => {
-        // language=JavaScript
-        const definition = NodeDefinition.parse(`
-            const input = view(<input name="name" type="text" value="Dan"/>);
-        `, '1234');
-
-        expect(definition.hasExplicitView()).toBe(true); // detected as input
-
-        // view is always stripped from inputs (accessed via _runtime_.View)
-        // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["jsx"],["input"],(jsx) => {
-const display = _runtime_.Display.for("1234", _runtime_);
-const view = _runtime_.View.for(display);
+const display = Display.for("1234", _runtime_);
+const view = View.for(display);
 const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
 return {input};
 }`)
@@ -64,10 +44,11 @@ return {input};
         const definition = NodeDefinition.parse(`<input name="name" type="text" value="Dan"/>`, '1234');
         expect(definition.hasImplicitDisplay()).toBe(true);
         expect(definition.hasDisplay()).toBe(true);
-        // Implicit display still injects _runtime_.Display.for() and wraps in display()
+        // Implicit display still injects Display.for() and wraps in display()
+        // jsx is a regular input provided by the jsx graph node
         // language=JavaScript
         expect(definition.toString()).toBe(`"1234",["jsx"],[],(jsx) => {
-const display = _runtime_.Display.for("1234", _runtime_);
+const display = Display.for("1234", _runtime_);
 return display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}))
 }`);
     });
@@ -86,6 +67,7 @@ return {Renderer};
     test("still handles jsx as an arrow body", async () => {
         // language=JavaScript
         const definition = NodeDefinition.parse(`const greeting = (name) => <i>Hello {name}!</i>`, '1234');
+        // jsx is a regular input provided by the jsx graph node
         // language=JavaScript
         expect(definition.toString()).toBe(`"1234",["jsx"],["greeting"],(jsx) => {
 const greeting = name => jsx.createElement("i", null, ["Hello ", name, "!"]);
@@ -207,9 +189,10 @@ return {Greeter};
         expect(definition.hasExplicitDisplay()).toBe(true);
         expect(definition.hasImplicitDisplay()).toBe(false);
         // Should NOT wrap body in return display(...) - that would produce invalid JS
+        // jsx is a regular input provided by the jsx graph node
         // language=JavaScript
         expect(definition.toString()).toBe(`"1234",["state","jsx"],[],(state,jsx) => {
-const display = _runtime_.Display.for("1234", _runtime_);
+const display = Display.for("1234", _runtime_);
 if (state !== 'closed') {display(jsx.createElement("div", null, ["Controls"]));}display(jsx.createElement("dl", null, [jsx.createElement("dt", null, ["Status"])]));
 }`);
     });
