@@ -68,7 +68,8 @@ const input = <input name="name" type="text" />;
 const name = iterator(notify => input.addEventListener('input', ev => {notify(ev.data)}), input.value);
 </script></body>`);
 
-        expect(result).toBe(`<body><script type="module" is="reactive-runtime" id="h3ztfi_1">${scriptTemplate({scriptId: 'h3ztfi_1', idle: false}, jsxImports, `_runtime_.graph.define("jsx",[],[],() => new JSX2DOM(chain({onEventListener: autoKeyEvents()}, globalThis)));_runtime_.graph.define("uf397b_0",["jsx"],["input","name","iterator"],async(jsx) => {
+        expect(result).toBe(`<body><script type="module" is="reactive-runtime" id="mct9x4_1">${scriptTemplate({scriptId: 'mct9x4_1', idle: false}, jsxImports, `_runtime_.graph.define("jsx",[],[],() => new JSX2DOM(chain({onEventListener: autoKeyEvents()}, globalThis)));
+_runtime_.graph.define("uf397b_0",["jsx"],["input","name","iterator"],async(jsx) => {
 const [{iterator}] = await Promise.all([import('@bodar/dataflow/observe.ts')]);
 const input = jsx.createElement("input", {"name": "name","type": "text"});const name = iterator(notify => input.addEventListener('input', ev => {notify(ev.data);}), input.value);
 return {input,name,iterator};

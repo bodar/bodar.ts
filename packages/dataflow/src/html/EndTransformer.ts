@@ -27,14 +27,13 @@ export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementCont
                 if (d.hasJsx()) imports.add('JSX2DOM').add('autoKeyEvents').add('chain');
             }
 
-            const jsxNodeDef = imports.has('JSX2DOM')
-                ? `_runtime_.graph.define("jsx",[],[],() => new JSX2DOM(chain({onEventListener: autoKeyEvents()}, globalThis)));`
-                : '';
-
-            const registrations = jsxNodeDef + sorted.map((d: NodeDefinition) => {
-                return (d.hasWidth() ? `_runtime_.graph.define("width_${d.key}",[],[],() => Width.for("${d.key}", _runtime_));` : '')
-                    + `_runtime_.graph.define(${d.toString()});`;
-            }).join('\n');
+            const registrations = [
+                imports.has('JSX2DOM') && `_runtime_.graph.define("jsx",[],[],() => new JSX2DOM(chain({onEventListener: autoKeyEvents()}, globalThis)));`,
+                ...sorted.flatMap((d: NodeDefinition) => [
+                    d.hasWidth() && `_runtime_.graph.define("width_${d.key}",[],[],() => Width.for("${d.key}", _runtime_));`,
+                    `_runtime_.graph.define(${d.toString()});`
+                ])
+            ].filter(Boolean).join('\n');
             const scriptId = this.controller.idGenerator.generate(registrations);
             const javascript = await this.bundler.transform(scriptTemplate({scriptId, idle: this.controller.idle}, imports, registrations));
             end.before(`<script type="module" is="reactive-runtime" id="${scriptId}">${javascript}</script>`, {html: true})
