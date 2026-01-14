@@ -1,9 +1,3 @@
-/**
- * @module
- *
- * ANSI SQL SELECT statement builder combining set quantifiers, columns, tables, and filters.
- */
-
 import {text, Text} from "../template/Text.ts";
 import {SetQuantifier} from "./SetQuantifier.ts";
 import {Compound, list} from "../template/Compound.ts";

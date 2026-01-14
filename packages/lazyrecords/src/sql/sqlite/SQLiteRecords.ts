@@ -5,10 +5,13 @@
  */
 
 import type {Transducer} from "@bodar/totallylazy/transducers/Transducer.ts";
+import type {Predicate} from "@bodar/totallylazy/predicates/Predicate.ts";
 import {type Definition, toSelect, type Supported} from "../builder/builders.ts";
 import {statement} from "../statement/ordinalPlaceholder.ts";
 import {sql} from "../template/Sql.ts";
 import type {Records} from "../Records.ts";
+import {InsertStatement} from "../ansi/InsertStatement.ts";
+import {DeleteStatement} from "../ansi/DeleteStatement.ts";
 
 /**
  * A minimal SQLite database interface compatible with Bun's SQLite Database.
@@ -16,6 +19,7 @@ import type {Records} from "../Records.ts";
 export interface SQLiteDatabase {
     query(sql: string): {
         all(...params: unknown[]): unknown[];
+        run(...params: unknown[]): { changes: number };
     };
 }
 
@@ -69,5 +73,21 @@ export class SQLiteRecords implements Records {
         for (const row of results) {
             yield row;
         }
+    }
+
+    async add<A>(definition: Definition<A>, records: Iterable<A>): Promise<number> {
+        let count = 0;
+        for (const record of records) {
+            const stmt = statement(sql(new InsertStatement(definition, record)));
+            const result = this.db.query(stmt.text).run(...stmt.args);
+            count += result.changes;
+        }
+        return count;
+    }
+
+    async remove<A>(definition: Definition<A>, predicate?: Predicate<A>): Promise<number> {
+        const stmt = statement(sql(new DeleteStatement(definition, predicate)));
+        const result = this.db.query(stmt.text).run(...stmt.args);
+        return result.changes;
     }
 }

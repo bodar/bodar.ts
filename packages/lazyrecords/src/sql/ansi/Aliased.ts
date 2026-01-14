@@ -1,9 +1,3 @@
-/**
- * @module
- *
- * ANSI SQL aliased expressions combining a value with its alias name.
- */
-
 import {Compound} from "../template/Compound.ts";
 import {Expression} from "../template/Expression.ts";
 import {text, Text} from "../template/Text.ts";

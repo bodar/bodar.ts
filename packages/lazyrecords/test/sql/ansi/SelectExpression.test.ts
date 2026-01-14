@@ -1,15 +1,15 @@
 import {describe, it} from "bun:test";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
-import {select} from "@bodar/lazyrecords/sql/ansi/SelectExpression.ts";
-import {distinct} from "@bodar/lazyrecords/sql/ansi/SetQuantifier.ts";
+import {select} from "../../../src/sql/ansi/SelectExpression.ts";
+import {distinct} from "../../../src/sql/ansi/SetQuantifier.ts";
 import {sql} from "@bodar/lazyrecords/sql/template/Sql.ts";
-import {column} from "@bodar/lazyrecords/sql/ansi/Column.ts";
-import {from} from "@bodar/lazyrecords/sql/ansi/FromClause.ts";
-import {table} from "@bodar/lazyrecords/sql/ansi/Table.ts";
-import {where} from "@bodar/lazyrecords/sql/ansi/WhereClause.ts";
-import {qualified} from "@bodar/lazyrecords/sql/ansi/Qualified.ts";
-import {is} from "@bodar/lazyrecords/sql/ansi/IsExpression.ts";
+import {column} from "../../../src/sql/ansi/Column.ts";
+import {from} from "../../../src/sql/ansi/FromClause.ts";
+import {table} from "../../../src/sql/ansi/Table.ts";
+import {where} from "../../../src/sql/ansi/WhereClause.ts";
+import {qualified} from "../../../src/sql/ansi/Qualified.ts";
+import {is} from "../../../src/sql/ansi/IsExpression.ts";
 
 describe('SelectExpression', () => {
     it('can write in normal SQL order', () => {

@@ -1,9 +1,3 @@
-/**
- * @module
- *
- * ANSI SQL IS NULL / IS NOT NULL expressions for null-safe comparisons.
- */
-
 import {text, Text} from "../template/Text.ts";
 import {Value} from "../template/Value.ts";
 import {PredicateExpression} from "./PredicateExpression.ts";

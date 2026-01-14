@@ -5,11 +5,14 @@
  */
 
 import type {Transducer} from "@bodar/totallylazy/transducers/Transducer.ts";
+import type {Predicate} from "@bodar/totallylazy/predicates/Predicate.ts";
 import {type Definition, toSelect, type Supported} from "../builder/builders.ts";
 import {statement} from "../statement/numberedPlaceholder.ts";
 import {sql} from "../template/Sql.ts";
 import type {Records} from "../Records.ts";
 import type {DuckDBResultReader, DuckDBValue} from "@duckdb/node-api";
+import {InsertStatement} from "../ansi/InsertStatement.ts";
+import {DeleteStatement} from "../ansi/DeleteStatement.ts";
 
 /**
  * A DuckDB connection interface compatible with @duckdb/node-api.
@@ -75,5 +78,21 @@ export class DuckDBRecords implements Records {
                 yield* toObjects<A>(result);
             }
         };
+    }
+
+    async add<A>(definition: Definition<A>, records: Iterable<A>): Promise<number> {
+        let count = 0;
+        for (const record of records) {
+            const stmt = statement(sql(new InsertStatement(definition, record)));
+            const result = await this.connection.runAndReadAll(stmt.text, stmt.args as DuckDBValue[]);
+            count += result.rowsChanged;
+        }
+        return count;
+    }
+
+    async remove<A>(definition: Definition<A>, predicate?: Predicate<A>): Promise<number> {
+        const stmt = statement(sql(new DeleteStatement(definition, predicate)));
+        const result = await this.connection.runAndReadAll(stmt.text, stmt.args as DuckDBValue[]);
+        return result.rowsChanged;
     }
 }

@@ -1,7 +1,7 @@
 import {describe, it} from "bun:test";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
-import {definition, toSelect} from "@bodar/lazyrecords/sql/builder/builders.ts";
+import {definition, toSelect} from "../../../src/sql/builder/builders.ts";
 import {sql} from "@bodar/lazyrecords/sql/template/Sql.ts";
 import {accept, filter, reject} from "@bodar/totallylazy/transducers/FilterTransducer.ts";
 import {where} from "@bodar/totallylazy/predicates/WherePredicate.ts";

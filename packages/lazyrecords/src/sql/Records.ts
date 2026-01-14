@@ -5,6 +5,7 @@
  */
 
 import type {Transducer} from "@bodar/totallylazy/transducers/Transducer.ts";
+import type {Predicate} from "@bodar/totallylazy/predicates/Predicate.ts";
 import {type Definition, type Supported} from "./builder/builders.ts";
 
 /**
@@ -39,4 +40,22 @@ export interface Records {
     query<A, B, C, D>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>, c: Transducer<B, C> & Supported<B>, d: Transducer<C, D> & Supported<C>): AsyncIterable<D>;
     query<A, B, C, D, E>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>, c: Transducer<B, C> & Supported<B>, d: Transducer<C, D> & Supported<C>, e: Transducer<D, E> & Supported<D>): AsyncIterable<E>;
     query<A, B, C, D, E, F>(definition: Definition<A>, b: Transducer<A, B> & Supported<A>, c: Transducer<B, C> & Supported<B>, d: Transducer<C, D> & Supported<C>, e: Transducer<D, E> & Supported<D>, f: Transducer<E, F> & Supported<E>): AsyncIterable<F>;
+
+    /**
+     * Inserts records into the database.
+     *
+     * @param definition - The table definition.
+     * @param records - The records to insert.
+     * @returns A promise resolving to the number of rows inserted.
+     */
+    add<A>(definition: Definition<A>, records: Iterable<A>): Promise<number>;
+
+    /**
+     * Removes records from the database.
+     *
+     * @param definition - The table definition.
+     * @param predicate - Optional predicate to filter which records to delete. If omitted, deletes all records.
+     * @returns A promise resolving to the number of rows deleted.
+     */
+    remove<A>(definition: Definition<A>, predicate?: Predicate<A>): Promise<number>;
 }

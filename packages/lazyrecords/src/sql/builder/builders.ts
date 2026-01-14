@@ -1,10 +1,3 @@
-/**
- * @module
- *
- * Functional SQL query builder that converts totallylazy transducers and predicates into type-safe SQL SELECT expressions.
- * Provides a composable approach to building SQL queries using familiar functional programming patterns.
- */
-
 import {select, SelectExpression, type SelectList} from "../ansi/SelectExpression.ts";
 import {from, FromClause} from "../ansi/FromClause.ts";
 import {table} from "../ansi/Table.ts";

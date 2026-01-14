@@ -1,9 +1,3 @@
-/**
- * @module
- *
- * ANSI SQL aliasing support for tables and columns using AS keyword.
- */
-
 import {Expression} from "../template/Expression.ts";
 import {Aliased} from "./Aliased.ts";
 import {Compound} from "../template/Compound.ts";

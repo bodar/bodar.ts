@@ -1,9 +1,3 @@
-/**
- * @module
- *
- * ANSI SQL column references and the star (*) selector for query projections.
- */
-
 import {Qualified} from "./Qualified.ts";
 import {Aliasable} from "./Aliasable.ts";
 import {id, Identifier} from "../template/Identifier.ts";

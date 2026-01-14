@@ -1,9 +1,3 @@
-/**
- * @module
- *
- * ANSI SQL FROM clause specifying the tables to query.
- */
-
 import {Compound} from "../template/Compound.ts";
 import {text, Text} from "../template/Text.ts";
 import {type TableReference} from "./Table.ts";
