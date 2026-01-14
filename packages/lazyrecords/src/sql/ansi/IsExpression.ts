@@ -15,7 +15,7 @@ export class IsExpression extends PredicateExpression {
     static is: Text = text("is");
 
     private static convert(value: unknown): Expression[] {
-        if (value === undefined || value === null) return [IsExpression.is, new Value(null)];
+        if (value === undefined || value === null) return [IsExpression.is, text("null")];
         return [IsExpression.equals, new Value(value)];
     }
 

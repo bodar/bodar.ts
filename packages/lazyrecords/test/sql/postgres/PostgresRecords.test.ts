@@ -1,47 +1,44 @@
-import {describe, it} from "bun:test";
-import {PostgresRecords} from "@bodar/lazyrecords/sql/postgres/PostgresRecords.ts";
-import {property} from "@bodar/totallylazy/functions/Property.ts";
-import {filter} from "@bodar/totallylazy/transducers/FilterTransducer.ts";
-import {where} from "@bodar/totallylazy/predicates/WherePredicate.ts";
-import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
-import {definition} from "@bodar/lazyrecords/sql/builder/builders.ts";
-import {select} from "@bodar/totallylazy/functions/Select.ts";
-import {map} from "@bodar/totallylazy/transducers/MapTransducer.ts";
 import {SQL} from "bun";
+import {PostgresRecords} from "@bodar/lazyrecords/sql/postgres/PostgresRecords.ts";
+import {recordsContract, testCountries} from "../RecordsContract.ts";
 
+let client: InstanceType<typeof SQL>;
 
-describe("PostgresRecords", () => {
-    it.skip("can query records", async () => {
-        const client = new SQL({
+// Skip by default - requires running Postgres instance
+// To run: remove .skip and ensure Postgres is available
+recordsContract.skip('PostgresRecords', {
+    async create() {
+        client = new SQL({
             username: "admin",
             password: "password",
-            database: "slipway",
+            database: "test",
             host: "localhost",
             port: 5432,
         } as any);
         await client.connect();
 
-        const records = new PostgresRecords(client);
+        await client.unsafe(`
+            DROP TABLE IF EXISTS country;
+            CREATE TABLE country (
+                country_code VARCHAR,
+                country_name VARCHAR,
+                population INTEGER
+            )
+        `);
 
-        interface Country {
-            country_code: string;
-            country_name: string;
-        }
+        const values = testCountries
+            .map(c => `('${c.country_code}', '${c.country_name}', ${c.population})`)
+            .join(', ');
+        await client.unsafe(`INSERT INTO country VALUES ${values}`);
 
-        const country = definition<Country>("country");
-        const countryCode = property<Country, 'country_code'>("country_code");
-        // const countryName = property<Country, 'country_name'>("country_name");
-
-        try {
-            const query = records.query(country,
-                filter(where(countryCode, is("GB"))),
-                map(select(countryCode)));
-
-            for await (const record of query) {
-                console.log(record);
-            }
-        } finally {
-            await client.end();
-        }
-    });
+        return new PostgresRecords(client);
+    },
+    async cleanup() {
+        await client.end();
+    }
 });
+
+// Postgres-specific tests can go here
+// describe('Postgres-specific', () => {
+//     it('supports JSONB', async () => { ... });
+// });
