@@ -12,11 +12,18 @@
     "bun-types": "1.2.3"
   },
   "exports": {
+    "./Keyword.ts": "./src/Keyword.ts",
+    "./sql/ColumnTypeMappings.ts": "./src/sql/ColumnTypeMappings.ts",
+    "./sql/duckdb/duckdbMappings.ts": "./src/sql/duckdb/duckdbMappings.ts",
     "./sql/duckdb/DuckDBRecords.ts": "./src/sql/duckdb/DuckDBRecords.ts",
+    "./sql/postgres/postgresMappings.ts": "./src/sql/postgres/postgresMappings.ts",
     "./sql/postgres/PostgresRecords.ts": "./src/sql/postgres/PostgresRecords.ts",
     "./sql/postgres/prepareStatement.ts": "./src/sql/postgres/prepareStatement.ts",
     "./sql/Records.ts": "./src/sql/Records.ts",
+    "./sql/Schema.ts": "./src/sql/Schema.ts",
+    "./sql/sqlite/sqliteMappings.ts": "./src/sql/sqlite/sqliteMappings.ts",
     "./sql/sqlite/SQLiteRecords.ts": "./src/sql/sqlite/SQLiteRecords.ts",
+    "./sql/SqlSchema.ts": "./src/sql/SqlSchema.ts",
     "./sql/statement/numberedPlaceholder.ts": "./src/sql/statement/numberedPlaceholder.ts",
     "./sql/statement/ordinalPlaceholder.ts": "./src/sql/statement/ordinalPlaceholder.ts",
     "./sql/template/Compound.ts": "./src/sql/template/Compound.ts",

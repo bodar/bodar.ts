@@ -95,4 +95,11 @@ export class DuckDBRecords implements Records {
         const result = await this.connection.runAndReadAll(stmt.text, stmt.args as DuckDBValue[]);
         return result.rowsChanged;
     }
+
+    async execute(expression: Compound): Promise<void> {
+        const stmt = statement(sql(expression));
+        await this.connection.runAndReadAll(stmt.text, stmt.args as DuckDBValue[]);
+    }
 }
+
+import type {Compound} from "../template/Compound.ts";

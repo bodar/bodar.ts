@@ -58,4 +58,13 @@ export interface Records {
      * @returns A promise resolving to the number of rows deleted.
      */
     remove<A>(definition: Definition<A>, predicate?: Predicate<A>): Promise<number>;
+
+    /**
+     * Executes a raw SQL expression (used for DDL operations like CREATE TABLE).
+     *
+     * @param expression - The SQL expression to execute.
+     */
+    execute(expression: Compound): Promise<void>;
 }
+
+import type {Compound} from "./template/Compound.ts";

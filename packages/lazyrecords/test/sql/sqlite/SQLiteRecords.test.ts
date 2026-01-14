@@ -1,27 +1,17 @@
 import {Database} from "bun:sqlite";
 import {SQLiteRecords} from "@bodar/lazyrecords/sql/sqlite/SQLiteRecords.ts";
-import {recordsContract, testCountries} from "../RecordsContract.ts";
+import {SqlSchema} from "@bodar/lazyrecords/sql/SqlSchema.ts";
+import {sqliteMappings} from "@bodar/lazyrecords/sql/sqlite/sqliteMappings.ts";
+import {recordsContract} from "../RecordsContract.ts";
 
 let db: Database;
 
 recordsContract('SQLiteRecords', {
     async create() {
         db = new Database(":memory:");
-
-        db.run(`
-            CREATE TABLE country (
-                country_code TEXT,
-                country_name TEXT,
-                population INTEGER
-            )
-        `);
-
-        const insert = db.prepare("INSERT INTO country VALUES (?, ?, ?)");
-        for (const c of testCountries) {
-            insert.run(c.country_code, c.country_name, c.population);
-        }
-
-        return new SQLiteRecords(db);
+        const records = new SQLiteRecords(db);
+        const schema = new SqlSchema(records, sqliteMappings());
+        return {records, schema};
     },
     async cleanup() {
         db.close();

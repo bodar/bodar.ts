@@ -1,10 +1,11 @@
 import {describe, it, beforeAll, afterAll, expect} from "bun:test";
 import type {Records} from "@bodar/lazyrecords/sql/Records.ts";
-import {property} from "@bodar/totallylazy/functions/Property.ts";
+import type {Schema} from "@bodar/lazyrecords/sql/Schema.ts";
 import {filter} from "@bodar/totallylazy/transducers/FilterTransducer.ts";
 import {where} from "@bodar/totallylazy/predicates/WherePredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import {definition} from "../../src/sql/builder/builders.ts";
+import {keyword} from "../../src/Keyword.ts";
 import {select} from "@bodar/totallylazy/functions/Select.ts";
 import {map} from "@bodar/totallylazy/transducers/MapTransducer.ts";
 import {and} from "@bodar/totallylazy/predicates/AndPredicate.ts";
@@ -19,10 +20,10 @@ export interface Country {
     population: number;
 }
 
-export const country = definition<Country>("country");
-export const countryCode = property<Country, 'country_code'>("country_code");
-export const countryName = property<Country, 'country_name'>("country_name");
-export const population = property<Country, 'population'>("population");
+export const countryCode = keyword<Country, 'country_code'>("country_code", String);
+export const countryName = keyword<Country, 'country_name'>("country_name", String);
+export const population = keyword<Country, 'population'>("population", Number);
+export const country = definition<Country>("country", [countryCode, countryName, population]);
 
 // Test data
 export const testCountries: Country[] = [
@@ -33,7 +34,7 @@ export const testCountries: Country[] = [
 ];
 
 export interface RecordsFactory {
-    create(): Promise<Records>;
+    create(): Promise<{records: Records, schema: Schema}>;
     cleanup?(): Promise<void>;
 }
 
@@ -41,12 +42,18 @@ function createContract(describeFn: typeof describe) {
     return (name: string, factory: RecordsFactory) => {
         describeFn(name, () => {
         let records: Records;
+        let schema: Schema;
 
         beforeAll(async () => {
-            records = await factory.create();
+            const result = await factory.create();
+            records = result.records;
+            schema = result.schema;
+            await schema.define(country);
+            await records.add(country, testCountries);
         });
 
         afterAll(async () => {
+            await schema.undefine(country);
             await factory.cleanup?.();
         });
 

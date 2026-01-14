@@ -85,4 +85,11 @@ export class PostgresRecords implements Records {
         const result = await this.client(stmt.text, stmt.args) as { count: number };
         return result.count ?? 0;
     }
+
+    async execute(expression: Compound): Promise<void> {
+        const stmt = statement(sql(expression));
+        await this.client(stmt.text, stmt.args);
+    }
 }
+
+import type {Compound} from "../template/Compound.ts";

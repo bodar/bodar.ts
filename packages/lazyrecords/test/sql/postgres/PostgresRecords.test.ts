@@ -1,6 +1,8 @@
 import {SQL} from "bun";
 import {PostgresRecords} from "@bodar/lazyrecords/sql/postgres/PostgresRecords.ts";
-import {recordsContract, testCountries} from "../RecordsContract.ts";
+import {SqlSchema} from "@bodar/lazyrecords/sql/SqlSchema.ts";
+import {postgresMappings} from "@bodar/lazyrecords/sql/postgres/postgresMappings.ts";
+import {recordsContract} from "../RecordsContract.ts";
 
 let client: InstanceType<typeof SQL>;
 
@@ -16,22 +18,9 @@ recordsContract.skip('PostgresRecords', {
             port: 5432,
         } as any);
         await client.connect();
-
-        await client.unsafe(`
-            DROP TABLE IF EXISTS country;
-            CREATE TABLE country (
-                country_code VARCHAR,
-                country_name VARCHAR,
-                population INTEGER
-            )
-        `);
-
-        const values = testCountries
-            .map(c => `('${c.country_code}', '${c.country_name}', ${c.population})`)
-            .join(', ');
-        await client.unsafe(`INSERT INTO country VALUES ${values}`);
-
-        return new PostgresRecords(client);
+        const records = new PostgresRecords(client);
+        const schema = new SqlSchema(records, postgresMappings());
+        return {records, schema};
     },
     async cleanup() {
         await client.end();

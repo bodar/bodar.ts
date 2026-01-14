@@ -10,7 +10,8 @@ import {isMapTransducer, type MapTransducer} from "@bodar/totallylazy/transducer
 import {isSelect} from "@bodar/totallylazy/functions/Select.ts";
 import {Column, column, star} from "../ansi/Column.ts";
 import {isWherePredicate} from "@bodar/totallylazy/predicates/WherePredicate.ts";
-import {isProperty, type Property} from "@bodar/totallylazy/functions/Property.ts";
+import type {Property} from "@bodar/totallylazy/functions/Property.ts";
+import {isKeyword} from "../../Keyword.ts";
 import {isIsPredicate} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import {is} from "../ansi/IsExpression.ts";
 import type {Predicate} from "@bodar/totallylazy/predicates/Predicate.ts";
@@ -19,16 +20,18 @@ import {and, between, Compound, not, or} from "../template/Compound.ts";
 import {isOrPredicate} from "@bodar/totallylazy/predicates/OrPredicate.ts";
 import {isNotPredicate} from "@bodar/totallylazy/predicates/NotPredicate.ts";
 import {isBetweenPredicate} from "@bodar/totallylazy/predicates/BetweenPredicate.ts";
+import type {Keyword} from "../../Keyword.ts";
 
-/** Represents a table definition with a name for SQL query generation. */
+/** Represents a table definition with typed fields for SQL query and schema generation. */
 // @ts-ignore
 export interface Definition<A> {
     name: string;
+    fields: readonly Keyword<A, keyof A>[];
 }
 
-/** Creates a table definition for use in SQL query building. */
-export function definition<A>(name: string): Definition<A> {
-    return {name};
+/** Creates a table definition for use in SQL query building and schema operations. */
+export function definition<A>(name: string, fields: readonly Keyword<A, keyof A>[]): Definition<A> {
+    return {name, fields};
 }
 
 /** Union type of supported transducers for SQL query building. */
@@ -76,7 +79,7 @@ export function toFromClause<A>(definition: Definition<A>): FromClause {
 
 /** Converts a mapper to a SQL predicand for use in WHERE clauses. */
 export function toPredicand<A>(mapper: Mapper<A, keyof A>): Predicand {
-    if (isProperty(mapper)) {
+    if (isKeyword(mapper)) {
         return toColumn(mapper);
     }
     throw new Error(`Unsupported Mapper: ${mapper}`);

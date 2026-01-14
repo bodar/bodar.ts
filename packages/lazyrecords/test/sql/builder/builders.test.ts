@@ -5,7 +5,7 @@ import {definition, toSelect} from "../../../src/sql/builder/builders.ts";
 import {sql} from "@bodar/lazyrecords/sql/template/Sql.ts";
 import {accept, filter, reject} from "@bodar/totallylazy/transducers/FilterTransducer.ts";
 import {where} from "@bodar/totallylazy/predicates/WherePredicate.ts";
-import {property} from "@bodar/totallylazy/functions/Property.ts";
+import {keyword} from "../../../src/Keyword.ts";
 import {map} from "@bodar/totallylazy/transducers/MapTransducer.ts";
 import {select} from "@bodar/totallylazy/functions/Select.ts";
 import {and} from "@bodar/totallylazy/predicates/AndPredicate.ts";
@@ -21,11 +21,11 @@ interface Country {
     age: number;
 }
 
-const country = definition<Country>("country");
-const countryCode = property<Country, 'country_code'>("country_code");
-const countryName = property<Country, 'country_name'>("country_name");
-const optional = property<Country, 'optional'>("optional");
-const age = property<Country, 'age'>("age");
+const countryCode = keyword<Country, 'country_code'>("country_code", String);
+const countryName = keyword<Country, 'country_name'>("country_name", String);
+const optional = keyword<Country, 'optional'>("optional", String);
+const age = keyword<Country, 'age'>("age", Number);
+const country = definition<Country>("country", [countryCode, countryName, optional, age]);
 
 describe("selectExpression", () => {
     it("works with just the definition", () => {

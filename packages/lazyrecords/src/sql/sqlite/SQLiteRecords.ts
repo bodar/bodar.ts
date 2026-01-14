@@ -90,4 +90,11 @@ export class SQLiteRecords implements Records {
         const result = this.db.query(stmt.text).run(...stmt.args);
         return result.changes;
     }
+
+    async execute(expression: Compound): Promise<void> {
+        const stmt = statement(sql(expression));
+        this.db.query(stmt.text).run(...stmt.args);
+    }
 }
+
+import type {Compound} from "../template/Compound.ts";
