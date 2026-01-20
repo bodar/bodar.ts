@@ -6,9 +6,7 @@
   "sideEffects": false,
   "dependencies": {
     "@bodar/totallylazy": "workspace:totallylazy",
-    "@duckdb/node-api": "^1.4.3-r.3"
-  },
-  "devDependencies": {
+    "@duckdb/node-api": "^1.4.3-r.3",
     "bun-types": "1.2.3"
   },
   "exports": {
