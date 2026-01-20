@@ -8,21 +8,7 @@ import type {Connection} from "../Connection.ts";
 import type {Compound} from "../template/Compound.ts";
 import {sql} from "../template/Sql.ts";
 import {statement} from "../statement/numberedPlaceholder.ts";
-import type {DuckDBResultReader, DuckDBValue} from "@duckdb/node-api";
-
-/**
- * A DuckDB native connection interface compatible with @duckdb/node-api.
- */
-export interface DuckDBNativeConnection {
-    runAndReadAll(sql: string, params?: DuckDBValue[]): Promise<DuckDBResultReader>;
-}
-
-/**
- * A DuckDB instance interface for creating connections.
- */
-export interface DuckDBInstance {
-    connect(): Promise<DuckDBNativeConnection>;
-}
+import type {DuckDBConnection as NativeDuckDBConnection, DuckDBResultReader, DuckDBValue} from "@duckdb/node-api";
 
 /**
  * Converts array-of-arrays result to array-of-objects using column names.
@@ -43,7 +29,7 @@ export class DuckDBConnection implements Connection {
      *
      * @param native - The DuckDB native connection instance.
      */
-    constructor(private readonly native: DuckDBNativeConnection) {}
+    constructor(private readonly native: NativeDuckDBConnection) {}
 
     async *query(expr: Compound): AsyncIterable<unknown> {
         const stmt = statement(sql(expr));
