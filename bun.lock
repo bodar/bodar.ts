@@ -25,6 +25,7 @@
       "devDependencies": {
         "@observablehq/inputs": "^0.12.0",
         "@observablehq/plot": "^0.6.17",
+        "@uwdata/vgplot": "^0.21.1",
       },
     },
     "packages/jsx2dom": {
@@ -137,6 +138,18 @@
     "@typescript/native-preview-win32-arm64": ["@typescript/native-preview-win32-arm64@7.0.0-dev.20251215.1", "", { "os": "win32", "cpu": "arm64" }, "sha512-spZW/Gq+uVbeMB2m+WsvU5ElCbvzwSmokEiSDcUhbY/0gICbVKQw0pChsZUibTjqYQmkyOXbx7CwnW9qOisZ7A=="],
 
     "@typescript/native-preview-win32-x64": ["@typescript/native-preview-win32-x64@7.0.0-dev.20251215.1", "", { "os": "win32", "cpu": "x64" }, "sha512-tvq8PbFmgy8C+oBw2UUbFbIndOuRfzf62S4ARDkmLxv7wvVysyv3Eai0wdv1xdJdPTLkaar7IOd1NqiN9Dw4kA=="],
+
+    "@uwdata/flechette": ["@uwdata/flechette@2.2.6", "", {}, "sha512-DoeWHYWHvda7kaxa1BeKVp0+S9ZiqGoRxLC+z9uuYyfMLDQ+3vW4s4WVxnQYFJm8nshS5ezAsbKBN9ojCBtdEQ=="],
+
+    "@uwdata/mosaic-core": ["@uwdata/mosaic-core@0.21.1", "", { "dependencies": { "@duckdb/duckdb-wasm": "1.30.0", "@uwdata/flechette": "^2.2.5", "@uwdata/mosaic-sql": "^0.21.1" } }, "sha512-nRh93+A7U/06x/6boSLUUaSCo4pkNAjOgV8P2Zl6ZZeF5pWynLcSqT30WLQPx+VewTvFgJGCymocymdbirFxYw=="],
+
+    "@uwdata/mosaic-inputs": ["@uwdata/mosaic-inputs@0.21.1", "", { "dependencies": { "@uwdata/mosaic-core": "^0.21.1", "@uwdata/mosaic-sql": "^0.21.1" } }, "sha512-9h/PFk71QL5+Nhqsai9pqVdnHUQb8OAemZrPossbfvb3q62o7RpU+jMwxcAId4uB/qRTAFxr0LgRfoPxrjfZYg=="],
+
+    "@uwdata/mosaic-plot": ["@uwdata/mosaic-plot@0.21.1", "", { "dependencies": { "@observablehq/plot": "^0.6.17", "@uwdata/mosaic-core": "^0.21.1", "@uwdata/mosaic-sql": "^0.21.1", "d3": "^7.9.0" } }, "sha512-ZPBD0Km44VIexZ7l88n1yWh8QpVJakJnmkyq6zr8aujw2i2+MkrcI8Abc2aPJ74o2YiSb9hMKxno83nB/Mfy7A=="],
+
+    "@uwdata/mosaic-sql": ["@uwdata/mosaic-sql@0.21.1", "", {}, "sha512-2B4Dle4odyxIaBaDVRfQchebH/CUZvUV8kIwKF3V2GksQoF8KYY/Q6zTLTJhYrDEdUkt8M0OIy4U/Ntw93CV1A=="],
+
+    "@uwdata/vgplot": ["@uwdata/vgplot@0.21.1", "", { "dependencies": { "@uwdata/mosaic-core": "^0.21.1", "@uwdata/mosaic-inputs": "^0.21.1", "@uwdata/mosaic-plot": "^0.21.1", "@uwdata/mosaic-sql": "^0.21.1" } }, "sha512-R+CFYeTPdNoMzMAxNwt7coTqcWWY6aOKUj28SqkQ4dbL3Ig37RjCnRDcpFzCqvxaSeOwZRXQ1Ld3WhnagqDh/Q=="],
 
     "acorn": ["acorn@8.15.0", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg=="],
 
@@ -305,6 +318,8 @@
     "@types/bun/bun-types": ["bun-types@1.3.4", "", { "dependencies": { "@types/node": "*" } }, "sha512-5ua817+BZPZOlNaRgGBpZJOSAQ9RQ17pkwPD0yR7CfJg+r8DgIILByFifDTa+IPDDxzf5VNhtNlcKqFzDgJvlQ=="],
 
     "@types/ws/@types/node": ["@types/node@22.13.4", "", { "dependencies": { "undici-types": "~6.20.0" } }, "sha512-ywP2X0DYtX3y08eFVx5fNIw7/uIv8hYUKgXoK8oayJlLnKcRfEYCxWMVE1XagUdVtCJlZT1AU4LXEABW+L1Peg=="],
+
+    "@uwdata/mosaic-core/@duckdb/duckdb-wasm": ["@duckdb/duckdb-wasm@1.30.0", "", { "dependencies": { "apache-arrow": "^17.0.0" } }, "sha512-9aWrm+4ayl4sTlvGtl/b+LxrUyXaac3yyVqkoJ3F7Vkd62PoS8PcQIRJ/KjXBW36LP1CnPY5jjvFyIcTFLtcXA=="],
 
     "apache-arrow/@types/node": ["@types/node@20.19.30", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-WJtwWJu7UdlvzEAUm484QNg5eAoq5QR08KDNx7g45Usrs2NtOPiX8ugDqmKdXkyL03rBqU5dYNYVQetEpBHq2g=="],
 

@@ -53,7 +53,8 @@ const app = CompressionHandler(ReactiveHandler(() => {
             return new HTMLTransformer({rewriter: new HTMLRewriter(), importMap: {
                     imports: {
                         "@bodar/": "/",
-                        "@observablehq/": "https://esm.run/@observablehq/"
+                        "@observablehq/": "https://esm.run/@observablehq/",
+                        "@uwdata/": "https://esm.run/@uwdata/"
                     }
                 }});
         }
