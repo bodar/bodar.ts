@@ -8,17 +8,17 @@ import {describe, it, beforeAll, afterAll, expect} from "bun:test";
 import {filter} from "@bodar/totallylazy/transducers/FilterTransducer.ts";
 import {where} from "@bodar/totallylazy/predicates/WherePredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
-import {definition, type Definition} from "@bodar/lazyrecords/sql/builder/builders.ts";
-import {keyword, type Keyword} from "@bodar/lazyrecords/Keyword.ts";
+import {definition, type Definition} from "../builder/builders.ts";
+import {keyword, type Keyword} from "../../Keyword.ts";
 import {select} from "@bodar/totallylazy/functions/Select.ts";
 import {map} from "@bodar/totallylazy/transducers/MapTransducer.ts";
 import {and} from "@bodar/totallylazy/predicates/AndPredicate.ts";
 import {or} from "@bodar/totallylazy/predicates/OrPredicate.ts";
 import {between} from "@bodar/totallylazy/predicates/BetweenPredicate.ts";
 import {not} from "@bodar/totallylazy/predicates/NotPredicate.ts";
-import type {Transaction} from "@bodar/lazyrecords/Transaction.ts";
-import type {Records} from "@bodar/lazyrecords/Records.ts";
-import type {Schema} from "@bodar/lazyrecords/Schema.ts";
+import type {Transaction} from "../../Transaction.ts";
+import type {Records} from "../../Records.ts";
+import type {Schema} from "../../Schema.ts";
 
 // Shared test data types
 export interface Country {
