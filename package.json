@@ -11,5 +11,8 @@
     "@typescript/native-preview": "^7.0.0-dev.20251215.1",
     "asserttt": "^1.0.1",
     "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "apache-arrow": "17.0.0"
   }
 }
