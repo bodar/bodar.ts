@@ -1,0 +1,23 @@
+{
+  "name": "@bodar/lazyrecords-duckdb",
+  "version": "0.0.0",
+  "description": "DuckDB native adapter for lazyrecords using @duckdb/node-api",
+  "type": "module",
+  "sideEffects": false,
+  "dependencies": {
+    "@bodar/lazyrecords": "workspace:lazyrecords",
+    "@bodar/totallylazy": "workspace:totallylazy",
+    "@duckdb/node-api": "^1.4.3-r.3"
+  },
+  "exports": {
+    "./DuckDBConnection.ts": "./src/DuckDBConnection.ts",
+    "./duckdbMappings.ts": "./src/duckdbMappings.ts",
+    "./DuckDBRecords.ts": "./src/DuckDBRecords.ts",
+    "./DuckDBTransaction.ts": "./src/DuckDBTransaction.ts"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "package.json"
+  ]
+}

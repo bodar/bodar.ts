@@ -1,14 +1,11 @@
 {
   "name": "@bodar/lazyrecords",
   "version": "0.0.0",
-  "description": "Type-safe SQL query builder for TypeScript with support for PostgreSQL, DuckDB, SQLite, template literals, and ANSI SQL standard",
+  "description": "Type-safe SQL query builder for TypeScript with support for PostgreSQL, SQLite, template literals, and ANSI SQL standard",
   "type": "module",
   "sideEffects": false,
   "dependencies": {
-    "@bodar/totallylazy": "workspace:totallylazy",
-    "@duckdb/duckdb-wasm": "^1.29.0",
-    "@duckdb/node-api": "^1.4.3-r.3",
-    "apache-arrow": "17.0.0"
+    "@bodar/totallylazy": "workspace:totallylazy"
   },
   "devDependencies": {
     "bun-types": "1.2.3"
@@ -17,16 +14,12 @@
     "./Keyword.ts": "./src/Keyword.ts",
     "./Records.ts": "./src/Records.ts",
     "./Schema.ts": "./src/Schema.ts",
+    "./sql/ansi/DeleteStatement.ts": "./src/sql/ansi/DeleteStatement.ts",
+    "./sql/ansi/InsertStatement.ts": "./src/sql/ansi/InsertStatement.ts",
+    "./sql/builder/builders.ts": "./src/sql/builder/builders.ts",
     "./sql/bun-types.ts": "./src/sql/bun-types.ts",
     "./sql/ColumnTypeMappings.ts": "./src/sql/ColumnTypeMappings.ts",
     "./sql/Connection.ts": "./src/sql/Connection.ts",
-    "./sql/duckdb/DuckDBConnection.ts": "./src/sql/duckdb/DuckDBConnection.ts",
-    "./sql/duckdb/duckdbMappings.ts": "./src/sql/duckdb/duckdbMappings.ts",
-    "./sql/duckdb/DuckDBRecords.ts": "./src/sql/duckdb/DuckDBRecords.ts",
-    "./sql/duckdb/DuckDBTransaction.ts": "./src/sql/duckdb/DuckDBTransaction.ts",
-    "./sql/duckdb/DuckDBWasm.ts": "./src/sql/duckdb/DuckDBWasm.ts",
-    "./sql/duckdb/DuckDBWasmBlockingConnection.ts": "./src/sql/duckdb/DuckDBWasmBlockingConnection.ts",
-    "./sql/duckdb/DuckDBWasmConnection.ts": "./src/sql/duckdb/DuckDBWasmConnection.ts",
     "./sql/postgres/PostgresConnection.ts": "./src/sql/postgres/PostgresConnection.ts",
     "./sql/postgres/postgresMappings.ts": "./src/sql/postgres/postgresMappings.ts",
     "./sql/postgres/PostgresRecords.ts": "./src/sql/postgres/PostgresRecords.ts",
@@ -37,6 +30,7 @@
     "./sql/sqlite/SQLiteRecords.ts": "./src/sql/sqlite/SQLiteRecords.ts",
     "./sql/sqlite/SQLiteTransaction.ts": "./src/sql/sqlite/SQLiteTransaction.ts",
     "./sql/SqlSchema.ts": "./src/sql/SqlSchema.ts",
+    "./sql/SqlTransaction.ts": "./src/sql/SqlTransaction.ts",
     "./sql/statement/numberedPlaceholder.ts": "./src/sql/statement/numberedPlaceholder.ts",
     "./sql/statement/ordinalPlaceholder.ts": "./src/sql/statement/ordinalPlaceholder.ts",
     "./sql/template/Compound.ts": "./src/sql/template/Compound.ts",
@@ -45,6 +39,7 @@
     "./sql/template/Sql.ts": "./src/sql/template/Sql.ts",
     "./sql/template/Text.ts": "./src/sql/template/Text.ts",
     "./sql/template/Value.ts": "./src/sql/template/Value.ts",
+    "./sql/testing/RecordsContract.ts": "./src/sql/testing/RecordsContract.ts",
     "./Transaction.ts": "./src/Transaction.ts"
   },
   "files": [

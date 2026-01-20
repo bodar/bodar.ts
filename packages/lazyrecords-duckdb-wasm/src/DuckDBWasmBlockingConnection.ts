@@ -5,10 +5,10 @@
  * Does not require Web Workers - runs on the main thread.
  */
 
-import type {Connection} from "../Connection.ts";
-import type {Compound} from "../template/Compound.ts";
-import {sql} from "../template/Sql.ts";
-import {statement} from "../statement/ordinalPlaceholder.ts";
+import type {Connection} from "@bodar/lazyrecords/sql/Connection.ts";
+import type {Compound} from "@bodar/lazyrecords/sql/template/Compound.ts";
+import {sql} from "@bodar/lazyrecords/sql/template/Sql.ts";
+import {statement} from "@bodar/lazyrecords/sql/statement/ordinalPlaceholder.ts";
 import {toObjects, getRowsChanged} from "./DuckDBWasm.ts";
 import {ConsoleLogger, createDuckDB, NODE_RUNTIME, type DuckDBBindings, type DuckDBConnection as DuckDBSyncConnection} from "@duckdb/duckdb-wasm/blocking";
 

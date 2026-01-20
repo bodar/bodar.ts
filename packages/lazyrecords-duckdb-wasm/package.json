@@ -1,0 +1,29 @@
+{
+  "name": "@bodar/lazyrecords-duckdb-wasm",
+  "version": "0.0.0",
+  "description": "DuckDB WASM adapter for lazyrecords using @duckdb/duckdb-wasm",
+  "type": "module",
+  "sideEffects": false,
+  "dependencies": {
+    "@bodar/lazyrecords": "workspace:lazyrecords",
+    "@bodar/totallylazy": "workspace:totallylazy",
+    "@duckdb/duckdb-wasm": "^1.29.0",
+    "apache-arrow": "17.0.0"
+  },
+  "overrides": {
+    "apache-arrow": "17.0.0"
+  },
+  "exports": {
+    "./duckdbMappings.ts": "./src/duckdbMappings.ts",
+    "./DuckDBWasm.ts": "./src/DuckDBWasm.ts",
+    "./DuckDBWasmBlockingConnection.ts": "./src/DuckDBWasmBlockingConnection.ts",
+    "./DuckDBWasmConnection.ts": "./src/DuckDBWasmConnection.ts",
+    "./DuckDBWasmRecords.ts": "./src/DuckDBWasmRecords.ts",
+    "./DuckDBWasmTransaction.ts": "./src/DuckDBWasmTransaction.ts"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "package.json"
+  ]
+}

@@ -4,10 +4,10 @@
  * DuckDB Connection implementation using @duckdb/node-api.
  */
 
-import type {Connection} from "../Connection.ts";
-import type {Compound} from "../template/Compound.ts";
-import {sql} from "../template/Sql.ts";
-import {statement} from "../statement/numberedPlaceholder.ts";
+import type {Connection} from "@bodar/lazyrecords/sql/Connection.ts";
+import type {Compound} from "@bodar/lazyrecords/sql/template/Compound.ts";
+import {sql} from "@bodar/lazyrecords/sql/template/Sql.ts";
+import {statement} from "@bodar/lazyrecords/sql/statement/numberedPlaceholder.ts";
 import type {DuckDBConnection as NativeDuckDBConnection, DuckDBResultReader, DuckDBValue} from "@duckdb/node-api";
 
 /**

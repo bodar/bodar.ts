@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * SQL INSERT statement builder.
+ */
+
 import {text, Text} from "../template/Text.ts";
 import {Compound, ids, values} from "../template/Compound.ts";
 import {table} from "./Table.ts";

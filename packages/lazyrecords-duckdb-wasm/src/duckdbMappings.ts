@@ -4,7 +4,7 @@
  * DuckDB-specific column type mappings.
  */
 
-import type {ColumnTypeMappings} from "../ColumnTypeMappings.ts";
+import type {ColumnTypeMappings} from "@bodar/lazyrecords/sql/ColumnTypeMappings.ts";
 
 /**
  * Creates DuckDB-specific type mappings.

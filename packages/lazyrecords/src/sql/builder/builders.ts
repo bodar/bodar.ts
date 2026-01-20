@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * SQL query builders for constructing type-safe SELECT statements.
+ */
+
 import {select, SelectExpression, type SelectList} from "../ansi/SelectExpression.ts";
 import {from, FromClause} from "../ansi/FromClause.ts";
 import {table} from "../ansi/Table.ts";

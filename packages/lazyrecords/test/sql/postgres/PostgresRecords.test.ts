@@ -4,7 +4,7 @@ import {PostgresConnection} from "@bodar/lazyrecords/sql/postgres/PostgresConnec
 import {postgresTransaction} from "@bodar/lazyrecords/sql/postgres/PostgresTransaction.ts";
 import {SqlSchema} from "@bodar/lazyrecords/sql/SqlSchema.ts";
 import {postgresMappings} from "@bodar/lazyrecords/sql/postgres/postgresMappings.ts";
-import {recordsContract} from "../RecordsContract.ts";
+import {recordsContract} from "@bodar/lazyrecords/sql/testing/RecordsContract.ts";
 
 let pool: InstanceType<typeof SQL>;
 let reserved: ReservedSQL;

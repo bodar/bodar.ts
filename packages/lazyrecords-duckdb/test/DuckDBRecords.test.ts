@@ -1,10 +1,10 @@
 import {DuckDBInstance} from "@duckdb/node-api";
-import {DuckDBRecords} from "@bodar/lazyrecords/sql/duckdb/DuckDBRecords.ts";
-import {DuckDBConnection} from "@bodar/lazyrecords/sql/duckdb/DuckDBConnection.ts";
-import {duckdbTransaction} from "@bodar/lazyrecords/sql/duckdb/DuckDBTransaction.ts";
+import {DuckDBRecords} from "../src/DuckDBRecords.ts";
+import {DuckDBConnection} from "../src/DuckDBConnection.ts";
+import {duckdbTransaction} from "../src/DuckDBTransaction.ts";
 import {SqlSchema} from "@bodar/lazyrecords/sql/SqlSchema.ts";
-import {duckdbMappings} from "@bodar/lazyrecords/sql/duckdb/duckdbMappings.ts";
-import {recordsContract} from "../RecordsContract.ts";
+import {duckdbMappings} from "../src/duckdbMappings.ts";
+import {recordsContract} from "@bodar/lazyrecords/sql/testing/RecordsContract.ts";
 
 let instance: DuckDBInstance;
 

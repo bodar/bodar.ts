@@ -4,10 +4,10 @@
  * DuckDB WASM async Connection implementation using Web Workers.
  */
 
-import type {Connection} from "../Connection.ts";
-import type {Compound} from "../template/Compound.ts";
-import {sql} from "../template/Sql.ts";
-import {statement} from "../statement/ordinalPlaceholder.ts";
+import type {Connection} from "@bodar/lazyrecords/sql/Connection.ts";
+import type {Compound} from "@bodar/lazyrecords/sql/template/Compound.ts";
+import {sql} from "@bodar/lazyrecords/sql/template/Sql.ts";
+import {statement} from "@bodar/lazyrecords/sql/statement/ordinalPlaceholder.ts";
 import {toObjects, getRowsChanged} from "./DuckDBWasm.ts";
 import {AsyncDuckDB, ConsoleLogger, type AsyncDuckDBConnection} from "@duckdb/duckdb-wasm";
 

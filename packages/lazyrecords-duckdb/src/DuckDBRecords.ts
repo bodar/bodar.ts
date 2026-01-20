@@ -6,11 +6,11 @@
 
 import type {Transducer} from "@bodar/totallylazy/transducers/Transducer.ts";
 import type {Predicate} from "@bodar/totallylazy/predicates/Predicate.ts";
-import {type Definition, toSelect, type Supported} from "../builder/builders.ts";
-import type {Connection} from "../Connection.ts";
-import {InsertStatement} from "../ansi/InsertStatement.ts";
-import {DeleteStatement} from "../ansi/DeleteStatement.ts";
-import type {Records} from "../../Records.ts";
+import {type Definition, toSelect, type Supported} from "@bodar/lazyrecords/sql/builder/builders.ts";
+import type {Connection} from "@bodar/lazyrecords/sql/Connection.ts";
+import {InsertStatement} from "@bodar/lazyrecords/sql/ansi/InsertStatement.ts";
+import {DeleteStatement} from "@bodar/lazyrecords/sql/ansi/DeleteStatement.ts";
+import type {Records} from "@bodar/lazyrecords/Records.ts";
 
 /**
  * DuckDBRecords provides type-safe database operations for DuckDB.

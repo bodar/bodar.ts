@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * Generic SQL Transaction implementation.
+ */
+
 import type {Connection} from "./Connection.ts";
 import type {Compound} from "./template/Compound.ts";
 import type {Transaction} from "../Transaction.ts";

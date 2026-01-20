@@ -4,7 +4,7 @@ import {SQLiteConnection} from "@bodar/lazyrecords/sql/sqlite/SQLiteConnection.t
 import {sqliteTransaction} from "@bodar/lazyrecords/sql/sqlite/SQLiteTransaction.ts";
 import {SqlSchema} from "@bodar/lazyrecords/sql/SqlSchema.ts";
 import {sqliteMappings} from "@bodar/lazyrecords/sql/sqlite/sqliteMappings.ts";
-import {recordsContract} from "../RecordsContract.ts";
+import {recordsContract} from "@bodar/lazyrecords/sql/testing/RecordsContract.ts";
 
 let db: Database;
 

@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * SQL DELETE statement builder.
+ */
+
 import {text, Text} from "../template/Text.ts";
 import {Compound} from "../template/Compound.ts";
 import {Expression} from "../template/Expression.ts";

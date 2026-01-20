@@ -1,18 +1,24 @@
+/**
+ * @module
+ *
+ * Contract tests for Records implementations.
+ */
+
 import {describe, it, beforeAll, afterAll, expect} from "bun:test";
 import {filter} from "@bodar/totallylazy/transducers/FilterTransducer.ts";
 import {where} from "@bodar/totallylazy/predicates/WherePredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
-import {definition} from "../../src/sql/builder/builders.ts";
-import {keyword} from "../../src/Keyword.ts";
+import {definition, type Definition} from "@bodar/lazyrecords/sql/builder/builders.ts";
+import {keyword, type Keyword} from "@bodar/lazyrecords/Keyword.ts";
 import {select} from "@bodar/totallylazy/functions/Select.ts";
 import {map} from "@bodar/totallylazy/transducers/MapTransducer.ts";
 import {and} from "@bodar/totallylazy/predicates/AndPredicate.ts";
 import {or} from "@bodar/totallylazy/predicates/OrPredicate.ts";
 import {between} from "@bodar/totallylazy/predicates/BetweenPredicate.ts";
 import {not} from "@bodar/totallylazy/predicates/NotPredicate.ts";
-import type {Transaction} from "../../src/Transaction.ts";
-import type {Records} from "../../src/Records.ts";
-import type {Schema} from "../../src/Schema.ts";
+import type {Transaction} from "@bodar/lazyrecords/Transaction.ts";
+import type {Records} from "@bodar/lazyrecords/Records.ts";
+import type {Schema} from "@bodar/lazyrecords/Schema.ts";
 
 // Shared test data types
 export interface Country {
@@ -21,10 +27,10 @@ export interface Country {
     population: number;
 }
 
-export const countryCode = keyword<Country, 'country_code'>("country_code", String);
-export const countryName = keyword<Country, 'country_name'>("country_name", String);
-export const population = keyword<Country, 'population'>("population", Number);
-export const country = definition<Country>("country", [countryCode, countryName, population]);
+export const countryCode: Keyword<Country, 'country_code'> = keyword<Country, 'country_code'>("country_code", String);
+export const countryName: Keyword<Country, 'country_name'> = keyword<Country, 'country_name'>("country_name", String);
+export const population: Keyword<Country, 'population'> = keyword<Country, 'population'>("population", Number);
+export const country: Definition<Country> = definition<Country>("country", [countryCode, countryName, population]);
 
 // Test data
 export const testCountries: Country[] = [
@@ -48,8 +54,16 @@ export interface RecordsFactory {
     cleanup?(): Promise<void>;
 }
 
-function createContract(describeFn: typeof describe) {
-    return (name: string, factory: RecordsFactory) => {
+/** Function signature for contract test runner */
+export type ContractRunner = (name: string, factory: RecordsFactory) => void;
+
+/** Records contract with skip variant */
+export interface RecordsContractRunner extends ContractRunner {
+    skip: ContractRunner;
+}
+
+function createContract(describeFn: typeof describe): ContractRunner {
+    return (name: string, factory: RecordsFactory): void => {
         describeFn(name, () => {
         let records: Records;
         let schema: Schema;
@@ -187,7 +201,7 @@ function createContract(describeFn: typeof describe) {
     };
 }
 
-export const recordsContract = Object.assign(
+export const recordsContract: RecordsContractRunner = Object.assign(
     createContract(describe),
     {skip: createContract(describe.skip)}
 );
