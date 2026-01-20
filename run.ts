@@ -84,8 +84,16 @@ export async function docs() {
     await $`bun run packages/dataflow/docs.ts`;
 }
 
-export async function jsr() {
+/**
+ * Prepares packages for JSR publishing by:
+ * 1. Replacing workspace: dependencies with actual version numbers
+ * 2. Creating jsr.json config files
+ *
+ * Returns info needed to restore workspace dependencies after publish.
+ */
+export async function jsr(): Promise<{ packageFile: string; depName: string; originalVersion: string }[]> {
     const v = await version();
+    const modifications: { packageFile: string; depName: string; originalVersion: string }[] = [];
 
     for await (const f of new Glob("packages/*/package.json").scan(".")) {
         const packageJsonFile = file(f);
@@ -96,6 +104,7 @@ export async function jsr() {
         if (packageJson.dependencies) {
             for (const [depName, depVersion] of Object.entries(packageJson.dependencies)) {
                 if (typeof depVersion === 'string' && depVersion.startsWith('workspace:')) {
+                    modifications.push({ packageFile: f, depName, originalVersion: depVersion });
                     packageJson.dependencies[depName] = v;
                 }
             }
@@ -117,10 +126,38 @@ export async function jsr() {
 
         await write(jsrFile, JSON.stringify(jsrConfig, null, 2));
     }
+
+    return modifications;
+}
+
+/**
+ * Restores workspace: dependencies and removes jsr.json files after publishing.
+ */
+async function cleanupAfterPublish(modifications: { packageFile: string; depName: string; originalVersion: string }[]) {
+    // Restore workspace: dependency versions
+    const byFile = new Map<string, { depName: string; originalVersion: string }[]>();
+    for (const mod of modifications) {
+        if (!byFile.has(mod.packageFile)) byFile.set(mod.packageFile, []);
+        byFile.get(mod.packageFile)!.push(mod);
+    }
+
+    for (const [packageFile, mods] of byFile) {
+        const packageJsonFile = file(packageFile);
+        const packageJson = await packageJsonFile.json();
+        for (const { depName, originalVersion } of mods) {
+            packageJson.dependencies[depName] = originalVersion;
+        }
+        await write(packageJsonFile, JSON.stringify(packageJson, null, 2));
+    }
+
+    // Remove jsr.json files
+    for await (const f of new Glob("packages/*/jsr.json").scan(".")) {
+        await $`rm -f ${f}`.quiet();
+    }
 }
 
 export async function publish() {
-    await jsr();
+    const modifications = await jsr();
     try {
         if (process.env.JSR_TOKEN) {
             await $`bunx jsr publish --allow-dirty --verbose --token ${process.env.JSR_TOKEN}`;
@@ -128,8 +165,7 @@ export async function publish() {
             await $`bunx jsr publish --allow-dirty --verbose`;
         }
     } finally {
-        await $`git checkout packages/*/package.json`;
-        await $`rm -rf **/jsr.json`;
+        await cleanupAfterPublish(modifications);
     }
 }
 
