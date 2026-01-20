@@ -6,7 +6,10 @@
   "sideEffects": false,
   "dependencies": {
     "@bodar/totallylazy": "workspace:totallylazy",
-    "@duckdb/node-api": "^1.4.3-r.3",
+    "@duckdb/duckdb-wasm": "^1.29.0",
+    "@duckdb/node-api": "^1.4.3-r.3"
+  },
+  "devDependencies": {
     "bun-types": "1.2.3"
   },
   "exports": {
@@ -19,6 +22,9 @@
     "./sql/duckdb/duckdbMappings.ts": "./src/sql/duckdb/duckdbMappings.ts",
     "./sql/duckdb/DuckDBRecords.ts": "./src/sql/duckdb/DuckDBRecords.ts",
     "./sql/duckdb/DuckDBTransaction.ts": "./src/sql/duckdb/DuckDBTransaction.ts",
+    "./sql/duckdb/DuckDBWasm.ts": "./src/sql/duckdb/DuckDBWasm.ts",
+    "./sql/duckdb/DuckDBWasmBlockingConnection.ts": "./src/sql/duckdb/DuckDBWasmBlockingConnection.ts",
+    "./sql/duckdb/DuckDBWasmConnection.ts": "./src/sql/duckdb/DuckDBWasmConnection.ts",
     "./sql/postgres/PostgresConnection.ts": "./src/sql/postgres/PostgresConnection.ts",
     "./sql/postgres/postgresMappings.ts": "./src/sql/postgres/postgresMappings.ts",
     "./sql/postgres/PostgresRecords.ts": "./src/sql/postgres/PostgresRecords.ts",
