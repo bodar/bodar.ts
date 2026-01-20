@@ -4,9 +4,9 @@
  * PostgreSQL Connection implementation using Bun's SQL client.
  */
 
-import type {SQL, ReservedSQL} from "bun";
 import type {Connection} from "../Connection.ts";
 import type {Compound} from "../template/Compound.ts";
+import type {PostgresSQL, PostgresReservedSQL} from "../bun-types.ts";
 import {sql} from "../template/Sql.ts";
 import {statement} from "../statement/numberedPlaceholder.ts";
 
@@ -17,9 +17,9 @@ export class PostgresConnection implements Connection {
     /**
      * Creates a new PostgresConnection.
      *
-     * @param client - The SQL client (pool or reserved connection from Bun SQL).
+     * @param client - The SQL client (Bun's SQL pool or ReservedSQL connection).
      */
-    constructor(private readonly client: SQL | ReservedSQL) {}
+    constructor(private readonly client: PostgresSQL | PostgresReservedSQL) {}
 
     async *query(expr: Compound): AsyncIterable<unknown> {
         const stmt = statement(sql(expr));
