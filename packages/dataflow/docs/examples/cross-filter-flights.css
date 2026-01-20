@@ -1,0 +1,75 @@
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    line-height: 1.6;
+}
+
+/* Links */
+a {
+    color: #1976d2;
+}
+
+a:hover {
+    color: #1565c0;
+}
+
+/* Site header */
+.site-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.site-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.site-header a {
+    display: flex;
+    align-items: center;
+}
+
+/* Navigation */
+.docs-nav {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 1.5rem;
+}
+
+.docs-nav a {
+    color: #555;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.25rem 0;
+    border-bottom: 2px solid transparent;
+}
+
+.docs-nav a:hover {
+    color: #1976d2;
+}
+
+.docs-nav a.active {
+    color: #1976d2;
+    border-bottom-color: #1976d2;
+}
+
+/* Example intro */
+.intro {
+    margin-bottom: 2rem;
+}
+
+.intro p {
+    margin-bottom: 0.75rem;
+}
+
+/* vgplot chart text styling */
+svg text {
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 1rem;
+}

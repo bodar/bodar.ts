@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cross-Filter Flights 10M - Dataflow Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="cross-filter-flights.css">
+</head>
+<body>
+
+<div class="site-header">
+    <h1>Dataflow</h1>
+    <a href="https://github.com/bodar/bodar.ts/tree/master/packages/dataflow"><img alt="GitHub" src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
+</div>
+
+<nav class="docs-nav">
+    <a href="../index.html">Quick Start</a>
+    <a href="../setup.html">Setup</a>
+    <a href="../reactivity.html">Reactivity</a>
+    <a href="../inputs.html">Inputs</a>
+    <a href="../islands.html">Islands</a>
+    <a href="./" class="active">Examples</a>
+</nav>
+
+<h1>Cross-Filter Flights 10M</h1>
+
+<div class="intro">
+    <p>This example demonstrates <strong>interactive cross-filtering</strong> of 10 million flight records using <a href="https://uwdata.github.io/mosaic/">Mosaic vgplot</a> and DuckDB-WASM.</p>
+
+    <p>Key features shown:</p>
+    <ul>
+        <li>Loading a remote Parquet file with 10M rows via DuckDB-WASM</li>
+        <li>Linked histograms with brush-based cross-filtering</li>
+        <li>Selections in one chart automatically filter the others</li>
+    </ul>
+
+    <p>Based on the <a href="https://observablehq.com/@uwdata/mosaic-cross-filter-flights-10m">Observable notebook by UW Data</a>.</p>
+
+    <p><a href="https://github.com/bodar/bodar.ts/blob/master/packages/dataflow/docs/examples/cross-filter-flights.html">View source on GitHub</a></p>
+</div>
+
+<script type="module" is="reactive">
+    const vg = await import('https://cdn.jsdelivr.net/npm/@uwdata/vgplot@0.10.0/+esm');
+    vg.coordinator().databaseConnector(vg.wasmConnector());
+    await vg.coordinator().exec(`CREATE TABLE IF NOT EXISTS flights10m AS
+        SELECT
+            GREATEST(-60, LEAST(ARR_DELAY, 180))::DOUBLE AS delay,
+            DISTANCE AS distance,
+            DEP_TIME AS time
+        FROM 'https://pub-1da360b43ceb401c809f68ca37c7f8a4.r2.dev/data/flights-10m.parquet'`);
+</script>
+
+<script type="module" is="reactive">
+    const brush = vg.Selection.crossfilter();
+
+    const makePlot = column => vg.plot(
+        vg.rectY(
+            vg.from("flights10m", {filterBy: brush}),
+            {x: vg.bin(column), y: vg.count(), fill: "#3b82f6", inset: 0.5}
+        ),
+        vg.intervalX({as: brush}),
+        vg.xDomain(vg.Fixed),
+        vg.marginLeft(100),
+        vg.marginBottom(50),
+        vg.marginRight(80),
+        vg.width(width),
+        vg.height(width / 3)
+    );
+
+    const flights = vg.vconcat(
+        makePlot("delay"),
+        makePlot("time"),
+        makePlot("distance")
+    );
+
+    display(flights);
+</script>
+
+</body>
+</html>
