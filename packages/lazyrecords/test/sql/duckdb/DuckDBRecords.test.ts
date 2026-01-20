@@ -1,26 +1,24 @@
 import {DuckDBInstance} from "@duckdb/node-api";
 import {DuckDBRecords} from "@bodar/lazyrecords/sql/duckdb/DuckDBRecords.ts";
+import {DuckDBConnection} from "@bodar/lazyrecords/sql/duckdb/DuckDBConnection.ts";
+import {duckdbTransaction} from "@bodar/lazyrecords/sql/duckdb/DuckDBTransaction.ts";
 import {SqlSchema} from "@bodar/lazyrecords/sql/SqlSchema.ts";
 import {duckdbMappings} from "@bodar/lazyrecords/sql/duckdb/duckdbMappings.ts";
 import {recordsContract} from "../RecordsContract.ts";
 
 let instance: DuckDBInstance;
-let connection: Awaited<ReturnType<DuckDBInstance['connect']>>;
 
 recordsContract('DuckDBRecords', {
     async create() {
         instance = await DuckDBInstance.create(':memory:');
-        connection = await instance.connect();
+        const native = await instance.connect();
+        const connection = new DuckDBConnection(native);
+        const transaction = duckdbTransaction(connection);
         const records = new DuckDBRecords(connection);
-        const schema = new SqlSchema(records, duckdbMappings());
-        return {records, schema};
+        const schema = new SqlSchema(connection, duckdbMappings());
+        return {records, schema, transaction};
     },
     async cleanup() {
         // DuckDB handles cleanup via GC
     }
 });
-
-// DuckDB-specific tests can go here
-// describe('DuckDB-specific', () => {
-//     it('supports ARRAY types', async () => { ... });
-// });

@@ -4,7 +4,9 @@
  * Schema interface for database table management operations.
  */
 
-import type {Definition} from "./builder/builders.ts";
+
+
+import type {Definition} from "./sql/builder/builders.ts";
 
 /**
  * Schema interface for type-safe database schema management.

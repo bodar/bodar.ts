@@ -1,6 +1,4 @@
 import {describe, it, beforeAll, afterAll, expect} from "bun:test";
-import type {Records} from "@bodar/lazyrecords/sql/Records.ts";
-import type {Schema} from "@bodar/lazyrecords/sql/Schema.ts";
 import {filter} from "@bodar/totallylazy/transducers/FilterTransducer.ts";
 import {where} from "@bodar/totallylazy/predicates/WherePredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
@@ -12,6 +10,9 @@ import {and} from "@bodar/totallylazy/predicates/AndPredicate.ts";
 import {or} from "@bodar/totallylazy/predicates/OrPredicate.ts";
 import {between} from "@bodar/totallylazy/predicates/BetweenPredicate.ts";
 import {not} from "@bodar/totallylazy/predicates/NotPredicate.ts";
+import type {Transaction} from "../../src/Transaction.ts";
+import type {Records} from "../../src/Records.ts";
+import type {Schema} from "../../src/Schema.ts";
 
 // Shared test data types
 export interface Country {
@@ -33,8 +34,17 @@ export const testCountries: Country[] = [
     {country_code: 'DE', country_name: 'Germany', population: 83000000},
 ];
 
+/** Helper to collect async iterable into array */
+async function collect<T>(iterable: AsyncIterable<T>): Promise<T[]> {
+    const result: T[] = [];
+    for await (const item of iterable) {
+        result.push(item);
+    }
+    return result;
+}
+
 export interface RecordsFactory {
-    create(): Promise<{records: Records, schema: Schema}>;
+    create(): Promise<{records: Records, schema: Schema, transaction: Transaction}>;
     cleanup?(): Promise<void>;
 }
 
@@ -43,98 +53,83 @@ function createContract(describeFn: typeof describe) {
         describeFn(name, () => {
         let records: Records;
         let schema: Schema;
+        let transaction: Transaction;
 
         beforeAll(async () => {
             const result = await factory.create();
             records = result.records;
             schema = result.schema;
+            transaction = result.transaction;
+            await transaction.begin();
             await schema.define(country);
             await records.add(country, testCountries);
         });
 
         afterAll(async () => {
             await schema.undefine(country);
+            await transaction.commit();
             await factory.cleanup?.();
         });
 
         describe('get', () => {
             it('returns all records', async () => {
-                const result = await records.get(country);
-                const rows = [...result];
+                const rows = await collect(records.get(country));
                 expect(rows.length).toBe(4);
             });
 
             it('filters with where/is', async () => {
-                const result = await records.get(country,
-                    filter(where(countryCode, is("GB"))));
-                const rows = [...result];
+                const rows = await collect(records.get(country,
+                    filter(where(countryCode, is("GB")))));
                 expect(rows.length).toBe(1);
                 expect(rows[0].country_code).toBe("GB");
                 expect(rows[0].country_name).toBe("United Kingdom");
             });
 
             it('filters with where/is null', async () => {
-                const result = await records.get(country,
-                    filter(where(countryCode, is<string | null>(null))));
-                const rows = [...result];
+                const rows = await collect(records.get(country,
+                    filter(where(countryCode, is<string | null>(null)))));
                 expect(rows.length).toBe(0);
             });
 
             it('maps with select', async () => {
-                const result = await records.get(country,
+                const rows = await collect(records.get(country,
                     filter(where(countryCode, is("GB"))),
-                    map(select(countryCode)));
-                const rows = [...result] as Pick<Country, 'country_code'>[];
+                    map(select(countryCode)))) as Pick<Country, 'country_code'>[];
                 expect(rows.length).toBe(1);
                 expect(rows[0].country_code).toBe("GB");
                 expect(rows[0]).not.toHaveProperty('country_name');
             });
 
             it('filters with and', async () => {
-                const result = await records.get(country,
+                const rows = await collect(records.get(country,
                     filter(and(
                         where(countryCode, is("GB")),
                         where(countryName, is("United Kingdom"))
-                    )));
-                const rows = [...result];
+                    ))));
                 expect(rows.length).toBe(1);
             });
 
             it('filters with or', async () => {
-                const result = await records.get(country,
+                const rows = await collect(records.get(country,
                     filter(or(
                         where(countryCode, is("GB")),
                         where(countryCode, is("US"))
-                    )));
-                const rows = [...result];
+                    ))));
                 expect(rows.length).toBe(2);
             });
 
             it('filters with not', async () => {
-                const result = await records.get(country,
-                    filter(not(where(countryCode, is("GB")))));
-                const rows = [...result];
+                const rows = await collect(records.get(country,
+                    filter(not(where(countryCode, is("GB"))))));
                 expect(rows.length).toBe(3);
                 expect(rows.every(r => r.country_code !== "GB")).toBe(true);
             });
 
             it('filters with between', async () => {
-                const result = await records.get(country,
-                    filter(where(population, between(60000000, 70000000))));
-                const rows = [...result];
+                const rows = await collect(records.get(country,
+                    filter(where(population, between(60000000, 70000000)))));
                 // GB and FR both have 67 million
                 expect(rows.length).toBe(2);
-            });
-        });
-
-        describe('query (async iteration)', () => {
-            it('returns async iterable', async () => {
-                const rows: Country[] = [];
-                for await (const row of records.query(country, filter(where(countryCode, is("DE"))))) {
-                    rows.push(row);
-                }
-                expect(rows.length).toBe(1);
-                expect(rows[0].country_code).toBe("DE");
             });
         });
 
@@ -148,8 +143,7 @@ function createContract(describeFn: typeof describe) {
                 expect(count).toBe(2);
 
                 // Verify the records were inserted
-                const result = await records.get(country, filter(where(countryCode, is("JP"))));
-                const rows = [...result];
+                const rows = await collect(records.get(country, filter(where(countryCode, is("JP")))));
                 expect(rows.length).toBe(1);
                 expect(rows[0].country_name).toBe("Japan");
             });
@@ -163,31 +157,30 @@ function createContract(describeFn: typeof describe) {
         describe('remove', () => {
             it('removes records matching predicate', async () => {
                 // First verify we have records to remove
-                const beforeResult = await records.get(country, filter(where(countryCode, is("AU"))));
-                expect([...beforeResult].length).toBe(1);
+                const beforeRows = await collect(records.get(country, filter(where(countryCode, is("AU")))));
+                expect(beforeRows.length).toBe(1);
 
                 // Remove Australia (added in previous test)
                 const count = await records.remove(country, where(countryCode, is("AU")));
                 expect(count).toBe(1);
 
                 // Verify removal
-                const afterResult = await records.get(country, filter(where(countryCode, is("AU"))));
-                expect([...afterResult].length).toBe(0);
+                const afterRows = await collect(records.get(country, filter(where(countryCode, is("AU")))));
+                expect(afterRows.length).toBe(0);
             });
 
             it('removes all records when no predicate', async () => {
                 // Get current count
-                const beforeResult = await records.get(country);
-                const beforeCount = [...beforeResult].length;
-                expect(beforeCount).toBeGreaterThan(0);
+                const beforeRows = await collect(records.get(country));
+                expect(beforeRows.length).toBeGreaterThan(0);
 
                 // Remove all
                 const count = await records.remove(country);
-                expect(count).toBe(beforeCount);
+                expect(count).toBe(beforeRows.length);
 
                 // Verify all removed
-                const afterResult = await records.get(country);
-                expect([...afterResult].length).toBe(0);
+                const afterRows = await collect(records.get(country));
+                expect(afterRows.length).toBe(0);
             });
         });
         });
