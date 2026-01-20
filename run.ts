@@ -156,13 +156,15 @@ async function cleanupAfterPublish(modifications: { packageFile: string; depName
     }
 }
 
-export async function publish() {
+export async function publish(dryRun: string = "") {
     const modifications = await jsr();
+    const isDryRun = dryRun === "--dry-run" || dryRun === "dry-run";
+    const dryRunFlag = isDryRun ? ["--dry-run"] : [];
     try {
         if (process.env.JSR_TOKEN) {
-            await $`bunx jsr publish --allow-dirty --verbose --token ${process.env.JSR_TOKEN}`;
+            await $`bunx jsr publish --allow-dirty --verbose ${dryRunFlag} --token ${process.env.JSR_TOKEN}`;
         } else {
-            await $`bunx jsr publish --allow-dirty --verbose`;
+            await $`bunx jsr publish --allow-dirty --verbose ${dryRunFlag}`;
         }
     } finally {
         await cleanupAfterPublish(modifications);

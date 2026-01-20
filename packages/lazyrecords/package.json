@@ -5,10 +5,12 @@
   "type": "module",
   "sideEffects": false,
   "dependencies": {
-    "@bodar/totallylazy": "workspace:totallylazy",
+    "@bodar/totallylazy": "workspace:totallylazy"
+  },
+  "peerDependencies": {
     "@duckdb/duckdb-wasm": "^1.29.0",
     "@duckdb/node-api": "^1.4.3-r.3",
-    "apache-arrow": "17.0.0"
+    "apache-arrow": ">=17.0.0"
   },
   "devDependencies": {
     "bun-types": "1.2.3"
