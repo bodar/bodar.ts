@@ -41,6 +41,7 @@ export class ReconnectingSocketConnector extends SocketConnector {
 
         self._events.close = () => {
             console.log('Connection closed');
+            this.events.dispatchEvent(new Event('disconnected'));
             const hadPendingWork = self._queue.length > 0 || self._request !== null;
 
             self._connected = false;
@@ -88,6 +89,7 @@ export class ReconnectingSocketConnector extends SocketConnector {
         if (!ws) return;
 
         // open and close are handled by overridden _events in constructor
+        this.events.dispatchEvent(new Event('opening'));
 
         ws.addEventListener('message', () => {
             this.hadActivity = true;

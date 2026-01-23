@@ -107,39 +107,43 @@
         } else {
             await coord.exec(setupSql);
         }
+        document.getElementById('chart').dataset.state = 'connected';
         console.log(`Setup complete in ${performance.now() - start}ms`);
     };
 
-    await setup();
-
+    connector.events?.addEventListener('opening', () => document.getElementById('chart').dataset.state = 'connecting');
+    connector.events?.addEventListener('disconnected', () => document.getElementById('chart').dataset.state = 'disconnected');
     connector.events?.addEventListener('reconnected', () => setup(true));
+
+    await setup();
 </script>
 
-<script type="module" is="reactive">
-    const brush = vg.Selection.crossfilter();
+<div id="chart">
+    <script type="module" is="reactive">
+        const brush = vg.Selection.crossfilter();
 
-    const makePlot = column => vg.plot(
-        vg.rectY(
-            vg.from("flights10m", {filterBy: brush}),
-            {x: vg.bin(column), y: vg.count(), fill: "#3b82f6", inset: 0.5}
-        ),
-        vg.intervalX({as: brush}),
-        vg.xDomain(vg.Fixed),
-        vg.marginLeft(100),
-        vg.marginBottom(50),
-        vg.marginRight(80),
-        vg.width(width),
-        vg.height(width / 3)
-    );
+        const makePlot = column => vg.plot(
+            vg.rectY(
+                vg.from("flights10m", {filterBy: brush}),
+                {x: vg.bin(column), y: vg.count(), fill: "#3b82f6", inset: 0.5}
+            ),
+            vg.intervalX({as: brush}),
+            vg.xDomain(vg.Fixed),
+            vg.marginLeft(100),
+            vg.marginBottom(50),
+            vg.marginRight(80),
+            vg.width(width),
+            vg.height(width / 3)
+        );
 
-    const flights = vg.vconcat(
-        makePlot("delay"),
-        makePlot("time"),
-        makePlot("distance")
-    );
+        const flights = vg.vconcat(
+            makePlot("delay"),
+            makePlot("time"),
+            makePlot("distance")
+        );
 
-    display(flights);
-</script>
-
+        display(flights);
+    </script>
+</div>
 </body>
 </html>

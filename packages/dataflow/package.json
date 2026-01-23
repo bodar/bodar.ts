@@ -15,7 +15,6 @@
     "./api/input.ts": "./src/api/input.ts",
     "./api/now.ts": "./src/api/now.ts",
     "./api/observe.ts": "./src/api/observe.ts",
-    "./vgplot/reconnecting-socket.ts": "./src/vgplot/reconnecting-socket.ts",
     "./api/view.ts": "./src/api/view.ts",
     "./api/width.ts": "./src/api/width.ts",
     "./BaseGraph.ts": "./src/BaseGraph.ts",
@@ -30,7 +29,8 @@
     "./runtime.ts": "./src/runtime.ts",
     "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts",
     "./testing/Idle.ts": "./src/testing/Idle.ts",
-    "./testing/renderAndExecute.ts": "./src/testing/renderAndExecute.ts"
+    "./testing/renderAndExecute.ts": "./src/testing/renderAndExecute.ts",
+    "./vgplot/reconnecting-socket.ts": "./src/vgplot/reconnecting-socket.ts"
   },
   "files": [
     "src",
