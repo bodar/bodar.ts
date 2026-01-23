@@ -62,7 +62,20 @@
 </div>
 
 <script type="module" is="reactive">
-    const backend = events(document.querySelector('.backend-options'), 'input', e => e.target.value, 'local');
+    // Read backend from URL, default to 'local'
+    const params = new URLSearchParams(window.location.search);
+    const backend = params.get('backend') || 'local';
+
+    // Sync radio button state with URL
+    const radio = document.querySelector(`input[name="backend"][value="${backend}"]`);
+    if (radio) radio.checked = true;
+
+    // On change, update URL and reload
+    document.querySelector('.backend-options').addEventListener('input', e => {
+        const url = new URL(window.location);
+        url.searchParams.set('backend', e.target.value);
+        window.location.href = url.toString();
+    });
 </script>
 
 <script type="module" is="reactive">
