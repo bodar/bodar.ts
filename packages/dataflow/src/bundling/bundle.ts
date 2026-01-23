@@ -37,3 +37,10 @@ export async function bundleText(source: string, extension: string, minify: bool
         await Bun.file(path).delete();
     }
 }
+
+/** Transpile TypeScript to JavaScript without bundling (preserves imports) */
+export async function transpileFile(path: string): Promise<string> {
+    const source = await Bun.file(path).text();
+    const transpiler = new Bun.Transpiler({ loader: "ts" });
+    return transpiler.transformSync(source);
+}
