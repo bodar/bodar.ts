@@ -41,13 +41,38 @@
     <p><a href="https://github.com/bodar/bodar.ts/blob/master/packages/dataflow/docs/examples/cross-filter-flights.html">View source on GitHub</a></p>
 </div>
 
+<div class="backend-selector">
+    <div class="backend-title">DuckDB Backend</div>
+    <div class="backend-options">
+        <label class="backend-option">
+            <input type="radio" name="backend" value="local" checked/>
+            <span class="backend-label">
+                <strong>Local (WASM)</strong>
+                <span class="backend-desc">Runs entirely in your browser using WebAssembly. Downloads 100mb of data</span>
+            </span>
+        </label>
+        <label class="backend-option">
+            <input type="radio" name="backend" value="edge"/>
+            <span class="backend-label">
+                <strong>Edge (Cloudflare)</strong>
+                <span class="backend-desc">Runs on a Cloudflare container near you. Spins up on-demand and shuts down when idle.</span>
+            </span>
+        </label>
+    </div>
+</div>
+
+<script type="module" is="reactive">
+    const backend = events(document.querySelector('.backend-options'), 'input', e => e.target.value, 'local');
+</script>
+
 <script type="module" is="reactive">
     const vg = await import('@uwdata/vgplot');
     const {reconnectingSocketConnector} = await import('@bodar/dataflow/vgplot/reconnecting-socket.ts');
 
-    const socketUrl = new URLSearchParams(location.search).get('socket');
-    const connector = socketUrl
-        ? reconnectingSocketConnector({uri: socketUrl})
+    const EDGE_URL = 'wss://data-viz.bodar.workers.dev/';
+
+    const connector = backend === 'edge'
+        ? reconnectingSocketConnector({uri: EDGE_URL})
         : await vg.wasmConnector();
 
     const coord = vg.coordinator();

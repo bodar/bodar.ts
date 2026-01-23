@@ -73,3 +73,76 @@ svg text {
     font-family: system-ui, -apple-system, sans-serif;
     font-size: 1rem;
 }
+
+/* Backend selector */
+.backend-selector {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.backend-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin-bottom: 0.75rem;
+}
+
+.backend-options {
+    display: flex;
+    gap: 1rem;
+}
+
+.backend-option {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background: white;
+    transition: border-color 0.15s, background-color 0.15s;
+}
+
+.backend-option:hover {
+    background: #f0f4f8;
+}
+
+.backend-option:has(input:checked) {
+    border-color: #1976d2;
+    background: #e3f2fd;
+}
+
+.backend-option input[type="radio"] {
+    margin-top: 0.2rem;
+    accent-color: #1976d2;
+}
+
+.backend-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.backend-label strong {
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.backend-desc {
+    font-size: 0.8rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+@media (max-width: 600px) {
+    .backend-options {
+        flex-direction: column;
+    }
+}
