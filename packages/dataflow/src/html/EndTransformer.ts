@@ -25,10 +25,12 @@ export class EndTransformer implements HTMLRewriterTypes.HTMLRewriterElementCont
                 if (d.hasExplicitView()) imports.add('View');
                 if (d.hasWidth()) imports.add('Width');
                 if (d.hasJsx()) imports.add('JSX2DOM').add('autoKeyEvents').add('chain');
+                if (d.hasNow()) imports.add('now');
             }
 
             const registrations = [
                 imports.has('JSX2DOM') && `_runtime_.graph.define("jsx",[],[],() => new JSX2DOM(chain({onEventListener: autoKeyEvents()}, globalThis)));`,
+                imports.has('now') && `_runtime_.graph.define("now",[],[],() => now());`,
                 ...sorted.flatMap((d: NodeDefinition) => [
                     d.hasWidth() && `_runtime_.graph.define("width_${d.key}",[],[],() => Width.for("${d.key}", _runtime_));`,
                     `_runtime_.graph.define(${d.toString()});`

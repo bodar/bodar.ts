@@ -214,4 +214,18 @@ if (state !== 'closed') {display(jsx.createElement("div", null, ["Controls"]));}
 if (condition) {console.log('yes');}console.log('done');
 }`);
     });
+
+    test("detects now as input (wired via graph node)", async () => {
+        // language=JavaScript
+        const definition = NodeDefinition.parse(`new Date(now).toLocaleTimeString()`, '1234');
+
+        expect(definition.hasNow()).toBe(true);
+        // now is a regular input provided by the now graph node (like jsx)
+        // Date is a global that gets automatically wired up
+        // language=JavaScript
+        expect(definition.toString()).toBe(`"1234",["Date","now"],[],(Date,now) => {
+const display = Display.for("1234", _runtime_);
+return display(new Date(now).toLocaleTimeString())
+}`);
+    });
 });

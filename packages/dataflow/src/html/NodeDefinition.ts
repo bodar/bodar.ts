@@ -5,7 +5,7 @@ import {findTopLevelDeclarations} from "../javascript/findTopLevelDeclarations.t
 import {isSingleExpression} from "../javascript/isSingleExpression.ts";
 import {hasTopLevelAwait} from "../javascript/findTopLevelAwaits.ts";
 
-export const IMPLICIT_IMPORTS = new Set(['observe', 'events', 'input', 'mutable', 'now', 'raw']);
+export const IMPLICIT_IMPORTS = new Set(['observe', 'events', 'input', 'mutable', 'raw']);
 
 /** A definition of a Node but still in raw text format */
 export class NodeDefinition {
@@ -129,6 +129,10 @@ export class NodeDefinition {
 
     hasJsx(): boolean {
         return this._inputs.includes('jsx');
+    }
+
+    hasNow(): boolean {
+        return this._inputs.includes('now');
     }
 
     /** Returns direct implicit imports used by this node (for tree-shaking imports) */
