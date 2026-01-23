@@ -19,7 +19,7 @@ interface QueueItem {
 }
 
 export class ReconnectingSocketConnector extends SocketConnector {
-    readonly events = new EventTarget();
+    readonly events: EventTarget = new EventTarget();
     private beaconTimeout: number;
     private timeoutId: ReturnType<typeof setTimeout> | null = null;
     private hadActivity = false;
@@ -153,6 +153,6 @@ export class ReconnectingSocketConnector extends SocketConnector {
     }
 }
 
-export function reconnectingSocketConnector(options: ReconnectingSocketOptions = {}) {
+export function reconnectingSocketConnector(options: ReconnectingSocketOptions = {}): ReconnectingSocketConnector {
     return new ReconnectingSocketConnector(options);
 }
