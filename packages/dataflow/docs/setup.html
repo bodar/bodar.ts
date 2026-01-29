@@ -66,9 +66,42 @@
     </script>
 </section>
 
-<!-- Step 2: Module Strategy Selection -->
+<!-- Step 2: Browser Transformer Selection (only shown for browser runtime) -->
+<script type="module" is="reactive">
+    const browserTransformer = mutable('dom');
+</script>
+
+<script type="module" is="reactive">
+    <section class="setup-section" hidden={runtime !== 'browser'}>
+        <h2>2. Browser Transformer</h2>
+        <p>Which transformer implementation should be used?</p>
+
+        <div class="selector-list">
+            <label class="selector-option">
+                <input type="radio" name="browserTransformer" value="dom" checked
+                       onchange={() => browserTransformer.value = 'dom'}/>
+                <div class="option-content">
+                    <strong>DOMTransformer</strong>
+                    <span class="option-desc">Uses the browser's native DOM parser. No external dependencies.</span>
+                </div>
+            </label>
+            <label class="selector-option">
+                <input type="radio" name="browserTransformer" value="html"
+                       onchange={() => browserTransformer.value = 'html'}/>
+                <div class="option-content">
+                    <strong>HTMLTransformer</strong>
+                    <span class="option-desc">Streaming transformer. Requires <a href="https://www.npmjs.com/package/htmlrewriter" target="_blank">htmlrewriter</a> npm package.</span>
+                </div>
+            </label>
+        </div>
+    </section>
+</script>
+
+<!-- Module Strategy Selection -->
 <section class="setup-section">
-    <h2>2. Module Strategy</h2>
+    <script type="module" is="reactive">
+        <h2>{runtime === 'browser' ? '3' : '2'}. Module Strategy</h2>
+    </script>
     <p>How should imports be resolved?</p>
 
     <script type="module" is="reactive">
@@ -100,18 +133,27 @@
 
 <!-- Installation -->
 <section class="setup-section">
-    <h2>Installation</h2>
+    <script type="module" is="reactive">
+        <h2>{runtime === 'browser' ? '4' : '3'}. Installation</h2>
+    </script>
 
     <script type="module" is="reactive">
-        const installCommands = {
-            bun: 'bunx jsr add @bodar/dataflow',
-            node: 'npx jsr add @bodar/dataflow',
-            deno: 'deno add jsr:@bodar/dataflow',
-            cloudflare: 'npx jsr add @bodar/dataflow',
-            browser: '# No server-side installation needed for browser-only setup'
+        const getInstallCommand = () => {
+            const commands = {
+                bun: 'bunx jsr add @bodar/dataflow',
+                node: 'npx jsr add @bodar/dataflow',
+                deno: 'deno add jsr:@bodar/dataflow',
+                cloudflare: 'npx jsr add @bodar/dataflow',
+                browser: 'npx jsr add @bodar/dataflow'
+            };
+            let cmd = commands[runtime];
+            if (runtime === 'browser' && browserTransformer === 'html') {
+                cmd += '\nnpm install htmlrewriter';
+            }
+            return cmd;
         };
 
-        const installCode = installCommands[runtime];
+        const installCode = getInstallCommand();
 
         display(<div class="code-block">
             <div class="code-header">
@@ -129,15 +171,26 @@
 
 <!-- Code Example -->
 <section class="setup-section">
-    <h2>Code Example</h2>
+    <script type="module" is="reactive">
+        <h2>{runtime === 'browser' ? '5' : '4'}. Code Example</h2>
+    </script>
 
     <script type="module" is="reactive">
+        const useDOMTransformer = runtime === 'browser' && browserTransformer === 'dom';
+
         const getCode = () => {
             const lines = [];
 
             // Imports
-            lines.push(`import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';`);
-            lines.push(`import {HTMLTransformer} from '@bodar/dataflow';`);
+            if (useDOMTransformer) {
+                lines.push(`import {DOMTransformer} from '@bodar/dataflow/html/DOMTransformer.ts';`);
+            } else {
+                lines.push(`import {ReactiveHandler} from '@bodar/dataflow/http/ReactiveHandler.ts';`);
+                lines.push(`import {HTMLTransformer} from '@bodar/dataflow';`);
+                if (runtime === 'browser') {
+                    lines.push(`import {HTMLRewriter} from 'htmlrewriter';`);
+                }
+            }
             if (strategy === 'bundler') {
                 lines.push(`import {BunBundler} from '@bodar/dataflow/bundling/BunBundler.ts';`);
             }
@@ -152,15 +205,25 @@
                 lines.push(`};`);
             }
 
-            // Transformer options
-            const options = ['rewriter: new HTMLRewriter()'];
-            if (strategy === 'bundler') options.push('bundler: new BunBundler()');
-            if (strategy === 'importmap') options.push('importMap');
-
+            // Transformer setup
             lines.push('');
-            lines.push(`const transformer = () => new HTMLTransformer({`);
-            lines.push(`    ${options.join(',\n    ')}`);
-            lines.push(`});`);
+            if (useDOMTransformer) {
+                const options = [];
+                if (strategy === 'importmap') options.push('importMap');
+                if (options.length > 0) {
+                    lines.push(`const transformer = () => new DOMTransformer({${options.join(', ')}});`);
+                } else {
+                    lines.push(`const transformer = () => new DOMTransformer();`);
+                }
+            } else {
+                const options = ['rewriter: new HTMLRewriter()'];
+                if (strategy === 'bundler') options.push('bundler: new BunBundler()');
+                if (strategy === 'importmap') options.push('importMap');
+
+                lines.push(`const transformer = () => new HTMLTransformer({`);
+                lines.push(`    ${options.join(',\n    ')}`);
+                lines.push(`});`);
+            }
 
             // Handler based on runtime
             lines.push('');
@@ -177,11 +240,24 @@
                 lines.push(`    fetch: ReactiveHandler(transformer, fetch)`);
                 lines.push(`};`);
             } else if (runtime === 'browser') {
-                lines.push(`const handler = ReactiveHandler(transformer, fetch);`);
-                lines.push('');
-                lines.push(`self.addEventListener('fetch', (event) => {`);
-                lines.push(`    event.respondWith(handler(event.request));`);
-                lines.push(`});`);
+                if (useDOMTransformer) {
+                    lines.push(`// Example: Transform HTML string using DOMParser`);
+                    lines.push(`const parser = new DOMParser();`);
+                    lines.push(`const doc = parser.parseFromString(html, 'text/html');`);
+                    lines.push(`await transformer().transform(doc);`);
+                    lines.push(`// doc is now mutated with reactive scripts transformed`);
+                    lines.push('');
+                    lines.push(`// Example: Transform an iframe's document directly`);
+                    lines.push(`const iframe = document.querySelector('iframe');`);
+                    lines.push(`await transformer().transform(iframe.contentDocument);`);
+                    lines.push(`// iframe's document is now mutated in place`);
+                } else {
+                    lines.push(`const handler = ReactiveHandler(transformer, fetch);`);
+                    lines.push('');
+                    lines.push(`self.addEventListener('fetch', (event) => {`);
+                    lines.push(`    event.respondWith(handler(event.request));`);
+                    lines.push(`});`);
+                }
             } else {
                 // Node.js, Deno
                 lines.push(`const handler = ReactiveHandler(transformer, yourRequestHandler);`);
@@ -214,11 +290,25 @@
 </script>
 
 <script type="module" is="reactive">
-    <div class="note" hidden={runtime !== 'browser'}>
-        <strong>Service Worker Considerations:</strong>
+    <div class="note" hidden={!(runtime === 'browser' && browserTransformer === 'dom')}>
+        <strong>DOMTransformer:</strong>
         <ul>
+            <li>Uses the browser's native <code>DOMParser</code> or can transform an iframe's document directly</li>
+            <li>No external dependencies required</li>
+            <li>Batch processing (parses entire document before transforming)</li>
+            <li>Ideal for client-side transformation of fetched HTML or iframe content</li>
+        </ul>
+    </div>
+</script>
+
+<script type="module" is="reactive">
+    <div class="note" hidden={!(runtime === 'browser' && browserTransformer === 'html')}>
+        <strong>HTMLTransformer (Service Worker):</strong>
+        <ul>
+            <li>Streaming transformer - processes HTML as it flows through</li>
+            <li>Requires the <a href="https://www.npmjs.com/package/htmlrewriter" target="_blank">htmlrewriter</a> npm package (a WASM port of Cloudflare's HTMLRewriter)</li>
             <li>Service workers only transform pages <em>after</em> initial registration - the first page load won't be transformed unless you force a reload</li>
-            <li>The service worker bundle is larger because it includes the HTML transformer and JavaScript parser (Acorn)</li>
+            <li>Larger bundle size due to HTMLRewriter WASM and JavaScript parser (Acorn)</li>
         </ul>
     </div>
 </script>
