@@ -119,7 +119,7 @@
 </div>
 
 <div class="note">
-    <strong>Deployment tip:</strong> When using islands, prefer import maps over bundling. With a bundler, each island gets its own copy of the runtime. With an import map, all islands share the same pre-minified runtime (<script type="module" is="reactive">`${runtime.compressed} (${runtime.uncompressed} uncompressed)`</script>). See <a href="setup.html#choosing-your-approach">Setup</a> for details.
+    <strong>Deployment tip:</strong> When using islands, prefer import maps over bundling. With a bundler, each island gets its own copy of the runtime. With an import map, all islands share the same pre-minified runtime (<script type="module" is="reactive">`${runtime.compressed} gzipped`</script>). See <a href="setup.html#choosing-your-approach">Setup</a> for details.
 </div>
 
 <h2>Integration with HTMX</h2>
@@ -192,7 +192,7 @@
     <tr>
         <td>Bundle size</td>
         <td>Large framework overhead</td>
-        <td><script type="module" is="reactive">`${runtime.compressed} (${runtime.uncompressed} uncompressed)`</script> for runtime</td>
+        <td><script type="module" is="reactive">`${runtime.compressed} gzipped`</script> for runtime</td>
     </tr>
     <tr>
         <td>Hydration</td>
@@ -211,10 +211,8 @@
     const runtime = fetch('https://dataflow.bodar.com/runtime.js')
         .then(async r => {
             const compressed = r.headers.get('content-length');
-            const uncompressed = (await r.text()).length;
             return {
-                compressed: `${Math.round(compressed / 1024)}KB`,
-                uncompressed: `${Math.round(uncompressed / 1024)}KB`
+                compressed: `${Math.round(compressed / 1024)}KB`
             };
         });
 </script>

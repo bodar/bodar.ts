@@ -35,7 +35,7 @@
 <p>Dataflow is a lightweight reactive JavaScript library heavily inspired by <a
         href="https://observablehq.com/framework/">Observable
     Framework</a>. It brings reactive programming to plain HTML pages with minimal overhead - the runtime
-    (including JSX support) is only <script type="module" is="reactive">`${runtime.compressed} (${runtime.uncompressed} uncompressed)`</script>!</p>
+    (including JSX support) is only <script type="module" is="reactive">`${runtime.compressed} gzipped`</script>!</p>
 
 <p>Just add a single <code>is="reactive"</code> attribute to any script tag and it becomes reactive. That's it.</p>
 
@@ -157,10 +157,8 @@
     const runtime = fetch('https://dataflow.bodar.com/runtime.js')
         .then(async r => {
             const compressed = r.headers.get('content-length');
-            const uncompressed = (await r.text()).length;
             return {
-                compressed: `${Math.round(compressed / 1024)}KB`,
-                uncompressed: `${Math.round(uncompressed / 1024)}KB`
+                compressed: `${Math.round(compressed / 1024)}KB`
             };
         });
 </script>

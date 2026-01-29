@@ -108,7 +108,7 @@
         const strategy = mutable('importmap');
 
         const strategies = [
-            {id: 'importmap', name: 'Import Map', desc: 'Use pre-minified runtime via import map (~11KB gzipped)', checked: true},
+            {id: 'importmap', name: 'Import Map', desc: `Use pre-minified runtime via import map (${runtimeSize.compressed} gzipped)`, checked: true},
             {id: 'bundler', name: 'Bundler', desc: 'Bundle and minify reactive imports with BunBundler', bunOnly: true},
             {id: 'byo', name: 'Bring Your Own', desc: 'You manage your own import map or bundling'}
         ];
@@ -304,7 +304,7 @@
 <!-- Notes based on selection -->
 <script type="module" is="reactive">
     <div class="note" hidden={strategy !== 'importmap'}>
-        <strong>Islands and Import Maps:</strong> When using <a href="islands.html">reactive islands</a>, import maps are preferred. All islands share the same pre-minified runtime (~11KB gzipped) rather than each island bundling its own copy.
+        <strong>Islands and Import Maps:</strong> When using <a href="islands.html">reactive islands</a>, import maps are preferred. All islands share the same pre-minified runtime ({runtimeSize.compressed} gzipped) rather than each island bundling its own copy.
     </div>
 </script>
 
@@ -312,17 +312,15 @@
     const runtimeSize = fetch('https://dataflow.bodar.com/runtime.js')
         .then(async r => {
             const compressed = r.headers.get('content-length');
-            const uncompressed = (await r.text()).length;
             return {
-                compressed: `${Math.round(compressed / 1024)}KB`,
-                uncompressed: `${Math.round(uncompressed / 1024)}KB`
+                compressed: `${Math.round(compressed / 1024)}KB`
             };
         });
 </script>
 
 <script type="module" is="reactive">
     <div class="note" hidden={runtime !== 'browser'}>
-        <strong>Browser Transformation:</strong> While the reactive runtime is small ({runtimeSize.compressed} ({runtimeSize.uncompressed} uncompressed)), the transformation library is significantly larger because it includes a JavaScript parser (Acorn). Browser-side transformation is best suited for development, prototyping, or cases where server-side transformation isn't possible. For production, prefer server-side transformation.
+        <strong>Browser Transformation:</strong> While the reactive runtime is small ({runtimeSize.compressed} gzipped), the transformation library is significantly larger because it includes a JavaScript parser (Acorn). Browser-side transformation is best suited for development, prototyping, or cases where server-side transformation isn't possible. For production, prefer server-side transformation.
     </div>
 </script>
 
