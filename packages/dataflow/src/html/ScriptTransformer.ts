@@ -1,9 +1,9 @@
-import {HTMLTransformer} from "./HTMLTransformer.ts";
+import {TransformationController, trimIndent} from "./TransformationController.ts";
 
 export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
     private chunks: string[] = [];
 
-    constructor(private controller: HTMLTransformer) {
+    constructor(private controller: TransformationController) {
     }
 
     element(start: HTMLRewriterTypes.Element): void | Promise<void> {
@@ -48,22 +48,5 @@ export class ScriptTransformer implements HTMLRewriterTypes.HTMLRewriterElementC
     }
 }
 
-export function trimIndent(text: string): string {
-    const lines = text.split('\n');
-    const firstNonEmptyIndex = lines.findIndex(line => line.trim().length > 0);
-    if (firstNonEmptyIndex === -1) return '';
-
-    const firstNonEmptyLine = lines[firstNonEmptyIndex];
-    const match = firstNonEmptyLine.match(/^(\s*)/);
-    const indent = match ? match[1] : '';
-    const indentLength = indent.length;
-
-    const relevantLines = lines.slice(firstNonEmptyIndex);
-
-    if (indentLength === 0) return relevantLines.map(line => line.trimEnd()).join('\n').trimEnd();
-
-    return relevantLines
-        .map(line => (line.startsWith(indent) ? line.slice(indentLength) : line.trimStart()).trimEnd())
-        .join('\n')
-        .trimEnd();
-}
+// Re-export trimIndent for backwards compatibility
+export {trimIndent} from "./TransformationController.ts";
