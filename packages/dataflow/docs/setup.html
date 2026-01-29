@@ -45,9 +45,9 @@
 
         const runtimes = [
             {id: 'bun', name: 'Bun', logo: 'bun'},
-            {id: 'node', name: 'Node.js', logo: 'nodedotjs'},
-            {id: 'deno', name: 'Deno', logo: 'deno'},
             {id: 'cloudflare', name: 'Cloudflare', logo: 'cloudflare'},
+            {id: 'deno', name: 'Deno', logo: 'deno'},
+            {id: 'node', name: 'Node.js', logo: 'nodedotjs'},
             {id: 'browser', name: 'Browser', logo: 'googlechrome'}
         ];
 
@@ -141,7 +141,7 @@
         const getInstallCommand = () => {
             const commands = {
                 bun: 'bunx jsr add @bodar/dataflow',
-                node: 'npx jsr add @bodar/dataflow',
+                node: 'npx jsr add @bodar/dataflow\nnpm install hono @hono/node-server',
                 deno: 'deno add jsr:@bodar/dataflow',
                 cloudflare: 'npx jsr add @bodar/dataflow',
                 browser: 'npx jsr add @bodar/dataflow'
@@ -189,6 +189,10 @@
                 lines.push(`import {HTMLTransformer} from '@bodar/dataflow';`);
                 if (runtime === 'browser') {
                     lines.push(`import {HTMLRewriter} from 'htmlrewriter';`);
+                }
+                if (runtime === 'node') {
+                    lines.push(`import {Hono} from 'hono';`);
+                    lines.push(`import {serve} from '@hono/node-server';`);
                 }
             }
             if (strategy === 'bundler') {
@@ -258,9 +262,24 @@
                     lines.push(`    event.respondWith(handler(event.request));`);
                     lines.push(`});`);
                 }
+            } else if (runtime === 'deno') {
+                lines.push(`Deno.serve({`);
+                lines.push(`    fetch: ReactiveHandler(transformer, async (request) => {`);
+                lines.push(`        return new Response('<html>...</html>', {`);
+                lines.push(`            headers: {'content-type': 'text/html'}`);
+                lines.push(`        });`);
+                lines.push(`    })`);
+                lines.push(`});`);
             } else {
-                // Node.js, Deno
-                lines.push(`const handler = ReactiveHandler(transformer, yourRequestHandler);`);
+                // Node.js with Hono
+                lines.push(`const app = new Hono();`);
+                lines.push(`app.get('/*', ReactiveHandler(transformer, async (request) => {`);
+                lines.push(`    return new Response('<html>...</html>', {`);
+                lines.push(`        headers: {'content-type': 'text/html'}`);
+                lines.push(`    });`);
+                lines.push(`}));`);
+                lines.push('');
+                lines.push(`serve({fetch: app.fetch, port: 3000});`);
             }
 
             return lines.join('\n');
@@ -290,13 +309,30 @@
 </script>
 
 <script type="module" is="reactive">
+    const runtimeSize = fetch('https://dataflow.bodar.com/runtime.js')
+        .then(async r => {
+            const compressed = r.headers.get('content-length');
+            const uncompressed = (await r.text()).length;
+            return {
+                compressed: `${Math.round(compressed / 1024)}KB`,
+                uncompressed: `${Math.round(uncompressed / 1024)}KB`
+            };
+        });
+</script>
+
+<script type="module" is="reactive">
+    <div class="note" hidden={runtime !== 'browser'}>
+        <strong>Browser Transformation:</strong> While the reactive runtime is small ({runtimeSize.compressed} ({runtimeSize.uncompressed} uncompressed)), the transformation library is significantly larger because it includes a JavaScript parser (Acorn). Browser-side transformation is best suited for development, prototyping, or cases where server-side transformation isn't possible. For production, prefer server-side transformation.
+    </div>
+</script>
+
+<script type="module" is="reactive">
     <div class="note" hidden={!(runtime === 'browser' && browserTransformer === 'dom')}>
         <strong>DOMTransformer:</strong>
         <ul>
             <li>Uses the browser's native <code>DOMParser</code> or can transform an iframe's document directly</li>
-            <li>No external dependencies required</li>
+            <li>No external dependencies beyond dataflow</li>
             <li>Batch processing (parses entire document before transforming)</li>
-            <li>Ideal for client-side transformation of fetched HTML or iframe content</li>
         </ul>
     </div>
 </script>
@@ -322,6 +358,12 @@
 <script type="module" is="reactive">
     <div class="note" hidden={!(strategy === 'bundler' && runtime === 'bun')}>
         <strong>Note:</strong> <code>HTMLTransformer</code> is stateful and should be created fresh for each transformation. When using <code>ReactiveHandler</code>, pass a factory function that creates a new transformer.
+    </div>
+</script>
+
+<script type="module" is="reactive">
+    <div class="note" hidden={runtime !== 'node'}>
+        <strong>Node.js HTTP:</strong> Node's built-in HTTP server is not fetch-based. You'll need a fetch-based framework like <a href="https://hono.dev/docs/getting-started/nodejs" target="_blank">Hono</a> to use <code>ReactiveHandler</code>.
     </div>
 </script>
 
