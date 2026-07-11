@@ -1,3 +1,12 @@
+---
+title: "Curry Placeholder Type Support Implementation Plan"
+date: 2025-11-02
+author: Daniel Bodart
+type: plan
+status: complete
+tags: [plan, curry, placeholder, types]
+---
+
 # Curry Placeholder Type Support Implementation Plan
 
 ## Overview

@@ -1,14 +1,10 @@
 ---
-date: 2025-10-30T18:08:24+0000
-researcher: Daniel Worthington-Bodart
-git_commit: 1a54ea52c4e38cb6895edbf020f9d4ed584204df
-branch: master
-repository: bodar.ts
-topic: "Feature delta between old totallylazy.js and new totallylazy rewrite"
-tags: [research, codebase, totallylazy, feature-comparison, migration]
+title: "Feature delta between old totallylazy.js and new totallylazy rewrite"
+date: 2025-10-30
+author: Daniel Bodart
+type: research
 status: complete
-last_updated: 2025-10-30
-last_updated_by: Daniel Worthington-Bodart
+tags: [research, codebase, totallylazy, feature-comparison, migration]
 ---
 
 # Research: Feature Delta Between totallylazy.js and @bodar/totallylazy

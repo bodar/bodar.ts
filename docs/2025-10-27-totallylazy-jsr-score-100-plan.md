@@ -1,3 +1,12 @@
+---
+title: "Increase totallylazy JSR Score to 100%"
+date: 2025-10-27
+author: Daniel Bodart
+type: plan
+status: complete
+tags: [plan, totallylazy, jsr, score]
+---
+
 # Increase totallylazy JSR Score to 100%
 
 ## Progress Summary

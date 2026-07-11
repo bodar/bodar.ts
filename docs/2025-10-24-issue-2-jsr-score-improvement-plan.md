@@ -1,12 +1,10 @@
 ---
-date: 2025-10-24
 title: "JSR Score Improvement for @bodar/yadic Package"
+date: 2025-10-24
+author: Daniel Bodart
+type: plan
 status: complete
-priority: high
 tags: [jsr, documentation, yadic, quality]
-related_research: docs/2025-10-24-issue-2-jsr-score.md
-related_tickets: docs/issue-package-structure.md
-completed_date: 2025-10-27
 ---
 
 # JSR Score Improvement for @bodar/yadic Package
@@ -965,10 +963,10 @@ After each phase:
 
 ## References
 
-- Original research: `docs/2025-10-24-issue-2-jsr-score.md`
+- Original research: `docs/2025-10-24-issue-2-jsr-score-research.md`
 - JSR score page: https://jsr.io/@bodar/yadic/score
 - JSR package page: https://jsr.io/@bodar/yadic
-- Related ticket (package structure): `docs/issue-package-structure.md`
+- Related plan (package structure): `docs/2025-10-24-3-standardize-package-structure-plan.md`
 - Source files:
   - `packages/yadic/src/chain.ts:1-18`
   - `packages/yadic/src/LazyMap.ts:4-57`

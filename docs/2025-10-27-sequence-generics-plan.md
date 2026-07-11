@@ -1,3 +1,12 @@
+---
+title: "Sequence Function Advanced Type Chaining Implementation Plan"
+date: 2025-10-27
+author: Daniel Bodart
+type: plan
+status: complete
+tags: [plan, sequence, generics]
+---
+
 # Sequence Function Advanced Type Chaining Implementation Plan
 
 ## Overview
@@ -165,6 +174,6 @@ No migration needed - the change is backward compatible. All existing code using
 
 ## References
 
-- Original research: `docs/2025-10-27-sequence-transducer-type-chaining.md`
+- Original research: `docs/2025-10-27-sequence-transducer-type-chaining-research.md`
 - Current implementation: `/home/dan/Projects/bodar.ts/packages/totallylazy/src/collections/Sequence.ts:43-55`
 - Test file: `/home/dan/Projects/bodar.ts/packages/totallylazy/test/collections/Sequence.test.ts:10-14`

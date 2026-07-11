@@ -1,14 +1,10 @@
 ---
-date: 2025-10-24T17:25:20+01:00
-researcher: Daniel Worthington-Bodart
-git_commit: 260dab3d7a9b8b29a5209d20b491baf7b043f976
-branch: master
-repository: bodar.ts
-topic: "Standardize package structure: Move package.json from src/ to package root"
-tags: [research, codebase, monorepo, package-structure, refactoring]
+title: "Standardize package structure: Move package.json from src/ to package root"
+date: 2025-10-24
+author: Daniel Bodart
+type: research
 status: complete
-last_updated: 2025-10-24
-last_updated_by: Daniel Worthington-Bodart
+tags: [research, codebase, monorepo, package-structure, refactoring]
 ---
 
 # Research: Standardize Package Structure

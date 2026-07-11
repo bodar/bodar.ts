@@ -1,14 +1,10 @@
 ---
-date: 2025-10-31T15:48:18+0000
-researcher: dan
-git_commit: b3135bcb25590f9271a6353e6308ace00b14ed4b
-branch: master
-repository: bodar.ts
-topic: "Create curried / partial application function proxy for issue #6"
-tags: [research, codebase, currying, transducers, lazyrecords, ramda, typescript]
+title: "Create curried / partial application function proxy for issue #6"
+date: 2025-10-31
+author: Daniel Bodart
+type: research
 status: complete
-last_updated: 2025-10-31
-last_updated_by: dan
+tags: [research, codebase, currying, transducers, lazyrecords, ramda, typescript]
 ---
 
 # Research: Create curried / partial application function proxy for issue #6

@@ -1,3 +1,12 @@
+---
+title: "Increase lazyrecords JSR Score to 100%"
+date: 2025-10-28
+author: Daniel Bodart
+type: plan
+status: complete
+tags: [plan, lazyrecords, jsr, score]
+---
+
 # Increase lazyrecords JSR Score to 100%
 
 ## Progress Summary
@@ -400,8 +409,8 @@ Not applicable - documentation-only changes, no breaking changes to API.
 ## References
 
 - Previous plans:
-  - `docs/2025-10-27-totallylazy-jsr-score-100.md` - totallylazy (14/17, 82%)
-  - `docs/2025-10-24-issue-2-jsr-score-improvement.md` - yadic (17/17, 100%)
+  - `docs/2025-10-27-totallylazy-jsr-score-100-plan.md` - totallylazy (14/17, 82%)
+  - `docs/2025-10-24-issue-2-jsr-score-improvement-plan.md` - yadic (17/17, 100%)
 - JSR Score page: https://jsr.io/@bodar/lazyrecords/score
 - JSR Score API: https://api.jsr.io/scopes/bodar/packages/lazyrecords/score
 - JSR Documentation guide: https://jsr.io/docs/writing-docs

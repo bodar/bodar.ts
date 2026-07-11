@@ -1,14 +1,10 @@
 ---
-date: 2025-10-24T22:21:09+0100
-researcher: Daniel Worthington-Bodart
-git_commit: c29894ad179bb5d8e5d2d064b1563190646b9af3
-branch: master
-repository: bodar.ts
-topic: "GitHub Issue #5: Update README.md in root and ensure we have one in each package"
-tags: [research, codebase, documentation, readme, monorepo, totallylazy, lazyrecords, yadic]
+title: "GitHub Issue #5: Update README.md in root and ensure we have one in each package"
+date: 2025-10-24
+author: Daniel Bodart
+type: research
 status: complete
-last_updated: 2025-10-24
-last_updated_by: Daniel Worthington-Bodart
+tags: [research, codebase, documentation, readme, monorepo, totallylazy, lazyrecords, yadic]
 ---
 
 # Research: GitHub Issue #5 - README Documentation Status

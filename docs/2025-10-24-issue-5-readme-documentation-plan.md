@@ -1,3 +1,12 @@
+---
+title: "GitHub Issue #5: README Documentation Implementation Plan"
+date: 2025-10-24
+author: Daniel Bodart
+type: plan
+status: complete
+tags: [plan, issue, readme, documentation]
+---
+
 # GitHub Issue #5: README Documentation Implementation Plan
 
 ## Overview
@@ -538,6 +547,6 @@ Not applicable - adding documentation only.
 ## References
 
 - Original issue: GitHub Issue #5
-- Research document: `docs/2025-10-24-readme-documentation-status.md`
+- Research document: `docs/2025-10-24-readme-documentation-status-research.md`
 - Pattern reference: `packages/totallylazy/README.md`
 - Pattern reference: `packages/yadic/README.md`

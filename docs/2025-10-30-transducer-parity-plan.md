@@ -1,3 +1,12 @@
+---
+title: "Transducer Parity Implementation Plan"
+date: 2025-10-30
+author: Daniel Bodart
+type: plan
+status: complete
+tags: [plan, transducer, parity]
+---
+
 # Transducer Parity Implementation Plan
 
 ## Overview
@@ -460,7 +469,7 @@ Implement utility transducers for pass-through and introspection.
 
 ## References
 
-- Original issue: Research document at `docs/2025-10-30-totallylazy-feature-delta.md`
+- Original issue: Research document at `docs/2025-10-30-totallylazy-feature-delta-research.md`
 - Current implementation: `packages/totallylazy/src/transducers/`
 - Old implementation reference: `../../../totallylazy.js/src/transducers/` (totallylazy.js is in project root)
 - Pattern examples: MapTransducer.ts, FilterTransducer.ts

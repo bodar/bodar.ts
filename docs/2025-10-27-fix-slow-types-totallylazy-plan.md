@@ -1,3 +1,12 @@
+---
+title: "Fix Slow Types for @bodar/totallylazy JSR Publishing Implementation Plan"
+date: 2025-10-27
+author: Daniel Bodart
+type: plan
+status: complete
+tags: [plan, fix, slow, types, totallylazy]
+---
+
 # Fix Slow Types for @bodar/totallylazy JSR Publishing Implementation Plan
 
 ## Overview

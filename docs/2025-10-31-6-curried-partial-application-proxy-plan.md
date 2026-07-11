@@ -1,3 +1,12 @@
+---
+title: "Curried/Partial Application Function Proxy Implementation Plan"
+date: 2025-10-31
+author: Daniel Bodart
+type: plan
+status: complete
+tags: [plan, curried, partial, application, proxy]
+---
+
 # Curried/Partial Application Function Proxy Implementation Plan
 
 ## Overview

@@ -1,3 +1,12 @@
+---
+title: "lazyrecords SQL construction for mogwai-db"
+date: 2026-07-11
+author: Daniel Bodart
+type: plan
+status: draft
+tags: [plan, lazyrecords, sql, mogwai]
+---
+
 # Plan: lazyrecords SQL construction for mogwai-db
 
 **Date:** 2026-07-11

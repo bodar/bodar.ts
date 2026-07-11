@@ -1,3 +1,12 @@
+---
+title: "Fix Slow Types for JSR Publishing - Implementation Plan"
+date: 2025-10-28
+author: Daniel Bodart
+type: plan
+status: complete
+tags: [plan, fix, slow, types]
+---
+
 # Fix Slow Types for JSR Publishing - Implementation Plan
 
 ## Overview

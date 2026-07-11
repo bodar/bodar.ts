@@ -1,14 +1,10 @@
 ---
-date: 2025-10-24T11:58:32+01:00
-researcher: Daniel Worthington-Bodart
-git_commit: 36780000539080a162fe45c412bd28e9d8865467
-branch: master
-repository: bodar.ts
-topic: "JSR Score Requirements for @bodar/yadic Package"
-tags: [research, codebase, yadic, jsr, documentation, scoring]
+title: "JSR Score Requirements for @bodar/yadic Package"
+date: 2025-10-24
+author: Daniel Bodart
+type: research
 status: complete
-last_updated: 2025-10-24
-last_updated_by: Daniel Worthington-Bodart
+tags: [research, codebase, yadic, jsr, documentation, scoring]
 ---
 
 # Research: JSR Score Requirements for @bodar/yadic Package

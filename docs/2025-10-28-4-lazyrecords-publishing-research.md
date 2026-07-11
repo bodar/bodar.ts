@@ -1,15 +1,10 @@
 ---
-date: 2025-10-28T13:19:17+00:00
-researcher: Daniel Worthington-Bodart
-git_commit: 06b8ee5fba1fa6e5e3c372afee0bbcfe965c51af
-branch: master
-repository: bodar.ts
-topic: "Publishing lazyrecords package alongside totallylazy with proper version dependencies"
-tags: [research, codebase, publishing, jsr, lazyrecords, totallylazy, monorepo]
+title: "Publishing lazyrecords package alongside totallylazy with proper version dependencies"
+date: 2025-10-28
+author: Daniel Bodart
+type: research
 status: complete
-last_updated: 2025-10-28
-last_updated_by: Daniel Worthington-Bodart
-last_updated_note: "Answered all open questions regarding JSR dependency handling"
+tags: [research, codebase, publishing, jsr, lazyrecords, totallylazy, monorepo]
 ---
 
 # Research: Publishing lazyrecords package alongside totallylazy with proper version dependencies
@@ -128,8 +123,8 @@ All packages receive identical version numbers during each publish cycle, ensuri
 ## Related Research
 
 - `docs/2025-10-24-3-standardize-package-structure-research.md` - Package structure standardization
-- `docs/2025-10-24-issue-2-jsr-score-improvement.md` - JSR score improvements
-- `docs/2025-10-27-totallylazy-jsr-score-100.md` - TotallyLazy JSR optimization
+- `docs/2025-10-24-issue-2-jsr-score-improvement-plan.md` - JSR score improvements
+- `docs/2025-10-27-totallylazy-jsr-score-100-plan.md` - TotallyLazy JSR optimization
 
 ## Answers to Open Questions
 

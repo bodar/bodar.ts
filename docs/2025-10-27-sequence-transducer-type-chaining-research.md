@@ -1,15 +1,10 @@
 ---
-date: 2025-10-27T20:08:06+00:00
-researcher: Daniel Worthington-Bodart
-git_commit: c9496af7084c195bd05442eb02c1b680148353b1
-branch: master
-repository: bodar.ts
-topic: "Sequence method overloads and transducer type chaining implementation"
-tags: [research, codebase, sequence, transducers, type-inference, overloads, typescript]
+title: "Sequence method overloads and transducer type chaining implementation"
+date: 2025-10-27
+author: Daniel Bodart
+type: research
 status: complete
-last_updated: 2025-10-27
-last_updated_by: Daniel Worthington-Bodart
-last_updated_note: "Added follow-up research on TypeScript 4.0+ solution using variadic tuple types and recursive conditional types"
+tags: [research, codebase, sequence, transducers, type-inference, overloads, typescript]
 ---
 
 # Research: Sequence Method Overloads and Transducer Type Chaining
