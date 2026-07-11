@@ -215,7 +215,7 @@ bodar.ts/
 5. **Self-Describing**: Most types include toString() for debugging/inspection
 
 ## Related Research
-- No other research documents found in `thoughts/shared/research/`
+- No other research documents found in `docs/`
 
 ## Open Questions
 1. Should package READMEs follow a specific template/format?

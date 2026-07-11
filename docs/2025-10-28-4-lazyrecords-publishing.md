@@ -127,9 +127,9 @@ All packages receive identical version numbers during each publish cycle, ensuri
 
 ## Related Research
 
-- `thoughts/shared/research/2025-10-24-3-standardize-package-structure.md` - Package structure standardization
-- `thoughts/shared/plans/2025-10-24-issue-2-jsr-score-improvement.md` - JSR score improvements
-- `thoughts/shared/plans/2025-10-27-totallylazy-jsr-score-100.md` - TotallyLazy JSR optimization
+- `docs/2025-10-24-3-standardize-package-structure-research.md` - Package structure standardization
+- `docs/2025-10-24-issue-2-jsr-score-improvement.md` - JSR score improvements
+- `docs/2025-10-27-totallylazy-jsr-score-100.md` - TotallyLazy JSR optimization
 
 ## Answers to Open Questions
 

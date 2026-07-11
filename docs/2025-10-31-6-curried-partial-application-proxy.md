@@ -308,7 +308,7 @@ If Phase 4 acceptance tests pass, optionally replace the MapTransducer implement
 
 ## References
 
-- Original research: `thoughts/shared/research/2025-10-31-6-curried-partial-application-proxy.md`
+- Original research: `docs/2025-10-31-6-curried-partial-application-proxy-research.md`
 - Issue: #6 (curried/partial application function proxy)
 - Transducer pattern: `packages/totallylazy/src/transducers/Transducer.ts:20-25`
 - LazyRecords SQL conversion: `packages/lazyrecords/src/sql/builder/builders.ts:42-64`

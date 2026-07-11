@@ -391,8 +391,8 @@ If issues arise, rollback is straightforward:
 
 ## References
 
-- Original ticket: `thoughts/shared/tickets/eng_3.md` → GitHub Issue #3
-- Related research: `thoughts/shared/research/2025-10-24-3-standardize-package-structure.md`
+- Original ticket: `docs/eng_3.md` → GitHub Issue #3
+- Related research: `docs/2025-10-24-3-standardize-package-structure-research.md`
 - GitHub Issue: https://github.com/bodar/bodar.ts/issues/3
 - Publish script: `run:58-80`
 - Root workspace config: `package.json:4-7`

@@ -538,6 +538,6 @@ Not applicable - adding documentation only.
 ## References
 
 - Original issue: GitHub Issue #5
-- Research document: `thoughts/shared/research/2025-10-24-readme-documentation-status.md`
+- Research document: `docs/2025-10-24-readme-documentation-status.md`
 - Pattern reference: `packages/totallylazy/README.md`
 - Pattern reference: `packages/yadic/README.md`

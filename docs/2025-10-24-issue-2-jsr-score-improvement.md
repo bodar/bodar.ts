@@ -4,8 +4,8 @@ title: "JSR Score Improvement for @bodar/yadic Package"
 status: complete
 priority: high
 tags: [jsr, documentation, yadic, quality]
-related_research: thoughts/shared/research/2025-10-24-issue-2-jsr-score.md
-related_tickets: thoughts/shared/tickets/issue-package-structure.md
+related_research: docs/2025-10-24-issue-2-jsr-score.md
+related_tickets: docs/issue-package-structure.md
 completed_date: 2025-10-27
 ---
 
@@ -965,10 +965,10 @@ After each phase:
 
 ## References
 
-- Original research: `thoughts/shared/research/2025-10-24-issue-2-jsr-score.md`
+- Original research: `docs/2025-10-24-issue-2-jsr-score.md`
 - JSR score page: https://jsr.io/@bodar/yadic/score
 - JSR package page: https://jsr.io/@bodar/yadic
-- Related ticket (package structure): `thoughts/shared/tickets/issue-package-structure.md`
+- Related ticket (package structure): `docs/issue-package-structure.md`
 - Source files:
   - `packages/yadic/src/chain.ts:1-18`
   - `packages/yadic/src/LazyMap.ts:4-57`

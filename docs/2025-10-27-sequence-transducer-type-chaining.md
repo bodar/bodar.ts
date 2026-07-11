@@ -165,7 +165,7 @@ The transducer architecture follows these patterns:
 The consistent use of this pattern across sequence, compose, parser, result, and single functions shows a deliberate architectural choice to prioritize type safety within practical limits (5-8 chained operations).
 
 ## Related Research
-- No previous research documents found in thoughts/shared/research/ for this specific topic
+- No previous research documents found in docs/ for this specific topic
 
 ## Follow-up Research 2025-10-27T20:21:52+00:00
 
