@@ -46,6 +46,11 @@ export function list(expressions: readonly Expression[], separator: Text = text(
     return new Compound(expressions, separator);
 }
 
+/** Wraps a separator-joined list of expressions in parentheses, e.g. `(a, b, c)`. */
+export function parens(expressions: readonly Expression[], separator: Text = text(', ')): Compound {
+    return new Compound(expressions, separator, text('('), text(')'));
+}
+
 /** Creates a comma-separated list of identifiers from strings. */
 export function ids(identifiers: readonly string[]): Compound {
     return list(identifiers.map(id));
