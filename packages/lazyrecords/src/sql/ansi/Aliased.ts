@@ -1,3 +1,10 @@
+/**
+ * @module
+ *
+ * A SQL expression with an `AS` alias, e.g. `expr AS "name"`. Produced by
+ * {@link Aliasable}`.as()`.
+ */
+
 import {Compound} from "../template/Compound.ts";
 import {Expression} from "../template/Expression.ts";
 import {text, Text} from "../template/Text.ts";

@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * A SQL `WHERE` clause pairing a predicand with a predicate; chainable with
+ * `.and()`/`.or()` to extend the condition.
+ */
 import {and, Compound, or} from "../template/Compound.ts";
 import {text, Text} from "../template/Text.ts";
 import {Column} from "./Column.ts";

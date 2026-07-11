@@ -1,3 +1,10 @@
+/**
+ * @module
+ *
+ * A SQL table reference (name, {@link Identifier}, or {@link Qualified}) that can be
+ * aliased with `AS`.
+ */
+
 import {Qualified} from "./Qualified.ts";
 import {Aliasable} from "./Aliasable.ts";
 import {id, Identifier} from "../template/Identifier.ts";

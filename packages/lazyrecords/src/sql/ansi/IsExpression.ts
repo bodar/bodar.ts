@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * A SQL `=`/`IS NULL` predicate tail: renders `= ?` for a value, `is null` when
+ * the operand is null/undefined.
+ */
 import {text, Text} from "../template/Text.ts";
 import {Value} from "../template/Value.ts";
 import {PredicateExpression} from "./PredicateExpression.ts";

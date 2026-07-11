@@ -1,3 +1,10 @@
+/**
+ * @module
+ *
+ * A SQL `SELECT` expression: set quantifier, select list, `FROM` clause, and an
+ * optional `WHERE` clause. `JOIN`/`GROUP BY`/`ORDER BY`/`LIMIT` are separate
+ * nodes concatenated alongside it via {@link sql}.
+ */
 import {text, Text} from "../template/Text.ts";
 import {SetQuantifier} from "./SetQuantifier.ts";
 import {Compound, list} from "../template/Compound.ts";

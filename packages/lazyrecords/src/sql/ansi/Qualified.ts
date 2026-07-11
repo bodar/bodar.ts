@@ -1,3 +1,10 @@
+/**
+ * @module
+ *
+ * A qualified SQL name — `schema.table` or `table.column` — rendered with each part
+ * escaped as an identifier (e.g. `"n"."props"`).
+ */
+
 import {Compound} from "../template/Compound.ts";
 import {empty, text, Text} from "../template/Text.ts";
 import {id} from "../template/Identifier.ts";

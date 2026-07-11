@@ -1,3 +1,10 @@
+/**
+ * @module
+ *
+ * SQL set quantifier controlling duplicate rows: `ALL` or `DISTINCT`. Exports the
+ * `all` / `distinct` singletons.
+ */
+
 import {Text} from "../template/Text.ts";
 
 /** SQL set quantifier for controlling duplicate rows (ALL or DISTINCT). */

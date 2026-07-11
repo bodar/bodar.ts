@@ -1,3 +1,9 @@
+/**
+ * @module
+ *
+ * Base class for SQL expressions that can be given an `AS` alias via `.as(name)`.
+ */
+
 import {Expression} from "../template/Expression.ts";
 import {Aliased} from "./Aliased.ts";
 import {Compound} from "../template/Compound.ts";

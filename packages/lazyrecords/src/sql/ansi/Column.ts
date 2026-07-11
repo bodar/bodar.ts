@@ -1,3 +1,10 @@
+/**
+ * @module
+ *
+ * A SQL column reference (name, {@link Identifier}, or {@link Qualified}) that can be
+ * aliased with `AS`. Also exports the `*` star selector.
+ */
+
 import {Qualified} from "./Qualified.ts";
 import {Aliasable} from "./Aliasable.ts";
 import {id, Identifier} from "../template/Identifier.ts";

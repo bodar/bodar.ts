@@ -1,3 +1,8 @@
+/**
+ * @module
+ *
+ * A SQL `FROM` clause over a table reference.
+ */
 import {Compound} from "../template/Compound.ts";
 import {text, Text} from "../template/Text.ts";
 import {type TableReference} from "./Table.ts";
