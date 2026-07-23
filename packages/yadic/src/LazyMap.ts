@@ -35,10 +35,11 @@ export class LazyMap {
      * Creates a new LazyMap instance, optionally inheriting from a parent container.
      *
      * When a parent is provided, the child container can access all parent
-     * dependencies through the chaining mechanism.
+     * dependencies through the chaining mechanism: inherited keys are directly
+     * readable on the child, and writes only ever apply to the child.
      */
     static create<P>(parent?: P): LazyMap & P {
-        return new LazyMap(parent as any) as any;
+        return new LazyMap(parent as any).deps as any;
     }
 
     /**

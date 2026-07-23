@@ -64,6 +64,10 @@ export type Chain<T extends any[]> = T extends [infer First, ...infer Rest]
  * found property. Properties from objects earlier in the array override those
  * in later objects. Useful for configuration merging and defaults.
  *
+ * Writes (assignment, defineProperty, delete) apply to the first object,
+ * like a prototype chain: later objects are never mutated and a write
+ * shadows any value they provide.
+ *
  * @template T - Tuple array of object types to chain
  * @param objects - Objects to chain, with earlier objects having higher precedence
  * @returns A proxy that combines all objects with proper precedence
@@ -78,7 +82,7 @@ export type Chain<T extends any[]> = T extends [infer First, ...infer Rest]
  * ```
  */
 export function chain<T extends object[]>(...objects: T): Chain<T> {
-    return new Proxy({}, {
+    return new Proxy(objects[0] ?? {}, {
         get(_target, prop, _receiver) {
             for (const obj of objects) {
                 try {

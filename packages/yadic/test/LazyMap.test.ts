@@ -108,5 +108,69 @@ describe("LazyMap", () => {
             expect(map.a).toEqual(1);
         }
     });
+
+    // --- parent-child: a child must expose inherited keys via DIRECT access, not only
+    //     through a factory's `deps`. `create<P>(parent): LazyMap & P` promises `child.a`
+    //     resolves to the parent's value; today it returns undefined. ---
+    describe("parent inheritance is directly readable", () => {
+        test("an inherited key resolves via direct access on the child", () => {
+            const parent = LazyMap.create()
+                .set('a', instance(1))
+                .set('b', instance(2));
+            const child = LazyMap.create(parent)
+                .set('c', instance(3));
+
+            expect(child.a).toEqual(1);   // inherited, direct read
+            expect(child.b).toEqual(2);   // inherited, direct read
+            expect(child.c).toEqual(3);   // own
+        });
+
+        test("a key set on the child AFTER create() is still readable", () => {
+            const parent = LazyMap.create().set('a', instance(1));
+            const child = LazyMap.create(parent)
+                .set('b', deps => deps.a + 1);   // factory over an inherited key
+
+            expect(child.b).toEqual(2);   // own key, set after create()
+            expect(child.a).toEqual(1);   // inherited, direct read
+        });
+
+        test("a child can shadow (override) an inherited key before it is used", () => {
+            const parent = LazyMap.create()
+                .set('a', instance(1))
+                .set('b', instance(2));
+            const child = LazyMap.create(parent)
+                .set('a', instance(99));   // override the inherited 'a'
+
+            expect(child.a).toEqual(99);  // child's own value wins
+            expect(child.b).toEqual(2);   // still inherited
+            expect(parent.a).toEqual(1);  // parent untouched
+        });
+
+        test("an inherited lazy dependency is realised once and shared across children", () => {
+            let count = 0;
+            const parent = LazyMap.create()
+                .set('shared', () => ({ id: ++count }));
+
+            const child1 = LazyMap.create(parent).set('x', instance('x'));
+            const child2 = LazyMap.create(parent).set('y', instance('y'));
+
+            const fromChild1 = child1.shared;   // direct read of an inherited lazy dep
+            const fromChild2 = child2.shared;
+
+            expect(count).toEqual(1);                 // realised exactly once (on the parent)
+            expect(fromChild1).toBe(fromChild2);      // same singleton instance across children
+            expect(parent.shared).toBe(fromChild1);   // and it IS the parent's instance
+        });
+
+        test("grandparent keys resolve through two levels of direct access", () => {
+            const grandparent = LazyMap.create().set('a', instance(1));
+            const parent = LazyMap.create(grandparent).set('b', instance(2));
+            const child = LazyMap.create(parent).set('c', instance(3));
+
+            expect(child.a).toEqual(1);   // from grandparent
+            expect(child.b).toEqual(2);   // from parent
+            expect(child.c).toEqual(3);   // own
+        });
+    });
 })
 
