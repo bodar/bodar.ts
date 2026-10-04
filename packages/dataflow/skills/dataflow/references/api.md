@@ -132,6 +132,8 @@ observe<T>(init: (notify: (t: T | undefined) => any) => any, value?: T,
 ```
 - `init` runs lazily on first pull. `initialValue` (if not `undefined`) is yielded first.
 - `notify(v)` pushes a value; values notified faster than they are consumed coalesce (latest wins).
+  A synchronous `notify(v)` inside `init` replaces `initialValue` and is yielded once, so
+  `observe(n => { listen(n); n(current); … })` replays the current value without a duplicate.
 - Ends when `terminate(v)` — by default `notify(undefined)`.
 - If `init` returns a **zero-parameter** function it is called (awaited) on end/return/invalidation.
   A cleanup that declares parameters is silently never called.

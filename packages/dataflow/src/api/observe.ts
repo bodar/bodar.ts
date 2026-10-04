@@ -9,6 +9,8 @@ export function observe<T>(init: (notify: (t: T | undefined) => any) => any, val
     async function* generator(): AsyncGenerator<T> {
         // Must close over the signal variable to see it change
         const dispose = init((v => signal.resolve(value = v)));
+        // A synchronous notify during init becomes the initial value, not a second change
+        if (!terminate(value)) signal = Promise.withResolvers<T>();
 
         try {
             if (value !== undefined) yield value;

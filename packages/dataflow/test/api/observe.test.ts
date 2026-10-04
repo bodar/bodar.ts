@@ -43,6 +43,20 @@ describe("observe", () => {
         expect(source.disposed).toBe(true);
     });
 
+    test("a value notified synchronously during init is only yielded once", async () => {
+        const source = observe<number>((notify) => {
+            notify(1);
+            setTimeout(() => notify(2), 5);
+            setTimeout(() => notify(undefined), 10);
+        });
+        expect(await toPromiseArray(source)).toEqual([1, 2]);
+    });
+
+    test("terminating synchronously during init completes", async () => {
+        const source = observe<number>((notify) => notify(undefined), 1);
+        expect(await toPromiseArray(source)).toEqual([]);
+    });
+
     test("return() completes even when awaiting a promise that will never resolve", async () => {
         let disposed = false;
         const source = observe<number>(() => () => disposed = true);
