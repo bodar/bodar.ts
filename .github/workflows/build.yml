@@ -24,6 +24,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup mise
+        uses: jdx/mise-action@v5
+
       - name: Run CI
         run: ./run ci
 

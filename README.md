@@ -23,13 +23,13 @@ bodar.ts/
 │   ├── lazyrecords/   # SQL query builder
 │   └── yadic/         # Dependency injection
 ├── run                # Main build/test script
-├── bootstrap.sh       # Auto-installs dependencies via mise
+├── bootstrap.sh       # Installs dependencies via mise
 └── package.json       # Workspace configuration
 ```
 
 ## Quick Start
 
-The `./run` command handles all build, test, and development tasks. On first use, it automatically installs all required dependencies using `mise`:
+The `./run` command handles all build, test, and development tasks. It requires [mise](https://mise.jdx.dev/getting-started.html) and on first use installs the required tools (see `.tool-versions`):
 
 ```bash
 # Run tests
@@ -51,7 +51,7 @@ The `./run` command handles all build, test, and development tasks. On first use
 ./run coverage
 ```
 
-The bootstrap process installs the correct versions of all tools (Bun, Node, etc.) automatically—no manual setup required.
+The bootstrap process installs the correct versions of all tools (Bun, Node, etc.) via mise.
 
 ## Design Decisions
 
