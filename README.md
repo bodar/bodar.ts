@@ -1,7 +1,7 @@
 # bodar.ts
 [![Build](https://github.com/bodar/bodar.ts/actions/workflows/build.yml/badge.svg)](https://github.com/bodar/bodar.ts/actions/workflows/build.yml)
 
-A monorepo containing TypeScript libraries for functional programming, database access, and dependency injection.
+A monorepo containing TypeScript libraries for functional programming, database access, dependency injection, JSX and reactive dataflow.
 
 ## Packages
 
@@ -11,20 +11,36 @@ A comprehensive functional programming library providing composable predicates, 
 ### [@bodar/lazyrecords](./packages/lazyrecords)
 A type-safe SQL query builder that bridges functional programming with SQL. Convert functional predicates and transducers into parameterized SQL queries. Currently supports PostgreSQL with ANSI SQL foundations.
 
+### [@bodar/lazyrecords-duckdb](./packages/lazyrecords-duckdb)
+DuckDB native adapter for lazyrecords using `@duckdb/node-api`.
+
+### [@bodar/lazyrecords-duckdb-wasm](./packages/lazyrecords-duckdb-wasm)
+DuckDB WASM adapter for lazyrecords using `@duckdb/duckdb-wasm`.
+
 ### [@bodar/yadic](./packages/yadic)
 A lightweight dependency injection container with lazy initialization. Uses property getters that convert to immutable read-only properties on first access for optimal performance.
+
+### [@bodar/jsx2dom](./packages/jsx2dom)
+An extremely thin adapter to convert JSX/TSX to native DOM method calls. Works in the browser, at the edge, server side or in unit tests using [linkedom](https://github.com/WebReflection/linkedom) without any global namespace pollution.
+
+### [@bodar/dataflow](./packages/dataflow)
+A reactive dataflow library inspired by Observable Framework but grounded in HTML rather than markdown. Adds reactivity to standard HTML for static, server, edge or client rendered content. Early days - not ready for use yet.
 
 ## Monorepo Structure
 
 ```
 bodar.ts/
-├── packages/           # All publishable packages
-│   ├── totallylazy/   # Functional programming library
-│   ├── lazyrecords/   # SQL query builder
-│   └── yadic/         # Dependency injection
-├── run                # Main build/test script
-├── bootstrap.sh       # Installs dependencies via mise
-└── package.json       # Workspace configuration
+├── packages/                     # All publishable packages
+│   ├── totallylazy/              # Functional programming library
+│   ├── lazyrecords/              # SQL query builder
+│   ├── lazyrecords-duckdb/       # DuckDB native adapter for lazyrecords
+│   ├── lazyrecords-duckdb-wasm/  # DuckDB WASM adapter for lazyrecords
+│   ├── yadic/                    # Dependency injection
+│   ├── jsx2dom/                  # JSX to native DOM calls
+│   └── dataflow/                 # Reactive HTML dataflow
+├── run                           # Main build/test script
+├── bootstrap.sh                  # Installs dependencies via mise
+└── package.json                  # Workspace configuration
 ```
 
 ## Quick Start
