@@ -3,7 +3,7 @@
  * Benefits over Promise.race:
  *  1. No memory leaks
  *  2. Races multiple at a time
- *  3. Allows micro tasks to settle in same iteration (solves diamond shaped dependencies)
+ *  3. Can pull a subset of keys, letting a join wait for the inputs that are behind (see combineStamped)
  */
 export class AsyncIteratorRacer<K, V> {
     private iterators: Map<K, AsyncIterator<V>>;
@@ -22,9 +22,16 @@ export class AsyncIteratorRacer<K, V> {
         return this;
     }
 
-    pull(): void {
-        for (const [key, iterator] of this.iterators) {
-            if (!this.pending.has(key) && !this.resolved.has(key)) {
+    /** Is this key still being raced (not yet done) */
+    has(key: K): boolean {
+        return this.iterators.has(key);
+    }
+
+    /** Requests the next value of each key (default all) that is not already pending or resolved */
+    pull(keys: Iterable<K> = this.iterators.keys()): void {
+        for (const key of Array.from(keys)) {
+            const iterator = this.iterators.get(key);
+            if (iterator && !this.pending.has(key) && !this.resolved.has(key)) {
                 this.pending.set(key, iterator.next().then(result => {
                     if (this.iterators.get(key) !== iterator) return;
                     this.pending.delete(key);
@@ -41,7 +48,7 @@ export class AsyncIteratorRacer<K, V> {
     }
 
     async wait(): Promise<void> {
-        await Promise.all([this.signal.promise, Promise.resolve()]);
+        await this.signal.promise;
         this.signal = Promise.withResolvers();
     }
 
@@ -51,8 +58,9 @@ export class AsyncIteratorRacer<K, V> {
         return result;
     }
 
-    async race(): Promise<Map<K, IteratorResult<V>>> {
-        this.pull();
+    /** Pulls the given keys (default all) and returns everything that resolved */
+    async race(keys?: Iterable<K>): Promise<Map<K, IteratorResult<V>>> {
+        this.pull(keys);
         await this.wait();
         return this.take();
     }

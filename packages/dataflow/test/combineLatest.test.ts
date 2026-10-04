@@ -1,5 +1,5 @@
 import {describe, expect, test} from "bun:test";
-import {combineLatest} from "../src/combineLatest.ts";
+import {combineLatest, combineStamped} from "../src/combineLatest.ts";
 import {toPromiseArray} from "@bodar/totallylazy/collections/Array.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
@@ -224,4 +224,42 @@ describe("combineLatest", () => {
     })
 
 
+});
+
+describe("combineStamped", () => {
+    const source = {};
+    const stamped = (value: any, count: number) => ({value, stamp: new Map([[source, count]])});
+
+    async function* stamps(...values: [any, number][]) {
+        for (const [value, count] of values) yield stamped(value, count);
+    }
+
+    test("only emits combinations that agree on shared nodes", async () => {
+        const result = await toPromiseArray(combineStamped([
+            stamps(['a1', 1], ['a2', 2], ['a3', 3]),
+            stamps(['b1', 1], ['b3', 3]),
+        ]));
+        assertThat(result.map(r => r.value), equals([['a1', 'b1'], ['a3', 'b3']]));
+    });
+
+    test("does not wait for inputs that share no node", async () => {
+        const result = await toPromiseArray(combineStamped([
+            stamps(['a1', 1], ['a2', 2]),
+            (async function* () { yield {value: 'x', stamp: new Map([[{}, 1]])}; })(),
+        ]));
+        assertThat(result.map(r => r.value), equals([['a1', 'x'], ['a2', 'x']]));
+    });
+
+    test("does not wait for an input that finished behind", async () => {
+        const result = await toPromiseArray(combineStamped([
+            stamps(['a1', 1], ['a2', 2]),
+            stamps(['b1', 1]),
+        ]));
+        assertThat(result.map(r => r.value).at(-1), equals(['a2', 'b1']));
+    });
+
+    test("the combined stamp is the merge of the inputs", async () => {
+        const [first] = await toPromiseArray(combineStamped([stamps(['a1', 1]), stamps(['b1', 1])]));
+        assertThat(first.stamp.get(source), equals(1));
+    });
 });
