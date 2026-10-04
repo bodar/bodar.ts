@@ -168,6 +168,10 @@
     <li>Variables are scoped to the island - no conflicts with other islands or page-level scripts</li>
 </ol>
 
+<p>Inside an island, <code>root</code> is the island element itself (at page level it is <code>&lt;body&gt;</code>), so an island can listen and dispatch on itself without needing an id:</p>
+
+<pre><code class="language-javascript">const shared = events(root, 'app:state', e =&gt; e.detail);</code></pre>
+
 <h2>Benefits Over Full SPA Frameworks</h2>
 
 <table>

@@ -135,6 +135,10 @@ export class NodeDefinition {
         return this._inputs.includes('now');
     }
 
+    hasRoot(): boolean {
+        return this._inputs.includes('root');
+    }
+
     /** Returns direct implicit imports used by this node (for tree-shaking imports) */
     getUsedDirectImports(): string[] {
         return this._inputs.filter((i) => IMPLICIT_IMPORTS.has(i));

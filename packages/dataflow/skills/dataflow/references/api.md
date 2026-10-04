@@ -6,7 +6,7 @@ All names below are **implicit inside reactive blocks** — never import them th
 
 ## Contents
 1. How the names get into a block
-2. display / view / input / events / observe / mutable / raw / now / width / invalidator
+2. display / view / input / events / observe / mutable / raw / now / width / root / invalidator
 3. How values flow between blocks (normalisation)
 4. Scheduling: throttle, backpressure, glitches
 5. Invalidation (cleanup)
@@ -25,6 +25,7 @@ All names below are **implicit inside reactive blocks** — never import them th
 | `view` | `const view = View.for(display);` | per-block function |
 | `width` | per-block graph node `width_<key>` = `Width.for(key, _runtime_)`; `const width = width_<key>;` | latest width number |
 | `now` | shared graph node `"now"` = `now()` generator | latest `Date.now()` number |
+| `root` | shared graph node `"root"` = `_runtime_.reactiveRoot` (parent of the runtime script) | the island element, or `<body>` |
 | `jsx` | graph node `"jsx"` = `new JSX2DOM(chain({onEventListener: autoKeyEvents()}, globalThis))` | JSX2DOM instance (JSX compiles to `jsx.createElement`) |
 | `invalidator` | graph globals are `chain({invalidator}, globalThis)` | the runtime's `Invalidator` |
 | anything else unresolved | auto-created global node `() => Reflect.get(globals, name)` | snapshot of `globalThis[name]` (or `undefined`) |
@@ -32,7 +33,7 @@ All names below are **implicit inside reactive blocks** — never import them th
 Consequences:
 - Declaring your own top-level `input`, `events`, `observe`, `mutable` or `raw` makes it invisible
   to other blocks (they get the runtime function). `display`, `view`, `width` are dropped from
-  outputs. Avoid `now`, `jsx`, `invalidator`, `_runtime_` as names too.
+  outputs. Avoid `now`, `root`, `jsx`, `invalidator`, `_runtime_` as names too.
 - `import {display} from "@bodar/dataflow/runtime.ts"` inside a block either produces a duplicate
   `const display` (single-expression blocks) or binds the placeholder, which throws when called;
   likewise `import {view} ...` gives a placeholder that throws.

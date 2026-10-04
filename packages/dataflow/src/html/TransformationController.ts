@@ -93,6 +93,7 @@ export class TransformationController {
         const registrations = [
             imports.has('JSX2DOM') && `_runtime_.graph.define("jsx",[],[],() => new JSX2DOM(chain({onEventListener: autoKeyEvents()}, globalThis)));`,
             imports.has('now') && `_runtime_.graph.define("now",[],[],() => now());`,
+            sorted.some(d => d.hasRoot()) && `_runtime_.graph.define("root",[],[],() => _runtime_.reactiveRoot);`,
             ...sorted.flatMap((d: NodeDefinition) => [
                 d.hasWidth() && `_runtime_.graph.define("width_${d.key}",[],[],() => Width.for("${d.key}", _runtime_));`,
                 `_runtime_.graph.define(${d.toString()});`

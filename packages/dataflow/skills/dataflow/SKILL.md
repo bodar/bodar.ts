@@ -112,7 +112,7 @@ task as usual.
    block is a self-cycle and fails the transform ("Circular dependency detected"). Reorder or
    split; cross-block order is free. Real cycles between blocks also fail the whole transform.
 5. **Never `import` the runtime API or `export` anything.** `display`, `view`, `input`, `events`,
-   `observe`, `mutable`, `raw`, `now`, `width`, `jsx`, `invalidator` are injected. Importing them
+   `observe`, `mutable`, `raw`, `now`, `width`, `root`, `jsx`, `invalidator` are injected. Importing them
    breaks the block; `export` produces invalid code. Don't reuse these names for your own variables.
 6. **Static `import` of libraries is fine** (`import * as Plot from "@observablehq/plot";`) — it
    becomes a dynamic `import()`, makes the block async, and the imported names become shared
@@ -138,6 +138,7 @@ task as usual.
 | `raw(x)` | Pass a generator function / iterable through un-iterated (doesn't stop Promise awaiting). |
 | `now` | Current `Date.now()` number, updates every frame. Referencing it re-runs the block per frame. |
 | `width` | Width (px) of *this block's slot/container* via ResizeObserver (not window width). |
+| `root` | The element owning this scope: the `is="reactive-island"` element, or `<body>`. Lets an island listen/dispatch on itself without an id. |
 | `invalidator.add(pred, handler)` | Custom cleanup rule, e.g. `value instanceof AudioNode → value.disconnect()`. |
 
 `view()`/`input()` value by element: range/number → number, checkbox → boolean (click), date →
