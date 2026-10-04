@@ -9,7 +9,7 @@ A monorepo containing TypeScript libraries for functional programming, database 
 A comprehensive functional programming library providing composable predicates, transducers, parsers, comparators, and collection utilities. Features lazy evaluation, parser combinators, and a complete JSON grammar with JSDoc custom type support.
 
 ### [@bodar/lazyrecords](./packages/lazyrecords)
-A type-safe SQL query builder that bridges functional programming with SQL. Convert functional predicates and transducers into parameterized SQL queries. Currently supports PostgreSQL with ANSI SQL foundations.
+A type-safe SQL query builder that bridges functional programming with SQL. Convert functional predicates and transducers into parameterized SQL queries, or write them with SQL template literals. Supports PostgreSQL and SQLite with ANSI SQL foundations (DuckDB via the adapter packages below).
 
 ### [@bodar/lazyrecords-duckdb](./packages/lazyrecords-duckdb)
 DuckDB native adapter for lazyrecords using `@duckdb/node-api`.
