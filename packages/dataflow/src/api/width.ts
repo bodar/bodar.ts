@@ -3,13 +3,14 @@
  */
 
 import {observe} from "./observe.ts";
+import {findSlot} from "../html/SlotRenderer.ts";
 
 /** Placeholder value - should be rewritten by the transformer */
 export const width = -1;
 
 /** Dependencies required by Width */
 export interface WidthDependencies {
-    document: Document;
+    reactiveRoot: Element;
     window: Window;
     ResizeObserver: typeof ResizeObserver;
 }
@@ -17,8 +18,8 @@ export interface WidthDependencies {
 /** Observes slot width changes using ResizeObserver */
 export class Width {
     static for(key: string, deps: WidthDependencies): AsyncIterable<number> {
-        const {document, window, ResizeObserver} = deps;
-        const slot = document.querySelector<HTMLSlotElement>(`slot[name="${key}"]`)!;
+        const {reactiveRoot, window, ResizeObserver} = deps;
+        const slot = findSlot(reactiveRoot, key);
         if (!slot) throw new Error(`Unable to find slot for ${key}`);
         if (window.getComputedStyle(slot).display === 'contents') slot.style.display = 'block';
         return observe((notify) => {

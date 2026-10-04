@@ -187,10 +187,11 @@ _runtime_.graph.run();
 </script>
 ```
 - Only used names are imported. Registrations are in topological order.
-- `runtime({scriptId})` sets `reactiveRoot` to the runtime script's parent element; `display`
-  looks its slot up under that root (island-scoped). `width` looks its slot up document-wide (keys
-  are unique per transformer, so this only matters if you combine separately-transformed
-  fragments). `idle: true` (testing) wraps the throttle in `Idle`.
+- `runtime({scriptId})` sets `reactiveRoot` to the runtime script's parent element; `display` and
+  `width` look their slot up under that root, skipping slots inside nested islands (keys are only
+  unique per transform, so separately-transformed fragments can reuse a key). The runtime script
+  id is still looked up document-wide, so inserting the *same* transformed fragment twice makes
+  both copies bind to the first one's root. `idle: true` (testing) wraps the throttle in `Idle`.
 - The `@bodar/dataflow/runtime.ts` import is a bare specifier: the page needs an import map entry
   or the transformer's `bundler` to inline it (see deployment.md).
 

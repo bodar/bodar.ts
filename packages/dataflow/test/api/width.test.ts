@@ -42,7 +42,7 @@ function setup(key: string = "test-key") {
     currentObserver = undefined;
     const globals = parseHTML(`<html><body><slot name="${key}" style="display: contents"></slot></body></html>`);
     const deps: WidthDependencies = {
-        document: globals.document,
+        reactiveRoot: globals.document.body,
         window: {
             getComputedStyle: (el: Element) => (el as HTMLElement).style
         } as Window,
@@ -108,10 +108,21 @@ describe("Width", () => {
         assertThat(slot.style.display, is("block"));
     });
 
+    test("ignores a slot with the same key inside a nested island", async () => {
+        const globals = parseHTML(`<html><body><div data-reactive-island><slot name="k" style="display: contents"></slot></div><slot name="k" style="display: contents"></slot></body></html>`);
+        Width.for("k", {
+            reactiveRoot: globals.document.body,
+            window: {getComputedStyle: (el: Element) => (el as HTMLElement).style} as Window,
+            ResizeObserver: ManualResizeObserver as unknown as typeof ResizeObserver
+        });
+        assertThat((globals.document.querySelector('div slot') as HTMLElement).style.display, is("contents"));
+        assertThat((globals.document.querySelector('body > slot') as HTMLElement).style.display, is("block"));
+    });
+
     test("throws if slot not found", async () => {
         const globals = parseHTML(`<html><body></body></html>`);
         const deps: WidthDependencies = {
-            document: globals.document,
+            reactiveRoot: globals.document.body,
             window: {getComputedStyle: () => ({display: 'block'})} as unknown as Window,
             ResizeObserver: ManualResizeObserver as unknown as typeof ResizeObserver
         };

@@ -1,7 +1,7 @@
 /** @module
  * Functions that can be used inside a reactive element
  */
-import {SlotRenderer, type SlotRendererDependencies} from "../html/SlotRenderer.ts";
+import {findSlot, SlotRenderer, type SlotRendererDependencies} from "../html/SlotRenderer.ts";
 import type {ThrottleStrategy} from "../Throttle.ts";
 
 /** Values that can be rendered to a slot */
@@ -49,7 +49,7 @@ export class Display {
         try {
             const updates = this.pop();
             if (updates.length > 0) {
-                const slot = this.deps.reactiveRoot.querySelector<HTMLSlotElement>(`slot[name="${this.key}"]`);
+                const slot = findSlot(this.deps.reactiveRoot, this.key);
                 if (slot) {
                     new SlotRenderer(this.deps).render(slot, updates);
                 }

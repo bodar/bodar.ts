@@ -7,6 +7,12 @@ export interface SlotRendererDependencies {
     DocumentFragment: typeof DocumentFragment,
 }
 
+/** Finds the named slot belonging to root's scope, skipping slots inside nested islands (keys are only unique per transform) */
+export function findSlot(root: Element, key: string): HTMLSlotElement | undefined {
+    return Array.from(root.querySelectorAll<HTMLSlotElement>(`slot[name="${key}"]`))
+        .find(slot => (slot.closest('[is=reactive-island],[data-reactive-island]') ?? root) === root);
+}
+
 export class SlotRenderer {
     constructor(private deps: SlotRendererDependencies) {
 

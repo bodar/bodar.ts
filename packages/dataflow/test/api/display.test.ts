@@ -27,4 +27,15 @@ describe("Display", () => {
         await throttle();
         expect(slot.innerHTML).toEqual('HelloDan');
     });
+
+    test("ignores a slot with the same key inside a nested island", async () => {
+        const browser = parseHTML('<html><body><div is="reactive-island"><slot name="key"></slot></div><p><slot name="key"></slot></p></body></html>');
+        const throttle = Throttle.auto();
+        const display = Display.for('key', chain({throttle, reactiveRoot: browser.document.body}, browser))
+
+        display('Hello');
+        await throttle();
+        expect(browser.document.querySelector('div slot')!.innerHTML).toEqual('');
+        expect(browser.document.querySelector('p slot')!.innerHTML).toEqual('Hello');
+    });
 })
