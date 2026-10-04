@@ -1,0 +1,14 @@
+{
+  "name": "bodar",
+  "owner": {
+    "name": "Daniel Bodart"
+  },
+  "description": "Claude Code plugins for the bodar.ts libraries",
+  "plugins": [
+    {
+      "name": "dataflow",
+      "source": "./packages/dataflow",
+      "description": "Build reactive, Observable-style HTML pages with @bodar/dataflow and jsx2dom, and port React/Svelte apps to it"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "dataflow",
+  "description": "Build reactive, Observable-style HTML pages with @bodar/dataflow and jsx2dom, and port React/Svelte apps to it",
+  "author": {
+    "name": "Daniel Bodart"
+  },
+  "repository": "https://github.com/bodar/bodar.ts",
+  "license": "Apache-2.0"
+}
