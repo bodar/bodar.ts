@@ -1,7 +1,7 @@
 /** @module
  * Super light weight JSX to Native DOM
  */
-import './types.d.ts';
+export type {JSXElement} from './types.ts';
 import {BOOLEAN_ATTRIBUTES} from './boolean-attributes.ts';
 import {isSVG} from './svg-elements.ts';
 

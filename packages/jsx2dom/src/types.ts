@@ -324,7 +324,7 @@ type SvgElementProps<T extends SVGElement, E extends string = never> =
 // =============================================================================
 
 // Container elements
-interface SvgSvgTag extends SvgElementProps<SVGSVGElement>, SvgPositionalAttributes, SvgDimensionalAttributes {
+interface SvgSvgTag extends SvgElementProps<SVGSVGElement, 'x' | 'y' | 'width' | 'height'>, SvgPositionalAttributes, SvgDimensionalAttributes {
     viewBox?: string;
     preserveAspectRatio?: string;
     xmlns?: string;
@@ -335,7 +335,7 @@ interface SvgSymbolTag extends SvgElementProps<SVGSymbolElement> {
     viewBox?: string;
     preserveAspectRatio?: string;
 }
-interface SvgUseTag extends SvgElementProps<SVGUseElement>, SvgPositionalAttributes, SvgDimensionalAttributes {
+interface SvgUseTag extends SvgElementProps<SVGUseElement, 'x' | 'y' | 'width' | 'height'>, SvgPositionalAttributes, SvgDimensionalAttributes {
     href?: string;
 }
 interface SvgSwitchTag extends SvgElementProps<SVGSwitchElement> {}
@@ -347,10 +347,10 @@ interface SvgLineTag extends SvgElementProps<SVGLineElement> {}
 interface SvgPathTag extends SvgElementProps<SVGPathElement> {
     d?: string;
 }
-interface SvgPolygonTag extends SvgElementProps<SVGPolygonElement> {
+interface SvgPolygonTag extends SvgElementProps<SVGPolygonElement, 'points'> {
     points?: string;
 }
-interface SvgPolylineTag extends SvgElementProps<SVGPolylineElement> {
+interface SvgPolylineTag extends SvgElementProps<SVGPolylineElement, 'points'> {
     points?: string;
 }
 interface SvgRectTag extends SvgElementProps<SVGRectElement> {}
@@ -374,7 +374,7 @@ interface SvgTextPathTag extends SvgElementProps<SVGTextPathElement> {
 }
 
 // Gradient elements
-interface SvgLinearGradientTag extends SvgElementProps<SVGLinearGradientElement> {
+interface SvgLinearGradientTag extends SvgElementProps<SVGLinearGradientElement, 'gradientUnits'> {
     x1?: number | string;
     y1?: number | string;
     x2?: number | string;
@@ -382,7 +382,7 @@ interface SvgLinearGradientTag extends SvgElementProps<SVGLinearGradientElement>
     gradientUnits?: string;
     gradientTransform?: string;
 }
-interface SvgRadialGradientTag extends SvgElementProps<SVGRadialGradientElement> {
+interface SvgRadialGradientTag extends SvgElementProps<SVGRadialGradientElement, 'gradientUnits'> {
     cx?: number | string;
     cy?: number | string;
     r?: number | string;
@@ -391,7 +391,7 @@ interface SvgRadialGradientTag extends SvgElementProps<SVGRadialGradientElement>
     gradientUnits?: string;
     gradientTransform?: string;
 }
-interface SvgStopTag extends SvgElementProps<SVGStopElement> {
+interface SvgStopTag extends SvgElementProps<SVGStopElement, 'offset'> {
     offset?: number | string;
 }
 
@@ -439,7 +439,6 @@ interface SvgForeignObjectTag extends SvgElementProps<SVGForeignObjectElement> {
 interface SvgViewTag extends SvgElementProps<SVGViewElement> {}
 
 // Descriptive elements (use base SVGElement)
-interface SvgTitleTag extends SvgElementProps<SVGTitleElement> {}
 interface SvgDescTag extends SvgElementProps<SVGDescElement> {}
 interface SvgMetadataTag extends SvgElementProps<SVGMetadataElement> {}
 
@@ -454,183 +453,189 @@ interface SvgSetTag extends SvgElementProps<SVGSetElement> {}
 // JSX Namespace
 // =============================================================================
 
-namespace JSX {
-    type Element = HTMLElement | SVGElement;
+// A module, so the declarations reach consumers: JSX2DOM.ts re-exports JSXElement, and with it this global
+declare global {
+    namespace JSX {
+        type Element = HTMLElement | SVGElement;
 
-    interface IntrinsicElements {
-            // HTML elements
-            a: HtmlAnchorTag;
-            abbr: HtmlTag;
-            address: HtmlTag;
-            area: HtmlAreaTag;
-            article: HtmlTag;
-            aside: HtmlTag;
-            audio: HtmlAudioTag;
-            b: HtmlTag;
-            base: HtmlBaseTag;
-            bdi: HtmlTag;
-            bdo: HtmlTag;
-            blockquote: HtmlQuoteTag;
-            body: HtmlBodyTag;
-            br: HtmlBRTag;
-            button: HtmlButtonTag;
-            canvas: HtmlCanvasTag;
-            caption: HtmlTableCaptionTag;
-            cite: HtmlTag;
-            code: HtmlTag;
-            col: HtmlTableColTag;
-            colgroup: HtmlTableColTag;
-            data: HtmlDataTag;
-            datalist: HtmlDataListTag;
-            dd: HtmlTag;
-            del: HtmlModTag;
-            details: HtmlDetailsTag;
-            dfn: HtmlTag;
-            dialog: HtmlDialogTag;
-            div: HtmlDivTag;
-            dl: HtmlDListTag;
-            dt: HtmlTag;
-            em: HtmlTag;
-            embed: HtmlEmbedTag;
-            fieldset: HtmlFieldSetTag;
-            figcaption: HtmlTag;
-            figure: HtmlTag;
-            footer: HtmlTag;
-            form: HtmlFormTag;
-            h1: HtmlHeadingTag;
-            h2: HtmlHeadingTag;
-            h3: HtmlHeadingTag;
-            h4: HtmlHeadingTag;
-            h5: HtmlHeadingTag;
-            h6: HtmlHeadingTag;
-            head: HtmlHeadTag;
-            header: HtmlTag;
-            hgroup: HtmlTag;
-            hr: HtmlHRTag;
-            html: HtmlHtmlTag;
-            i: HtmlTag;
-            iframe: HtmlIFrameTag;
-            img: HtmlImageTag;
-            input: HtmlInputTag;
-            ins: HtmlModTag;
-            kbd: HtmlTag;
-            label: HtmlLabelTag;
-            legend: HtmlLegendTag;
-            li: HtmlLITag;
-            link: HtmlLinkTag;
-            main: HtmlTag;
-            map: HtmlMapTag;
-            mark: HtmlTag;
-            menu: HtmlMenuTag;
-            meta: HtmlMetaTag;
-            meter: HtmlMeterTag;
-            nav: HtmlTag;
-            noscript: HtmlTag;
-            object: HtmlObjectTag;
-            ol: HtmlOListTag;
-            optgroup: HtmlOptGroupTag;
-            option: HtmlOptionTag;
-            output: HtmlOutputTag;
-            p: HtmlParagraphTag;
-            picture: HtmlPictureTag;
-            pre: HtmlPreTag;
-            progress: HtmlProgressTag;
-            q: HtmlQuoteTag;
-            rp: HtmlTag;
-            rt: HtmlTag;
-            ruby: HtmlTag;
-            s: HtmlTag;
-            samp: HtmlTag;
-            script: HtmlScriptTag;
-            search: HtmlTag;
-            section: HtmlTag;
-            select: HtmlSelectTag;
-            slot: HtmlSlotTag;
-            small: HtmlTag;
-            source: HtmlSourceTag;
-            span: HtmlSpanTag;
-            strong: HtmlTag;
-            style: HtmlStyleTag;
-            sub: HtmlTag;
-            summary: HtmlTag;
-            sup: HtmlTag;
-            table: HtmlTableTag;
-            tbody: HtmlTableSectionTag;
-            td: HtmlTableCellTag;
-            template: HtmlTemplateTag;
-            textarea: HtmlTextAreaTag;
-            tfoot: HtmlTableSectionTag;
-            th: HtmlTableCellTag;
-            thead: HtmlTableSectionTag;
-            time: HtmlTimeTag;
-            title: HtmlTitleTag;
-            tr: HtmlTableRowTag;
-            track: HtmlTrackTag;
-            u: HtmlTag;
-            ul: HtmlUListTag;
-            var: HtmlTag;
-            video: HtmlVideoTag;
-            wbr: HtmlTag;
+        interface IntrinsicElements {
+                // HTML elements
+                a: HtmlAnchorTag;
+                abbr: HtmlTag;
+                address: HtmlTag;
+                area: HtmlAreaTag;
+                article: HtmlTag;
+                aside: HtmlTag;
+                audio: HtmlAudioTag;
+                b: HtmlTag;
+                base: HtmlBaseTag;
+                bdi: HtmlTag;
+                bdo: HtmlTag;
+                blockquote: HtmlQuoteTag;
+                body: HtmlBodyTag;
+                br: HtmlBRTag;
+                button: HtmlButtonTag;
+                canvas: HtmlCanvasTag;
+                caption: HtmlTableCaptionTag;
+                cite: HtmlTag;
+                code: HtmlTag;
+                col: HtmlTableColTag;
+                colgroup: HtmlTableColTag;
+                data: HtmlDataTag;
+                datalist: HtmlDataListTag;
+                dd: HtmlTag;
+                del: HtmlModTag;
+                details: HtmlDetailsTag;
+                dfn: HtmlTag;
+                dialog: HtmlDialogTag;
+                div: HtmlDivTag;
+                dl: HtmlDListTag;
+                dt: HtmlTag;
+                em: HtmlTag;
+                embed: HtmlEmbedTag;
+                fieldset: HtmlFieldSetTag;
+                figcaption: HtmlTag;
+                figure: HtmlTag;
+                footer: HtmlTag;
+                form: HtmlFormTag;
+                h1: HtmlHeadingTag;
+                h2: HtmlHeadingTag;
+                h3: HtmlHeadingTag;
+                h4: HtmlHeadingTag;
+                h5: HtmlHeadingTag;
+                h6: HtmlHeadingTag;
+                head: HtmlHeadTag;
+                header: HtmlTag;
+                hgroup: HtmlTag;
+                hr: HtmlHRTag;
+                html: HtmlHtmlTag;
+                i: HtmlTag;
+                iframe: HtmlIFrameTag;
+                img: HtmlImageTag;
+                input: HtmlInputTag;
+                ins: HtmlModTag;
+                kbd: HtmlTag;
+                label: HtmlLabelTag;
+                legend: HtmlLegendTag;
+                li: HtmlLITag;
+                link: HtmlLinkTag;
+                main: HtmlTag;
+                map: HtmlMapTag;
+                mark: HtmlTag;
+                menu: HtmlMenuTag;
+                meta: HtmlMetaTag;
+                meter: HtmlMeterTag;
+                nav: HtmlTag;
+                noscript: HtmlTag;
+                object: HtmlObjectTag;
+                ol: HtmlOListTag;
+                optgroup: HtmlOptGroupTag;
+                option: HtmlOptionTag;
+                output: HtmlOutputTag;
+                p: HtmlParagraphTag;
+                picture: HtmlPictureTag;
+                pre: HtmlPreTag;
+                progress: HtmlProgressTag;
+                q: HtmlQuoteTag;
+                rp: HtmlTag;
+                rt: HtmlTag;
+                ruby: HtmlTag;
+                s: HtmlTag;
+                samp: HtmlTag;
+                script: HtmlScriptTag;
+                search: HtmlTag;
+                section: HtmlTag;
+                select: HtmlSelectTag;
+                slot: HtmlSlotTag;
+                small: HtmlTag;
+                source: HtmlSourceTag;
+                span: HtmlSpanTag;
+                strong: HtmlTag;
+                style: HtmlStyleTag;
+                sub: HtmlTag;
+                summary: HtmlTag;
+                sup: HtmlTag;
+                table: HtmlTableTag;
+                tbody: HtmlTableSectionTag;
+                td: HtmlTableCellTag;
+                template: HtmlTemplateTag;
+                textarea: HtmlTextAreaTag;
+                tfoot: HtmlTableSectionTag;
+                th: HtmlTableCellTag;
+                thead: HtmlTableSectionTag;
+                time: HtmlTimeTag;
+                title: HtmlTitleTag;
+                tr: HtmlTableRowTag;
+                track: HtmlTrackTag;
+                u: HtmlTag;
+                ul: HtmlUListTag;
+                var: HtmlTag;
+                video: HtmlVideoTag;
+                wbr: HtmlTag;
 
-            // SVG elements
-            svg: SvgSvgTag;
-            g: SvgGTag;
-            defs: SvgDefsTag;
-            symbol: SvgSymbolTag;
-            use: SvgUseTag;
-            switch: SvgSwitchTag;
-            circle: SvgCircleTag;
-            ellipse: SvgEllipseTag;
-            line: SvgLineTag;
-            path: SvgPathTag;
-            polygon: SvgPolygonTag;
-            polyline: SvgPolylineTag;
-            rect: SvgRectTag;
-            text: SvgTextTag;
-            tspan: SvgTspanTag;
-            textPath: SvgTextPathTag;
-            linearGradient: SvgLinearGradientTag;
-            radialGradient: SvgRadialGradientTag;
-            stop: SvgStopTag;
-            clipPath: SvgClipPathTag;
-            mask: SvgMaskTag;
-            marker: SvgMarkerTag;
-            pattern: SvgPatternTag;
-            filter: SvgFilterTag;
-            feBlend: SvgFeBlendTag;
-            feColorMatrix: SvgFeColorMatrixTag;
-            feComponentTransfer: SvgFeComponentTransferTag;
-            feComposite: SvgFeCompositeTag;
-            feConvolveMatrix: SvgFeConvolveMatrixTag;
-            feDiffuseLighting: SvgFeDiffuseLightingTag;
-            feDisplacementMap: SvgFeDisplacementMapTag;
-            feDistantLight: SvgFeDistantLightTag;
-            feDropShadow: SvgFeDropShadowTag;
-            feFlood: SvgFeFloodTag;
-            feFuncA: SvgFeFuncATag;
-            feFuncB: SvgFeFuncBTag;
-            feFuncG: SvgFeFuncGTag;
-            feFuncR: SvgFeFuncRTag;
-            feGaussianBlur: SvgFeGaussianBlurTag;
-            feImage: SvgFeImageTag;
-            feMerge: SvgFeMergeTag;
-            feMergeNode: SvgFeMergeNodeTag;
-            feMorphology: SvgFeMorphologyTag;
-            feOffset: SvgFeOffsetTag;
-            fePointLight: SvgFePointLightTag;
-            feSpecularLighting: SvgFeSpecularLightingTag;
-            feSpotLight: SvgFeSpotLightTag;
-            feTile: SvgFeTileTag;
-            feTurbulence: SvgFeTurbulenceTag;
-            image: SvgImageTag;
-            foreignObject: SvgForeignObjectTag;
-            view: SvgViewTag;
-            desc: SvgDescTag;
-            metadata: SvgMetadataTag;
-            animate: SvgAnimateTag;
-            animateMotion: SvgAnimateMotionTag;
-            animateTransform: SvgAnimateTransformTag;
-            mpath: SvgMpathTag;
-            set: SvgSetTag;
+                // SVG elements
+                svg: SvgSvgTag;
+                g: SvgGTag;
+                defs: SvgDefsTag;
+                symbol: SvgSymbolTag;
+                use: SvgUseTag;
+                switch: SvgSwitchTag;
+                circle: SvgCircleTag;
+                ellipse: SvgEllipseTag;
+                line: SvgLineTag;
+                path: SvgPathTag;
+                polygon: SvgPolygonTag;
+                polyline: SvgPolylineTag;
+                rect: SvgRectTag;
+                text: SvgTextTag;
+                tspan: SvgTspanTag;
+                textPath: SvgTextPathTag;
+                linearGradient: SvgLinearGradientTag;
+                radialGradient: SvgRadialGradientTag;
+                stop: SvgStopTag;
+                clipPath: SvgClipPathTag;
+                mask: SvgMaskTag;
+                marker: SvgMarkerTag;
+                pattern: SvgPatternTag;
+                filter: SvgFilterTag;
+                feBlend: SvgFeBlendTag;
+                feColorMatrix: SvgFeColorMatrixTag;
+                feComponentTransfer: SvgFeComponentTransferTag;
+                feComposite: SvgFeCompositeTag;
+                feConvolveMatrix: SvgFeConvolveMatrixTag;
+                feDiffuseLighting: SvgFeDiffuseLightingTag;
+                feDisplacementMap: SvgFeDisplacementMapTag;
+                feDistantLight: SvgFeDistantLightTag;
+                feDropShadow: SvgFeDropShadowTag;
+                feFlood: SvgFeFloodTag;
+                feFuncA: SvgFeFuncATag;
+                feFuncB: SvgFeFuncBTag;
+                feFuncG: SvgFeFuncGTag;
+                feFuncR: SvgFeFuncRTag;
+                feGaussianBlur: SvgFeGaussianBlurTag;
+                feImage: SvgFeImageTag;
+                feMerge: SvgFeMergeTag;
+                feMergeNode: SvgFeMergeNodeTag;
+                feMorphology: SvgFeMorphologyTag;
+                feOffset: SvgFeOffsetTag;
+                fePointLight: SvgFePointLightTag;
+                feSpecularLighting: SvgFeSpecularLightingTag;
+                feSpotLight: SvgFeSpotLightTag;
+                feTile: SvgFeTileTag;
+                feTurbulence: SvgFeTurbulenceTag;
+                image: SvgImageTag;
+                foreignObject: SvgForeignObjectTag;
+                view: SvgViewTag;
+                desc: SvgDescTag;
+                metadata: SvgMetadataTag;
+                animate: SvgAnimateTag;
+                animateMotion: SvgAnimateMotionTag;
+                animateTransform: SvgAnimateTransformTag;
+                mpath: SvgMpathTag;
+                set: SvgSetTag;
+        }
     }
 }
+
+/** The element type JSX produces */
+export type JSXElement = JSX.Element;
