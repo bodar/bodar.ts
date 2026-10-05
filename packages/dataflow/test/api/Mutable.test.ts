@@ -61,5 +61,11 @@ describe("Mutable", () => {
         setTimeout(() => mut.value = undefined, 30); // terminates
         assertThat(await toPromiseArray(mut), equals([0, 1, 2]))
     });
-});
 
+    test("a change between creating the iterator and the first next() is not lost", async () => {
+        const mut = new Mutable(0);
+        const iter = mut[Symbol.asyncIterator]();
+        mut.value = 1;
+        assertThat((await iter.next()).value, equals(1));
+    });
+});

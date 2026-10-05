@@ -131,10 +131,14 @@ const state = events(context, 'statechange', () => context.state, context.state)
 observe<T>(init: (notify: (t: T | undefined) => any) => any, value?: T,
            terminate: (t: T | undefined) => boolean = t => t === undefined): AsyncGenerator<T>
 ```
-- `init` runs lazily on first pull. `initialValue` (if not `undefined`) is yielded first.
-- `notify(v)` pushes a value; values notified faster than they are consumed coalesce (latest wins).
-  A synchronous `notify(v)` inside `init` replaces `initialValue` and is yielded once, so
-  `observe(n => { listen(n); n(current); … })` replays the current value without a duplicate.
+- `init` runs **immediately**, when `observe()` is called, so nothing notified after that is ever lost —
+  not even before the first pull. `initialValue` (if not `undefined`) is yielded first.
+- `notify(v)` pushes a value; values notified faster than they are consumed coalesce (latest wins):
+  the consumer always ends on the latest value. Any notify before the first pull (including a
+  synchronous one inside `init`) replaces `initialValue`, so `events(el, type, f, el.current)` and
+  `observe(n => { listen(n); n(current); … })` both replay the current value without a gap or a duplicate.
+- Because it subscribes on creation, an `observe` that is never iterated still needs disposing:
+  `return()` or `[Symbol.asyncDispose]` runs the cleanup (the `Invalidator` does this for block outputs).
 - Ends when `terminate(v)` — by default `notify(undefined)`.
 - If `init` returns a **zero-parameter** function it is called (awaited) on end/return/invalidation.
   A cleanup that declares parameters is silently never called.

@@ -2,39 +2,68 @@
  * iterator function
  * */
 
-/** Converts a callback into an AsyncIterator that terminates on undefined */
+/**
+ * Converts a callback into an AsyncIterator that terminates on undefined.
+ *
+ * Subscribes immediately (init runs on creation, not on the first next()), so a value notified at any
+ * time after observe() returns is never lost: values are coalesced and the latest one is always yielded.
+ */
 export function observe<T>(init: (notify: (t: T | undefined) => any) => any, value?: T, terminate: (t: T | undefined) => boolean = t => t === undefined): AsyncGenerator<T> {
-    let signal = Promise.withResolvers<T>()
+    return new Observer(init, value, terminate) as unknown as AsyncGenerator<T>;
+}
 
-    async function* generator(): AsyncGenerator<T> {
-        // Must close over the signal variable to see it change
-        const dispose = init((v => signal.resolve(value = v)));
-        // A synchronous notify during init becomes the initial value, not a second change
-        if (!terminate(value)) signal = Promise.withResolvers<T>();
+class Observer<T> implements AsyncIterableIterator<T> {
+    private pending: boolean;
+    private done = false;
+    private signal = Promise.withResolvers<void>();
+    private readonly dispose: unknown;
 
-        try {
-            if (value !== undefined) yield value;
-
-            while (true) {
-                await signal.promise;
-                // Must create new promise before yielding otherwise we miss any synchronous notifications
-                signal = Promise.withResolvers<T>();
-                if (terminate(value)) break;
-                yield value!;
-            }
-        } finally {
-            if (typeof dispose === 'function' && dispose.length === 0) await dispose();
-        }
+    constructor(init: (notify: (t: T | undefined) => any) => any,
+                private value: T | undefined,
+                private terminate: (t: T | undefined) => boolean) {
+        this.pending = value !== undefined;
+        this.dispose = init((v: T | undefined) => this.notify(v));
     }
 
-    // Make generator interruptible even when awaiting
-    const instance = generator();
-    const originalReturn = instance.return;
-    Reflect.set(instance, 'return', function (returnValue?: any): Promise<IteratorResult<T>> {
-        terminate = () => true;
-        signal.resolve?.(undefined);
-        return originalReturn.call(instance, returnValue);
-    });
+    private notify(value: T | undefined): void {
+        if (this.done) return;
+        this.value = value;
+        this.pending = true;
+        this.signal.resolve();
+    }
 
-    return instance;
+    async next(): Promise<IteratorResult<T>> {
+        while (!this.done) {
+            if (this.pending) {
+                this.pending = false;
+                if (this.terminate(this.value)) break;
+                return {done: false, value: this.value!};
+            }
+            await this.signal.promise;
+            this.signal = Promise.withResolvers<void>();
+        }
+        return this.return();
+    }
+
+    async return(value?: any): Promise<IteratorResult<T>> {
+        if (!this.done) {
+            this.done = true;
+            this.signal.resolve(); // release a pending next()
+            if (typeof this.dispose === 'function' && this.dispose.length === 0) await this.dispose();
+        }
+        return {done: true, value};
+    }
+
+    async throw(error?: any): Promise<IteratorResult<T>> {
+        await this.return();
+        throw error;
+    }
+
+    [Symbol.asyncIterator](): this {
+        return this;
+    }
+
+    async [Symbol.asyncDispose](): Promise<void> {
+        await this.return();
+    }
 }

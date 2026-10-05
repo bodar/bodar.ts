@@ -64,4 +64,18 @@ describe("observe", () => {
         await source.return(undefined as any);
         expect(disposed).toBe(true);
     });
+
+    test("a value notified before the first next() is not lost", async () => {
+        let notify!: (n: number) => void;
+        const source = observe<number>((n) => { notify = n; }, 0);
+        notify(1);
+        expect((await source.next()).value).toBe(1);
+    });
+
+    test("disposing before the first next() still cleans up", async () => {
+        let disposed = false;
+        const source = observe<number>(() => () => disposed = true);
+        await source.return(undefined as any);
+        expect(disposed).toBe(true);
+    });
 });
