@@ -1,11 +1,11 @@
 import {describe, expect, test} from "bun:test";
 import {toPromiseArray} from "@bodar/totallylazy/collections/Array.ts";
-import {observe} from "../../src/api/observe.ts";
+import {end, observe} from "../../src/api/observe.ts";
 
 export function observableSource<T>(...values: T[]): AsyncGenerator<T> & { disposed?: boolean } {
     const source = observe<T>((notify) => {
         values.forEach((value, index) => setTimeout(() => notify(value), index * 5));
-        setTimeout(() => notify(undefined), values.length * 5);
+        setTimeout(() => notify(end), values.length * 5);
         return () => Reflect.set(source, 'disposed', true);
     });
     return source;
@@ -47,14 +47,41 @@ describe("observe", () => {
         const source = observe<number>((notify) => {
             notify(1);
             setTimeout(() => notify(2), 5);
-            setTimeout(() => notify(undefined), 10);
+            setTimeout(() => notify(end), 10);
         });
         expect(await toPromiseArray(source)).toEqual([1, 2]);
     });
 
-    test("terminating synchronously during init completes", async () => {
-        const source = observe<number>((notify) => notify(undefined), 1);
+    test("ending synchronously during init completes", async () => {
+        const source = observe<number>((notify) => notify(end), 1);
         expect(await toPromiseArray(source)).toEqual([]);
+    });
+
+    test("undefined is a value: it is yielded and the stream goes on", async () => {
+        const source = observe<number | undefined>((notify) => {
+            setTimeout(() => notify(undefined), 0);
+            setTimeout(() => notify(1), 5);
+            setTimeout(() => notify(end), 10);
+        });
+        expect(await toPromiseArray(source)).toEqual([undefined, 1]);
+    });
+
+    test("an initial value is whatever was passed, undefined included; none when nothing (or end) was passed", async () => {
+        const later = (notify: (n: number | typeof end) => void) => {
+            setTimeout(() => notify(1), 0);
+            setTimeout(() => notify(end), 5);
+        };
+        expect(await toPromiseArray(observe<number | undefined>(later, undefined))).toEqual([undefined, 1]);
+        expect(await toPromiseArray(observe<number>(later))).toEqual([1]);
+        expect(await toPromiseArray(observe<number>(later, end))).toEqual([1]);
+    });
+
+    test("a predicate can end the stream on a value of its own", async () => {
+        const source = observe<number>((notify) => {
+            setTimeout(() => notify(1), 0);
+            setTimeout(() => notify(-1), 5);
+        }, end, n => n === end || (n as number) < 0);
+        expect(await toPromiseArray(source)).toEqual([1]);
     });
 
     test("return() completes even when awaiting a promise that will never resolve", async () => {

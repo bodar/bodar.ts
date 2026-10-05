@@ -8,4 +8,16 @@ describe("events", () => {
         target.dispatchEvent(new CustomEvent('x', {detail: 1}));
         expect((await iterator.next()).value).toBe(1);
     });
+
+    test("a value function returning undefined yields undefined and the stream goes on", async () => {
+        const target = new EventTarget();
+        // Like reading .value from an element that has none (linkedom's <button>)
+        const iterator = events(target, 'x', (e: any) => e.value);
+        target.dispatchEvent(new Event('x'));
+        const first = await iterator.next();
+        expect(first.done).toBe(false);
+        expect(first.value).toBe(undefined);
+        target.dispatchEvent(Object.assign(new Event('x'), {value: 2}));
+        expect((await iterator.next()).value).toBe(2);
+    });
 });

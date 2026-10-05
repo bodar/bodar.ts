@@ -2,7 +2,6 @@ import {describe, test} from "bun:test";
 import {Mutable} from "../../src/api/mutable.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
-import {toPromiseArray} from "@bodar/totallylazy/collections/Array.ts";
 
 describe("Mutable", () => {
     test("initial value", () => {
@@ -54,12 +53,16 @@ describe("Mutable", () => {
         assertThat((await iter.next()).value, equals(3));
     });
 
-    test("can terminate", async () => {
-        const mut = new Mutable<number | undefined>(0);
-        setTimeout(() => mut.value = 1, 10);
-        setTimeout(() => mut.value = 2, 20);
-        setTimeout(() => mut.value = undefined, 30); // terminates
-        assertThat(await toPromiseArray(mut), equals([0, 1, 2]))
+    test("undefined is a value like any other: it is emitted, initially too, and the mutable goes on", async () => {
+        const mut = new Mutable<number | undefined>(undefined);
+        const iter = mut[Symbol.asyncIterator]();
+        assertThat((await iter.next()).value, equals(undefined));
+        mut.value = 1;
+        assertThat((await iter.next()).value, equals(1));
+        mut.value = undefined;
+        assertThat((await iter.next()).value, equals(undefined));
+        mut.value = 2;
+        assertThat((await iter.next()).value, equals(2));
     });
 
     test("a change between creating the iterator and the first next() is not lost", async () => {

@@ -240,7 +240,7 @@ render the inputs once, write state from `oninput`, and push state back into the
 </script>
 ```
 `document` is captured once as a global, but `document.activeElement` is a live property read, so
-the focus check works. Never set a mutable to `undefined` (it ends the stream) — hence the guard.
+the focus check works. The guard keeps a half-typed, unparseable value out of the mutable.
 For a single input, `view()` is all you need — don't recreate controlled-input plumbing.
 
 ### e. Subscriptions and timers

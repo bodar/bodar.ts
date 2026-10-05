@@ -233,7 +233,7 @@ input(element, 'input', (el) => el.value.toUpperCase());</code></pre>
 <p>For more complex scenarios, <code>observe</code> lets you create custom async iterators from any event source. Pass an initial value as the second argument:</p>
 
 <div class="note">
-    <strong>Note:</strong> Dataflow's <code>observe()</code> adds <code>initialValue</code> and <code>terminate</code> parameters beyond Observable Framework's <code>Generators.observe()</code>. This eliminates the need to call <code>notify()</code> inside the initializer for the initial value.
+    <strong>Note:</strong> Dataflow's <code>observe()</code> adds <code>initialValue</code> and <code>terminate</code> parameters beyond Observable Framework's <code>Generators.observe()</code>. This eliminates the need to call <code>notify()</code> inside the initializer for the initial value. A stream ends on <code>notify(end)</code>; <code>undefined</code> is just a value.
 </div>
 
 <div class="example">
@@ -255,16 +255,16 @@ input(element, 'input', (el) => el.value.toUpperCase());</code></pre>
 <h3>observe() Signature</h3>
 
 <pre><code class="language-typescript">function observe&lt;T&gt;(
-    init: (notify: (value: T | undefined) => void) => (() => void) | void,
-    initialValue?: T,
-    terminate?: (value: T | undefined) => boolean
+    init: (notify: (value: T | typeof end) => void) => (() => void) | void,
+    initialValue?: T | typeof end,
+    terminate?: (value: T | typeof end) => boolean
 ): AsyncGenerator&lt;T&gt;</code></pre>
 
 <p>Parameters:</p>
 <ul>
     <li><strong>init</strong> - Function that sets up the event source. Receives a <code>notify</code> callback to push new values. Can return a cleanup function.</li>
-    <li><strong>initialValue</strong> - Optional initial value to yield before any events</li>
-    <li><strong>terminate</strong> - Optional predicate to stop iteration (defaults to stopping on <code>undefined</code>)</li>
+    <li><strong>initialValue</strong> - Optional initial value to yield before any events (<code>undefined</code> counts; omit it or pass <code>end</code> for none)</li>
+    <li><strong>terminate</strong> - Optional predicate to stop iteration (defaults to stopping on <code>notify(end)</code>)</li>
 </ul>
 
 <h2>Using Observable Inputs</h2>

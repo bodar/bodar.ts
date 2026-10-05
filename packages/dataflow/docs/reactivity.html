@@ -335,7 +335,7 @@
     <strong>Note:</strong> Dataflow's <code>observe(init, initialValue, terminate)</code> adds two arguments beyond
     Observable Framework's <code>Generators.observe(init)</code>: <code>initialValue</code> yields immediately without
     calling <code>notify()</code>, and <code>terminate</code> is a predicate to stop iteration (defaults to stopping on
-    <code>undefined</code>).
+    <code>notify(end)</code>, with <code>end</code> imported from the runtime; <code>undefined</code> is a value like any other).
 </div>
 
 <div class="example">

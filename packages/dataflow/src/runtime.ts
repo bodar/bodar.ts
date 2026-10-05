@@ -16,7 +16,7 @@ export {view, View} from './api/view.ts';
 export {width, Width} from './api/width.ts';
 export {input} from './api/input.ts';
 export {events} from './api/events.ts';
-export {observe} from './api/observe.ts';
+export {observe, end} from './api/observe.ts';
 export {mutable} from './api/mutable.ts';
 export {now} from './api/now.ts';
 export {raw} from './api/raw.ts';

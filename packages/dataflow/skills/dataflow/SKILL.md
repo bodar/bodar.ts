@@ -132,7 +132,7 @@ task as usual.
 | `display(x)` | Render `x` into this block's slot; returns `x` (`const c = display(<canvas/>)`). |
 | `view(el)` | Display an input element and return its live value: `const n = view(<input type="range"/>)` → other blocks see a number. |
 | `input(el, event?, el => value)` | Like `view` but doesn't display — place the element yourself. Extractor gets the **element**. |
-| `events(target, type, ev => value, initial?)` | Any `EventTarget` → stream. Plural `events`. Returning `undefined` ends the stream. |
+| `events(target, type, ev => value, initial?)` | Any `EventTarget` → stream. Plural `events`. Every return value is emitted, `undefined` included. |
 | `observe(notify => { …; return () => cleanup }, initial?)` | Arbitrary push source with cleanup (cleanup must take no params). |
 | `mutable(init)` | Writable state. Declaring block: `.value`, `.value = v`, `.update(f)`. Other blocks: plain current value. |
 | `raw(x)` | Pass a generator function / iterable through un-iterated (doesn't stop Promise awaiting). |

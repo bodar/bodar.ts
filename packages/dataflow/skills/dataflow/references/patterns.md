@@ -322,8 +322,8 @@ const message = observe(notify => {
     return () => ws.close();
 }, null);
 ```
-(`null` is the initial value so dependents run immediately — handle it; `undefined` would end the
-stream.) To keep a history, push into a mutable from the handler instead of relying on every value
+(`null` is the initial value so dependents run immediately — handle it. `notify(end)` ends the
+stream; `undefined` is just a value.) To keep a history, push into a mutable from the handler instead of relying on every value
 reaching dependents.
 Generic disposable: `const sub = {…, [Symbol.dispose]() { …cleanup… }};` as a top-level output.
 

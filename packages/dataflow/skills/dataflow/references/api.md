@@ -114,13 +114,14 @@ wire radio groups with `onchange` handlers writing a mutable, or use a `<select>
 
 ### `events(target, type, valueFn, initialValue?)`
 ```ts
-events<E extends EventTarget, EV extends Event, R>(element: E, event: string, value: (event: EV) => R, initialValue?: R): AsyncIterator<R>
+events<E extends EventTarget, EV extends Event, R>(element: E, event: string, value: (event: EV) => R, initialValue?: R | typeof end): AsyncIterator<R>
 ```
 - Any `EventTarget`: `window`, `document`, elements, `AudioContext`, `WebSocket`, a `Mutable`…
 - Listener removed when iteration ends (block invalidated / page torn down).
-- **Return non-`undefined`** from `valueFn`: `undefined` terminates the stream
-  (`events(btn, 'click', () => {})` stops after one click). Use `ev => ev` or `() => Date.now()`.
-- Without `initialValue` dependents wait for the first event.
+- Whatever `valueFn` returns is yielded, `undefined` included (`events(btn, 'click', () => {})`
+  emits `undefined` on every click).
+- Without `initialValue` (or with `end`) dependents wait for the first event. An explicit
+  `undefined` is an initial value.
 ```js
 const windowWidth = events(window, 'resize', () => window.innerWidth, window.innerWidth);
 const pointer = events(document, 'pointermove', ev => [ev.clientX, ev.clientY], [0, 0]);
@@ -129,18 +130,22 @@ const state = events(context, 'statechange', () => context.state, context.state)
 
 ### `observe(init, initialValue?, terminate?)`
 ```ts
-observe<T>(init: (notify: (t: T | undefined) => any) => any, value?: T,
-           terminate: (t: T | undefined) => boolean = t => t === undefined): AsyncGenerator<T>
+import {observe, end} from "@bodar/dataflow/runtime.ts";   // observe is implicit in blocks; end is not
+observe<T>(init: (notify: (t: T | typeof end) => any) => any, value?: T | typeof end,
+           terminate: (t: T | typeof end) => boolean = t => t === end): AsyncGenerator<T>
 ```
 - `init` runs **immediately**, when `observe()` is called, so nothing notified after that is ever lost —
-  not even before the first pull. `initialValue` (if not `undefined`) is yielded first.
+  not even before the first pull. `initialValue` is yielded first when one is passed — `undefined`
+  included; omitting it (or passing `end`) means dependents wait for the first `notify`.
 - `notify(v)` pushes a value; values notified faster than they are consumed coalesce (latest wins):
   the consumer always ends on the latest value. Any notify before the first pull (including a
   synchronous one inside `init`) replaces `initialValue`, so `events(el, type, f, el.current)` and
   `observe(n => { listen(n); n(current); … })` both replay the current value without a gap or a duplicate.
 - Because it subscribes on creation, an `observe` that is never iterated still needs disposing:
   `return()` or `[Symbol.asyncDispose]` runs the cleanup (the `Invalidator` does this for block outputs).
-- Ends when `terminate(v)` — by default `notify(undefined)`.
+- `notify(v)` takes a value or the `end` sentinel. It ends when `terminate(v)` — by default on
+  `notify(end)` — or when the consumer stops (`return()`, invalidation). Every other value,
+  `undefined` included, is yielded. A custom predicate also sees `end`, so keep `t === end ||` in it.
 - If `init` returns a **zero-parameter** function it is called (awaited) on end/return/invalidation.
   A cleanup that declares parameters is silently never called.
 ```js
@@ -155,7 +160,8 @@ const tick = observe(notify => {                     // timer as a source
     return () => clearInterval(id);
 }, Date.now());
 ```
-Differs from Observable's `Generators.observe` by the `initialValue`/`terminate` params.
+Differs from Observable's `Generators.observe` by the `initialValue`/`terminate` params and the
+`end` sentinel.
 
 ### `mutable(value)`
 ```ts
@@ -182,7 +188,8 @@ mutable<T>(value: T): Mutable<T>
 - `update` must return the value; returning the same mutated array still notifies, but prefer new
   values (`[...xs, x]`, `filter`, `map`) — consumers holding the old reference see it mutate.
 - In-place mutation without a set (`count.value.push(x)`) notifies nothing.
-- Setting `undefined` ends the stream — use `null` for "empty".
+- `undefined` is a value like any other: `mutable(undefined)` emits it, and setting it notifies.
+  A mutable never ends; its stream stops when the block is invalidated.
 - If the declaring block has reactive inputs, every re-run creates a **new** Mutable (state reset).
   Keep state blocks dependency-free (globals like `crypto` are fine).
 - Rapid sets coalesce; dependents see the latest.
@@ -331,9 +338,9 @@ for await (const value of reactive) console.log(value);
   job, not the graph's). `graph.run()` pulls all sinks.
 
 ## 8. Gotchas (beyond those in SKILL.md)
-1. `undefined` terminates `observe`/`events`/`input`/`Mutable` streams — permanently and silently
-   (every later update is lost).
-2. No initial value ⇒ dependents wait (`events` without initial, `width`, file inputs).
+1. No initial value ⇒ dependents wait (`events`/`observe` without initial, `width`, file inputs).
+   `undefined` *is* an initial value: `mutable(undefined)` and `events(…, undefined)` run dependents.
+2. `notify(end)` ends an `observe` stream for good; `undefined` never does.
 3. In-place mutation without a set (`m.value.push(x)`) notifies nothing.
 4. Bare globals are captured once as a *binding* (`innerWidth`, `location` are snapshots), but
    property reads on a captured object stay live: `document.activeElement`, `window.innerWidth`

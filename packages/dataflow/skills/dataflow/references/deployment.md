@@ -288,9 +288,8 @@ renderAndExecute(htmlParser: (html: string) => Window & typeof globalThis, html:
   To stub `fetch`/`localStorage`, assign on `globalThis` or pass them via the third argument.
 - linkedom gaps (patch in a wrapper parser as above):
   - No `HTMLInputElement.valueAsNumber`/`valueAsDate`: `view(<input type="number"|"range"|"date">)`
-    yields an initial `undefined`, which **ends the stream** (dependents render nothing, never
-    update). Handlers doing `mutable.value = e.target.valueAsNumber` likewise set `undefined` and
-    silently kill the mutable.
+    yields `undefined` (dependents see `undefined`, not a number). Handlers doing
+    `mutable.value = e.target.valueAsNumber` likewise set `undefined`.
   - `<select>` has `.type === undefined` and `.value === ''` regardless of the selected option, so
     `view(<select>)` emits `''` (and select-multiple isn't detected).
   - No `HTMLFormElement.prototype.submit/reset` — the repo tests polyfill them

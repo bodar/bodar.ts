@@ -5,6 +5,7 @@ import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import {observableSource} from "./api/observe.test.ts";
+import {end, observe} from "../src/api/observe.ts";
 import {Mutable, mutable} from "../src/api/mutable.ts";
 import {Invalidator} from "../src/Invalidator.ts";
 import {Backpressure} from "../src/SharedAsyncIterable.ts";
@@ -395,17 +396,17 @@ describe("graph", () => {
 
         test("invalidating an async generator that is awaiting a promise that will never resolve does not hang", async () => {
             const graph = new Graph();
-            const trigger = mutable<number | undefined>(1);
+            // 1 -> 2 (creates a stuck generator) -> 1 (invalidates it, yields 1 again) -> end
+            const trigger = observe<number>(notify => {
+                setTimeout(() => notify(2), 10);
+                setTimeout(() => notify(1), 20);
+                setTimeout(() => notify(end), 30);
+            }, 1);
             graph.define('trigger', () => trigger);
             const {source} = graph.define(async function* source(trigger: number) {
                 if (trigger === 1) yield 1;
                 if (trigger === 2) await new Promise(() => {}); // never resolves
             });
-
-            // Queue up mutations: 1 -> 2 -> 1 -> undefined
-            setTimeout(() => trigger.value = 2, 10);       // creates stuck generator
-            setTimeout(() => trigger.value = 1, 20);       // invalidates stuck, yields 1 again
-            setTimeout(() => trigger.value = undefined, 30); // terminates
 
             assertThat(await toPromiseArray(source), equals([1, 1]));
         });
