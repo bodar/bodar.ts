@@ -4,7 +4,6 @@
  */
 import {type Node} from "./Node.ts";
 import {Backpressure, type BackpressureStrategy} from "./SharedAsyncIterable.ts";
-import {lazy} from "@bodar/totallylazy/functions/lazy.ts";
 import {Throttle, type ThrottleStrategy} from "./Throttle.ts";
 import {BaseGraph} from "./BaseGraph.ts";
 import {Invalidator} from "./Invalidator.ts";
@@ -29,8 +28,10 @@ export class Graph extends BaseGraph {
     define(...args: any[]): { [id: string]: Node<any> } {
         const fun = args.find(v => typeof v === "function")!;
         const key = args.find(v => typeof v === 'string') || (fun.name === '' ? this.idGenerator.generate(fun.toString()) : fun.name);
-        const definition = lazy(() => parseFunction(fun));
-        const [inputs = getInputs(definition), outputs = getOutputs(definition)] = args.filter(Array.isArray) as string[][];
+        // Only parsed when the inputs or outputs aren't given
+        let parsed: ReturnType<typeof parseFunction> | undefined;
+        const definition = () => parsed ??= parseFunction(fun);
+        const [inputs = getInputs(definition()), outputs = getOutputs(definition())] = args.filter(Array.isArray) as string[][];
         return super.define(key, inputs, outputs, fun);
     }
 }
