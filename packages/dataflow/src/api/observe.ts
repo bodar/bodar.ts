@@ -2,8 +2,8 @@
  * iterator function
  * */
 
-/** Notify this to end an {@link observe} stream; every other value, `undefined` included, is yielded */
-export const end: unique symbol = Symbol('end');
+/** Notify this to end an {@link observe} stream; every other value, `undefined` included, is yielded. Registered, so every copy of dataflow agrees on it */
+export const end: unique symbol = Symbol.for('@bodar/dataflow/end');
 
 /**
  * Converts a callback into an AsyncIterator that ends when `terminate` says so (by default on

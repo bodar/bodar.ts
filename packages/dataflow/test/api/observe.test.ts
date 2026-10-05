@@ -84,6 +84,10 @@ describe("observe", () => {
         expect(await toPromiseArray(source)).toEqual([1]);
     });
 
+    test("end is a registered symbol, so separate copies of dataflow agree on it", () => {
+        expect(end === Symbol.for('@bodar/dataflow/end')).toBe(true);
+    });
+
     test("return() completes even when awaiting a promise that will never resolve", async () => {
         let disposed = false;
         const source = observe<number>(() => () => disposed = true);
