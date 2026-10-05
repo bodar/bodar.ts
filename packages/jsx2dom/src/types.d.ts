@@ -127,7 +127,11 @@ type DataAttributes = { [K in `data-${string}`]?: string | number | boolean };
 /** ARIA attribute support */
 type AriaAttributes = { [K in `aria-${string}`]?: string | number | boolean };
 
+/** Identity among siblings for PositionalJSX (consumed, never written to the DOM) */
+type KeyProp = { key?: string | number };
+
 type ElementProps<T extends HTMLElement, E extends string = never> =
+    & KeyProp
     & TransformToAttribute<Partial<Omit<NonMethods<NonConstants<T>>, BaseExclusions | E>>>
     & Partial<PickStartingWith<T, 'on'>>
     & { style?: Partial<CSSStyleDeclaration> | string }
@@ -309,6 +313,7 @@ interface SvgDimensionalAttributes {
 // =============================================================================
 
 type SvgElementProps<T extends SVGElement, E extends string = never> =
+    & KeyProp
     & { [K in keyof NonMethods<NonConstants<T>> as K extends (SvgBaseExclusions | E) ? never : K]?: UnwrapAnimated<T[K]> }
     & SvgPresentationAttributes
     & SvgCoreAttributes
