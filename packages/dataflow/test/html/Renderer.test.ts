@@ -1,7 +1,6 @@
 import {describe, expect, it} from "bun:test";
 import {parseHTML} from "linkedom";
 import {Display} from "../../src/api/display.ts";
-import {Throttle} from "../../src/Throttle.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
@@ -11,17 +10,15 @@ import {SlotRenderer} from "../../src/html/SlotRenderer.ts";
 describe("Renderer", () => {
     async function render(fun: (doc: Document, display: (v: any) => any) => any, initialSlot: string = ''): Promise<Element> {
         const globals = parseHTML(`<body><slot name="output">${initialSlot}</slot></body>`);
-        const throttle = Throttle.auto();
         const display = Display.for('output', chain({
-            throttle,
             reactiveRoot: globals.document.documentElement
         }, globals));
 
         // Execute the function which should call display() to render values
         fun(globals.document, display);
 
-        // Wait for throttle to flush
-        await throttle();
+        // Wait for the microtask flush
+        await Promise.resolve();
         return globals.document.querySelector('slot[name="output"]')!;
     }
 

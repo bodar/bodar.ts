@@ -325,9 +325,9 @@ const dispatch = action => state.update(s => reducer(s, action));
   ```
   (The audio tutorial toggles `hidden` this way.)
 - **Imperative widgets** (React `useRef` + `useEffect` mount: Leaflet/Mapbox, CodeMirror/Monaco,
-  Chart.js, D3 with measurement). `display()` is buffered until the next frame, so a node created
-  with JSX/`display` in a block is not guaranteed to be attached or laid out yet when the same or
-  a dependent block runs — measuring, focusing or handing it to a library that needs a sized
+  Chart.js, D3 with measurement). `display()` is buffered until a microtask after the run, so a new node
+  created with JSX/`display` in a block is not attached yet while that block runs, nor guaranteed
+  to be laid out when a dependent block runs — measuring, focusing or handing it to a library that needs a sized
   container can fail. Preferred idiom: a static container in the HTML, the widget created once
   as a top-level output with teardown, and updates from separate blocks calling its methods:
   ```html

@@ -2,7 +2,6 @@
  * Functions that can be used inside a reactive element
  */
 import {findSlot, SlotRenderer, type SlotRendererDependencies} from "../html/SlotRenderer.ts";
-import type {ThrottleStrategy} from "../Throttle.ts";
 
 /** Values that can be rendered to a slot (arrays, e.g. a fragment's nodes, are flattened) */
 export type SupportedValue = Node | string | number | SupportedValue[];
@@ -24,11 +23,10 @@ export interface DisplayContract {
 
 /** Dependencies required by Display */
 export interface DisplayDependencies extends SlotRendererDependencies {
-    throttle: ThrottleStrategy;
     reactiveRoot: HTMLElement;
 }
 
-/** Collects values and renders them to a named slot with throttling */
+/** Collects a run's values and renders them to a named slot on a microtask, so they land with the run's other DOM writes (the node already throttles runs) */
 export class Display {
     public values: SupportedValue[] = [];
     private pending = false;
@@ -40,7 +38,7 @@ export class Display {
         this.values.push(value);
         if (!this.pending) {
             this.pending = true;
-            this.deps.throttle().then(() => this.flush());
+            queueMicrotask(() => this.flush());
         }
         return value;
     }
