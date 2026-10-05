@@ -40,9 +40,6 @@ function findCycle(unsorted: NodeDefinition[], lookup: Map<string, NodeDefinitio
 
 function describeCycle(cycle: NodeDefinition[], lookup: Map<string, NodeDefinition>): string {
     const needs = (from: NodeDefinition, to: NodeDefinition) => from.inputs.find(input => lookup.get(input) === to);
-    if (cycle.length === 1) {
-        return `Circular dependency: block ${cycle[0].key} uses '${needs(cycle[0], cycle[0])}' before declaring it (declare it first, or move it to another block)`;
-    }
     const steps = cycle.map((node, i) => {
         const next = cycle[(i + 1) % cycle.length];
         return `needs '${needs(node, next)}' from block ${next.key}`;

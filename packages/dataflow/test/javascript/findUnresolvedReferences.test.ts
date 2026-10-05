@@ -56,6 +56,13 @@ describe("findUnresolvedReferences", () => {
         test("let visible in block", () => assertThat(findUnresolvedReferences(parseScript('{ let x = 1; x; }')), equals([])));
     });
 
+    describe("names declared later in a scope resolve, as in JavaScript", () => {
+        test("a closure using a const declared later", () => assertThat(findUnresolvedReferences(parseScript('const f = () => g(); const g = () => 1;')), equals([])));
+        test("a closure using a const declared later in its own function", () => assertThat(findUnresolvedReferences(parseScript('const f = () => { const h = () => k; const k = 1; return h; };')), equals([])));
+        test("a function declaration used before it", () => assertThat(findUnresolvedReferences(parseScript('g(); function g() {}')), equals([])));
+        test("a later declaration in an inner block does not leak out", () => assertThat(findUnresolvedReferences(parseScript('const f = () => x; { const x = 1; }')), equals(['x'])));
+    });
+
     describe("function scope (var)", () => {
         test("var hoisted to function", () => assertThat(findUnresolvedReferences(parseScript('function f() { { var x = 1; } x; }')), equals([])));
         test("var not hoisted outside function", () => assertThat(findUnresolvedReferences(parseScript('function f() { var x = 1; } x;')), equals(['x'])));

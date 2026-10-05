@@ -81,15 +81,15 @@ fresh transformer per document. Don't give a block an `id` equal to one of its o
   depend on `g` (re-runs and redefines `f` whenever `g` changes).
 - Filtered/renamed: `display`, `view` (injected locally), `observe/events/input/mutable/raw`
   (module imports), `width` → `width_KEY`. `jsx` and `now` stay as graph inputs.
-- **Forward references inside one block become self-dependencies.** Because analysis is single
-  pass, a name used before its top-level declaration *in the same block* is recorded as unresolved
-  while also being an output of that block → "Circular dependency: block KEY uses 'g' before declaring it":
+- **Names declared later in a scope resolve, as in JavaScript.** References are resolved after
+  the whole block is analysed, so a closure can call something declared below it:
   ```js
-  const f = () => g();   // ✗ g used before declared in this block
+  const f = () => g();   // ✓ g resolves to the declaration below
   const g = () => 1;
   ```
-  Declare before use within a block (function declarations included), or split blocks. Direct
-  recursion (`function fib(n) { return fib(n-1) }`) is fine.
+  A direct use before the declaration (`const a = g; const g = 1;`) is JavaScript's own TDZ error
+  at run time (like any runtime throw it only reaches the console, and the block stops). A name
+  declared in an inner `{}` still doesn't leak out.
 
 ## 4. Outputs (top-level declarations)
 
@@ -217,8 +217,7 @@ type-stripping "ts" transformer and claim TS works; write plain JS (+ JSDoc if u
   children `{...xs}`, namespaced attr/tag, side-effect import.
 - **Value is `undefined` in another block**: destructured declaration; name declared inside `{}`;
   typo (global lookup); island isolation; reserved name (`input`, `events`…) shadowed by runtime.
-- **"Circular dependency"**: the message names the blocks and values. "uses 'x' before declaring it" is a
-  forward reference inside one block; "needs … from block …" is a genuine cycle between blocks.
+- **"Circular dependency"**: the message names the blocks and the values that close the loop.
 - **State resets**: the `mutable` block has a reactive input and re-ran.
 - **Input stops working / loses focus**: the `view`/input block depends on changing state.
 - **Runtime fails to load in the browser**: missing import map/bundler for `@bodar/dataflow/runtime.ts`

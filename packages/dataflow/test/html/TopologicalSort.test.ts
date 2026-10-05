@@ -15,8 +15,7 @@ describe("topologicalSort", () => {
             .toThrow(`Circular dependency: block blockA needs 'b' from block blockB, which needs 'a' from block blockA`);
     });
 
-    test("a block that uses its own output before declaring it says so", () => {
-        expect(() => topologicalSort([parse("const f = () => g(); const g = 1;", "blockF")]))
-            .toThrow(`Circular dependency: block blockF uses 'g' before declaring it (declare it first, or move it to another block)`);
+    test("a closure can use a value declared later in the same block", () => {
+        expect(topologicalSort([parse("const f = () => g(); const g = 1;", "blockF")]).map(d => d.key)).toEqual(["blockF"]);
     });
 });

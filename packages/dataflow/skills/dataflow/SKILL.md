@@ -108,9 +108,10 @@ task as usual.
    shared namespace (and is not displayed). Use it for draw/effect blocks.
 3. **Only plain identifier declarations are outputs.** `const {a, b} = obj` and `const [x, y] = arr`
    export nothing. Write `const a = obj.a;` or export the object.
-4. **Inside one block, declare before use.** `const f = () => g(); const g = ...;` in the same
-   block is a self-cycle and fails the transform ("Circular dependency: block … uses 'g' before declaring it"). Reorder or
-   split; cross-block order is free. Real cycles between blocks also fail the whole transform.
+4. **Inside one block, plain JavaScript rules apply.** A closure may use a name declared later in
+   the block (`const f = () => g(); const g = ...;`); a *direct* use before the declaration throws
+   JavaScript's own "Cannot access before initialization". Cross-block order is free. A real cycle
+   between blocks fails the whole transform, naming the blocks and values.
 5. **Never `import` the runtime API or `export` anything.** `display`, `view`, `input`, `events`,
    `observe`, `mutable`, `raw`, `now`, `width`, `root`, `jsx`, `invalidator` are injected. Importing them
    breaks the block; `export` produces invalid code. Don't reuse these names for your own variables.

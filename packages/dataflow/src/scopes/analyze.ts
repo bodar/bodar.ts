@@ -6,10 +6,13 @@ import {extractBindings} from "./patterns.ts";
 /**
  * Analyze a program and return all unresolved references (references to variables
  * not declared in any enclosing scope).
+ *
+ * References are resolved after the walk, once every scope holds all its declarations, so a
+ * name declared later in its scope resolves (a closure calling a function declared below it).
  */
 export function analyze(program: Program): string[] {
     let scope = new Scope(null, true);
-    const unresolved = new Set<string>();
+    const references: [Scope, string][] = [];
 
     const pushScope = (isFunction: boolean) => {
         scope = scope.child(isFunction);
@@ -30,9 +33,7 @@ export function analyze(program: Program): string[] {
     };
 
     const reference = (name: string) => {
-        if (!scope.resolves(name)) {
-            unresolved.add(name);
-        }
+        references.push([scope, name]);
     };
 
     const handleDeclaration = (node: any) => {
@@ -223,5 +224,5 @@ export function analyze(program: Program): string[] {
         }
     });
 
-    return Array.from(unresolved);
+    return Array.from(new Set(references.filter(([scope, name]) => !scope.resolves(name)).map(([, name]) => name)));
 }
