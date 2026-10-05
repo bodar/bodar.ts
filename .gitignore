@@ -1,7 +1,6 @@
 .idea
 artifacts
 node_modules
-tools
 **/jsr.json
 packages/totallylazy.js
 CLAUDE.local.md

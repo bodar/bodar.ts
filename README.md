@@ -45,7 +45,7 @@ bodar.ts/
 
 ## Quick Start
 
-The `./run` command handles all build, test, and development tasks. It requires [mise](https://mise.jdx.dev/getting-started.html) and on first use installs the required tools (see `.tool-versions`):
+The `./run` command handles all build, test, and development tasks. It requires [mise](https://mise.jdx.dev/getting-started.html) and on first use installs the required tools (see `mise.toml`):
 
 ```bash
 # Run tests

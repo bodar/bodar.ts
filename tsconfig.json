@@ -29,5 +29,5 @@
     "jsxFactory": "jsx.createElement",
     "jsxFragmentFactory": "null"
   },
-  "exclude": ["node_modules", "tools/**", "artifacts/**", "out/**"]
+  "exclude": ["node_modules", "artifacts/**", "out/**"]
 }
