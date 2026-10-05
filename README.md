@@ -24,7 +24,7 @@ A lightweight dependency injection container with lazy initialization. Uses prop
 An extremely thin adapter to convert JSX/TSX to native DOM method calls. Works in the browser, at the edge, server side or in unit tests using [linkedom](https://github.com/WebReflection/linkedom) without any global namespace pollution.
 
 ### [@bodar/dataflow](./packages/dataflow)
-A reactive dataflow library inspired by Observable Framework but grounded in HTML rather than markdown. Adds reactivity to standard HTML for static, server, edge or client rendered content. Early days - not ready for use yet.
+A reactive dataflow library inspired by Observable Framework but grounded in HTML rather than markdown. Adds reactivity to standard HTML for static, server, edge or client rendered content.
 
 ## Monorepo Structure
 
