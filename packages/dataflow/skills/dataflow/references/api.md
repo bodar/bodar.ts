@@ -54,12 +54,15 @@ type SupportedValue = Node | string | number | SupportedValue[];
 display<T extends SupportedValue>(value: T): T
 ```
 - Returns its argument: `const canvas = display(<canvas width={width} height="100"/>);`
-- Calls are buffered and flushed on the next throttle tick (animation frame). A flush makes the
+- Calls are buffered and flushed on a microtask after the run, so they land with the run's other DOM
+  writes (the node's own throttle limits runs to about one per frame). A flush makes the
   slot's children the batch: the same node (by identity, e.g. a reused JSX element) is kept and moved
   only if misplaced; other nodes are removed.
 - Multiple calls in one run all show, in order: `display('a'); display(1); display(<b/>)` → `a1<b/>`.
-- A later batch (next run, or a later frame inside a `for await` loop) replaces the earlier one:
+- A later batch (next run, or a later turn inside a `for await` loop) replaces the earlier one:
   `for await (const i of src()) display(i);` shows only the latest `i`.
+- A run that calls `display()` nothing keeps the last output: put the condition inside
+  (`show ? <Panel/> : ''`), not around the call.
 - **Only `Node` (incl. DocumentFragment), `string`, `number` and arrays of them (a fragment's
   nodes) render.** Booleans, `null`, `undefined`, objects and Promises render nothing, silently.
 - **Implicit display**: a block that is exactly one expression statement and doesn't mention
