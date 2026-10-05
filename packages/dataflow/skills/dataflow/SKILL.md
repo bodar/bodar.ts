@@ -109,7 +109,7 @@ task as usual.
 3. **Only plain identifier declarations are outputs.** `const {a, b} = obj` and `const [x, y] = arr`
    export nothing. Write `const a = obj.a;` or export the object.
 4. **Inside one block, declare before use.** `const f = () => g(); const g = ...;` in the same
-   block is a self-cycle and fails the transform ("Circular dependency detected"). Reorder or
+   block is a self-cycle and fails the transform ("Circular dependency: block … uses 'g' before declaring it"). Reorder or
    split; cross-block order is free. Real cycles between blocks also fail the whole transform.
 5. **Never `import` the runtime API or `export` anything.** `display`, `view`, `input`, `events`,
    `observe`, `mutable`, `raw`, `now`, `width`, `root`, `jsx`, `invalidator` are injected. Importing them

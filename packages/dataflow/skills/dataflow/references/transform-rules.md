@@ -83,7 +83,7 @@ fresh transformer per document. Don't give a block an `id` equal to one of its o
   (module imports), `width` → `width_KEY`. `jsx` and `now` stay as graph inputs.
 - **Forward references inside one block become self-dependencies.** Because analysis is single
   pass, a name used before its top-level declaration *in the same block* is recorded as unresolved
-  while also being an output of that block → "Circular dependency detected":
+  while also being an output of that block → "Circular dependency: block KEY uses 'g' before declaring it":
   ```js
   const f = () => g();   // ✗ g used before declared in this block
   const g = () => 1;
@@ -157,8 +157,8 @@ import {range, select} from "@observablehq/inputs"; // → const [{range,select}
 
 - Kahn's algorithm per scope; edge A→B iff an input of B is an output of A. Ties keep document
   order. Globals are ignored for sorting.
-- Cycle between blocks → `Error('Circular dependency detected in node definitions')` thrown from
-  the transform — the whole page fails, not just one block. Break cycles with a `mutable` (a block
+- Cycle between blocks → `Error("Circular dependency: block A needs 'b' from block B, which needs 'a' from block A")`
+  (block keys are the script `id` or the generated hash) thrown from the transform — the whole page fails, not just one block. Break cycles with a `mutable` (a block
   writes via an action function, another reads the value) — the write is a closure call, not a
   graph edge.
 - Duplicate output names across blocks → no error; last definition silently wins. Wrap scratch
@@ -219,7 +219,8 @@ type-stripping "ts" transformer and claim TS works; write plain JS (+ JSDoc if u
   children `{...xs}`, namespaced attr/tag, side-effect import.
 - **Value is `undefined` in another block**: destructured declaration; name declared inside `{}`;
   typo (global lookup); island isolation; reserved name (`input`, `events`…) shadowed by runtime.
-- **"Circular dependency detected"**: forward reference inside one block, or a genuine cycle.
+- **"Circular dependency"**: the message names the blocks and values. "uses 'x' before declaring it" is a
+  forward reference inside one block; "needs … from block …" is a genuine cycle between blocks.
 - **State resets**: the `mutable` block has a reactive input and re-ran.
 - **Input stops working / loses focus**: the `view`/input block depends on changing state.
 - **Runtime fails to load in the browser**: missing import map/bundler for `@bodar/dataflow/runtime.ts`

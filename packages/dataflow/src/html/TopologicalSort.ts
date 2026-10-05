@@ -22,9 +22,32 @@ export function topologicalSort(definitions: NodeDefinition[]): NodeDefinition[]
     }
 
     if (sorted.length !== definitions.length) {
-        throw new Error('Circular dependency detected in node definitions');
+        throw new Error(describeCycle(findCycle(definitions.filter(d => !sorted.includes(d)), lookup), lookup));
     }
     return sorted;
+}
+
+/** Every unsorted node still depends on an unsorted node, so walking dependencies must loop */
+function findCycle(unsorted: NodeDefinition[], lookup: Map<string, NodeDefinition>): NodeDefinition[] {
+    const path: NodeDefinition[] = [];
+    let node = unsorted[0];
+    while (!path.includes(node)) {
+        path.push(node);
+        node = dependenciesOf(node, lookup).find(d => unsorted.includes(d))!;
+    }
+    return path.slice(path.indexOf(node));
+}
+
+function describeCycle(cycle: NodeDefinition[], lookup: Map<string, NodeDefinition>): string {
+    const needs = (from: NodeDefinition, to: NodeDefinition) => from.inputs.find(input => lookup.get(input) === to);
+    if (cycle.length === 1) {
+        return `Circular dependency: block ${cycle[0].key} uses '${needs(cycle[0], cycle[0])}' before declaring it (declare it first, or move it to another block)`;
+    }
+    const steps = cycle.map((node, i) => {
+        const next = cycle[(i + 1) % cycle.length];
+        return `needs '${needs(node, next)}' from block ${next.key}`;
+    });
+    return `Circular dependency: block ${cycle[0].key} ${steps.join(', which ')}`;
 }
 
 
