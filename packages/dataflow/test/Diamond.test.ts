@@ -74,4 +74,23 @@ describe("diamond shaped graphs", () => {
         const d = g.set('d', ['b', 'c2'], (b: number, c: number) => `${b}/${c}`);
         assertThat(await toPromiseArray(d), equals(['10/100', '11/100', '20/200', '21/200']));
     });
+
+    test("several outputs of one block are always seen together", async () => {
+        // Runtime settings: each output node is throttled on its own, so they can drift apart
+        const g = new BaseGraph(Backpressure.fastest, Throttle.eventLoop(), new Invalidator());
+        g.set('a', [], async function* () {
+            for (let i = 1; i <= 20; i++) {
+                yield i;
+                await (i % 3 ? Promise.resolve() : new Promise(resolve => setTimeout(resolve, 1)));
+            }
+        });
+        g.define('block', ['a'], ['x', 'y'], (a: number) => ({x: a, y: a * 10}));
+        const d = g.set('d', ['x', 'y'], (x: number, y: number) => [x, y]);
+        const mixed: number[][] = [];
+        for await (const [x, y] of d as AsyncIterable<number[]>) {
+            if (y !== x * 10) mixed.push([x, y]);
+            if (x === 20) break;
+        }
+        assertThat(mixed, equals([]));
+    });
 });
