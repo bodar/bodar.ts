@@ -5,11 +5,12 @@
 import {join} from "node:path";
 import {simpleHash} from "../simpleHash.ts";
 
-/** Simple function to bundle the typescript file */
-export async function bundleFile(path: string, minify: boolean): Promise<string> {
+/** Simple function to bundle the typescript file (`files` adds in-memory files, keyed by path) */
+export async function bundleFile(path: string, minify: boolean, files?: Record<string, string>): Promise<string> {
     const result = await Bun.build({
         entrypoints: [path],
         minify,
+        files,
     });
     if (!result.success) {
         console.error('Build failed for:', path);
@@ -26,16 +27,13 @@ export async function bundleFile(path: string, minify: boolean): Promise<string>
     return bundled!;
 }
 
-/** Bundles source code text by writing to temp file and bundling */
-export async function bundleText(source: string, extension: string, minify: boolean = true, temp: string = import.meta.dir): Promise<string> {
-    const key = simpleHash(source);
-    const path = join(temp, `${key}.${extension}`);
-    try {
-        await Bun.write(path, source);
-        return await bundleFile(path, minify);
-    } finally {
-        await Bun.file(path).delete();
-    }
+/**
+ * Bundles source code text in memory, as if it were a file in `dir` (default: the working directory):
+ * its relative imports resolve beside it and its bare imports through that directory's node_modules
+ */
+export async function bundleText(source: string, extension: string, minify: boolean = true, dir: string = process.cwd()): Promise<string> {
+    const path = join(dir, `${simpleHash(source)}.${extension}`);
+    return bundleFile(path, minify, {[path]: source});
 }
 
 /** Transpile TypeScript to JavaScript without bundling (preserves imports) */
