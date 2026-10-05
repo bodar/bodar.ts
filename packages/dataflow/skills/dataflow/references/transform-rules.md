@@ -145,11 +145,9 @@ import {range, select} from "@observablehq/inputs"; // → const [{range,select}
 - The block becomes `async`. So does any block with top-level `await`, `for await`, or
   `await using`. `await` inside nested functions doesn't count. `const m = await import('x')`
   works and `m` is an output.
-- Broken forms (avoid):
-  - `import {x as y} from 'm'` → generates `{y}` → reads export `y`, not `x`.
-  - `import d, {x} from 'm'` → only `d` is kept.
-  - `import 'm'` (side-effect only) → error displayed. Use `await import('m')` in a `{}` block.
-  - Two imports from the same source in one block → the first is lost. Combine them.
+- Every import form works, one `import()` slot per declaration:
+  `import {x as y}` → `{x:y}`; `import d, {x}` → `{default:d,x}`; `import d, * as ns` → two slots
+  (`ns`, `{default:d}`, the same module instance); `import 'm'` → `{}`; repeated sources each get a slot.
 - Specifiers are emitted verbatim inside `import('...')`: bare specifiers need an import map
   (transformer `importMap` option, or your own `<script type="importmap">`), or use full URLs.
 

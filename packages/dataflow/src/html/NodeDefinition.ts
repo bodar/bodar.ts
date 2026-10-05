@@ -51,12 +51,7 @@ export class NodeDefinition {
     }
 
     importsExpressions(imports: Imports = this._imports): string {
-        if (imports.isEmpty()) return "";
-
-        const entries = Array.from(imports.data.entries());
-        const specifierStrings = entries.map(([, imp]) => imp.specifier);
-        const importStrings = entries.map(([source]) => `import('${source}')`);
-        return `const [${specifierStrings.join(', ')}] = await Promise.all([${importStrings.join(', ')}]);`;
+        return imports.toString().trimEnd();
     }
 
     isAsync(): boolean {

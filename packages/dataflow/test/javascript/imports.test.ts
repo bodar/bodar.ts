@@ -34,4 +34,28 @@ describe("Imports", () => {
         const result = Imports.from(program).toString();
         expect(result).toBe("const [{Renderer}, {JSX2DOM,another}] = await Promise.all([import('@bodar/dataflow/Renderer.ts'), import('@bodar/jsx2dom/JSX2DOM.ts')]);\n");
     });
+
+    test('keeps a renamed import', () => {
+        expect(Imports.from(parseScript("import {a as b, c} from \"m\";")).toString()).toBe("const [{a:b,c}] = await Promise.all([import('m')]);\n");
+    });
+
+    test('keeps the named imports next to a default import', () => {
+        expect(Imports.from(parseScript("import d, {x as y} from \"m\";")).toString()).toBe("const [{default:d,x:y}] = await Promise.all([import('m')]);\n");
+    });
+
+    test('supports a default import next to a namespace import', () => {
+        expect(Imports.from(parseScript("import d, * as ns from \"m\";")).toString()).toBe("const [ns, {default:d}] = await Promise.all([import('m'), import('m')]);\n");
+    });
+
+    test('supports side effect only imports', () => {
+        expect(Imports.from(parseScript("import \"polyfill.js\";")).toString()).toBe("const [{}] = await Promise.all([import('polyfill.js')]);\n");
+    });
+
+    test('keeps every import from the same source', () => {
+        expect(Imports.from(parseScript("import {a} from \"m\";\nimport * as M from \"m\";")).toString()).toBe("const [{a}, M] = await Promise.all([import('m'), import('m')]);\n");
+    });
+
+    test('the locals are the names the block binds', () => {
+        expect(Imports.from(parseScript('import d, {x as y} from "m"; import * as ns from "n"; import "p";')).locals()).toEqual(['d', 'y', 'ns']);
+    });
 });

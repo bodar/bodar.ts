@@ -116,8 +116,8 @@ task as usual.
    breaks the block; `export` produces invalid code. Don't reuse these names for your own variables.
 6. **Static `import` of libraries is fine** (`import * as Plot from "@observablehq/plot";`) — it
    becomes a dynamic `import()`, makes the block async, and the imported names become shared
-   outputs. Put imports in their own block (an import + one expression doesn't auto-display),
-   don't use `{x as y}` renames, don't mix default + named in one import, one import per source.
+   outputs. Put imports in their own block (an import + one expression doesn't auto-display).
+   Every import form works: renames, default + named, namespace, side-effect only.
    Bare specifiers need an import map entry (or use `https://esm.run/...` URLs).
 7. **Top-level `await` and `for await` are allowed** and make the block async.
 8. **`display()` renders only `Node | string | number`.** Arrays, booleans, null, objects and
