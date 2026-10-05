@@ -140,6 +140,13 @@
     </script>
 </div>
 
+<p>When a block re-runs, its JSX hands back the element it made last run at the same place (the same spot in the
+    source, the same parent, and the same <code>key</code> or order), and only writes what the JSX changed. So focus,
+    typed text, scroll and a canvas's drawing survive a re-run. Give list rows a <code>key</code> so their state follows
+    the row: <code>{items.map(i =&gt; &lt;li key={i.id}&gt;{i.name}&lt;/li&gt;)}</code>. To get fresh DOM on purpose,
+    change the <code>key</code>. JSX built outside the block's run (in an event handler, a timer, or a helper called
+    from another block) is always fresh.</p>
+
 <h2>Reactive Inputs</h2>
 
 <p>The <code>view</code> function creates reactive inputs. When the input changes, dependent code re-runs:</p>

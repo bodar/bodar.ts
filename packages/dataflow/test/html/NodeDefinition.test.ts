@@ -11,13 +11,13 @@ describe("NodeDefinition", () => {
         expect(definition.hasExplicitDisplay()).toBe(true);
 
         // display is detected as input and wired via Display.for()
-        // jsx is a regular input provided by the jsx graph node
+        // jsx is not an input: the block is wrapped with its own PositionalJSX, passed in as jsx
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["jsx"],["input"],(jsx) => {
+        expect(definition.toString()).toBe(`"1234",[],["input"],new PositionalJSX(_runtime_).wrap((jsx) => {
 const display = Display.for("1234", _runtime_);
-const input = display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
+const input = display(jsx.element(35, "input", {"name": "name","type": "text","value": "Dan"}));
 return {input};
-}`)
+})`)
     });
 
     test("detects view as unresolved reference (input)", async () => {
@@ -29,14 +29,14 @@ return {input};
         expect(definition.hasExplicitView()).toBe(true);
 
         // view is detected as input and wired via View.for()
-        // jsx is a regular input provided by the jsx graph node
+        // jsx is not an input: the block is wrapped with its own PositionalJSX, passed in as jsx
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["jsx"],["input"],(jsx) => {
+        expect(definition.toString()).toBe(`"1234",[],["input"],new PositionalJSX(_runtime_).wrap((jsx) => {
 const display = Display.for("1234", _runtime_);
 const view = View.for(display);
-const input = view(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}));
+const input = view(jsx.element(32, "input", {"name": "name","type": "text","value": "Dan"}));
 return {input};
-}`)
+})`)
     });
 
     test("when the javascript is a single expression it has implicit display", async () => {
@@ -45,12 +45,12 @@ return {input};
         expect(definition.hasImplicitDisplay()).toBe(true);
         expect(definition.hasDisplay()).toBe(true);
         // Implicit display still injects Display.for() and wraps in display()
-        // jsx is a regular input provided by the jsx graph node
+        // jsx is not an input: the block is wrapped with its own PositionalJSX, passed in as jsx
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["jsx"],[],(jsx) => {
+        expect(definition.toString()).toBe(`"1234",[],[],new PositionalJSX(_runtime_).wrap((jsx) => {
 const display = Display.for("1234", _runtime_);
-return display(jsx.createElement("input", {"name": "name","type": "text","value": "Dan"}))
-}`);
+return display(jsx.element(0, "input", {"name": "name","type": "text","value": "Dan"}))
+})`);
     });
 
     test("any import becomes an output", async () => {
@@ -67,12 +67,12 @@ return {Renderer};
     test("still handles jsx as an arrow body", async () => {
         // language=JavaScript
         const definition = NodeDefinition.parse(`const greeting = (name) => <i>Hello {name}!</i>`, '1234');
-        // jsx is a regular input provided by the jsx graph node
+        // jsx is not an input: the block is wrapped with its own PositionalJSX, passed in as jsx
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["jsx"],["greeting"],(jsx) => {
-const greeting = name => jsx.createElement("i", null, ["Hello ", name, "!"]);
+        expect(definition.toString()).toBe(`"1234",[],["greeting"],new PositionalJSX(_runtime_).wrap((jsx) => {
+const greeting = name => jsx.element(27, "i", null, "Hello ", () => name, "!");
 return {greeting};
-}`);
+})`);
     });
 
     test("does not blow up with single for statement", async () => {
@@ -189,12 +189,12 @@ return {Greeter};
         expect(definition.hasExplicitDisplay()).toBe(true);
         expect(definition.hasImplicitDisplay()).toBe(false);
         // Should NOT wrap body in return display(...) - that would produce invalid JS
-        // jsx is a regular input provided by the jsx graph node
+        // jsx is not an input: the block is wrapped with its own PositionalJSX, passed in as jsx
         // language=JavaScript
-        expect(definition.toString()).toBe(`"1234",["state","jsx"],[],(state,jsx) => {
+        expect(definition.toString()).toBe(`"1234",["state"],[],new PositionalJSX(_runtime_).wrap((jsx,state) => {
 const display = Display.for("1234", _runtime_);
-if (state !== 'closed') {display(jsx.createElement("div", null, ["Controls"]));}display(jsx.createElement("dl", null, [jsx.createElement("dt", null, ["Status"])]));
-}`);
+if (state !== 'closed') {display(jsx.element(63, "div", null, "Controls"));}display(jsx.element(118, "dl", null, () => jsx.element(122, "dt", null, "Status")));
+})`);
     });
 
     test("multiple statements without display should not wrap in implicit display", async () => {
@@ -220,7 +220,7 @@ if (condition) {console.log('yes');}console.log('done');
         const definition = NodeDefinition.parse(`new Date(now).toLocaleTimeString()`, '1234');
 
         expect(definition.hasNow()).toBe(true);
-        // now is a regular input provided by the now graph node (like jsx)
+        // now is a regular input provided by the now graph node
         // Date is a global that gets automatically wired up
         // language=JavaScript
         expect(definition.toString()).toBe(`"1234",["Date","now"],[],(Date,now) => {

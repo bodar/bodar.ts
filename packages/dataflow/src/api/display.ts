@@ -4,8 +4,8 @@
 import {findSlot, SlotRenderer, type SlotRendererDependencies} from "../html/SlotRenderer.ts";
 import type {ThrottleStrategy} from "../Throttle.ts";
 
-/** Values that can be rendered to a slot */
-export type SupportedValue = Node | string | number;
+/** Values that can be rendered to a slot (arrays, e.g. a fragment's nodes, are flattened) */
+export type SupportedValue = Node | string | number | SupportedValue[];
 
 /** Placeholder function - should be rewritten by the transformer */
 export function display<T extends SupportedValue>(_value: T): T {

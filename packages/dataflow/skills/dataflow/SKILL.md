@@ -70,8 +70,7 @@ task as usual.
   not several `display()` calls.
 - **Reach for `display()` when the block does more than produce elements**: it keeps a handle
   (`const canvas = display(<canvas/>)`), declares outputs, needs locals, or runs statements first.
-- **Split blocks only when it changes behaviour**: inputs must live in blocks that don't depend on
-  changing state (or they get recreated); fast sources like `now` shouldn't re-run heavy blocks;
+- **Split blocks only when it changes behaviour**: fast sources like `now` shouldn't re-run heavy blocks;
   a value used by several blocks gets its own name. Otherwise, fewer blocks.
 
 ```html
@@ -148,8 +147,10 @@ textarea, radio) → string. Full, precise semantics: **[references/api.md](refe
 
 ## JSX without React
 
-JSX in blocks is compiled at transform time to `jsx.createElement(tag, attrs, [children])`, where
-`jsx` is a `JSX2DOM` instance that creates **real DOM nodes** immediately. Nothing to import, no
+JSX in blocks is compiled at transform time to `jsx.element(site, tag, attrs, ...children)`, where
+`jsx` is the block's own `PositionalJSX` (a `JSX2DOM` subclass, passed into the block's function
+by `new PositionalJSX(_runtime_).wrap(...)`) and makes **real DOM nodes**
+immediately, reusing last run's (see "How re-rendering works"). Nothing to import, no
 React, no Babel/tsconfig step. (The repo's root tsconfig `"jsx": "react", "jsxFactory":
 "jsx.createElement", "jsxFragmentFactory": "null"` exists only for `.tsx` source files that make
 their own `const jsx = new JSX2DOM()`.) A JSX expression's value *is* the element — call
@@ -165,31 +166,65 @@ Top silent failures (full React/Svelte/Vue → jsx2dom table:
 | Don't (React) | Do (jsx2dom) | Why |
 |---|---|---|
 | `onClick`, `className`, `htmlFor`, SVG `strokeWidth` | `onclick`, `class`, `for`, `stroke-width` | Names are verbatim: `onClick` listens for `"Click"`; attributes via `setAttribute`. |
-| `{cond && <X/>}`, `{maybeNull}` | `{cond ? <X/> : ''}` | `false`/`null`/`undefined` render as the *text* "false"/"null". |
-| `<MyComp prop={1}/>` | `{myComp({prop: 1})}` | No function components; capitalised tags crash at runtime. |
-| `value={v}` + `onChange` (controlled) | `const v = view(<input value="init"/>)` | `value`/`checked` set the *initial* attribute only. |
-| `{/* comment */}` in JSX | JS comments outside JSX | Breaks the transform. |
+| `{n && <X/>}` | `{n > 0 ? <X/> : ''}` | `false`/`null`/`undefined` render nothing in blocks, but `0` renders "0" (and in `.tsx`, plain JSX2DOM renders them all as text). |
+| `<MyComp prop={1}/>` | `{myComp({prop: 1})}` | No function components: a capitalised tag must hold a tag-name string; a function crashes. |
+| `value={v}` + `onChange` (controlled) | `const v = view(<input value="init"/>)` | `value`/`checked`/`selected` are written (attribute and property) only when the JSX value changes, so typing wins until then. |
 
 Also: no automatic `px` in `style` objects; booleans set only for exactly `true`; JSX
-whitespace/newlines are kept verbatim; `<>…</>` → DocumentFragment.
+whitespace/newlines are kept verbatim; `<>…</>` in a block → an array of its nodes (`display` and
+child holes flatten arrays).
 
 ### How re-rendering works (and why it matters)
 
-A re-run produces brand-new DOM. The slot keeps an old top-level child only if `isEqualNode` to the
-new one; otherwise it is replaced wholesale. Any element with an `on*` handler gets a unique
-`data-key`, so subtrees with handlers are **always** replaced. General rule: **any live DOM state
-inside a re-running block is reset** — focus, caret, typed text, inner scroll position,
-`<details open>`, media playback, and CSS transitions/animations never play (the element is new,
-not mutated). Consequences:
+A re-run is **positional**: JSX hands back *last run's element made at the same place*, and writes
+only what the JSX changed since last run. "The same place" = the same JSX call site in the source,
+in the same parent hole (`{…}` child position), plus `key` — or, without a key, the same order among
+uses of that call site in that hole. So in
 
-- Keep inputs the user types into in blocks that **do not depend on changing state**
-  (`const q = view(<input/>)` in its own block; forms that read their fields on submit).
-- Put derived output (lists, counts, charts) in separate blocks downstream.
-- A `view()` block that re-runs and yields an `isEqualNode`-identical element keeps the *old*
-  element on screen while listening to the new detached one — keep `view` blocks dependency-free.
-- For transitions, scroll containers, maps/editors: render the element once (static HTML or a
-  dependency-free block) and mutate it (`classList`, `style`, `hidden`, library methods) from a
-  `{}` effect block. See porting.md §4.
+```jsx
+display(<div><p>{count} votes</p><input placeholder="Rename"/></div>);
+```
+
+a new `count` rewrites only the `<p>`'s text: the `<div>` and `<input>` are the same objects, so
+focus, caret, typed text, scroll, `<details open>` and a canvas's bitmap survive.
+
+- **What is written**: attributes whose JSX value changed (`Object.is`), text whose JSX value
+  changed, `style` objects per key. `value`/`checked`/`selected` are also set as properties, on the
+  first build and whenever the JSX value changes — otherwise the user's typing stays. Anything code
+  or the user changed that the JSX didn't touch survives.
+- **Handlers** are stable listeners: one per element and event, calling the latest closure.
+- **Handles are live**: `const c = display(<canvas/>)`, `const f = <input/>`, `view(<input/>)` are the
+  same element every run, so dependents keep working with what is on screen.
+- **Lists**: `key={id}` matches rows by key (moved only if misplaced, inner state follows the row);
+  without a key, rows are reused by index (typed text stays at its index, not its item). Give rows
+  that hold state a key. `key` is consumed, never written to the DOM. Keys are unique per parent
+  *across* its holes (a pinned row and the full list under one `<ul>` share one key space — prefix
+  them per list); a duplicate warns once and gets fresh DOM every run.
+- **Conditionals**: a different call site in a hole (`{a ? <p>A</p> : <p>B</p>}`) is rebuilt;
+  nothing else is. The same call site used conditionally in one hole shifts by order — add a `key`.
+- **Ownership**: an element with no JSX children doesn't own its children (a chart, `replaceChildren`,
+  code-appended nodes survive). One with JSX children owns only the nodes it placed; others are left
+  alone — so don't also `textContent =`/`replaceChildren` an element whose children come from JSX
+  (the code's text stays and the JSX text is put back beside it: `<span>{t}</span>` then
+  `s.textContent = 'edited'` reads `editedt` after the next run).
+- **Imperative setup repeats on the same element**: `c.addEventListener(...)`, a `ResizeObserver` or a
+  library init in a re-running block now runs again on the *same* element each run, and stacks up.
+  Use `on*` attributes (stable listeners), do the setup in a block that doesn't re-run, or undo it
+  (an `AbortController` output aborts on re-run; or an `observe` cleanup).
+- **Forcing fresh DOM**: change the `key` (`<div key={visit}>`) to reset scroll, replay a mount
+  animation, or drop all state. CSS `@keyframes` don't replay on a reused element.
+- **Only during the block's own run**: a run lasts until the block's function returns (or, for an
+  async block, its promise settles). JSX evaluated outside it — in an event handler or timer after the
+  run, in a generator resumed later, in a helper *defined in another block*, or in a run that a newer
+  run has superseded — builds fresh DOM and is remembered nowhere. So a helper defined in a block
+  participates when that block calls it; called from another block it is just fresh DOM (to reuse
+  there, define it in the calling block, or make it a `.tsx` helper taking the caller's `jsx`).
+- **Not reused**: JSX built by `jsx.createElement` (`.tsx` helpers given the block's `jsx`, e.g. an
+  icon) is fresh each run; the element around it is kept.
+- A run that throws keeps what it already patched; what it didn't reach is rebuilt next run.
+  An async run superseded before it finished hands its claims on, so the next run still reuses.
+- New top-level nodes appear at the next `display` flush (animation frame); reused ones are
+  patched during the run.
 
 ### Where output lands
 
@@ -321,7 +356,7 @@ docs at http://localhost:3000/.
   ids, scopes/islands, topological sort, cycles, emitted runtime code. Read when debugging "nothing
   renders", "Circular dependency", "undefined value", or import problems.
 - **[references/jsx2dom.md](references/jsx2dom.md)** — JSX compilation and the JSX2DOM runtime:
-  attributes, events, styles, booleans, SVG namespaces, children, fragments, slot reconciliation,
+  attributes, events, styles, booleans, SVG namespaces, children, fragments, positional re-runs,
   using JSX2DOM in `.tsx` files. Read when writing non-trivial markup, SVG, or porting JSX.
 - **[references/patterns.md](references/patterns.md)** — idioms from the examples with snippets:
   forms, CRUD lists, filters, fetch + abort, async init, animation with `now`/generators, canvas,

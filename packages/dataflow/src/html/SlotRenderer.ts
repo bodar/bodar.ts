@@ -1,4 +1,5 @@
 import type {SupportedValue} from "../api/display.ts";
+import {flatten, place} from "@bodar/jsx2dom/PositionalJSX.ts";
 
 export interface SlotRendererDependencies {
     document: Document,
@@ -25,24 +26,12 @@ export class SlotRenderer {
 
     createNode(update: SupportedValue[]): Node[] {
         const {document, Node} = this.deps;
-        return update.map(u => {
-            if (typeof u === "string") {
-                return document.createTextNode(u);
-            } else if (typeof u === "number") {
-                return document.createTextNode(String(u));
-            } else if (u instanceof Node) {
-                return u;
-            }
-        }).filter(u => u !== undefined);
+        return flatten(update, Node).flatMap(u => u instanceof Node ? [u]
+            : typeof u === "string" || typeof u === "number" ? [document.createTextNode(String(u))] : []);
     }
 
+    /** Keeps a node that is the same node, places the rest (moving only misplaced ones) */
     updateSlot(slot: HTMLSlotElement, newNodes: Node[]) {
-        while (slot.childNodes.length > newNodes.length) slot.removeChild(slot.lastChild!);
-        for (let i = 0; i < newNodes.length; i++) {
-            const newChild = newNodes[i];
-            const slotChild = slot.childNodes[i];
-            if (slotChild === undefined) slot?.appendChild(newChild);
-            else if (!newChild.isEqualNode(slotChild)) slotChild.replaceWith(newChild);
-        }
+        place(slot, Array.from(slot.childNodes), newNodes);
     }
 }

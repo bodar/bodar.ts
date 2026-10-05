@@ -1,11 +1,12 @@
-import {describe, it} from "bun:test";
+import {describe, expect, it} from "bun:test";
 import {parseHTML} from "linkedom";
 import {Display} from "../../src/api/display.ts";
 import {Throttle} from "../../src/Throttle.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
-import {assertFalse, assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
+import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {chain} from "@bodar/yadic/chain.ts";
+import {SlotRenderer} from "../../src/html/SlotRenderer.ts";
 
 describe("Renderer", () => {
     async function render(fun: (doc: Document, display: (v: any) => any) => any, initialSlot: string = ''): Promise<Element> {
@@ -60,31 +61,10 @@ describe("Renderer", () => {
         return Reflect.get(instance, tag) === tagValue;
     }
 
-    it("Only updates nodes if they are different", async () => {
+    it("Replaces a node that is equal but not the same node", async () => {
         const [child] = Array.from((await render((document, display) =>
             display(tagAsNew(document.createElement('div'))), '<div></div>')).childNodes);
-        assertFalse(isNew(child));
-    });
-
-    it("Also does the diff when there are multiple nodes", async () => {
-        const updated = (await render((document, display) => {
-                display(tagAsNew(document.createElement('div')));
-                display(tagAsNew(document.createTextNode('different')));
-                display(tagAsNew(document.createElement('span')));
-        }, '<div></div>Will-be-replaced<span></span>'));
-        assertThat(updated.innerHTML, equals('<div></div>different<span></span>'));
-        assertThat(Array.from(updated.childNodes).map(isNew), equals([false, true, false]));
-    });
-
-    it("Supports diffing even if the lengths don't match", async () => {
-        const updated = (await render((document, display) => {
-            display(tagAsNew(document.createElement('div')));
-            display(tagAsNew(document.createTextNode('different')));
-            display(tagAsNew(document.createElement('span')));
-            display(tagAsNew(document.createElement('img')));
-        }, '<div></div>Will-be-replaced'));
-        assertThat(updated.innerHTML, equals('<div></div>different<span></span><img>'));
-        assertThat(Array.from(updated.childNodes).map(isNew), equals([false, true, true, true]));
+        assertThat(isNew(child), is(true));
     });
 
     it("Will remove excess nodes", async () => {
@@ -94,5 +74,29 @@ describe("Renderer", () => {
 
         assertThat(updated.innerHTML, equals('different'));
         assertThat(Array.from(updated.childNodes).map(isNew), equals([true]));
+    });
+
+    describe("by identity", () => {
+        const globals = parseHTML('<body><slot name="output"></slot></body>');
+        const renderer = new SlotRenderer(globals);
+        const slot = globals.document.querySelector('slot')!;
+        const [a, b, c] = ['a', 'b', 'c'].map(id => Object.assign(globals.document.createElement('p'), {id}));
+        const ids = () => Array.from(slot.childNodes).map(n => (n as Element).id ?? n.textContent).join();
+
+        it("keeps the same nodes, moves only misplaced ones and removes the rest", () => {
+            renderer.render(slot, [a, b, c]);
+            const moved: Node[] = [];
+            const insertBefore = slot.insertBefore.bind(slot);
+            slot.insertBefore = (node, ref) => (moved.push(node), insertBefore(node, ref));
+            renderer.render(slot, [c, a]);
+            expect(ids()).toBe('c,a');
+            expect(moved.length === 1 && moved[0] === c).toBe(true);
+            expect(slot.firstChild === c && slot.lastChild === a).toBe(true);
+        });
+
+        it("flattens arrays, e.g. a fragment's nodes", () => {
+            renderer.render(slot, [[a, ['x', b]], 1]);
+            expect(slot.innerHTML).toBe('<p id="a"></p>x<p id="b"></p>1');
+        });
     });
 });

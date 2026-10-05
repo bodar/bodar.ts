@@ -50,7 +50,8 @@ fails. Always import file subpaths:
 @bodar/dataflow/testing/Idle.ts                 Idle
 @bodar/dataflow/runtime.ts                      runtime + all runtime API
 @bodar/dataflow/Graph.ts, BaseGraph.ts          programmatic graph
-@bodar/jsx2dom/JSX2DOM.ts                       JSX2DOM, autoKeyEvents
+@bodar/jsx2dom/JSX2DOM.ts                       JSX2DOM
+@bodar/jsx2dom/PositionalJSX.ts                 PositionalJSX, place, flatten, stableListener
 ```
 Install (published on JSR): `bunx jsr add @bodar/dataflow` · `npx jsr add @bodar/dataflow` ·
 `deno add jsr:@bodar/dataflow`. In this monorepo use the workspace package.

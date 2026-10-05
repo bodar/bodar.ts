@@ -32,8 +32,9 @@ The repo's `packages/dataflow/docs/examples/todo.html` is a port of the MDN Reac
    references its sources) when several blocks share it. No dependency arrays — references *are*
    the dependencies.
 4. **Find the views** (JSX/templates): each distinct region becomes a block placed where it
-   renders. Split regions by what they depend on: inputs/forms in blocks that don't depend on
-   changing state; lists/counts/charts downstream.
+   renders. Split regions by what they depend on, so each re-runs only for its own inputs
+   (optional: a re-running block keeps its inputs' elements, focus and typed text); lists, counts
+   and charts downstream.
 5. **Find the effects** (useEffect, `$effect`, `watch`, onMount): each becomes a `{ ... }` block
    that references what it reacts to; cleanup becomes an invalidated output (AbortController,
    `Symbol.dispose`, `observe` cleanup).
@@ -41,7 +42,8 @@ The repo's `packages/dataflow/docs/examples/todo.html` is a port of the MDN Reac
    reference any top-level name. Components that exist only for structure become plain markup;
    reusable markup becomes plain functions returning JSX.
 7. **Fix JSX dialect**: `class`, `for`, lowercase `on*` events, kebab-case SVG attrs, ternaries
-   instead of `&&`, no `<Component/>`, no keys/refs (see jsx2dom.md §7).
+   or `&&` with a boolean condition (never a number), no `<Component/>`, `key` on list rows that
+   hold state, no refs (see jsx2dom.md §7).
 8. **Strip TypeScript** from code moved into reactive blocks (no TS support in blocks yet — planned
    for the TypeScript 7.1 Go compiler API). Keep TS in server/build code. For a large typed
    codebase, **keep typed logic in ordinary `.ts` modules** (reducers, API clients, domain types)
@@ -70,10 +72,10 @@ The repo's `packages/dataflow/docs/examples/todo.html` is a port of the MDN Reac
 | callback props `onAdd` | dispatched events | `emit` | action functions exported from the state block |
 | `<Comp {...p}/>` | `<Comp/>` | `<Comp/>` | `{comp(p)}` plain function returning JSX |
 | `children` | `<slot/>` / snippets | `<slot/>` | function argument: `card(title, <p>…</p>)` |
-| `{cond && <X/>}` | `{#if}` | `v-if` | `cond ? <X/> : ''` |
+| `{cond && <X/>}` | `{#if}` | `v-if` | `cond && <X/>` with a boolean `cond`; `n > 0 ? <X/> : ''` with a number (`0` renders "0") |
 | — | — | `v-show` | `hidden={!cond}` |
-| `items.map(i => <li key=…/>)` | `{#each items as i (i.id)}` | `v-for` + `:key` | `items.map(i => <li>…</li>)` (no keys) |
-| CSS class transitions | `transition:` / `animate:` | `<Transition>` | render the element once (static HTML or dependency-free block); toggle `classList`/`style`/`hidden` from a `{}` effect block (§4) |
+| `items.map(i => <li key=…/>)` | `{#each items as i (i.id)}` | `v-for` + `:key` | `items.map(i => <li key={i.id}>…</li>)` (matches rows; consumed, not an attribute) |
+| CSS class transitions | `transition:` / `animate:` | `<Transition>` | `class={open ? 'panel open' : 'panel'}` in any block transitions (the element is reused); static HTML plus a `{}` effect block only for enter/leave animations (§4) |
 | SSR / `getServerSideProps` / `load` | SvelteKit SSR | Nuxt SSR | server-generated static HTML + blocks; block output is client-rendered only |
 | Component libraries (MUI, Radix, shadcn) | component libs | component libs | not portable — plain-DOM libraries or Web Components (§4) |
 | Suspense / `use(promise)` | `{#await}` | `<Suspense>` | promise-valued `const`; dependents wait. Loading UI: async generator yielding `{loading:true}` first (patterns.md §6) |
@@ -117,8 +119,8 @@ function Counter() {
     { document.title = `Count: ${count}`; }
 </script>
 ```
-The button lives in a block that never re-runs; only the `<span>` block and the title effect
-depend on `count`.
+Only the `<span>` block and the title effect depend on `count`, so only they re-run (a re-running
+block would keep its button anyway).
 
 ### b. Fetch on change with cleanup
 
@@ -215,8 +217,9 @@ const fahrenheit = computed({get: () => celsius.value * 9 / 5 + 32, set: f => ce
 </script>
 <template><input type="number" v-model="celsius"/> °C = <input type="number" v-model="fahrenheit"/> °F</template>
 ```
-dataflow has no controlled inputs (attributes set initial state only, and re-rendering an input
-loses focus). Render the inputs once, write state from `oninput`, and push state back into the
+dataflow has no controlled inputs: `value={v}` is written (attribute and property) only when `v`
+changes, and the input keeps focus across re-runs. To avoid echoing the user's own keystrokes back,
+render the inputs once, write state from `oninput`, and push state back into the
 *other* element's `.value` property from an effect:
 ```html
 <script type="module" is="reactive">
@@ -286,13 +289,16 @@ const dispatch = action => state.update(s => reducer(s, action));
 
 ## 4. Components, reuse, widgets and live DOM state
 
-- **Presentational components → functions** (declared in a block, used anywhere):
+- **Presentational components → functions**:
   ```js
   const card = (title, body) => <section class="card"><h3>{title}</h3>{body}</section>;
   // ---
   card('Stats', <p>{visible.length} items</p>)
   ```
-  Functions must be called, not used as tags. Keep them pure (args in, nodes out).
+  Functions must be called, not used as tags. Keep them pure (args in, nodes out). A helper's JSX
+  is reused only when called during its *own* block's run; called from another block (as above) it
+  builds fresh DOM each time (the `<p>` passed in is still reused). If a helper's elements hold
+  state, define it in the block that calls it.
 - **Component-local state for N instances** (e.g. each row has its own "expanded" flag):
   lift it into data. `const expanded = mutable(new Set()); const toggleRow = id => expanded.update(s => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });`
   then `expanded.has(row.id) ? … : …` in the list block.
@@ -304,12 +310,13 @@ const dispatch = action => state.update(s => reducer(s, action));
   ```js
   const toggleButton = label => { const b = <button aria-pressed="false" onclick={() => b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'))}>{label}</button>; return b; };
   ```
-  Note such state is lost when the enclosing block re-runs.
-- **Live DOM state and transitions.** A re-running block replaces its nodes, so *all* live DOM
-  state inside it resets: focus/caret/typed text, scroll position of inner scroll containers,
-  `<details open>`, media playback position, and CSS transitions/animations never play (the
-  element is new, not mutated). Svelte `transition:`/Vue `<Transition>` have no direct
-  equivalent. Render such elements once and mutate them imperatively:
+  Such state survives the enclosing block's re-runs (the element is reused), unless its call
+  site, key or order changes.
+- **Live DOM state and transitions.** A re-running block reuses its elements (positional JSX), so
+  focus/caret/typed text, inner scroll, `<details open>` and media survive, and a changed `class`
+  or `style` runs its CSS transition. A changed call site, key or order gives fresh DOM (mount
+  `@keyframes` replay only then). Svelte `transition:`/Vue `<Transition>` enter/leave animations
+  have no direct equivalent; for those, render the element once and mutate it imperatively:
   ```html
   <div id="panel" class="panel">…</div>        <!-- static, styled with a CSS transition -->
   <script type="module" is="reactive">
@@ -384,12 +391,12 @@ own reactive state, and pick one of the above rather than forcing it.
 
 - [ ] Static markup is plain HTML; blocks only where something changes.
 - [ ] State blocks contain `mutable`s + actions, no changing inputs.
-- [ ] Inputs via `view()`; forms uncontrolled; input blocks don't depend on changing state.
+- [ ] Inputs via `view()`; forms uncontrolled; `value={x}` only where `x` should overwrite typing.
 - [ ] Derived values inlined where used (named `const` block only if shared); no dependency arrays.
 - [ ] Top-level names are deliberate (they are page-global); single-use values inlined, needed
       locals in a `{}` scope; blocks evaluate to their elements, `display()` used sparingly.
 - [ ] Effects are `{}` blocks; cleanup via AbortController / `Symbol.dispose` / `observe` / `invalidator`.
-- [ ] No `<Component/>`, `className`, `onClick`, `&&` rendering, `key`, `ref`, TS syntax, `export`, `import React`.
+- [ ] No `<Component/>`, `className`, `onClick`, `&&` on a number, `ref`, TS syntax, `export`, `import React`; `key` on stateful list rows.
 - [ ] No rAF/setInterval animation loops; use `now`/generators.
 - [ ] Top-level names unique across the page (prefix or `{}`-scope locals).
 - [ ] Errors caught inside blocks; fetches `.catch`.

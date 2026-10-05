@@ -82,9 +82,10 @@ display(<ul>{filtered.map(todo =>
     </li>)}</ul>);
 ```
 - The state block has no changing inputs (only globals like `crypto`), so it never resets.
-- The list re-renders wholesale on each change (no keys). DOM-only edits (contenteditable text)
-  must be copied into state before an update re-renders them away (`todo.html` reads `innerText`
-  in its handlers and commits on `onblur`).
+- Rows are unkeyed, so they are reused by index. Give rows that hold DOM state a `key={todo.id}`
+  so the state follows the row. DOM-only edits (contenteditable text) survive a re-run until the
+  JSX text changes; commit them to state (`todo.html` reads `innerText` in its handlers and
+  commits on `onblur`).
 - Bounded buffer: `samples.update(a => { a.push(s); return a.length > max ? a.slice(-max) : a; })`.
 - Split count / list / form into separate blocks for finer re-rendering (comments.html).
 
@@ -114,11 +115,12 @@ state === 'running'
     ? <button onclick={() => context.suspend()}>Stop</button>
     : <button onclick={() => context.resume()}>Play</button>
 ```
-- Always ternary with `''` for "nothing" — never `&&`.
+- `cond && <X/>` is fine with a boolean `cond`; with a number use `n > 0 ? <X/> : ''` (`0` renders "0").
 - Toggle static HTML with `hidden`: `<div class="note" hidden={mode !== 'advanced'}>…</div>`, or
   imperatively from an effect block: `document.getElementById('filter-q').hidden = !showQ;`.
 - Multi-way: object lookup `({list: listView, grid: gridView})[layout]` where each is a node built
-  in its own block, or a small function returning JSX.
+  in its own block, or a small function returning JSX (reused when called in its own block's run;
+  fresh DOM when called from another block).
 
 ## 6. Data fetching
 
@@ -242,8 +244,9 @@ const canvas = display(<canvas width={width} height={Math.round(width / 3)}></ca
     ctx.setLineDash([]);                                  // reset any state you changed
 }
 ```
-The draw block re-runs when any parameter changes; the canvas block only when its size changes
-(a new element). Keep canvas blocks dependent only on attribute values.
+The draw block re-runs when any parameter changes; the canvas block when its size changes. The
+canvas is the same element across runs, but changing `width`/`height` clears its pixels, so the draw
+block must redraw fully (as above).
 
 ## 10. SVG
 

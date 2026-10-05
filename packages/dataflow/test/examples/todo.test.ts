@@ -56,7 +56,7 @@ describe("todo", async () => {
         const {browser, idle} = await renderHTML(html as any);
 
         const span = browser.document.querySelector<HTMLSpanElement>('.todo-item:nth-child(2) .todo-name')!;
-        span.textContent = 'Sleep more';
+        (span.firstChild as Text).data = 'Sleep more'; // typing edits the text node in place
         span.blur();
 
         await idle.fired();

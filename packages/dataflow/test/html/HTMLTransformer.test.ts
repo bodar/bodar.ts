@@ -4,7 +4,7 @@ import {scriptTemplate} from "../../src/html/EndTransformer.ts";
 
 const emptyImports = new Set(['runtime']);
 const displayImports = new Set(['runtime', 'Display']);
-const jsxImports = new Set(['runtime', 'JSX2DOM', 'autoKeyEvents', 'chain']);
+const jsxImports = new Set(['runtime', 'PositionalJSX']);
 
 describe("HTMLTransformer", () => {
     test("constants are not rendered, so no placeholder slot", async () => {
@@ -68,12 +68,11 @@ const input = <input name="name" type="text" />;
 const name = iterator(notify => input.addEventListener('input', ev => {notify(ev.data)}), input.value);
 </script></body>`);
 
-        expect(result).toBe(`<body><script type="module" is="reactive-runtime" id="mct9x4_1">${scriptTemplate({scriptId: 'mct9x4_1', idle: false}, jsxImports, `_runtime_.graph.define("jsx",[],[],() => new JSX2DOM(chain({onEventListener: autoKeyEvents()}, globalThis)));
-_runtime_.graph.define("uf397b_0",["jsx"],["input","name","iterator"],async(jsx) => {
+        expect(result).toBe(`<body><script type="module" is="reactive-runtime" id="o6id1l_1">${scriptTemplate({scriptId: 'o6id1l_1', idle: false}, jsxImports, `_runtime_.graph.define("uf397b_0",[],["input","name","iterator"],new PositionalJSX(_runtime_).wrap(async(jsx) => {
 const [{iterator}] = await Promise.all([import('@bodar/dataflow/observe.ts')]);
-const input = jsx.createElement("input", {"name": "name","type": "text"});const name = iterator(notify => input.addEventListener('input', ev => {notify(ev.data);}), input.value);
+const input = jsx.element(67, "input", {"name": "name","type": "text"});const name = iterator(notify => input.addEventListener('input', ev => {notify(ev.data);}), input.value);
 return {input,name,iterator};
-});`)}</script></body>`
+}));`)}</script></body>`
         );
     });
 

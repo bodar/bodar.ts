@@ -7,8 +7,8 @@ export function parseScript(javascript: string): Program {
     return Parser.extend(jsx()).parse(javascript, {ecmaVersion: "latest", sourceType: "module"});
 }
 
-export function processJSX(program: Program, factory: string = "jsx.createElement"): Program {
-    return transformJSX(program, {factory});
+export function processJSX(program: Program): Program {
+    return transformJSX(program);
 }
 
 export function toScript(program: Program): string {

@@ -32,13 +32,13 @@ describe("processJSX", () => {
     test('supports JSX code', () => {
         const program = parseScript("<span style={`color: hsl(${(now / 10) % 360} 100% 50%)`}>Rainbow text!</span>");
         const result = toScript(processJSX(program));
-        assertThat(result, equals('jsx.createElement("span", {"style": `color: hsl(${now / 10 % 360} 100% 50%)`}, ["Rainbow text!"]);'));
+        assertThat(result, equals('jsx.element(0, "span", {"style": `color: hsl(${now / 10 % 360} 100% 50%)`}, "Rainbow text!");'));
     });
 
     test('preserves whitespace between text and expressions', () => {
         const program = parseScript("<i>Hello {name}!</i>");
         const result = toScript(processJSX(program));
-        assertThat(result, equals('jsx.createElement("i", null, ["Hello ", name, "!"]);'));
+        assertThat(result, equals('jsx.element(0, "i", null, "Hello ", () => name, "!");'));
     });
 });
 

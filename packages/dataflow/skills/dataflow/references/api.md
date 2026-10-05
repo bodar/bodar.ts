@@ -26,7 +26,7 @@ All names below are **implicit inside reactive blocks** — never import them th
 | `width` | per-block graph node `width_<key>` = `Width.for(key, _runtime_)`; `const width = width_<key>;` | latest width number |
 | `now` | shared graph node `"now"` = `now()` generator | latest `Date.now()` number |
 | `root` | shared graph node `"root"` = `_runtime_.reactiveRoot` (parent of the runtime script) | the island element, or `<body>` |
-| `jsx` | graph node `"jsx"` = `new JSX2DOM(chain({onEventListener: autoKeyEvents()}, globalThis))` | JSX2DOM instance (JSX compiles to `jsx.createElement`) |
+| `jsx` | the block is registered as `new PositionalJSX(_runtime_).wrap((jsx, …) => …)` (one instance per block, kept across runs) | `PositionalJSX` (JSX compiles to `jsx.element(site, …)`) |
 | `invalidator` | graph globals are `chain({invalidator}, globalThis)` | the runtime's `Invalidator` |
 | anything else unresolved | auto-created global node `() => Reflect.get(globals, name)` | snapshot of `globalThis[name]` (or `undefined`) |
 
@@ -41,7 +41,7 @@ Consequences:
   work after the transformer rewrites them.
 
 `runtime.ts` exports: `display, Display, view, View, width, Width, input, events, observe,
-mutable, now, raw, BaseGraph, Idle, Throttle, Invalidator, JSX2DOM, autoKeyEvents, chain` and
+mutable, now, raw, BaseGraph, Idle, Throttle, Invalidator, PositionalJSX` and
 `runtime(config?: {scriptId?, idle?}, global = globalThis)`. In ordinary (non-reactive) JS use
 `@bodar/dataflow/runtime.ts` for `events`/`mutable`/`raw` (there are no `api/events.ts`,
 `api/mutable.ts`, `api/raw.ts` package exports).
@@ -50,17 +50,18 @@ mutable, now, raw, BaseGraph, Idle, Throttle, Invalidator, JSX2DOM, autoKeyEvent
 
 ### `display(value)`
 ```ts
-type SupportedValue = Node | string | number;
+type SupportedValue = Node | string | number | SupportedValue[];
 display<T extends SupportedValue>(value: T): T
 ```
 - Returns its argument: `const canvas = display(<canvas width={width} height="100"/>);`
-- Calls are buffered and flushed on the next throttle tick (animation frame). A flush **replaces**
-  the slot's children with the batch (positional `isEqualNode` diff — equal nodes are kept).
+- Calls are buffered and flushed on the next throttle tick (animation frame). A flush makes the
+  slot's children the batch: the same node (by identity, e.g. a reused JSX element) is kept and moved
+  only if misplaced; other nodes are removed.
 - Multiple calls in one run all show, in order: `display('a'); display(1); display(<b/>)` → `a1<b/>`.
 - A later batch (next run, or a later frame inside a `for await` loop) replaces the earlier one:
   `for await (const i of src()) display(i);` shows only the latest `i`.
-- **Only `Node` (incl. DocumentFragment), `string`, `number` render.** Arrays, booleans, `null`,
-  `undefined`, objects and Promises render nothing, silently. Arrays are fine as JSX children.
+- **Only `Node` (incl. DocumentFragment), `string`, `number` and arrays of them (a fragment's
+  nodes) render.** Booleans, `null`, `undefined`, objects and Promises render nothing, silently.
 - **Implicit display**: a block that is exactly one expression statement and doesn't mention
   `display`/`view` becomes `return display(expr)`. Any top-level declaration (incl. an import)
   disables it.
@@ -76,9 +77,9 @@ view(el: HTMLElement): AsyncIterator<value>   // = input(display(el))
   import {range} from "@observablehq/inputs";        // own block
   const volume = view(range([0, 100], {label: "Volume", step: 1, value: 50}));
   ```
-- Keep `view(...)` blocks free of changing inputs: if the block re-runs and the new element is
-  `isEqualNode` to the old, the old element stays on screen while `view` listens to the new
-  detached element — the input goes dead.
+- A `view(...)` block that re-runs gets the same element back (positional JSX), so the typed value
+  and focus survive; its `value` is only rewritten when the JSX `value` changes. A re-run still
+  creates a new value stream, starting from the element's current value.
 
 ### `input(element, eventType?, valueFn?)`
 ```ts
@@ -203,8 +204,8 @@ To pass a promise un-awaited, wrap it: `raw({promise})` or `raw(() => p)`.
 
 ### `now`
 `function* now() { while (true) yield Date.now(); }` as one shared node. In blocks `now` is a
-number updated once per frame; any block referencing it re-runs every frame (keep it cheap; no
-event handlers in it since those elements get replaced every frame).
+number updated once per frame; any block referencing it re-runs every frame (keep it cheap: its
+JSX elements are reused, but every hole is re-evaluated each frame).
 ```js
 `The current time is ${new Date(now).toLocaleTimeString("en-GB")}.`
 ```

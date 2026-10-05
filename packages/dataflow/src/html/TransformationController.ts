@@ -86,12 +86,11 @@ export class TransformationController {
             if (d.hasDisplay()) imports.add('Display');
             if (d.hasExplicitView()) imports.add('View');
             if (d.hasWidth()) imports.add('Width');
-            if (d.hasJsx()) imports.add('JSX2DOM').add('autoKeyEvents').add('chain');
+            if (d.hasJsx()) imports.add('PositionalJSX');
             if (d.hasNow()) imports.add('now');
         }
 
         const registrations = [
-            imports.has('JSX2DOM') && `_runtime_.graph.define("jsx",[],[],() => new JSX2DOM(chain({onEventListener: autoKeyEvents()}, globalThis)));`,
             imports.has('now') && `_runtime_.graph.define("now",[],[],() => now());`,
             sorted.some(d => d.hasRoot()) && `_runtime_.graph.define("root",[],[],() => _runtime_.reactiveRoot);`,
             ...sorted.flatMap((d: NodeDefinition) => [

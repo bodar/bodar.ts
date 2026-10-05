@@ -23,8 +23,7 @@ export {BaseGraph} from './BaseGraph.ts'
 export {Idle} from './testing/Idle.ts'
 export {Throttle} from './Throttle.ts'
 export {Invalidator} from './Invalidator.ts'
-export {JSX2DOM, autoKeyEvents} from "@bodar/jsx2dom/JSX2DOM.ts";
-export {chain} from "@bodar/yadic/chain.ts";
+export {PositionalJSX} from "@bodar/jsx2dom/PositionalJSX.ts";
 
 /** Dependencies and services provided by the runtime */
 export interface RuntimeExports {

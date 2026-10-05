@@ -69,14 +69,16 @@ export class NodeDefinition {
         return new Function(...this.inputs, this.body());
     }
 
+    /** A block using JSX is wrapped so each call is a run of its own PositionalJSX, passed in as `jsx` */
     fun(): string {
-        const inputs = this.getInputs();
-        return `${this.isAsync() ? 'async' : ''}(${inputs.join(',')}) => {\n${this.body()}\n}`;
+        const inputs = this.hasJsx() ? ['jsx', ...this.getInputs()] : this.getInputs();
+        const fun = `${this.isAsync() ? 'async' : ''}(${inputs.join(',')}) => {\n${this.body()}\n}`;
+        return this.hasJsx() ? `new PositionalJSX(_runtime_).wrap(${fun})` : fun;
     }
 
     private getInputs(): string[] {
         let inputs = this._inputs;
-        inputs = inputs.filter(i => i !== 'display' && i !== 'view');
+        inputs = inputs.filter(i => i !== 'display' && i !== 'view' && i !== 'jsx');
         inputs = inputs.filter(i => !IMPLICIT_IMPORTS.has(i));
         inputs = inputs.map(i => i === 'width' ? `width_${this.key}` : i);
         return inputs;

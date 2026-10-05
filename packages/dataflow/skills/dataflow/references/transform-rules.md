@@ -30,7 +30,8 @@ HTML ─► HTMLTransformer (HTMLRewriter, streaming)  ─┐
 
 Per block, `NodeDefinition.parse(js, key)`:
 1. Parse with acorn + acorn-jsx (`ecmaVersion: "latest"`, `sourceType: "module"`). Plain JS + JSX.
-2. Rewrite JSX → `jsx.createElement(...)` (so `jsx` becomes an input).
+2. Rewrite JSX → `jsx.element(site, ...)`, children as thunks (a block using `jsx` gets its own
+   `PositionalJSX`; see jsx2dom.md §5).
 3. Inputs = unresolved references; outputs = top-level declarations + import locals.
 4. Static imports removed and hoisted into one `await Promise.all([import(...)])`.
 5. Regenerate code with astring (comments dropped).
@@ -80,7 +81,7 @@ fresh transformer per document. Don't give a block an `id` equal to one of its o
 - References inside nested functions still count: `const f = () => g` makes the whole block
   depend on `g` (re-runs and redefines `f` whenever `g` changes).
 - Filtered/renamed: `display`, `view` (injected locally), `observe/events/input/mutable/raw`
-  (module imports), `width` → `width_KEY`. `jsx` and `now` stay as graph inputs.
+  (module imports), `jsx` (injected locally), `width` → `width_KEY`. `now` stays a graph input.
 - **Names declared later in a scope resolve, as in JavaScript.** References are resolved after
   the whole block is analysed, so a closure can call something declared below it:
   ```js
@@ -166,17 +167,16 @@ import {range, select} from "@observablehq/inputs"; // → const [{range,select}
 
 ```html
 <script type="module" is="reactive-runtime" id="yzo1ae_5">
-import {runtime,mutable,Display,View,JSX2DOM,autoKeyEvents,chain,Width,now} from "@bodar/dataflow/runtime.ts";
+import {runtime,mutable,Display,View,PositionalJSX,Width,now} from "@bodar/dataflow/runtime.ts";
 const _runtime_ = runtime({"scriptId":"yzo1ae_5","idle":false}, globalThis);
-_runtime_.graph.define("jsx",[],[],() => new JSX2DOM(chain({onEventListener: autoKeyEvents()}, globalThis)));
 _runtime_.graph.define("now",[],[],() => now());
 _runtime_.graph.define("width_k1",[],[],() => Width.for("k1", _runtime_));
-_runtime_.graph.define("hv7xlq_1",["jsx"],["name"],(jsx) => {
+_runtime_.graph.define("hv7xlq_1",[],["name"],new PositionalJSX(_runtime_).wrap((jsx) => {
 const display = Display.for("hv7xlq_1", _runtime_);
 const view = View.for(display);
-const name = view(jsx.createElement("input", {"value": "Dan"}));
+const name = view(jsx.element(18, "input", {"value": "Dan"}));
 return {name};
-});
+}));
 _runtime_.graph.define("r9tgct_0",["name"],[],(name) => {
 const display = Display.for("r9tgct_0", _runtime_);
 return display(`Hello ${name}`)
@@ -185,6 +185,8 @@ _runtime_.graph.run();
 </script>
 ```
 - Only used names are imported. Registrations are in topological order.
+- A block using JSX is wrapped by its own `PositionalJSX`, which passes itself in as `jsx`: each call
+  is a run, and JSX evaluated outside the block's current run builds fresh DOM (jsx2dom.md §5).
 - `runtime({scriptId})` sets `reactiveRoot` to the runtime script's parent element; `display` and
   `width` look their slot up under that root, skipping slots inside nested islands (keys are only
   unique per transform, so separately-transformed fragments can reuse a key). The runtime script
@@ -210,15 +212,17 @@ type-stripping "ts" transformer and claim TS works; write plain JS (+ JSDoc if u
 
 ## 10. Debugging checklist
 
-- **Nothing renders**: block has declarations → add `display(...)`; value is an array/boolean/
+- **Nothing renders**: block has declarations → add `display(...)`; value is a boolean/
   object/Promise; block is a `{...}` statement; a dependency never emitted (no initial value,
   rejected promise, upstream threw — check the console); reactive script outside `<body>`/island.
-- **Error text appears in the page**: parse error — TS syntax, JSX comment `{/* */}`, spread
-  children `{...xs}`, namespaced attr/tag, side-effect import.
+- **Error text appears in the page**: parse error — TS syntax, spread children `{...xs}`,
+  namespaced attr/tag, side-effect import.
 - **Value is `undefined` in another block**: destructured declaration; name declared inside `{}`;
   typo (global lookup); island isolation; reserved name (`input`, `events`…) shadowed by runtime.
 - **"Circular dependency"**: the message names the blocks and the values that close the loop.
 - **State resets**: the `mutable` block has a reactive input and re-ran.
-- **Input stops working / loses focus**: the `view`/input block depends on changing state.
+- **Input loses focus or typed text**: its JSX call site, key or order changed between runs (a
+  conditional before it in the same hole: add a `key`), the input is built outside its block's run
+  (a handler, another block's helper), or `value={state}` echoes state back and rewrites it.
 - **Runtime fails to load in the browser**: missing import map/bundler for `@bodar/dataflow/runtime.ts`
   or for a library import.

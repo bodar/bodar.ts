@@ -1,4 +1,4 @@
-import type {Expression, Program} from "acorn";
+import type {Expression, Node, Program} from "acorn";
 import type {
     JSXElement,
     JSXFragment,
@@ -6,6 +6,7 @@ import type {
     JSXMemberExpression,
     JSXAttribute,
     JSXSpreadAttribute,
+    JSXChild,
     AnyNode
 } from "./types.ts";
 import {
@@ -25,7 +26,7 @@ export interface TransformOptions {
 }
 
 const defaultOptions: Required<TransformOptions> = {
-    factory: "jsx.createElement"
+    factory: "jsx.element"
 };
 
 function isCapitalLetter(char: string): boolean {
@@ -86,29 +87,41 @@ function transformAttributes(attributes: Array<JSXAttribute | JSXSpreadAttribute
 
 function transformElement(node: JSXElement, factory: string): Expression {
     const {name, attributes} = node.openingElement;
-    const children = node.children;
-
-    const args: Expression[] = [transformName(name as JSXIdentifier | JSXMemberExpression)];
-
-    args.push(attributes.length > 0
-        ? transformAttributes(attributes as Array<JSXAttribute | JSXSpreadAttribute>)
-        : literal(null));
-
-    if (children.length > 0) {
-        args.push(arrayExpression(children as unknown as Expression[]));
-    }
-
-    return callExpression(memberExpression(factory), args);
+    return callExpression(memberExpression(factory), [
+        literal(node.start),
+        transformName(name as JSXIdentifier | JSXMemberExpression),
+        attributes.length > 0 ? transformAttributes(attributes as Array<JSXAttribute | JSXSpreadAttribute>) : literal(null),
+        ...transformChildren(node.children)]);
 }
 
 function transformFragment(node: JSXFragment, factory: string): Expression {
-    const args: Expression[] = [literal(null), literal(null)];
+    return callExpression(memberExpression(factory), [literal(node.start), literal(null), literal(null), ...transformChildren(node.children)]);
+}
 
-    if (node.children.length > 0) {
-        args.push(arrayExpression(node.children as unknown as Expression[]));
-    }
+/** Text stays a string; every other child is a thunk, so its parent is claimed before it runs.
+ *  A child that awaits or yields can't be deferred: it is evaluated eagerly, wrapped in an array. */
+function transformChildren(children: JSXChild[]): Expression[] {
+    return children.flatMap(child => {
+        if (child.type === "JSXText") return [literal(child.value)];
+        const expression = child.type === "JSXExpressionContainer" || child.type === "JSXSpreadChild" ? child.expression : child;
+        if (expression.type === "JSXEmptyExpression") return [];
+        return [suspends(expression) ? arrayExpression([expression as Expression]) : thunk(expression as Expression)];
+    });
+}
 
-    return callExpression(memberExpression(factory), args);
+function suspends(expression: Node): boolean {
+    let found = false;
+    walk(expression, {
+        enter(node) {
+            if (node.type === "AwaitExpression" || node.type === "YieldExpression") found = true;
+            if (node.type.includes("Function")) this.skip();
+        }
+    });
+    return found;
+}
+
+function thunk(body: Expression): Expression {
+    return {type: "ArrowFunctionExpression", id: null, params: [], body, expression: true, async: false, generator: false, start: 0, end: 0} as Expression;
 }
 
 export function transformJSX(program: Program, options?: TransformOptions): Program {
