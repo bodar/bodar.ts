@@ -11,6 +11,18 @@ import {Backpressure} from "../src/SharedAsyncIterable.ts";
 import {Throttle} from "../src/Throttle.ts";
 
 describe("graph", () => {
+    test("a null value flows to dependents like any other value", async () => {
+        const graph = new Graph();
+        const {empty} = graph.define(function empty() {
+            return null;
+        });
+        const {label} = graph.define(function label(empty: null) {
+            return String(empty);
+        });
+        assertThat(await toPromiseArray(empty), equals([null]));
+        assertThat(await toPromiseArray(label), equals(["null"]));
+    });
+
     test("if the function has a name use that as the key", async () => {
         const graph = new Graph();
         const {constant} = graph.define(function constant() {
