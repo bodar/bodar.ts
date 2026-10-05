@@ -48,10 +48,10 @@ The repo's `packages/dataflow/docs/examples/todo.html` is a port of the MDN Reac
    for the TypeScript 7.1 Go compiler API). Keep TS in server/build code. For a large typed
    codebase, **keep typed logic in ordinary `.ts` modules** (reducers, API clients, domain types)
    and have blocks import the compiled JS via an import-map entry or URL, leaving only thin glue
-   in the blocks. The repo does this: `cross-filter-flights.html` runs
-   `await import('@bodar/dataflow/vgplot/reconnecting-socket.ts')` (the dev server bundles `.ts`
-   URLs on the fly; `docs.ts` transpiles it to `.js` for production). This adds no TS syntax to
-   reactive blocks, so it is not a workaround for the missing block support.
+   in the blocks: e.g. `import {reducer} from "@app/lib/state.ts"` with an import-map entry for
+   `@app/` (the repo's dev server, `server.ts`, bundles `.ts` URLs on the fly; a production build
+   bundles them into the page). This adds no TS syntax to reactive blocks, so it is not a
+   workaround for the missing block support.
 9. **Test** with `renderAndExecute` (deployment.md §8) and serve via `ReactiveHandler`.
 
 ## 2. Concept translation

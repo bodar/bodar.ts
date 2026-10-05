@@ -2,7 +2,6 @@ import {file, Glob, write} from "bun";
 import {join} from "path";
 import {HTMLTransformer} from "./src/html/HTMLTransformer.ts";
 import {BunBundler} from "./src/bundling/BunBundler.ts";
-import {transpileFile} from "./src/bundling/bundle.ts";
 
 const ROOT = import.meta.dir;
 const docsDir = join(ROOT, "docs");
@@ -29,7 +28,3 @@ await Bun.build({
 });
 console.log(`Bundled runtime.js`);
 
-// Transpile vgplot extensions (not bundled - expects @uwdata/vgplot as peer dependency)
-const reconnectingSocket = await transpileFile(join(ROOT, 'src/vgplot/reconnecting-socket.ts'));
-await write(join(outDir, 'vgplot', 'reconnecting-socket.js'), reconnectingSocket);
-console.log(`Transpiled vgplot/reconnecting-socket.js`);

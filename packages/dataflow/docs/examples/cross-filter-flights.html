@@ -79,13 +79,108 @@
 </script>
 
 <script type="module" is="reactive">
+    // A Mosaic socket connector for the edge backend: it reconnects with its queue intact, and while
+    // queries are flowing it sends a beacon so the container doesn't go to sleep mid-session.
+    const reconnectingSocketConnector = (SocketConnector, options = {}) => {
+        class ReconnectingSocketConnector extends SocketConnector {
+            events = new EventTarget;
+            timeoutId = null;
+            hadActivity = false;
+            wasClosed = false;
+
+            constructor(options) {
+                super(options);
+                // Beacon timeout in ms: keep it below the server's sleepAfter
+                this.beaconTimeout = options.beaconTimeout ?? 50000;
+                const self = this;
+                // Override the parent's close handler to support reconnection
+                self._events.close = () => {
+                    console.log("Connection closed");
+                    this.events.dispatchEvent(new Event("disconnected"));
+                    const hadPendingWork = self._queue.length > 0 || self._request !== null;
+                    self._connected = false;
+                    self._ws = null;
+                    this.wasClosed = true;
+                    this.clearTimer();
+                    if (hadPendingWork) {
+                        // Re-queue the in-flight request at the front, then reconnect with the queue preserved
+                        if (self._request) {
+                            self._queue.unshift(self._request);
+                            self._request = null;
+                        }
+                        this.init();
+                    }
+                    // No pending work: stay disconnected (an idle close is fine)
+                };
+                // Dispatch reconnected BEFORE next(), so handlers can prepend setup queries
+                self._events.open = () => {
+                    console.log("Connection opened");
+                    self._connected = true;
+                    if (this.wasClosed) this.events.dispatchEvent(new Event("reconnected"));
+                    this.hadActivity = false;
+                    this.startTimer();
+                    // Start the queue unless queryPriority() already did
+                    if (!self._request) self.next();
+                };
+            }
+
+            init() {
+                console.log("Connection init");
+                super.init();
+                const ws = this._ws;
+                if (!ws) return;
+                this.events.dispatchEvent(new Event("opening"));
+                ws.addEventListener("message", () => { this.hadActivity = true; });
+                ws.addEventListener("error", () => console.log("Connection error"));
+            }
+
+            /** Runs a query at the front of the queue, for setup that must run before pending work */
+            queryPriority(request) {
+                const self = this;
+                return new Promise((resolve, reject) => {
+                    if (self._ws == null) this.init();
+                    self._queue.unshift({query: request, resolve, reject});
+                    if (self._connected && !self._request) self.next();
+                });
+            }
+
+            startTimer() {
+                this.clearTimer();
+                this.timeoutId = setTimeout(() => this.onTimerFired(), this.beaconTimeout);
+            }
+
+            clearTimer() {
+                if (this.timeoutId) {
+                    clearTimeout(this.timeoutId);
+                    this.timeoutId = null;
+                }
+            }
+
+            onTimerFired() {
+                // No activity: let the container sleep
+                if (this.hadActivity) {
+                    this.sendBeacon();
+                    this.hadActivity = false;
+                    this.startTimer();
+                }
+            }
+
+            sendBeacon() {
+                const uri = this._uri;
+                if (uri) navigator.sendBeacon(uri.replace("wss://", "https://").replace("ws://", "http://"));
+            }
+        }
+        return new ReconnectingSocketConnector(options);
+    };
+</script>
+
+<script type="module" is="reactive">
     const vg = await import('@uwdata/vgplot');
-    const {reconnectingSocketConnector} = await import('@bodar/dataflow/vgplot/reconnecting-socket.ts');
 
     const EDGE_URL = 'wss://data-viz.bodar.workers.dev/';
 
     const connector = backend === 'edge'
-        ? reconnectingSocketConnector({uri: EDGE_URL})
+        ? reconnectingSocketConnector(vg.SocketConnector, {uri: EDGE_URL})
         : await vg.wasmConnector();
 
     const coord = vg.coordinator();

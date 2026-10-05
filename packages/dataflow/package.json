@@ -33,8 +33,7 @@
     "./SharedAsyncIterable.ts": "./src/SharedAsyncIterable.ts",
     "./Stamp.ts": "./src/Stamp.ts",
     "./testing/Idle.ts": "./src/testing/Idle.ts",
-    "./testing/renderAndExecute.ts": "./src/testing/renderAndExecute.ts",
-    "./vgplot/reconnecting-socket.ts": "./src/vgplot/reconnecting-socket.ts"
+    "./testing/renderAndExecute.ts": "./src/testing/renderAndExecute.ts"
   },
   "files": [
     "src",
