@@ -188,7 +188,10 @@ run 2: same JSX, xs reordered c,a,b                        → same ul, same lis
   as is, never merged into. Strings/numbers are text.
 - Moves use `moveBefore` where the browser has it (keeps focus, iframes and animations), else
   `insertBefore`; only misplaced nodes move.
-- `jsx.createElement` (e.g. `.tsx` helpers given the block's `jsx`) always builds fresh DOM.
+- `jsx.createElement` (e.g. `.tsx` helpers compiled by tsc/Bun and given the block's `jsx`) always builds
+  fresh DOM. To make module helpers positional too, compile their JSX with
+  `transformModuleJSX(js, id)` (`@bodar/dataflow/jsx-transform/module.ts`, after stripping TypeScript with
+  `jsx: preserve`, e.g. in a Bun plugin): sites become `"<id>@<offset>"`, so modules never share one.
 - Change the `key` to get fresh DOM on purpose (reset scroll, replay a mount animation).
 - A run lasts until the block's function returns or its promise settles. JSX evaluated outside its
   block's current run — a handler or timer after the run, a generator resumed later, a helper defined

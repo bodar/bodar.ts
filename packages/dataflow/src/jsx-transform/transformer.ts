@@ -23,11 +23,16 @@ import {walk} from "./walker.ts";
 
 export interface TransformOptions {
     factory?: string;
+    /** Prefix for call sites, so JSX from different modules never shares a site (blocks use the bare offset) */
+    sitePrefix?: string;
 }
 
 const defaultOptions: Required<TransformOptions> = {
-    factory: "jsx.element"
+    factory: "jsx.element",
+    sitePrefix: ""
 };
+
+const site = (node: Node, prefix: string): Expression => literal(prefix ? `${prefix}@${node.start}` : node.start);
 
 function isCapitalLetter(char: string): boolean {
     return char !== char.toLowerCase();
@@ -85,17 +90,17 @@ function transformAttributes(attributes: Array<JSXAttribute | JSXSpreadAttribute
     return objectExpression(properties);
 }
 
-function transformElement(node: JSXElement, factory: string): Expression {
+function transformElement(node: JSXElement, factory: string, prefix: string): Expression {
     const {name, attributes} = node.openingElement;
     return callExpression(memberExpression(factory), [
-        literal(node.start),
+        site(node, prefix),
         transformName(name as JSXIdentifier | JSXMemberExpression),
         attributes.length > 0 ? transformAttributes(attributes as Array<JSXAttribute | JSXSpreadAttribute>) : literal(null),
         ...transformChildren(node.children)]);
 }
 
-function transformFragment(node: JSXFragment, factory: string): Expression {
-    return callExpression(memberExpression(factory), [literal(node.start), literal(null), literal(null), ...transformChildren(node.children)]);
+function transformFragment(node: JSXFragment, factory: string, prefix: string): Expression {
+    return callExpression(memberExpression(factory), [site(node, prefix), literal(null), literal(null), ...transformChildren(node.children)]);
 }
 
 /** Text stays a string; every other child is a thunk, so its parent is claimed before it runs.
@@ -145,10 +150,10 @@ export function transformJSX(program: Program, options?: TransformOptions): Prog
                     this.replace(identifier((anyNode as any).name));
                     return;
                 case "JSXElement":
-                    this.replace(transformElement(anyNode as JSXElement, opts.factory));
+                    this.replace(transformElement(anyNode as JSXElement, opts.factory, opts.sitePrefix));
                     return;
                 case "JSXFragment":
-                    this.replace(transformFragment(anyNode as JSXFragment, opts.factory));
+                    this.replace(transformFragment(anyNode as JSXFragment, opts.factory, opts.sitePrefix));
                     return;
             }
         }

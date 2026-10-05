@@ -218,9 +218,10 @@ focus, caret, typed text, scroll, `<details open>` and a canvas's bitmap survive
   run, in a generator resumed later, in a helper *defined in another block*, or in a run that a newer
   run has superseded — builds fresh DOM and is remembered nowhere. So a helper defined in a block
   participates when that block calls it; called from another block it is just fresh DOM (to reuse
-  there, define it in the calling block, or make it a `.tsx` helper taking the caller's `jsx`).
-- **Not reused**: JSX built by `jsx.createElement` (`.tsx` helpers given the block's `jsx`, e.g. an
-  icon) is fresh each run; the element around it is kept.
+  there, define it in the calling block, or make it a module helper taking the caller's `jsx`).
+- **Module helpers** (`.tsx` files taking the caller's `jsx`) reuse too when their JSX is compiled with
+  `transformModuleJSX` (see jsx2dom.md §5); compiled by tsc/Bun to `jsx.createElement` they are fresh
+  each run, while the element around them is kept.
 - A run that throws keeps what it already patched; what it didn't reach is rebuilt next run.
   An async run superseded before it finished hands its claims on, so the next run still reuses.
 - New top-level nodes appear at the next `display` flush (animation frame); reused ones are

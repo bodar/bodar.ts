@@ -77,7 +77,7 @@ export class PositionalJSX extends JSX2DOM {
         return Object.create(this, {generation: {value: ++state.generation}});
     }
 
-    element(site: number, tag: string | null, attributes: Attributes | null, ...children: unknown[]): Node | Node[] {
+    element(site: number | string, tag: string | null, attributes: Attributes | null, ...children: unknown[]): Node | Node[] {
         const {key, ...rest} = attributes ?? {};
         const memory = this.claim(site, tag, key);
         const nodes = children.flatMap((child, hole) => this.hole(memory, hole, child));
@@ -89,7 +89,7 @@ export class PositionalJSX extends JSX2DOM {
         return node;
     }
 
-    private claim(site: number, tag: string | null, key: unknown): Memory {
+    private claim(site: number | string, tag: string | null, key: unknown): Memory {
         const {state} = this;
         if (!state.open || this.generation !== state.generation) return this.create(tag);
         const {memory: parent, hole} = state.at;

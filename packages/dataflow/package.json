@@ -26,6 +26,7 @@
     "./html/TransformationController.ts": "./src/html/TransformationController.ts",
     "./http/ReactiveHandler.ts": "./src/http/ReactiveHandler.ts",
     "./Invalidator.ts": "./src/Invalidator.ts",
+    "./jsx-transform/module.ts": "./src/jsx-transform/module.ts",
     "./Node.ts": "./src/Node.ts",
     "./PullNode.ts": "./src/PullNode.ts",
     "./runtime.ts": "./src/runtime.ts",
