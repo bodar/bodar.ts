@@ -269,11 +269,12 @@ no way) to `await` another block's value — it already arrives resolved.
 - Backpressure is "fastest/latest wins": slow consumers skip intermediate values. If every value
   matters (e.g. accumulating events), accumulate inside one generator/`observe` or in a mutable's
   `update`, not by relying on dependents seeing each value.
-- A block re-runs on every input emission even if the value is identical.
-- Synchronous diamonds (`m → x`, `m → y`, `(x, y) → z`) settle in the same microtask turn, so `z`
-  sees consistent `x`/`y` (`AsyncIteratorRacer`). If one branch is async (await/fetch/promise), `z`
-  can briefly run with the new value from the fast branch and the old value from the slow one;
-  derive both in one block if that matters.
+- A block re-runs on every input emission, even an identical one: emissions are occurrences
+  (clicks, retries, mutate-then-reassign). To skip repeats, skip them at the source
+  (`if (v !== m.value) m.value = v`). There is no cutoff between blocks.
+- Diamonds (`m → x`, `m → y`, `(x, y) → z`) never mix old and new values, whatever the path
+  lengths and even when one branch is async: values carry logical stamps, and a join waits for the
+  input that is behind.
 - Interruption is best-effort: after an input changes, one stale value from the previous
   run/generator may still arrive (the repo's own test for this fails on Bun 1.4.2). For async
   results, carry the query in the value (`{query, items}`) and check it, or abort via

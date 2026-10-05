@@ -1,11 +1,13 @@
 import {describe, expect, test} from "bun:test";
 import {Graph} from "../src/Graph.ts";
+import {BaseGraph} from "../src/BaseGraph.ts";
 import {toPromiseArray} from "@bodar/totallylazy/collections/Array.ts";
 import {assertThat} from "@bodar/totallylazy/asserts/assertThat.ts";
 import {equals} from "@bodar/totallylazy/predicates/EqualsPredicate.ts";
 import {is} from "@bodar/totallylazy/predicates/IsPredicate.ts";
 import {observableSource} from "./api/observe.test.ts";
 import {end, observe} from "../src/api/observe.ts";
+import {events} from "../src/api/events.ts";
 import {Mutable, mutable} from "../src/api/mutable.ts";
 import {Invalidator} from "../src/Invalidator.ts";
 import {Backpressure} from "../src/SharedAsyncIterable.ts";
@@ -71,12 +73,45 @@ describe("graph", () => {
     test("if a dependency returns the same value multiple times in a row, it will still cause the function to execute", async () => {
         const graph = new Graph();
         graph.define(function* datasource() {
-            yield* [1, 2, 3];
+            yield* [1, 1, 1];
         });
         let sum = 0;
         const {node} = graph.define('node', (datasource: number) => sum += datasource);
         assertThat(sum, is(0));
-        assertThat(await toPromiseArray(node), equals([1, 3, 6]));
+        assertThat(await toPromiseArray(node), equals([1, 2, 3]));
+    });
+
+    test("an event stream of identical values (clicks) runs its dependent for every event", async () => {
+        const graph = new BaseGraph(Backpressure.fastest, Throttle.microTasks(), new Invalidator());
+        const button = new EventTarget();
+        graph.set('clicked', [], () => events(button, 'click', () => true));
+        let runs = 0;
+        const counted = graph.set('counted', ['clicked'], () => ++runs);
+        const iterator = counted[Symbol.asyncIterator]();
+        const values: number[] = [];
+        for (let i = 0; i < 3; i++) {
+            const next = iterator.next();
+            await new Promise(resolve => setTimeout(resolve, 1));
+            button.dispatchEvent(new Event('click'));
+            values.push((await next).value);
+        }
+        assertThat(values, equals([1, 2, 3]));
+    });
+
+    test("a mutable mutated in place and set again notifies its dependents", async () => {
+        const graph = new BaseGraph(Backpressure.fastest, Throttle.microTasks(), new Invalidator());
+        const list = mutable<number[]>([]);
+        graph.set('list', [], () => list);
+        const size = graph.set('size', ['list'], (list: number[]) => list.length);
+        const iterator = size[Symbol.asyncIterator]();
+        assertThat((await iterator.next()).value, equals(0));
+        const next = iterator.next();
+        list.value.push(1);
+        list.value = list.value;
+        assertThat((await next).value, equals(1));
+        const after = iterator.next();
+        list.update(xs => { xs.push(2); return xs; });
+        assertThat((await after).value, equals(2));
     });
 
     test("if a function returns an generator then the node will yield the values not the generator", async () => {
