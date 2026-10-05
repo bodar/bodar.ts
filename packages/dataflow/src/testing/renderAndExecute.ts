@@ -12,7 +12,9 @@ import {NodeDefinition} from "../html/NodeDefinition.ts";
 export async function renderAndExecute(htmlParser: (html: string) => (Window & typeof globalThis), html: string, global: any = globalThis): Promise<{
     browser: (Window & typeof globalThis),
     idle: Idle,
-    graph: BaseGraph
+    graph: BaseGraph,
+    /** Tears the page down: stops its graph and disposes its blocks' values (`await using page = …`) */
+    [Symbol.asyncDispose](): Promise<void>
 }> {
     const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), idle: true});
     const reactive = await transformer.transform(html);
@@ -24,5 +26,6 @@ export async function renderAndExecute(htmlParser: (html: string) => (Window & t
     const fun = definition.toFunction();
     const {_runtime_} = await fun(...definition.inputs.map(i => i === 'globalThis' ? g : Reflect.get(g, i)));
     await new Promise(resolve => setTimeout(resolve, 0));
-    return {browser, idle: _runtime_.idle, graph: _runtime_.graph};
+    const graph: BaseGraph = _runtime_.graph;
+    return {browser, idle: _runtime_.idle, graph, [Symbol.asyncDispose]: () => graph[Symbol.asyncDispose]()};
 }

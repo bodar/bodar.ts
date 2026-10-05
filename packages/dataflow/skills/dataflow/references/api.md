@@ -305,7 +305,9 @@ const socket = Object.assign(new WebSocket(url), { [Symbol.dispose]() { this.clo
 ```
 - Only declared top-level outputs (the node values) are invalidated — a resource hidden in a `{}`
   block is never cleaned up.
-- The final value is not invalidated at page teardown (only iterators are returned).
+- A node's last value is only invalidated when the graph is disposed: `await graph[Symbol.asyncDispose]()`
+  stops it (sources unsubscribe) and invalidates every node's current value, skipping the host's
+  globals. Nothing disposes a page's graph automatically; tests do it via `renderAndExecute`.
 - No Observable-style `invalidation` promise; returning a function does nothing.
 
 ## 6. Errors

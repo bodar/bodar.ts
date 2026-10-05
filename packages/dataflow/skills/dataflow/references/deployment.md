@@ -276,8 +276,11 @@ the monorepo, add `@bodar/dataflow` and `linkedom` as dev dependencies (ask firs
 outside the project can be read with `readFileSync` instead of a `with {type: "text"}` import.
 ```ts
 renderAndExecute(htmlParser: (html: string) => Window & typeof globalThis, html: string, global = globalThis)
-  : Promise<{browser, idle: Idle, graph: BaseGraph}>
+  : Promise<{browser, idle: Idle, graph: BaseGraph, [Symbol.asyncDispose]}>
 ```
+- Tear a page down when its test ends — `await using page = await renderAndExecute(…)`, or
+  `await page[Symbol.asyncDispose]()` in `afterEach` — so its blocks' resources (frame loops,
+  timers, sockets with `[Symbol.dispose]`) and event listeners don't run on into later tests.
 - Transforms with `HTMLTransformer({rewriter: new HTMLRewriter(), idle: true})` (needs Bun's global
   `HTMLRewriter`), parses with your parser (linkedom), runs the **first** runtime script only (no
   multi-island pages), resolving globals from the parsed window first, then real globals.

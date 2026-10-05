@@ -26,6 +26,10 @@ export class BaseGraph {
     }
 
     private nodes = new Map<string, PullNode<any>>();
+    /** Nodes standing for the host's globals: theirs to dispose, not ours */
+    private globalKeys = new Set<string>();
+    /** The sink iterators run() is consuming */
+    private running: AsyncIterator<any>[] = [];
 
     /** Returns node by key if it exists */
     get(key: string): Node<any> | undefined {
@@ -39,12 +43,14 @@ export class BaseGraph {
             if (!this.nodes.has(input)) {
                 const globalNode = node(input, [], () => Reflect.get(this.globals, input), this.backpressure, this.throttle, this.invalidator, this.onError);
                 this.nodes.set(input, globalNode);
+                this.globalKeys.add(input);
             }
         }
 
         const dependencies = inputs.map(input => this.nodes.get(input)!);
         const newNode = node(key, dependencies, fun, this.backpressure, this.throttle, this.invalidator, this.onError);
         this.nodes.set(key, newNode);
+        this.globalKeys.delete(key);
         return newNode
     }
 
@@ -71,9 +77,25 @@ export class BaseGraph {
 
     /** Starts consuming all sink nodes */
     run(): void {
-        this.sinks().forEach(async node => {
-            for await (const value of node) void (value);
-        });
+        for (const sink of this.sinks()) {
+            const iterator = sink[Symbol.asyncIterator]();
+            this.running.push(iterator);
+            void (async () => {
+                while (!(await iterator.next()).done) ;
+            })();
+        }
+    }
+
+    /** Stops the graph (sources unsubscribe) and disposes every node's current value; safe to call twice */
+    async [Symbol.asyncDispose](): Promise<void> {
+        await Promise.all(this.running.splice(0).map(iterator => iterator.return?.()));
+        const seen = new Set<unknown>();
+        for (const [key, node] of this.nodes) {
+            if (this.globalKeys.has(key) || seen.has(node.value)) continue;
+            seen.add(node.value);
+            this.invalidator.invalidate(node.value);
+            node.value = undefined;
+        }
     }
 }
 
