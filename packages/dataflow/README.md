@@ -13,8 +13,6 @@ edge rendered or client rendered content.
 
 ## Status
 
-Early days - DO NOT USE YET!
-
 - [x] Create Graph and Nodes
   - [X] Function parsing
     - [x] Detect dependencies / inputs
