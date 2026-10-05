@@ -288,9 +288,9 @@ Prefix names per section on big pages (`fillRectX`, `strokeRectX`) since the nam
   *structure* means: render it in a block, transform it server-side per request (the HTTP
   intercept can transform server-generated HTML), or load an island fragment from an endpoint
   that is itself transformed.
-- No error propagation: a throw / rejected promise in a block silently freezes that block and its
-  dependents (console shows an unhandled rejection). Catch errors inside the block and display a
-  fallback.
+- No error propagation: a throw / rejected promise in a block skips that run (logged, shown as text
+  in the block's slot, `dataflow-error` event on the root); dependents keep the last good value
+  until the block's next good run. Catch errors inside the block and display a real fallback.
 - Not Observable: no `Generators.*`, `visibility()`, `invalidation`, `html\`\``, Markdown pages.
 
 ## Minimal complete page

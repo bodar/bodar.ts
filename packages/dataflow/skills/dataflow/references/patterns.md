@@ -163,7 +163,8 @@ const search = (async function* () {
 // ---
 search.loading ? <p>Loading…</p> : search.error ? <p>{search.error}</p> : <ul>{search.items.map(i => <li>{i}</li>)}</ul>
 ```
-Always catch: a rejected promise silently freezes the block and everything downstream.
+Always catch: an uncaught rejection only shows the raw error in the block's slot, and dependents keep
+their last value until the block's next good run.
 
 ## 7. Async initialisation and libraries
 

@@ -8,6 +8,8 @@ import {Idle} from "./testing/Idle.ts";
 import {BaseGraph} from "./BaseGraph.ts";
 import {Backpressure, type BackpressureStrategy} from "./SharedAsyncIterable.ts";
 import {Invalidator} from "./Invalidator.ts";
+import {type ErrorHandler, reportError} from "./PullNode.ts";
+import {findSlot} from "./html/SlotRenderer.ts";
 
 export {display, Display} from './api/display.ts';
 export {view, View} from './api/view.ts';
@@ -23,6 +25,7 @@ export {BaseGraph} from './BaseGraph.ts'
 export {Idle} from './testing/Idle.ts'
 export {Throttle} from './Throttle.ts'
 export {Invalidator} from './Invalidator.ts'
+export type {ErrorHandler} from './PullNode.ts'
 export {PositionalJSX} from "@bodar/jsx2dom/PositionalJSX.ts";
 
 /** Dependencies and services provided by the runtime */
@@ -31,6 +34,7 @@ export interface RuntimeExports {
     backpressure: BackpressureStrategy;
     invalidator: Invalidator;
     graph: BaseGraph;
+    onError: ErrorHandler;
     idle?: Idle;
 }
 
@@ -52,6 +56,17 @@ export function runtime(config: RuntimeConfig = {}, global: typeof globalThis = 
         .set('reactiveRoot', () => config.scriptId ? global.document.getElementById(config.scriptId)?.parentElement! : global.document.documentElement!)
         .set('backpressure', () => Backpressure.fastest)
         .set('invalidator', () => new Invalidator())
-        .set('graph', ({throttle, backpressure, invalidator}: { throttle: ThrottleStrategy, backpressure: BackpressureStrategy, invalidator: Invalidator }) =>
-            new BaseGraph(backpressure, throttle, invalidator, chain({invalidator}, global))), global) as RuntimeExports & typeof globalThis;
+        .set('onError', ({reactiveRoot}: { reactiveRoot: HTMLElement }) => showError(reactiveRoot, global))
+        .set('graph', ({throttle, backpressure, invalidator, onError}: { throttle: ThrottleStrategy, backpressure: BackpressureStrategy, invalidator: Invalidator, onError: ErrorHandler }) =>
+            new BaseGraph(backpressure, throttle, invalidator, chain({invalidator}, global), onError)), global) as RuntimeExports & typeof globalThis;
+}
+
+/** Logs a failed block, dispatches a bubbling `dataflow-error` event ({key, error}) from the root, and shows the error in the block's slot until its next good run */
+function showError(reactiveRoot: HTMLElement, global: typeof globalThis): ErrorHandler {
+    return (key, error) => {
+        reportError(key, error);
+        reactiveRoot.dispatchEvent(new global.CustomEvent('dataflow-error', {bubbles: true, detail: {key, error}}));
+        // After the failed run's own display flush, which is also a microtask
+        queueMicrotask(() => findSlot(reactiveRoot, key)?.replaceChildren(global.document.createTextNode(String(error))));
+    };
 }

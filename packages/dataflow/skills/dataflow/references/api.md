@@ -299,10 +299,13 @@ const socket = Object.assign(new WebSocket(url), { [Symbol.dispose]() { this.clo
 
 ## 6. Errors
 
-There is no error channel. A synchronous throw or rejected promise in a block causes an unhandled
-rejection in the console and **that node and everything downstream stop updating**. Generator
-errors after a yield may be swallowed. Transform-time parse errors are rendered as text in the
-block's slot. So: `try/catch` inside blocks, `.catch()` on fetches, and render an error value:
+A synchronous throw, a rejected promise or a generator that throws in a block skips that run: it is
+logged with `console.error`, dispatched from the island's root as a bubbling `dataflow-error`
+`CustomEvent` (`detail: {key, error}`), and shown as text (`String(error)`) in the block's slot if it
+has one. Values a generator yielded before throwing stay. Dependents keep the last good value, and
+the block runs again on its next input, replacing the error. Transform-time parse errors are also
+rendered as text in the slot. A raw error message is a developer aid, not UI: `try/catch` inside
+blocks, `.catch()` on fetches, and render an error value:
 ```js
 const user = fetch(`/api/users/${id}`).then(r => r.ok ? r.json() : Promise.reject(new Error(r.statusText)))
     .catch(error => ({error: error.message}));
