@@ -12,7 +12,7 @@ export class Throttle {
     }
 
     static clamped(global: any = globalThis): ThrottleStrategy {
-        return this.fixedThrottle(global, 0);
+        return this.fixedThrottle(0, global);
     }
 
     static fixedThrottle(ms: number, global: any = globalThis): ThrottleStrategy {
