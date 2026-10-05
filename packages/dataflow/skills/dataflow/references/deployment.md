@@ -284,7 +284,7 @@ renderAndExecute(htmlParser: (html: string) => Window & typeof globalThis, html:
 - Transforms with `HTMLTransformer({rewriter: new HTMLRewriter(), idle: true})` (needs Bun's global
   `HTMLRewriter`), parses with your parser (linkedom), runs the **first** runtime script only (no
   multi-island pages), resolving globals from the parsed window first, then real globals.
-- After every interaction: `await idle.fired()` (resolves ~2 ms after the last throttle tick).
+- After every interaction: `await idle.fired()` (resolves ~2 ms after the last pending throttle tick has resolved, so a slow frame keeps the page busy).
   `fired()` only resolves after further graph activity — calling it when nothing is pending (e.g.
   after work driven by your own timers already finished) hangs until the test times out. For
   timer/fetch-driven updates, wait for the time instead.

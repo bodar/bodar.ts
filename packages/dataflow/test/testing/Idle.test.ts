@@ -12,4 +12,19 @@ describe("Idle", () => {
         const end = Date.now();
         expect(end - start).toBeGreaterThanOrEqual(idleMs)
     });
+
+    test("is not idle while a requested tick is still pending, however long it takes", async () => {
+        const frames: Function[] = [];
+        const frame = () => new Promise(resolve => frames.push(resolve));
+        const idle = new Idle(frame, 2);
+        let fired = false;
+        idle.fired().then(() => fired = true);
+        const tick = idle.strategy();
+        await new Promise(resolve => setTimeout(resolve, 20));
+        expect(fired).toBe(false);
+        frames.shift()!();
+        await tick;
+        await new Promise(resolve => setTimeout(resolve, 20));
+        expect(fired).toBe(true);
+    });
 });

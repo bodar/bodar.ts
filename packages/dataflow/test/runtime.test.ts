@@ -21,8 +21,10 @@ describe("runtime", async () => {
         });
         void runtime({}, global).throttle();
         expect(frames.length).toBe(1);
-        void runtime({idle: true}, global).throttle();
+        const tick = runtime({idle: true}, global).throttle();
         expect(frames.length).toBe(2);
+        frames[1]();
+        await tick;
         expect(timers.length).toBe(1);
     });
 });
