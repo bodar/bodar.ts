@@ -10,6 +10,7 @@ export class AsyncIteratorRacer<K, V> {
     private pending = new Map<K, Promise<void>>();
     private resolved = new Map<K, IteratorResult<V>>();
     private signal: PromiseWithResolvers<void> = Promise.withResolvers();
+    private interrupted = false;
 
     constructor(entries?: Iterable<[K, AsyncIterator<V>]>) {
         this.iterators = new Map<K, AsyncIterator<V>>(entries)
@@ -53,6 +54,7 @@ export class AsyncIteratorRacer<K, V> {
     }
 
     take(): Map<K, IteratorResult<V>> {
+        if (this.interrupted) return new Map();
         const result = this.resolved;
         this.resolved = new Map();
         return result;
@@ -66,7 +68,13 @@ export class AsyncIteratorRacer<K, V> {
     }
 
     get continue(): boolean {
-        return this.iterators.size > 0;
+        return !this.interrupted && this.iterators.size > 0;
+    }
+
+    /** Wakes a pending wait() with nothing, and stops the race: lets a generator awaiting it be returned */
+    interrupt(): void {
+        this.interrupted = true;
+        this.signal.resolve();
     }
 
     async [Symbol.asyncDispose](): Promise<void> {
@@ -83,4 +91,19 @@ export class AsyncIteratorRacer<K, V> {
             await this[Symbol.asyncDispose]();
         }
     }
+}
+
+
+/**
+ * A generator paused at an await can't take return() until that await settles, so a consumer's
+ * `break` would hang while the race waits for a source. Interrupting the race first wakes it (as observe does).
+ */
+export function interruptible<T, G extends AsyncGenerator<T>>(generator: G, racer: AsyncIteratorRacer<any, any>): G {
+    const original = generator.return.bind(generator);
+    return Object.assign(generator, {
+        return(value?: any) {
+            racer.interrupt();
+            return original(value);
+        }
+    });
 }

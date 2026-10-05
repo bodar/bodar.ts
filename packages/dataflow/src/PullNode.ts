@@ -7,7 +7,7 @@ import {type BackpressureStrategy, SharedAsyncIterable} from "./SharedAsyncItera
 import type {ThrottleStrategy} from "./Throttle.ts";
 import {type Node} from "./Node.ts";
 import {toAsyncIterable} from "./toAsyncIterable.ts";
-import {AsyncIteratorRacer} from "./AsyncIteratorRacer.ts";
+import {AsyncIteratorRacer, interruptible} from "./AsyncIteratorRacer.ts";
 import {Invalidator} from "./Invalidator.ts";
 import type {Stamp, Stamped} from "./Stamp.ts";
 
@@ -74,12 +74,21 @@ export class PullNode<T> implements Node<T> {
                 if (run === this.runs) this.onError(this.key, error);
                 return {done: true, value: undefined};
             }),
-            return: async (value?: any) => await iterator.return?.(value) ?? {done: true, value}
+            // Not awaited: a block's own generator stuck in an await can't take return() until it settles
+            return: async (value?: any) => {
+                Promise.resolve(iterator.return?.(value)).catch(error => this.onError(this.key, error));
+                return {done: true, value};
+            }
         };
     }
 
-    async* create(): AsyncGenerator<Stamped<T>> {
-        await using racer = new AsyncIteratorRacer<string, any>([['inputs', combineStamped(this.dependencies.map(d => d.stamped()))[Symbol.asyncIterator]()]]);
+    create(): AsyncGenerator<Stamped<T>> {
+        const racer = new AsyncIteratorRacer<string, any>([['inputs', combineStamped(this.dependencies.map(d => d.stamped()))[Symbol.asyncIterator]()]]);
+        return interruptible(this.values(racer), racer);
+    }
+
+    private async* values(race: AsyncIteratorRacer<string, any>): AsyncGenerator<Stamped<T>> {
+        await using racer = race;
         let stamp: Stamp | undefined;
 
         for await (const resolved of racer) {

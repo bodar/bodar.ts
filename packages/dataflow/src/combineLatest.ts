@@ -1,4 +1,4 @@
-import {AsyncIteratorRacer} from "./AsyncIteratorRacer.ts";
+import {AsyncIteratorRacer, interruptible} from "./AsyncIteratorRacer.ts";
 import {empty, lagging, merge, type Stamped} from "./Stamp.ts";
 
 /**
@@ -27,10 +27,14 @@ export async function* combineLatest(iterables: AsyncIterable<any>[]): AsyncIter
  * no input is behind another on an upstream node they share (diamond shaped graphs).
  * While inconsistent it only pulls the inputs that are behind, so the ones ahead wait.
  */
-export async function* combineStamped(iterables: AsyncIterable<Stamped<any>>[]): AsyncIterableIterator<Stamped<any[]>> {
-    const indexes = iterables.map((_, index) => index);
-    await using racer = new AsyncIteratorRacer<number, Stamped<any>>(iterables.map((it, index) => [index, it[Symbol.asyncIterator]()]));
-    const latest: (Stamped<any> | undefined)[] = iterables.map(() => undefined);
+export function combineStamped(iterables: AsyncIterable<Stamped<any>>[]): AsyncIterableIterator<Stamped<any[]>> {
+    const racer = new AsyncIteratorRacer<number, Stamped<any>>(iterables.map((it, index) => [index, it[Symbol.asyncIterator]()]));
+    return interruptible(stamped(iterables.map((_, index) => index), racer), racer);
+}
+
+async function* stamped(indexes: number[], race: AsyncIteratorRacer<number, Stamped<any>>): AsyncGenerator<Stamped<any[]>> {
+    await using racer = race;
+    const latest: (Stamped<any> | undefined)[] = indexes.map(() => undefined);
     let changed = true;
 
     while (true) {

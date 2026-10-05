@@ -81,6 +81,41 @@ describe("graph", () => {
         assertThat(await toPromiseArray(node), equals([1, 2, 3]));
     });
 
+    test("a node fed by a mutable can be iterated and broken out of", async () => {
+        const graph = new BaseGraph(Backpressure.fastest, Throttle.microTasks(), new Invalidator());
+        const count = mutable(0);
+        graph.set('count', [], () => count);
+        const doubled = graph.set('doubled', ['count'], (count: number) => count * 2);
+        const seen: number[] = [];
+        setTimeout(() => count.value = 1, 5);
+        for await (const value of doubled) {
+            seen.push(value);
+            if (value === 2) break;
+        }
+        assertThat(seen, equals([0, 2]));
+    }, 1000);
+
+    test("breaking out of a node cleans up its sources straight away", async () => {
+        const graph = new BaseGraph(Backpressure.fastest, Throttle.microTasks(), new Invalidator());
+        let disposed = false;
+        graph.set('source', [], () => observe<number>(() => () => disposed = true, 1));
+        const doubled = graph.set('doubled', ['source'], (source: number) => source * 2);
+        for await (const value of doubled) if (value === 2) break;
+        assertThat(disposed, is(true));
+    }, 1000);
+
+    test("breaking out still completes past a block whose own generator is stuck in an await", async () => {
+        const graph = new BaseGraph(Backpressure.fastest, Throttle.microTasks(), new Invalidator());
+        const trigger = mutable(1);
+        graph.set('trigger', [], () => trigger);
+        const stuck = graph.set('stuck', ['trigger'], async function* (trigger: number) {
+            yield trigger;
+            await new Promise(() => {});
+        });
+        for await (const value of stuck) if (value === 1) break;
+        assertThat(true, is(true));
+    }, 1000);
+
     test("an event stream of identical values (clicks) runs its dependent for every event", async () => {
         const graph = new BaseGraph(Backpressure.fastest, Throttle.microTasks(), new Invalidator());
         const button = new EventTarget();
