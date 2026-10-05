@@ -1,7 +1,7 @@
 # JSX in dataflow (@bodar/jsx2dom)
 
 Source: `packages/jsx2dom/src/JSX2DOM.ts`, `PositionalJSX.ts`,
-`boolean-attributes.ts`, `svg-elements.ts`, `types.ts`; dataflow's compiler `packages/dataflow/src/jsx-transform/transformer.ts`;
+`boolean-attributes.ts`, `svg-elements.ts`, `types.d.ts`; dataflow's compiler `packages/dataflow/src/jsx-transform/transformer.ts`;
 `src/html/SlotRenderer.ts`.
 
 ## Contents
