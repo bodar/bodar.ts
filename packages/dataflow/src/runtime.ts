@@ -47,10 +47,10 @@ export type RuntimeConfig = Partial<{
 export function runtime(config: RuntimeConfig = {}, global: typeof globalThis = globalThis): RuntimeExports & typeof globalThis {
     const base = config.idle ?
         LazyMap.create()
-            .set('idle', () => new Idle(Throttle.auto()))
+            .set('idle', () => new Idle(Throttle.auto(global), 2, global))
             .set('throttle', ({idle}) => idle.strategy) :
         LazyMap.create()
-            .set('throttle', () => Throttle.auto())
+            .set('throttle', () => Throttle.auto(global))
 
     return chain(base
         .set('reactiveRoot', () => config.scriptId ? global.document.getElementById(config.scriptId)?.parentElement! : global.document.documentElement!)

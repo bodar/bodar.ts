@@ -11,4 +11,18 @@ describe("runtime", async () => {
         const r = runtime({idle: true});
         expect(typeof r.idle).toBe("object");
     });
+
+    test("throttles and times idleness on the global it is given, not globalThis", async () => {
+        const frames: Function[] = [], timers: Function[] = [];
+        const global = Object.assign(Object.create(globalThis), {
+            requestAnimationFrame: (f: Function) => frames.push(f),
+            setTimeout: (f: Function) => timers.push(f),
+            clearTimeout: () => {}
+        });
+        void runtime({}, global).throttle();
+        expect(frames.length).toBe(1);
+        void runtime({idle: true}, global).throttle();
+        expect(frames.length).toBe(2);
+        expect(timers.length).toBe(1);
+    });
 });
