@@ -340,6 +340,9 @@ for await (const value of reactive) console.log(value);
 - `BaseGraph.define(key, inputs, outputs, fun)` takes explicit arrays and binds dependencies **at
   definition time** — define producers before consumers (order-independence is the transformer's
   job, not the graph's). `graph.run()` pulls all sinks.
+- Backpressure: the runtime uses `Backpressure.fastest`. `Backpressure.slowest` (lock-step) is for
+  deterministic tests only: under it, a node that yields nothing for an input (a filtering generator,
+  a failed run) stalls any join that also reads that input directly.
 
 ## 8. Gotchas (beyond those in SKILL.md)
 1. No initial value ⇒ dependents wait (`events`/`observe` without initial, `width`, file inputs).

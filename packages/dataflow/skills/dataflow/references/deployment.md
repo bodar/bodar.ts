@@ -74,15 +74,22 @@ Install (published on JSR): `bunx jsr add @bodar/dataflow` · `npx jsr add @boda
    import {BunBundler} from "@bodar/dataflow/bundling/BunBundler.ts";
    const transformer = () => new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: new BunBundler()});
    ```
-   ~14 KB minified (~5 KB gzipped) **per scope** (each island gets a copy). Uses `Bun.build`, writes temp files
-   into the installed package dir, needs deps installed; fails the transform if an import can't be
+   ~14 KB minified (~5 KB gzipped) **per scope** (each island gets a copy). Uses `Bun.build` in memory;
+   a block's imports resolve as if it sat in the working directory (`new BunBundler(minify, dir)` to
+   choose another), so deps must be installed there; fails the transform if an import can't be
    resolved. Not usable on Cloudflare/Deno/Node. Any object `{transform(js: string): Promise<string>}`
    can be passed as `bundler`.
 3. **Bring your own** — pass neither; your page/template already has an import map mapping
    `@bodar/dataflow/runtime.ts` (common with server-side templates/HTMX).
 
+**Browser support.** The runtime needs `Promise.withResolvers` (Safari/WKWebView 17.4+) and
+`Symbol.asyncDispose`/`Symbol.dispose` (it uses `await using`; bundlers lower it to a helper that
+throws "Object not disposable" without the symbols). Older Safari, WKWebView and WebKitGTK (e.g.
+Tauri on Linux) lack them: polyfill in a classic script before the runtime loads, or nothing renders:
+`<script>Symbol.asyncDispose ??= Symbol.for('Symbol.asyncDispose'); Symbol.dispose ??= Symbol.for('Symbol.dispose');</script>`
+
 `HTMLTransformer` options: `{rewriter (required), bundler?, importMap?, selectors?, idGenerator?,
-idle?, typeTransformers?}`. `transform(string): string`, `transform(Response|Blob|BufferSource): Response`.
+idle?, typeTransformers?}`. `transform(string): Promise<string>`, `transform(Response|Blob|BufferSource): Response`.
 Handlers bind to the rewriter in the constructor → **one transformer + one `new HTMLRewriter()` per
 document**.
 
@@ -284,8 +291,19 @@ renderAndExecute(htmlParser: (html: string) => Window & typeof globalThis, html:
 - Globals resolve via `chain(linkedomWindow, global)`: names the linkedom window defines — even as
   `undefined` — shadow real globals. Verified: `console` is `undefined` inside blocks under
   `renderAndExecute`, while `fetch`/`setTimeout` fall through. Pass needed globals in the third
-  argument, or stub them on the parsed window in your wrapper parser (`w.console = console`).
-  To stub `fetch`/`localStorage`, assign on `globalThis` or pass them via the third argument.
+  argument, or as linkedom's overlay: `parseHTML(source, {console, requestAnimationFrame})`.
+- **Writing to the parsed window writes to `globalThis`.** linkedom's window is a `Proxy` over the
+  real `globalThis` (only `add/removeEventListener`/`dispatchEvent` stay per window), so
+  `w.requestAnimationFrame = …` in a wrapper parser changes it for every later test in the process.
+  Stub through the overlay above instead: it is read first and never touches `globalThis`.
+- Parse a full document (`<html><body>…</body></html>`): without the wrapper linkedom makes the
+  first element the `documentElement`, and `document.body` isn't the parsed content.
+- linkedom ignores `addEventListener`'s `{signal}` option, so the abort-signal cleanup idiom doesn't
+  remove listeners in tests. Where a test depends on it, also remove explicitly:
+  `signal.addEventListener('abort', () => el.removeEventListener(type, handler))`.
+- Bun takes JSX settings from the `tsconfig.json` in the **working directory**, not the one nearest
+  the file: run `bun test` from the directory whose tsconfig sets `jsxFactory: "jsx.createElement"`,
+  or a lib `.tsx` compiles to `react/jsx-dev-runtime` calls.
 - linkedom gaps (patch in a wrapper parser as above):
   - No `HTMLInputElement.valueAsNumber`/`valueAsDate`: `view(<input type="number"|"range"|"date">)`
     yields `undefined` (dependents see `undefined`, not a number). Handlers doing
