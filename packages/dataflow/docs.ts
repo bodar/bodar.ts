@@ -12,7 +12,7 @@ for await (const path of new Glob("**/*").scan({cwd: docsDir, onlyFiles: true}))
     const src = file(join(docsDir, path));
     if (path.endsWith(".html")) {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: new BunBundler()});
-        const output = transformer.transform(await src.text());
+        const output = await transformer.transform(new Response(src)).text();
         await write(join(outDir, path), output);
         console.log(`Generated ${path}`);
     } else {
