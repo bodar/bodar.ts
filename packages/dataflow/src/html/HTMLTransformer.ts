@@ -57,10 +57,14 @@ export class HTMLTransformer {
         return this.controller.idle;
     }
 
-    transform(input: Response | Blob | Bun.BufferSource): Response;
-    transform(input: string): string;
-    transform(input: ArrayBuffer): ArrayBuffer;
-    transform(input: any): any {
-        return this.deps.rewriter.transform(input)
+    /**
+     * Always rewrites via a Response: HTMLRewriter's synchronous string/ArrayBuffer path throws
+     * if a handler (e.g. an async bundler) hasn't resolved within a microtask.
+     */
+    transform(input: string): Promise<string>;
+    transform(input: Response | BodyInit): Response;
+    transform(input: Response | BodyInit): Response | Promise<string> {
+        if (typeof input === 'string') return this.deps.rewriter.transform(new Response(input)).text();
+        return this.deps.rewriter.transform(input instanceof Response ? input : new Response(input));
     }
 }

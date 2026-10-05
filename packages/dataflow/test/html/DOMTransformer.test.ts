@@ -224,7 +224,7 @@ describe("DOMTransformer vs HTMLTransformer contract", () => {
         test(`produces identical output for: ${html.slice(0, 60)}...`, async () => {
             // Use SimpleHashGenerator to avoid ID ordering differences between streaming and batch processing
             const htmlTransformer = new HTMLTransformer({rewriter: new HTMLRewriter(), idGenerator: SimpleHashGenerator});
-            const htmlResult = htmlTransformer.transform(html);
+            const htmlResult = await htmlTransformer.transform(html);
 
             const {document} = parseHTML(html);
             const domTransformer = new DOMTransformer({idGenerator: SimpleHashGenerator});

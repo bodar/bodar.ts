@@ -15,7 +15,7 @@ export async function renderAndExecute(htmlParser: (html: string) => (Window & t
     graph: BaseGraph
 }> {
     const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), idle: true});
-    const reactive = transformer.transform(html);
+    const reactive = await transformer.transform(html);
     const browser = htmlParser(reactive);
     const g = chain(browser, global)
 

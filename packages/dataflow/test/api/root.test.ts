@@ -14,9 +14,9 @@ describe("root", () => {
 
     test("is only defined when a block uses it", async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
-        expect(transformer.transform('<body><script is="reactive">root.id</script></body>'))
+        expect(await transformer.transform('<body><script is="reactive">root.id</script></body>'))
             .toContain('_runtime_.graph.define("root",[],[],() => _runtime_.reactiveRoot);');
-        expect(transformer.transform('<body><script is="reactive">const a = 1;</script></body>'))
+        expect(await transformer.transform('<body><script is="reactive">const a = 1;</script></body>'))
             .not.toContain('"root"');
     });
 });

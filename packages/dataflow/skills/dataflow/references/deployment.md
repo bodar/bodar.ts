@@ -26,7 +26,7 @@ are hash + counter). So it can run anywhere, and the output is cacheable:
 | Where | How |
 |---|---|
 | **Request time, as an HTTP intercept** (author's preferred) | `ReactiveHandler(factory, upstream)` in front of static files or a server-rendered origin, at the edge (Cloudflare) or in any fetch-style server. No build step; cache the output. |
-| Build time (static site) | `new HTMLTransformer(...).transform(htmlString)` per file, write the result. |
+| Build time (static site) | `await new HTMLTransformer(...).transform(htmlString)` per file, write the result. |
 | Browser service worker | `ReactiveHandler` + `htmlrewriter` npm (WASM). |
 | Browser, in-page | `DOMTransformer` over a `Document` (ships acorn; dev/prototyping). |
 | Tests | `renderAndExecute(parseHTML, html)` under Bun. |
@@ -178,7 +178,7 @@ for await (const path of new Glob("**/*").scan({cwd: srcDir, onlyFiles: true})) 
     const src = file(`${srcDir}/${path}`);
     if (path.endsWith(".html")) {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: new BunBundler()});
-        await write(`${outDir}/${path}`, transformer.transform(await src.text()));
+        await write(`${outDir}/${path}`, await transformer.transform(await src.text()));
     } else await write(`${outDir}/${path}`, src);
 }
 ```
@@ -297,7 +297,7 @@ renderAndExecute(htmlParser: (html: string) => Window & typeof globalThis, html:
     `form.elements`. Prefer `form.querySelector('[name=x]').value` in handlers.
   - Browser-only APIs (ResizeObserver → `width`, WASM, audio) aren't testable this way.
 - `linkedom` must be a dev dependency of your project (ask before adding).
-- Pure transform assertions: `new HTMLTransformer({rewriter: new HTMLRewriter()}).transform('<body>…</body>')`
+- Pure transform assertions: `await new HTMLTransformer({rewriter: new HTMLRewriter()}).transform('<body>…</body>')`
   and compare strings, as `packages/dataflow/test/html/HTMLTransformer.test.ts` does.
 - The repo's example tests use the docs pages themselves as fixtures
   (`test/examples/{todo,comments}.test.ts`).

@@ -9,7 +9,7 @@ const jsxImports = new Set(['runtime', 'PositionalJSX']);
 describe("HTMLTransformer", () => {
     test("constants are not rendered, so no placeholder slot", async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
-        const result = transformer.transform('<body><script data-reactive>const a = 1;</script></body>');
+        const result = await transformer.transform('<body><script data-reactive>const a = 1;</script></body>');
         expect(result).toBe(`<body><script type="module" is="reactive-runtime" id="dmyfzn_1">${scriptTemplate({scriptId: 'dmyfzn_1', idle: false}, emptyImports, `_runtime_.graph.define("vge10p_0",[],["a"],() => {
 const a = 1;
 return {a};
@@ -18,7 +18,7 @@ return {a};
 
     test("can transform multiple reactive scripts", async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
-        const result = transformer.transform('<body><script data-reactive>const a = 1;</script><script data-reactive>const b = a + 1;</script></body>');
+        const result = await transformer.transform('<body><script data-reactive>const a = 1;</script><script data-reactive>const b = a + 1;</script></body>');
         expect(result).toBe(`<body><script type="module" is="reactive-runtime" id="v88umo_2">${scriptTemplate({scriptId: 'v88umo_2', idle: false}, emptyImports, `_runtime_.graph.define("vge10p_0",[],["a"],() => {
 const a = 1;
 return {a};
@@ -31,7 +31,7 @@ return {b};
 
     test("single expressions will create a placeholder display slot", async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
-        const result = transformer.transform('<body><script data-reactive>const a = 1;</script><script data-reactive>`Some text ${a}`</script></body>');
+        const result = await transformer.transform('<body><script data-reactive>const a = 1;</script><script data-reactive>`Some text ${a}`</script></body>');
         expect(result).toBe(`<body><slot name="4vhz4q_1"></slot><script type="module" is="reactive-runtime" id="izknfa_2">${scriptTemplate({scriptId: 'izknfa_2', idle: false}, displayImports, `_runtime_.graph.define("vge10p_0",[],["a"],() => {
 const a = 1;
 return {a};
@@ -44,7 +44,7 @@ return display(\`Some text \${a}\`)
 
     test("can provide an id/key via HTML id attribute", async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
-        const result = transformer.transform('<body><script data-reactive id="constant">1</script></body>');
+        const result = await transformer.transform('<body><script data-reactive id="constant">1</script></body>');
         expect(result).toBe(`<body><slot name="constant"></slot><script type="module" is="reactive-runtime" id="z6unte_0">${scriptTemplate({scriptId: 'z6unte_0', idle: false}, displayImports, `_runtime_.graph.define("constant",[],[],() => {
 const display = Display.for("constant", _runtime_);
 return display(1)
@@ -53,7 +53,7 @@ return display(1)
 
     test("if the javascript is invalid, report the error in the slot", async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
-        const result = transformer.transform('<body><script data-reactive>=</script></body>');
+        const result = await transformer.transform('<body><script data-reactive>=</script></body>');
         expect(result).toBe(`<body><slot name="00001p_0"></slot><script type="module" is="reactive-runtime" id="t4zik1_1">${scriptTemplate({scriptId: 't4zik1_1', idle: false}, displayImports, `_runtime_.graph.define("00001p_0",[],[],() => {
 const display = Display.for("00001p_0", _runtime_);
 return display("Unexpected token (1:0)")
@@ -62,7 +62,7 @@ return display("Unexpected token (1:0)")
 
     test("can use an import inside a cell", async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
-        const result = transformer.transform(`<body><script type="module" data-reactive>
+        const result = await transformer.transform(`<body><script type="module" data-reactive>
 import {iterator} from "@bodar/dataflow/observe.ts";
 const input = <input name="name" type="text" />;
 const name = iterator(notify => input.addEventListener('input', ev => {notify(ev.data)}), input.value);
@@ -78,7 +78,7 @@ return {input,name,iterator};
 
     test("data-echo inserts escaped code block after output", async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
-        const result = transformer.transform('<body><script type="module" data-reactive data-echo>1 + 2</script></body>');
+        const result = await transformer.transform('<body><script type="module" data-reactive data-echo>1 + 2</script></body>');
 
         expect(result).toBe(`<body><pre><code class="language-javascript">1 + 2</code></pre><slot name="0rj9ce_0"></slot><script type="module" is="reactive-runtime" id="8mkckx_1">${scriptTemplate({scriptId: '8mkckx_1', idle: false}, displayImports, `_runtime_.graph.define("0rj9ce_0",[],[],() => {
 const display = Display.for("0rj9ce_0", _runtime_);
@@ -88,14 +88,14 @@ return display(1 + 2)
 
     test("data-echo is not included when not present", async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
-        const result = transformer.transform('<body><script data-reactive>1 + 2</script></body>');
+        const result = await transformer.transform('<body><script data-reactive>1 + 2</script></body>');
 
         expect(result).not.toContain('<pre><code');
     });
 
     test('can use is="reactive" attribute instead of data-reactive', async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
-        const result = transformer.transform('<body><script is="reactive">const a = 1;</script></body>');
+        const result = await transformer.transform('<body><script is="reactive">const a = 1;</script></body>');
         expect(result).toBe(`<body><script type="module" is="reactive-runtime" id="dmyfzn_1">${scriptTemplate({scriptId: 'dmyfzn_1', idle: false}, emptyImports, `_runtime_.graph.define("vge10p_0",[],["a"],() => {
 const a = 1;
 return {a};
@@ -104,7 +104,7 @@ return {a};
 
     test('can use is="reactive-island" determine where graph code is placed', async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
-        const result = transformer.transform('<body><div is="reactive-island"><script is="reactive">const a = 1;</script></div></body>');
+        const result = await transformer.transform('<body><div is="reactive-island"><script is="reactive">const a = 1;</script></div></body>');
         expect(result).toBe(`<body><div is="reactive-island"><script type="module" is="reactive-runtime" id="dmyfzn_1">${scriptTemplate({scriptId: 'dmyfzn_1', idle: false}, emptyImports, `_runtime_.graph.define("vge10p_0",[],["a"],() => {
 const a = 1;
 return {a};
@@ -113,7 +113,7 @@ return {a};
 
     test('supports multiple isolated reactive islands on the same page', async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
-        const result = transformer.transform('<body><div id="one" is="reactive-island"><script is="reactive">const a = 1;</script></div><div id="two" is="reactive-island"><script is="reactive">const a = 1;</script></div></body>');
+        const result = await transformer.transform('<body><div id="one" is="reactive-island"><script is="reactive">const a = 1;</script></div><div id="two" is="reactive-island"><script is="reactive">const a = 1;</script></div></body>');
         expect(result).toBe(`<body><div id="one" is="reactive-island"><script type="module" is="reactive-runtime" id="dmyfzn_1">${scriptTemplate({scriptId: 'dmyfzn_1', idle: false}, emptyImports, `_runtime_.graph.define("vge10p_0",[],["a"],() => {
 const a = 1;
 return {a};
@@ -126,7 +126,7 @@ return {a};
 
     test('can use custom selector to determine where graph code is placed', async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), selectors: {end: '#my-component'}});
-        const result = transformer.transform('<body><div id="my-component"><script is="reactive">const a = 1;</script></div></body>');
+        const result = await transformer.transform('<body><div id="my-component"><script is="reactive">const a = 1;</script></div></body>');
         expect(result).toBe(`<body><div id="my-component"><script type="module" is="reactive-runtime" id="dmyfzn_1">${scriptTemplate({scriptId: 'dmyfzn_1', idle: false}, emptyImports, `_runtime_.graph.define("vge10p_0",[],["a"],() => {
 const a = 1;
 return {a};
@@ -135,7 +135,7 @@ return {a};
 
     test('supports nested reactive islands with isolated scopes', async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
-        const result = transformer.transform('<body><script is="reactive">const a = 1;</script><div is="reactive-island"><script is="reactive">const b = 2;</script></div></body>');
+        const result = await transformer.transform('<body><script is="reactive">const a = 1;</script><div is="reactive-island"><script is="reactive">const b = 2;</script></div></body>');
         // Inner island should have only 'b', outer body should have only 'a'
         expect(result).toBe(`<body><div is="reactive-island"><script type="module" is="reactive-runtime" id="s6yqeh_2">${scriptTemplate({scriptId: 's6yqeh_2', idle: false}, emptyImports, `_runtime_.graph.define("vxfnfr_1",[],["b"],() => {
 const b = 2;
@@ -153,7 +153,7 @@ return {a};
                 'sql': (content, _attributes, key) => `const ${key}_result = executeSql(\`${content}\`);`
             }
         });
-        const result = transformer.transform('<body><script type="sql" is="reactive" id="query">SELECT * FROM users</script></body>');
+        const result = await transformer.transform('<body><script type="sql" is="reactive" id="query">SELECT * FROM users</script></body>');
         // Transformer converts SQL to JS, which then gets parsed for inputs/outputs
         expect(result).toContain('_runtime_.graph.define("query",["executeSql"],["query_result"]');
         expect(result).toContain('const query_result = executeSql(`SELECT * FROM users`);');
@@ -175,7 +175,7 @@ return {a};
                 }
             }
         });
-        transformer.transform('<body><script type="custom" is="reactive" id="mykey" data-foo="bar">some content</script></body>');
+        await transformer.transform('<body><script type="custom" is="reactive" id="mykey" data-foo="bar">some content</script></body>');
 
         expect(receivedContent).toBe('some content');
         expect(receivedKey).toBe('mykey');
@@ -185,10 +185,27 @@ return {a};
 
     test('unregistered types pass through as JavaScript', async () => {
         const transformer = new HTMLTransformer({rewriter: new HTMLRewriter()});
-        const result = transformer.transform('<body><script type="unknown" is="reactive">const a = 1;</script></body>');
+        const result = await transformer.transform('<body><script type="unknown" is="reactive">const a = 1;</script></body>');
         expect(result).toBe(`<body><script type="module" is="reactive-runtime" id="dmyfzn_1">${scriptTemplate({scriptId: 'dmyfzn_1', idle: false}, emptyImports, `_runtime_.graph.define("vge10p_0",[],["a"],() => {
 const a = 1;
 return {a};
 });`)}</script></body>`);
+    });
+
+    describe('with a bundler that resolves after a macrotask', () => {
+        const slowBundler = {
+            transform: (javascript: string) => new Promise<string>(resolve => setTimeout(() => resolve(`/*bundled*/${javascript}`), 1))
+        };
+        const html = '<body><script is="reactive">const a = 1;</script></body>';
+
+        test('a string resolves to the transformed string', async () => {
+            const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: slowBundler});
+            expect(await transformer.transform(html)).toContain('/*bundled*/');
+        });
+
+        test('an ArrayBuffer returns a Response', async () => {
+            const transformer = new HTMLTransformer({rewriter: new HTMLRewriter(), bundler: slowBundler});
+            expect(await transformer.transform(new TextEncoder().encode(html).buffer).text()).toContain('/*bundled*/');
+        });
     });
 });
