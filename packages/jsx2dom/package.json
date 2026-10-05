@@ -12,6 +12,7 @@
     "linkedom": "^0.18.12"
   },
   "exports": {
-    "./JSX2DOM.ts": "./src/JSX2DOM.ts"
+    "./JSX2DOM.ts": "./src/JSX2DOM.ts",
+    "./PositionalJSX.ts": "./src/PositionalJSX.ts"
   }
 }

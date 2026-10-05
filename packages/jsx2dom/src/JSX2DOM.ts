@@ -23,15 +23,9 @@ export interface JSX2DOMDependencies {
     onEventListener?: (element: SupportedElement, eventName: string, listener: EventListener) => void,
 }
 
-/** Creates an onEventListener that adds unique data-key attributes for isEqualNode compatibility */
-export function autoKeyEvents(): (element: SupportedElement) => void {
-    let keyCounter = 0;
-    return (element) => element.setAttribute('data-key', String(keyCounter++));
-}
-
 /** JSX2DOM class, works with native DOM or linkedom */
 export class JSX2DOM {
-    constructor(private deps: JSX2DOMDependencies = globalThis) {
+    constructor(protected deps: JSX2DOMDependencies = globalThis) {
     }
 
     createElement(name: null, attributes: null, ...contents: Content[]): DocumentFragment;
@@ -50,7 +44,7 @@ export class JSX2DOM {
         }
     }
 
-    private addAttributes(element: SupportedElement, attributes: Attributes) {
+    protected addAttributes(element: SupportedElement, attributes: Attributes) {
         for (const [key, value] of Object.entries(attributes)) {
             if (value === undefined || value === null) continue;
 
