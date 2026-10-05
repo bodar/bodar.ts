@@ -14,9 +14,14 @@ side or in unit tests using [linkedom](https://github.com/WebReflection/linkedom
     "jsx": "react",
     "jsxFactory": "jsx.createElement",
     "jsxFragmentFactory": "null"
-  }
+  },
+  // jsx2dom's JSX types (the global JSX namespace)
+  "include": ["src/**/*", "node_modules/@bodar/jsx2dom/src/types.d.ts"]
 }
 ```
+
+The `include` line is needed because `jsx` is an instance (`new JSX2DOM(window)`), not an imported function, so
+TypeScript can only find the `JSX` types globally, and JSR doesn't carry global types to consumers by itself.
 
 ## Usage
 
